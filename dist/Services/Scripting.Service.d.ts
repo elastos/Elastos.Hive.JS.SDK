@@ -5,6 +5,8 @@ export interface IScriptingService {
 }
 export interface ISetScriptData {
     name: string;
+    allowAnonymousUser?: boolean;
+    allowAnonymousApp?: boolean;
     executable: ISetScriptExecutable;
     condition?: ISetScriptCondition;
 }
