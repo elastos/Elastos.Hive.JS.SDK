@@ -1,5 +1,5 @@
 {
-  "name": "@elastos/elastos-hive-js-sdk",
+  "name": "@elastosfoundation/elastos-js-sdk",
   "version": "1.0.0",
   "description": "Elastos Hive JS SDK",
   "main": "dist/HiveClient.js",
@@ -31,6 +31,10 @@
     "src",
     "dist"
   ],
-  "author": "Elastos",
-  "license": "MIT"
+  "author": "Tuum Tech",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK/issues"
+  },
+  "homepage": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK#readme"
 }
