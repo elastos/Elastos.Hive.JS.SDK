@@ -1,24 +1,11 @@
-package org.elastos.hive.config;
+import { DIDDocument } from "@elastosfoundation/did-js-sdk";
 
-import org.elastos.did.DIDDocument;
-import org.elastos.did.exception.DIDException;
-import org.elastos.did.jwt.Claims;
-import org.elastos.did.jwt.JwtParserBuilder;
-import org.elastos.hive.*;
-import org.elastos.hive.did.AppDID;
-import org.elastos.hive.did.UserDID;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.service.BackupService;
-import org.elastos.hive.service.HiveBackupContext;
-
-import java.io.File;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 /**
  * This is used for representing 3rd-party application.
  */
-public class TestData {
+export class TestData {
+	/**
 	private static final String RESOLVE_CACHE = "data/didCache";
 	private static TestData instance = null;
 
@@ -222,4 +209,5 @@ public class TestData {
 		PRODUCTION,
 		LOCAL
 	}
+*/
 }

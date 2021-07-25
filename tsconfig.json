@@ -1,10 +1,10 @@
 {
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "tests", "dist"],
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2015",
+    "module": "es2015",
     "lib": ["es2017", "es7", "es6", "dom"],
-    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "dist",
     "declaration": true,
@@ -12,14 +12,18 @@
     "esModuleInterop": true,
     "emitDeclarationOnly": false,
     "experimentalDecorators": true,
+    "allowJs": true,
     "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
+    "isolatedModules": false,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "removeComments": true,
+    "resolveJsonModule": true,
     "rootDirs": ["src/"],
-    "typeRoots": ["node_modules/@types", "typings"]
+    "typeRoots": ["node_modules/@types"]
   }
 }
