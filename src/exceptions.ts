@@ -15,3 +15,40 @@ export class ParentException extends Error{
 }
 
 export class IllegalArgumentException extends ParentException  {}
+export class AlreadyExistsException extends ParentException {} 
+export class BackupIsInProcessingException extends ParentException {} 
+export class BackupNotFoundException extends ParentException {} 
+export class BadContextProviderException extends ParentException {} 
+export class DIDNotPublishedException extends ParentException {} 
+export class DIDResolverNotSetupException extends ParentException {} 
+export class DIDResolverSetupException extends ParentException {} 
+export class DIDResoverAlreadySetupException extends ParentException {} 
+export class HiveException extends ParentException {} 
+export class IllegalDidFormatException extends ParentException {} 
+export class InsufficientStorageException extends ParentException {} 
+export class NotFoundException extends ParentException {} 
+export class NotImplementedException extends ParentException {} 
+export class PathNotExistException extends ParentException {} 
+export class PricingPlanNotFoundException extends ParentException {} 
+export class ProviderNotSetException extends ParentException {} 
+export class ScriptNotFoundException extends ParentException {} 
+export class UnauthorizedException extends ParentException {} 
+export class VaultForbiddenException extends ParentException {} 
+export class VaultNotFoundException extends ParentException {} 
+
+export class ServerUnknownException extends ParentException {
+
+    constructor(message?: string) {
+        super(message ? message : "Impossible failure happened");
+    }
+    public static withHttpCode(httpCode: number, message: string) {
+        return new ServerUnknownException("Exception (http code: " + String(httpCode) + ", message: " + message);
+    }
+}
+
+export class NetworkException extends ParentException {
+    constructor(message: string) {
+        super("Unkown network exception with message: " + message);
+    }
+
+} 
