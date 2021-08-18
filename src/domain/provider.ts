@@ -1,7 +1,8 @@
+/*
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-
+*/
 /**
  * This class is used to fetch some possible information from remote hive node.
  * eg. version;
@@ -12,7 +13,8 @@ import org.elastos.hive.exception.HiveException;
  *	 How much disk storage filled there;
  *	 etc.
  */
-class Provider extends ServiceEndpoint {
+/*
+ class Provider extends ServiceEndpoint {
 	public Provider(AppContext context) throws HiveException {
 		this(context, null);
 	}
@@ -21,3 +23,4 @@ class Provider extends ServiceEndpoint {
 		super(context, providerAddress);
 	}
 }
+*/
