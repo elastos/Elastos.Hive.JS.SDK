@@ -36,6 +36,8 @@ export class UnauthorizedException extends ParentException {}
 export class VaultForbiddenException extends ParentException {} 
 export class VaultNotFoundException extends ParentException {} 
 
+export class MalformedDIDException extends IllegalArgumentException {}
+
 export class ServerUnknownException extends ParentException {
 
     constructor(message?: string) {
@@ -52,3 +54,22 @@ export class NetworkException extends ParentException {
     }
 
 } 
+
+export class NodeRPCException extends ParentException {
+    private readonly code: number;
+    private readonly internalCode: number;
+
+    constructor(code: number, internalCode: number, message: string) {
+        super(message);
+        this.code = code;
+        this.internalCode = internalCode;
+    }
+
+    public getCode(): number {
+        return this.code;
+    }
+
+    public getInternalCode(): number {
+        return this.internalCode;
+    }
+}

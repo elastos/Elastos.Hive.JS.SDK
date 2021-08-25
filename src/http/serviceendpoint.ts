@@ -1,3 +1,20 @@
+import { NodeRPCConnection } from './noderpcconnection';
+export class ServiceEndpoint extends NodeRPCConnection {
+	private context: AppContext;
+	private providerAddress: string;
+
+	private appDid: string;
+	private appInstanceDid: string;
+	private serviceInstanceDid: string;
+
+	private accessToken: AccessToken;
+	private dataStorage: DataStorage;
+
+    constructor(context: AppContext , providerAddress: string) {
+        super();
+    }
+}
+
 /*
 package org.elastos.hive;
 

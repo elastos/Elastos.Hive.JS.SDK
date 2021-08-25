@@ -19,6 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Class } from '../domain/class';
+export abstract class NodeRPCConnection {
+	private static DEFAULT_TIMEOUT = 30;
+
+	protected abstract getProviderAddress(): string;
+	protected abstract getAccessToken(): AccessToken ;
+
+	public openConnection(urlPath: string): HttpURLConnection {
+
+	}
+
+	public createService<S>(serviceClass: Class<S> , requiredAuthorization: boolean): S {
+
+	}
+}
+
 /*
 package org.elastos.hive.connection;
 

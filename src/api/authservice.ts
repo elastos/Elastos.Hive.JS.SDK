@@ -1,3 +1,40 @@
+
+import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { NodeRPCConnection } from '../http/noderpcconnection'
+
+export class AuthService {
+
+    private authAPI: AuthAPI;
+
+    constructor(connection: NodeRPCConnection, appInstanceDidDoc: DIDDocument) {
+
+    }
+
+}
+
+class AuthAPI {
+
+    private connection: NodeRPCConnection;
+
+    constructor(connection: NodeRPCConnection) {
+        this.connection = connection;
+    }
+
+    //@POST("/api/v2/did/signin")
+	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
+    public signIn(request: SignInRequest): ChallengeRequest {
+
+    }
+
+	//@POST("/api/v2/did/auth")
+	//Call<AccessCode> auth(@Body ChallengeResponse request);
+    public auth(request: ChallengeResponse): AccessCode {
+
+    }
+}
+
+/*
+
 package org.elastos.hive.connection.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,3 +126,4 @@ public class AuthController {
 		}
 	}
 }
+*/
