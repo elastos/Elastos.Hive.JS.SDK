@@ -1,29 +1,31 @@
-import { JsonProperty } from "@elastosfoundation/jackson-js";
 import { ApplicationConfig } from "./applicationconfig"
 import { UserConfig } from "./userconfig"
-import { Config } from "./config"
 
-export class CrossConfig extends Config {
-	@JsonProperty("application")
-	private applicationConfig: ApplicationConfig ;
-	@JsonProperty("user")
-	private userConfig: UserConfig ;
-	@JsonProperty("crossDid")
-	private crossDid: string ;
+export class CrossConfig {
+	private application: ApplicationConfig;
+	private user: UserConfig;
+	private crossDid: string;
 
 	public getApplicationConfig(): ApplicationConfig {
-		return this.applicationConfig;
+		return this.application;
 	}
 
 	public getUserConfig(): UserConfig {
-		return this.userConfig;
+		return this.user;
 	}
 
 	public getCrossDid(): string {
 		return this.crossDid;
 	}
 
-	public static deserialize(content: string): CrossConfig {
-		return super.parse(content, CrossConfig);
+	public static deserialize(json: string): CrossConfig {
+		let jsonObj = JSON.parse(json);
+		let newConfig = new CrossConfig();
+
+		newConfig.application = ApplicationConfig.deserialize(jsonObj['application']);
+		newConfig.user = UserConfig.deserialize(jsonObj['user']);
+		newConfig.crossDid = jsonObj['crossDid'];
+
+		return newConfig;
 	}
 }

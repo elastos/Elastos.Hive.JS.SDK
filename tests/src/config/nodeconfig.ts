@@ -1,16 +1,9 @@
-import { JsonProperty } from "@elastosfoundation/jackson-js";
-import { Config } from "./config"
-
-export class NodeConfig extends Config {
-	@JsonProperty("provider")
+export class NodeConfig {
 	private provider: string;
 	// the service instance did of backup node.
-	@JsonProperty("targetDid")
 	private targetDid: string;
 	// the host of backup node.
-	@JsonProperty("targetHost")
 	private targetHost: string
-	@JsonProperty("storePath")
 	private storePath: string;
 
 	public getProvider(): string {
@@ -29,7 +22,15 @@ export class NodeConfig extends Config {
 		return this.storePath;
 	}
 
-	public static deserialize(content: string): NodeConfig {
-		return super.parse(content, NodeConfig);
+	public static deserialize(json: string): NodeConfig {
+		let jsonObj = JSON.parse(json);
+		let newConfig = new NodeConfig();
+
+		newConfig.provider = jsonObj['provider'];
+		newConfig.targetDid = jsonObj['targetDid'];
+		newConfig.targetHost = jsonObj['targetHost'];
+		newConfig.storePath = jsonObj['storePath'];
+
+		return newConfig;
 	}
 }

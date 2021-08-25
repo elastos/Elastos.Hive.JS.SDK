@@ -9,6 +9,7 @@ import {
      NetworkException,
      ProviderNotSetException,
      DIDNotPublishedException } from '../../exceptions';
+import { AppContextProvider } from './appcontextprovider';
 
 /**
  * The application context would contain the resources list below:
@@ -100,42 +101,38 @@ export class AppContext {
 	 * @return The URL address of the provider
 	 */
 	public static async getProviderAddress(targetDid: string, preferredProviderAddress?: string): Promise<string> {
-		return new Promise((resolve, reject) => {
-			if (targetDid == null)
-				throw new IllegalArgumentException("Missing input parameter for target Did");
+        if (targetDid == null)
+            throw new IllegalArgumentException("Missing input parameter for target Did");
 
-			// Prioritize the use of external input value for 'preferredProviderAddress';
-			if (preferredProviderAddress != null)
-				resolve(preferredProviderAddress);
+        // Prioritize the use of external input value for 'preferredProviderAddress';
+        if (preferredProviderAddress != null)
+            return(preferredProviderAddress);
 
-			try {
-				let services: Array<DIDDocumentService> = null;
-				let did: DID = new DID(targetDid);
-				let doc: DIDDocument = await did.resolve();
-				if (doc == null)
-					reject(new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain"));
+        try {
+            let services: Array<DIDDocumentService> = null;
+            let did: DID = new DID(targetDid);
+            let doc: DIDDocument = await did.resolve();
+            if (doc == null)
+                throw (new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain"));
 
-				services = doc.selectServices(null, "HiveVault");
-				if (services == null || services.length == 0)
-					reject(new ProviderNotSetException("No 'HiveVault' services declared on DID document " + targetDid));
+            services = doc.selectServices(null, "HiveVault");
+            if (services == null || services.length == 0)
+                throw (new ProviderNotSetException("No 'HiveVault' services declared on DID document " + targetDid));
 
-				/*
-				 * Should we throw special exception when it has more than one end-point
-				 * of service "HiveVault";
-				 */
-    			resolve(services[0].getServiceEndpoint());
+            /*
+                * Should we throw special exception when it has more than one end-point
+                * of service "HiveVault";
+                */
+            return(services[0].getServiceEndpoint());
 
-			} catch (e) {
-                if (e instanceof MalformedDIDException) {
-				    console.log.("Malformed target did " + targetDid + " with error: " + e.message);
-				    reject(new IllegalArgumentException("Malformed did string: " + targetDid));
-                } else if (e instanceof DIDResolveException) {
-				    console.log("Resolving the target DID " + targetDid + " failed: " + e.message);
-				    reject(new NetworkException("Resolving DID failed: " + e.message));
-                }
-			}
-		});
+        } catch (e) {
+            if (e instanceof MalformedDIDException) {
+                console.log("Malformed target did " + targetDid + " with error: " + e.message);
+                throw new IllegalArgumentException("Malformed did string: " + targetDid);
+            } else if (e instanceof DIDResolveException) {
+                console.log("Resolving the target DID " + targetDid + " failed: " + e.message);
+                throw new NetworkException("Resolving DID failed: " + e.message);
+            }
+        }
 	}
-}
-*/
 }

@@ -1,15 +1,8 @@
-import { JsonProperty } from "@elastosfoundation/jackson-js";
-import { Config } from "./config"
-
-export class ApplicationConfig extends Config {
+export class ApplicationConfig {
 	
-	@JsonProperty({ value: "name" })
 	private name: string;
-	@JsonProperty({ value: "mnemonic" })
 	private mnemonic: string;
-	@JsonProperty({ value: "passPhrase" })
 	private passPhrase: string;
-	@JsonProperty({ value: "storepass" })
 	private storepass: string;
 
 	public ApplicationConfig (name: string, mnemonic: string, passPhrase: string, storepass: string) {
@@ -35,7 +28,14 @@ export class ApplicationConfig extends Config {
 		return this.storepass;
 	}
 
-	public static deserialize(content : string): ApplicationConfig {
-		return super.parse(content, ApplicationConfig);
+	public static deserialize(json: string): ApplicationConfig {
+		let jsonObj = JSON.parse(json);
+		let newConfig = new ApplicationConfig();
+		newConfig.name = jsonObj['name'];
+		newConfig.mnemonic = jsonObj['mnemonic'];
+		newConfig.passPhrase = jsonObj['passPhrase'];
+		newConfig.storepass = jsonObj['storepass'];
+
+		return newConfig;
 	}
 }

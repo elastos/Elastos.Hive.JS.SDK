@@ -1,6 +1,7 @@
-
 import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
 import { NodeRPCConnection } from '../http/noderpcconnection'
+import { SignInRequest } from './signinrequest';
+import { ChallengeRequest } from './challengerequest';
 
 export class AuthService {
 
