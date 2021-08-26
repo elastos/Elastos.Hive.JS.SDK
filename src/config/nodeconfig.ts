@@ -22,8 +22,8 @@ export class NodeConfig {
 		return this.storePath;
 	}
 
-	public static deserialize(json: string): NodeConfig {
-		let jsonObj = JSON.parse(json);
+	public static deserialize(json: any): NodeConfig {
+		let jsonObj = (typeof json === "string" ? JSON.parse(json as string) : json);
 		let newConfig = new NodeConfig();
 
 		newConfig.provider = jsonObj['provider'];

@@ -1,5 +1,10 @@
-import { NodeRPCConnection } from './noderpcconnection';
-export class ServiceEndpoint extends NodeRPCConnection {
+import { checkNotNull } from '../domain/utils'
+import { File } from '../domain/file'
+import { AppContext } from './security/appcontext'
+import { AccessToken } from './security/accesstoken'
+import { DataStorage } from './security/datastorage'
+
+export class ServiceEndpoint {
 	private context: AppContext;
 	private providerAddress: string;
 
@@ -11,41 +16,22 @@ export class ServiceEndpoint extends NodeRPCConnection {
 	private dataStorage: DataStorage;
 
     constructor(context: AppContext , providerAddress: string) {
-        super();
+        checkNotNull(context, "Empty context parameter");
+        checkNotNull(providerAddress, "Empty provider address parameter");
+
+        this.context = context;
+        this.providerAddress = providerAddress;
     }
-}
+
+    private init():void {
+        let dataDir = this.context.getAppContextProvider().getLocalDataDir();
+		if (!dataDir.endsWith(File.separator))
+			dataDir += File.separator;
+
+    }
 
 /*
-package org.elastos.hive;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-
-import org.elastos.did.jwt.Claims;
-import org.elastos.did.jwt.JwtParserBuilder;
-import org.elastos.hive.connection.NodeRPCConnection;
-import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.connection.auth.AccessToken;
-import org.elastos.hive.connection.auth.BridgeHandler;
-import org.elastos.hive.endpoint.AboutController;
-import org.elastos.hive.endpoint.NodeVersion;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NotImplementedException;
-
-public class ServiceEndpoint extends NodeRPCConnection {
-	private AppContext context;
-	private String providerAddress;
-
-	private String appDid;
-	private String appInstanceDid;
-	private String serviceInstanceDid;
-
-	private AccessToken accessToken;
-	private DataStorage dataStorage;
-
-	protected ServiceEndpoint(AppContext context, String providerAddress) {
+    protected ServiceEndpoint(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
 			throw new IllegalArgumentException("Empty context or provider address parameter");
 

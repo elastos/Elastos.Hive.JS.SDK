@@ -18,8 +18,8 @@ export class CrossConfig {
 		return this.crossDid;
 	}
 
-	public static deserialize(json: string): CrossConfig {
-		let jsonObj = JSON.parse(json);
+	public static deserialize(json: any): CrossConfig {
+		let jsonObj = (typeof json === "string" ? JSON.parse(json as string) : json);
 		let newConfig = new CrossConfig();
 
 		newConfig.application = ApplicationConfig.deserialize(jsonObj['application']);

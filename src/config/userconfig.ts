@@ -1,16 +1,8 @@
-export class ApplicationConfig {
-	
+export class UserConfig {
 	private name: string;
 	private mnemonic: string;
 	private passPhrase: string;
 	private storepass: string;
-
-	public ApplicationConfig (name: string, mnemonic: string, passPhrase: string, storepass: string) {
-		this.name = name;
-		this.mnemonic = mnemonic;
-		this.passPhrase = passPhrase;
-		this.storepass = storepass;
-	}
 
 	public getName(): string {
 		return this.name;
@@ -28,9 +20,10 @@ export class ApplicationConfig {
 		return this.storepass;
 	}
 
-	public static deserialize(json: string): ApplicationConfig {
-		let jsonObj = JSON.parse(json);
-		let newConfig = new ApplicationConfig();
+	public static deserialize(json: any): UserConfig {
+		let jsonObj = (typeof json === "string" ? JSON.parse(json as string) : json);
+		let newConfig = new UserConfig();
+
 		newConfig.name = jsonObj['name'];
 		newConfig.mnemonic = jsonObj['mnemonic'];
 		newConfig.passPhrase = jsonObj['passPhrase'];

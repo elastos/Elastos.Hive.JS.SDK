@@ -1,21 +1,34 @@
 import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
-import { NodeRPCConnection } from '../http/noderpcconnection'
 import { SignInRequest } from './signinrequest';
 import { ChallengeRequest } from './challengerequest';
 
 export class AuthService {
 
-    private authAPI: AuthAPI;
+	private httpClient: HttpClient;
 
-    constructor(connection: NodeRPCConnection, appInstanceDidDoc: DIDDocument) {
+	private connection: NodeRPCConnection;
 
+    constructor(connection: NodeRPCConnection) {
+		this.connection = connection;
     }
 
+    //@POST("/api/v2/did/signin")
+	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
+    public signIn(request: SignInRequest): ChallengeRequest {
+		this.connection.openConnection(
+    }
+
+	//@POST("/api/v2/did/auth")
+	//Call<AccessCode> auth(@Body ChallengeResponse request);
+    public auth(request: ChallengeResponse): AccessCode {
+
+    }
 }
 
 class AuthAPI {
 
     private connection: NodeRPCConnection;
+	private httpClient: HttpClient;
 
     constructor(connection: NodeRPCConnection) {
         this.connection = connection;
@@ -24,7 +37,7 @@ class AuthAPI {
     //@POST("/api/v2/did/signin")
 	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
     public signIn(request: SignInRequest): ChallengeRequest {
-
+		this.connection.openConnection(
     }
 
 	//@POST("/api/v2/did/auth")

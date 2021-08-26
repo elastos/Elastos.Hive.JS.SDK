@@ -2,6 +2,7 @@ import { ApplicationConfig } from "./applicationconfig"
 import { UserConfig } from "./userconfig"
 import { CrossConfig } from "./crossconfig"
 import { NodeConfig } from "./nodeconfig"
+import { JSONObject } from "@elastosfoundation/did-js-sdk/typings";
 
 export class ClientConfig {
 	private resolverUrl: string;
@@ -30,8 +31,8 @@ export class ClientConfig {
 		return this.cross;
 	}
 
-	public static deserialize(json: string): ClientConfig {
-		let jsonObj = JSON.parse(json);
+	public static deserialize(json: any): ClientConfig {
+		let jsonObj = (typeof json === "string" ? JSON.parse(json as string) : json);
 		let newConfig = new ClientConfig();
 		newConfig.resolverUrl = jsonObj['resolverUrl'];
 		newConfig.application = ApplicationConfig.deserialize(jsonObj['application']);
