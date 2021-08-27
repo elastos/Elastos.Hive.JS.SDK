@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class VaultSubscription extends ServiceEndpoint
+public class VaultSubscription extends ServiceContext
 	implements SubscriptionService<VaultInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;

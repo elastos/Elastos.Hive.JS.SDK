@@ -1,12 +1,12 @@
 package org.elastos.hive.backup;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.service.PromotionService;
 
 public class ServiceBuilder {
-	private ServiceEndpoint backup;
+	private ServiceContext backup;
 
-	public ServiceBuilder(ServiceEndpoint backup) {
+	public ServiceBuilder(ServiceContext backup) {
 		this.backup = backup;
 	}
 

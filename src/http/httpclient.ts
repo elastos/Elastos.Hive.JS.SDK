@@ -1,47 +1,79 @@
 import * as http from 'http';
-import { AppContext } from './security/appcontext';
+import { checkNotNull } from '../domain/utils';
+import { ServiceContext } from './servicecontext';
+import { HttpResponseParser } from './httpresponseparser';
+import { HttpException } from '../exceptions';
 
 export class HttpClient {
-    private static HTTP_TIMEOUT = 30000;
+    public static DEFAULT_OPTIONS: http.RequestOptions = {};
+    private static DEFAULT_TIMEOUT = 5000;
+    private static DEFAULT_PROTOCOL = "http";
+    private static DEFAULT_PORT = 80;
+    private static DEFAULT_METHOD = "PUT";
+    private static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
 
-    private context: AppContext;
-    private providerAddress: string;
+    private serviceContext: ServiceContext;
+    private httpOptions: http.RequestOptions;
 
-    constructor(context: AppContext, providerAddress: string) {
-        this.context = context;
-        this.providerAddress = providerAddress;
+    constructor(serviceContext: ServiceContext, httpOptions: http.RequestOptions) {
+        this.serviceContext = serviceContext;
+        this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    public send(request: http.RequestOptions): http.IncomingMessage {
-        let headers: http.OutgoingHttpHeaders;
-        request.headers = {
+    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T>): Promise<T> {
+        checkNotNull(serviceEndpoint, "No service endpoint specified");
 
-        }
-        request.timeout = HttpClient.HTTP_TIMEOUT;
-        return null;
+        return new Promise((resolve, reject) => {
+            let request = http.request(
+              this.buildRequest(serviceEndpoint),
+              function(response) {
+                const { statusCode } = response;
+                if (statusCode >= 300) {
+                  reject(
+                    new HttpException(statusCode, response.statusMessage)
+                  )
+                }
+                const chunks = [];
+                response.on('data', (chunk) => {
+                  chunks.push(chunk);
+                });
+                response.on('end', () => {
+                  const result = Buffer.concat(chunks).toString();
+                  resolve(responseParser.deserialize(result));
+                });
+              }
+            );
+            
+            if (this.httpOptions.method != "GET") {
+                request.write(JSON.stringify(payload));
+            }
+
+            request.end();
+        })
     }
 
-    private setupConnection openConnection(urlPath: string): void {
-		let url = this.providerAddress + urlPath;
-		console.log("open connection with URL: " + url + " and method: PUT");
+    private buildRequest(serviceEndpoint: string): http.RequestOptions {
+        let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
+        requestOptions.path = serviceEndpoint;
+        requestOptions.headers['Authorization'] = this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
-		HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-		urlConnection.setRequestMethod("PUT");
-		urlConnection.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-		urlConnection.setConnectTimeout(5000);
-		urlConnection.setReadTimeout(5000);
+        return requestOptions;
+    }
 
-		urlConnection.setDoOutput(true);
-		urlConnection.setDoInput(true);
-		urlConnection.setUseCaches(false);
+    private validateOptions(httpOptions: http.RequestOptions): http.RequestOptions {
+        checkNotNull(httpOptions, "No HTTP configuration provided");
 
-		urlConnection.setRequestProperty("Transfer-Encoding", "chunked");
-		urlConnection.setRequestProperty("Connection", "Keep-Alive");
-		urlConnection.setRequestProperty("Authorization", getAccessToken().getCanonicalizedAccessToken());
+        httpOptions.protocol = httpOptions.protocol ?? HttpClient.DEFAULT_PROTOCOL;
+        httpOptions.port = httpOptions.port ?? HttpClient.DEFAULT_PORT;
+        httpOptions.method = httpOptions.method ?? HttpClient.DEFAULT_METHOD;
+        httpOptions.timeout = httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT;
+        httpOptions.host = this.serviceContext.getProviderAddress();
+        httpOptions.headers = httpOptions.headers ?? {
+            "Transfer-Encoding": "chunked",
+            "Connection": "Keep-Alive",
+            "User-Agent": HttpClient.DEFAULT_AGENT
+        };
 
-		urlConnection.setChunkedStreamingMode(0);
-
-		return urlConnection;
-	}
+        return httpOptions;
+    }
 }

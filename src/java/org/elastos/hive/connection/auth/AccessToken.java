@@ -1,6 +1,6 @@
 package org.elastos.hive.connection.auth;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
 
@@ -10,7 +10,7 @@ public class AccessToken implements CodeFetcher {
 	private DataStorage storage;
 	private BridgeHandler bridge;
 
-	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, BridgeHandler bridge) {
+	public AccessToken(ServiceContext endpoint, DataStorage storage, BridgeHandler bridge) {
 		remoteFetcher = new RemoteFetcher(endpoint);
 		this.storage = storage;
 		this.bridge = bridge;
@@ -51,7 +51,7 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private String restoreToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return null;
 
@@ -88,7 +88,7 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private void saveToken(String jwtCode) {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return;
 
@@ -97,7 +97,7 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private void clearToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return;
 

@@ -1,7 +1,9 @@
 import { CodeFetcher } from '../codefetcher';
-import { DataStorage } from './datastorage';
+import { DataStorage } from '../../domain/datastorage';
 import { BridgeHandler } from './bridgehandler';
-import { ServiceEndpoint } from '../serviceendpoint';
+import { ServiceContext } from '../servicecontext';
+import { AuthService } from '../../auth/authservice';
+import { HttpClient } from '../httpclient';
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
@@ -10,7 +12,7 @@ import { ServiceEndpoint } from '../serviceendpoint';
  */
 export class AccessToken implements CodeFetcher {
 	private jwtCode: string;
-	private remoteFetcher: CodeFetcher;
+	private authService: AuthService;
 	private storage: DataStorage;
 	private bridge: BridgeHandler;
 
@@ -21,8 +23,8 @@ export class AccessToken implements CodeFetcher {
 	 * @param storage The data storage which is used to save the access token.
 	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
-	public constructor(endpoint: ServiceEndpoint , storage: DataStorage , bridge: BridgeHandler) {
-		remoteFetcher = new RemoteFetcher(endpoint);
+	public constructor(serviceContext: ServiceContext , storage: DataStorage , bridge: BridgeHandler) {
+		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
 		this.bridge = bridge;
 	}
@@ -65,7 +67,7 @@ export class AccessToken implements CodeFetcher {
 	}
 
 	private String restoreToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return null;
 
@@ -102,7 +104,7 @@ export class AccessToken implements CodeFetcher {
 	}
 
 	private void saveToken(String jwtCode) {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return;
 
@@ -111,7 +113,7 @@ export class AccessToken implements CodeFetcher {
 	}
 
 	private void clearToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
+		ServiceContext endpoint = (ServiceContext)bridge.target();
 		if (endpoint == null)
 			return;
 

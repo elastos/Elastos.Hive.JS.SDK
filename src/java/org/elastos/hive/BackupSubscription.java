@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class BackupSubscription extends ServiceEndpoint
+public class BackupSubscription extends ServiceContext
 				implements SubscriptionService<BackupInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;

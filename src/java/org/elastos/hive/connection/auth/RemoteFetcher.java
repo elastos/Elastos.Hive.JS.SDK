@@ -1,16 +1,16 @@
 package org.elastos.hive.connection.auth;
 
 import org.elastos.hive.AppContextProvider;
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.connection.NodeRPCException;
 
 class RemoteFetcher implements CodeFetcher {
 	private AppContextProvider contextProvider;
 	private AuthController controller;
 
-	public RemoteFetcher(ServiceEndpoint serviceEndpoint) {
-		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
-		this.controller = new AuthController(serviceEndpoint, contextProvider.getAppInstanceDocument());
+	public RemoteFetcher(ServiceContext ServiceContext) {
+		this.contextProvider = ServiceContext.getAppContext().getAppContextProvider();
+		this.controller = new AuthController(ServiceContext, contextProvider.getAppInstanceDocument());
 	}
 
 	@Override

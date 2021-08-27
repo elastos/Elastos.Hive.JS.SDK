@@ -1,7 +1,7 @@
 package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.vault.scripting.Condition;
@@ -15,8 +15,8 @@ import java.util.concurrent.CompletionException;
 class ScriptingServiceRender implements ScriptingService {
 	private ScriptingController controller;
 
-	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
-		this.controller = new ScriptingController(serviceEndpoint);
+	public ScriptingServiceRender(ServiceContext ServiceContext) {
+		this.controller = new ScriptingController(ServiceContext);
 	}
 
 	@Override

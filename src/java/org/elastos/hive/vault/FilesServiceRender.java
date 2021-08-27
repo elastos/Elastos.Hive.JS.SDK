@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
@@ -18,8 +18,8 @@ import java.io.Reader;
 class FilesServiceRender implements FilesService {
 	private FilesController controller;
 
-	public FilesServiceRender(ServiceEndpoint serviceEndpoint) {
-		this.controller = new FilesController(serviceEndpoint);
+	public FilesServiceRender(ServiceContext ServiceContext) {
+		this.controller = new FilesController(ServiceContext);
 	}
 
 	@Override

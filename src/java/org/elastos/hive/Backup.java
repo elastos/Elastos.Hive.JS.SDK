@@ -3,7 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.backup.ServiceBuilder;
 import org.elastos.hive.service.PromotionService;
 
-public class Backup extends ServiceEndpoint {
+public class Backup extends ServiceContext {
 	private PromotionService promotionService;
 
 	public Backup(AppContext context, String providerAddress) {

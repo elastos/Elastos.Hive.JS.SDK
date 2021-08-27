@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.vault.database.*;
 import org.elastos.hive.exception.HiveException;
@@ -14,8 +14,8 @@ import java.util.concurrent.CompletionException;
 class DatabaseServiceRender implements DatabaseService {
 	DatabaseController controller;
 
-	public DatabaseServiceRender(ServiceEndpoint serviceEndpoint) {
-		controller = new DatabaseController(serviceEndpoint);
+	public DatabaseServiceRender(ServiceContext ServiceContext) {
+		controller = new DatabaseController(ServiceContext);
 	}
 
 	@Override

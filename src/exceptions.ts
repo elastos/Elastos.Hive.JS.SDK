@@ -34,7 +34,21 @@ export class ProviderNotSetException extends ParentException {}
 export class ScriptNotFoundException extends ParentException {} 
 export class UnauthorizedException extends ParentException {} 
 export class VaultForbiddenException extends ParentException {} 
-export class VaultNotFoundException extends ParentException {} 
+export class VaultNotFoundException extends ParentException {}
+export class DIDResolveException extends ParentException {}
+export class JWTException extends ParentException {}
+export class HttpException extends ParentException {
+    private httpCode: number;
+
+    constructor(httpCode: number, message: string) {
+        super(message);
+        this.httpCode = httpCode;
+    }
+
+    public getHttpCode(): number {
+        return this.httpCode;
+    }
+} 
 
 export class MalformedDIDException extends IllegalArgumentException {}
 

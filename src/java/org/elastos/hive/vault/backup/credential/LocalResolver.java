@@ -1,16 +1,16 @@
 package org.elastos.hive.vault.backup.credential;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.DataStorage;
 
 class LocalResolver implements CodeFetcher {
-	private ServiceEndpoint serviceEndpoint;
+	private ServiceContext ServiceContext;
 	private CodeFetcher nextResolver;
 
-	public LocalResolver(ServiceEndpoint serviceEndpoint, CodeFetcher next) {
-		this.serviceEndpoint = serviceEndpoint;
+	public LocalResolver(ServiceContext ServiceContext, CodeFetcher next) {
+		this.ServiceContext = ServiceContext;
 		this.nextResolver = next;
 	}
 
@@ -31,25 +31,25 @@ class LocalResolver implements CodeFetcher {
 	}
 
 	private String restoreToken() {
-		DataStorage storage = serviceEndpoint.getStorage();
+		DataStorage storage = ServiceContext.getStorage();
 
-		if (serviceEndpoint.getServiceInstanceDid() == null)
+		if (ServiceContext.getServiceInstanceDid() == null)
 			return null;
 
-		return storage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
+		return storage.loadBackupCredential(ServiceContext.getServiceInstanceDid());
 	}
 
 	private void saveToken(String token) {
-		DataStorage storage = serviceEndpoint.getStorage();
+		DataStorage storage = ServiceContext.getStorage();
 
-		if (serviceEndpoint.getServiceInstanceDid() != null)
-			storage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
+		if (ServiceContext.getServiceInstanceDid() != null)
+			storage.storeBackupCredential(ServiceContext.getServiceInstanceDid(), token);
 	}
 
 	private void clearToken() {
-		DataStorage storage = serviceEndpoint.getStorage();
+		DataStorage storage = ServiceContext.getStorage();
 
-		if (serviceEndpoint.getServiceInstanceDid() != null)
-			storage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
+		if (ServiceContext.getServiceInstanceDid() != null)
+			storage.clearBackupCredential(ServiceContext.getServiceInstanceDid());
 	}
 }

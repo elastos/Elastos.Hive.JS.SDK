@@ -2,9 +2,9 @@ import { checkNotNull } from '../domain/utils'
 import { File } from '../domain/file'
 import { AppContext } from './security/appcontext'
 import { AccessToken } from './security/accesstoken'
-import { DataStorage } from './security/datastorage'
+import { DataStorage } from '../domain/datastorage'
 
-export class ServiceEndpoint {
+export class ServiceContext {
 	private context: AppContext;
 	private providerAddress: string;
 
@@ -25,13 +25,30 @@ export class ServiceEndpoint {
 
     private init():void {
         let dataDir = this.context.getAppContextProvider().getLocalDataDir();
-		if (!dataDir.endsWith(File.separator))
-			dataDir += File.separator;
+		if (!dataDir.endsWith(File.SEPARATOR))
+			dataDir += File.SEPARATOR;
+
+        this.dataStorage = new FileStorage(dataDir, context.getUserDid());
 
     }
 
+    public getAccessToken(): AccessToken {
+        return this.accessToken;
+    }
+
+    public getProviderAddress(): string {
+        return this.providerAddress;
+    }
+
+    public getAppContext(): AppContext {
+		return this.context;
+	}
+
+*/
+
+
 /*
-    protected ServiceEndpoint(AppContext context, String providerAddress) {
+    protected ServiceContext(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
 			throw new IllegalArgumentException("Empty context or provider address parameter");
 
@@ -44,12 +61,12 @@ export class ServiceEndpoint {
 
 		this.dataStorage = new FileStorage(dataDir, context.getUserDid());
 		this.accessToken = new AccessToken(this, dataStorage, new BridgeHandler() {
-			private WeakReference<ServiceEndpoint> weakref;
+			private WeakReference<ServiceContext> weakref;
 
 			@Override
 			public void flush(String value) {
 				try {
-					ServiceEndpoint endpoint = weakref.get();
+					ServiceContext endpoint = weakref.get();
 					Claims claims;
 
 					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
@@ -61,7 +78,7 @@ export class ServiceEndpoint {
 				}
 			}
 
-			BridgeHandler setTarget(ServiceEndpoint endpoint) {
+			BridgeHandler setTarget(ServiceContext endpoint) {
 				this.weakref = new WeakReference<>(endpoint);
 				return this;
 			}
@@ -74,22 +91,14 @@ export class ServiceEndpoint {
 		}.setTarget(this));
 	}
 
-	public AppContext getAppContext() {
-		return context;
-	}
 */
 	/**
 	 * Get the end-point address of this service End-point.
 	 *
 	 * @return provider address
 	 */
- /*    @Override
-     public String getProviderAddress() {
-         return providerAddress;
-     }
-*/
      /**
-      * Get the user DID string of this serviceEndpoint.
+      * Get the user DID string of this ServiceContext.
       *
       * @return user did
       */
@@ -145,11 +154,6 @@ export class ServiceEndpoint {
  
      public void refreshAccessToken() throws NodeRPCException {
          accessToken.fetch();
-     }
- 
-     @Override
-     protected AccessToken getAccessToken() {
-         return accessToken;
      }
  
      public CompletableFuture<NodeVersion> getNodeVersion() {

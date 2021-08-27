@@ -6,7 +6,7 @@ import org.elastos.hive.vault.ServiceBuilder;
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
-public class Vault extends ServiceEndpoint {
+public class Vault extends ServiceContext {
 	private FilesService 	filesService;
 	private DatabaseService database;
 	private ScriptingService scripting;

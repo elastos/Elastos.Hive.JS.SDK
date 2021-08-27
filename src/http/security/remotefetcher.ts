@@ -1,4 +1,4 @@
-import { ServiceEndpoint } from '../serviceendpoint';
+import { ServiceContext } from '../ServiceContext';
 import { CodeFetcher } from '../codefetcher';
 import { NodeRPCException } from '../../exceptions';
 
@@ -6,9 +6,9 @@ export class RemoteFetcher implements CodeFetcher {
 	private contextProvider: AppContextProvider;
 	private authService: AuthService;
 
-	public constructor(serviceEndpoint: ServiceEndpoint) {
-		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
-		this.authService = new AuthService(serviceEndpoint, contextProvider.getAppInstanceDocument());
+	public constructor(ServiceContext: ServiceContext) {
+		this.contextProvider = ServiceContext.getAppContext().getAppContextProvider();
+		this.authService = new AuthService(ServiceContext, contextProvider.getAppInstanceDocument());
 	}
 
 	public fetch(): string {

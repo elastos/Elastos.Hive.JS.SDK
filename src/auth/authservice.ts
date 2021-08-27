@@ -1,50 +1,94 @@
 import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
 import { SignInRequest } from './signinrequest';
 import { ChallengeRequest } from './challengerequest';
+import { AppContextProvider } from '../http/security/appcontextprovider';
+import { AccessToken } from '../http/security/accesstoken';
+import { HttpClient } from '../http/httpclient';
+import { ServiceContext } from '../http/servicecontext';
+import { HttpResponseParser } from '../http/httpresponseparser';
+import { NodeRPCException, ServerUnknownException } from '../exceptions';
 
 export class AuthService {
+	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
+	private static AUTH_ENDPOINT = "/api/v2/did/auth";
 
 	private httpClient: HttpClient;
+	private serviceContext: ServiceContext;
+	private contextProvider: AppContextProvider;
 
-	private connection: NodeRPCConnection;
-
-    constructor(connection: NodeRPCConnection) {
-		this.connection = connection;
+    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+		this.serviceContext = serviceContext;
+		this.httpClient = httpClient;
+		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
     }
+
+	public async fetch(): Promise<string> {
+		try {
+			let challenge: string  = await this.signIn(this.contextProvider.getAppInstanceDocument());
+
+			let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
+			return this.auth(challengeResponse);
+		} catch (e) {
+			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
+		}
+	}
 
     //@POST("/api/v2/did/signin")
 	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
-    public signIn(request: SignInRequest): ChallengeRequest {
-		this.connection.openConnection(
+    public async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
+		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, appInstanceDidDoc.toString(), <HttpResponseParser<string>> {
+			deserialize(content: any): string {
+				return this.rawContent(content);
+			},
+			rawContent(content: any): any {
+				return JSON.parse(content)['challenge'];
+			}
+		});
+
+		if (!this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
+			console.log("Failed to check the valid of challenge code when sign in.");
+			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
+		}
+		return challenge;
     }
 
 	//@POST("/api/v2/did/auth")
 	//Call<AccessCode> auth(@Body ChallengeResponse request);
-    public auth(request: ChallengeResponse): AccessCode {
+    public async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
+		let challengeResponseRequest = {
+			"challenge_response": challengeResponse
+		};
+		let token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, JSON.stringify(challengeResponseRequest), <HttpResponseParser<string>> {
+			deserialize(content: any): string {
+				return this.rawContent(content);
+			},
+			rawContent(content: any): any {
+				return JSON.parse(content)['token'];
+			}
+		});
+
+		if (!this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
+			console.log("Failed to check the valid of access token when auth.");
+			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
+		}
+		return token;
+
 
     }
-}
 
-class AuthAPI {
+	private checkValid(jwtCode: string, expectationDid: string): boolean {
+		try {
+			let claims: Claims = new JwtParserBuilder()
+					.build()
+					.parseClaimsJws(jwtCode)
+					.getBody();
+			return claims.getExpiration().getTime() > System.currentTimeMillis() &&
+					claims.getAudience().equals(expectationDid);
+		} catch (e) {
+			return false;
+		}
+	}
 
-    private connection: NodeRPCConnection;
-	private httpClient: HttpClient;
-
-    constructor(connection: NodeRPCConnection) {
-        this.connection = connection;
-    }
-
-    //@POST("/api/v2/did/signin")
-	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
-    public signIn(request: SignInRequest): ChallengeRequest {
-		this.connection.openConnection(
-    }
-
-	//@POST("/api/v2/did/auth")
-	//Call<AccessCode> auth(@Body ChallengeResponse request);
-    public auth(request: ChallengeResponse): AccessCode {
-
-    }
 }
 
 /*

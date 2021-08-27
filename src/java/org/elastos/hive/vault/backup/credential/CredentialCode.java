@@ -1,7 +1,7 @@
 package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.DataStorage;
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.ServiceContext;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.exception.HiveException;
@@ -16,7 +16,7 @@ public class CredentialCode {
 	private CodeFetcher remoteResolver;
 	private DataStorage storage;
 
-	public CredentialCode(ServiceEndpoint endpoint, BackupContext context) {
+	public CredentialCode(ServiceContext endpoint, BackupContext context) {
 		targetServiceDid = context.getParameter("targetServiceDid");
 		CodeFetcher remoteResolver = new RemoteResolver(
 				endpoint, context, targetServiceDid, context.getParameter("targetAddress"));

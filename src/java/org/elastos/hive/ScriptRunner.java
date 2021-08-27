@@ -9,7 +9,7 @@ import org.elastos.hive.vault.scripting.ScriptingController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocationService {
+public class ScriptRunner extends ServiceContext implements ScriptingInvocationService {
 	private ScriptingController controller;
 
 	public ScriptRunner(AppContext context, String providerAddress) {

@@ -106,7 +106,7 @@ public class AppContext {
 				 * Should we throw special exception when it has more than one end-point
 				 * of service "HiveVault";
 				 */
-				return services.get(0).getServiceEndpoint();
+				return services.get(0).getServiceContext();
 
 			} catch (MalformedDIDException e) {
 				log.error("Malformed target did {} with error: {}", targetDid, e.getMessage());

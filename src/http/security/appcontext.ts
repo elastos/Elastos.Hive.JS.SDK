@@ -23,6 +23,7 @@ import { AppContextProvider } from './appcontextprovider';
  */
 
 export class AppContext {
+    public static debug = false;
     private static resolverHasSetup = false;
 
     private contextProvider: AppContextProvider;
@@ -123,7 +124,7 @@ export class AppContext {
                 * Should we throw special exception when it has more than one end-point
                 * of service "HiveVault";
                 */
-            return(services[0].getServiceEndpoint());
+            return(services[0].getServiceContext());
 
         } catch (e) {
             if (e instanceof MalformedDIDException) {

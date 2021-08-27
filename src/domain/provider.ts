@@ -14,7 +14,7 @@ import org.elastos.hive.exception.HiveException;
  *	 etc.
  */
 /*
- class Provider extends ServiceEndpoint {
+ class Provider extends ServiceContext {
 	public Provider(AppContext context) throws HiveException {
 		this(context, null);
 	}
