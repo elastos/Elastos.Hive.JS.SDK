@@ -6,6 +6,14 @@ import { HttpException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 
 export class HttpClient {
+    public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>> {
+			deserialize(content: any): string {
+				return JSON.stringify(content);
+			},
+			rawContent(content: any): any {
+				return JSON.stringify(content);
+			}
+		};
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
     private static DEFAULT_TIMEOUT = 5000;
     private static DEFAULT_PROTOCOL = "http";
@@ -21,7 +29,7 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T>, method?: HttpMethod): Promise<T> {
+    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         return new Promise((resolve, reject) => {

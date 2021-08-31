@@ -50,7 +50,7 @@ export class AccessToken implements CodeFetcher {
 
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
-			jwtCode = remoteFetcher.fetch();
+			jwtCode = this.authService.fetch();
 
 			if (jwtCode != null) {
 				bridge.flush(jwtCode);
