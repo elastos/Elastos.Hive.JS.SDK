@@ -3,6 +3,7 @@ import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
 import { HttpException } from '../exceptions';
+import { HttpMethod } from './httpmethod';
 
 export class HttpClient {
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
@@ -20,12 +21,13 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T>): Promise<T> {
+    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T>, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         return new Promise((resolve, reject) => {
+          let options = this.buildRequest(serviceEndpoint, method)
             let request = http.request(
-              this.buildRequest(serviceEndpoint),
+              options,
               function(response) {
                 const { statusCode } = response;
                 if (statusCode >= 300) {
@@ -44,7 +46,7 @@ export class HttpClient {
               }
             );
             
-            if (this.httpOptions.method != "GET") {
+            if (options.method != "GET") {
                 request.write(JSON.stringify(payload));
             }
 
@@ -52,8 +54,11 @@ export class HttpClient {
         })
     }
 
-    private buildRequest(serviceEndpoint: string): http.RequestOptions {
+    private buildRequest(serviceEndpoint: string, method: HttpMethod): http.RequestOptions {
         let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
+        if (method) {
+          requestOptions.method = method;
+        }
         requestOptions.path = serviceEndpoint;
         requestOptions.headers['Authorization'] = this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
