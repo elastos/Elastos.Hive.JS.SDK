@@ -15,6 +15,7 @@ export class ParentException extends Error{
 }
 
 export class IllegalArgumentException extends ParentException  {}
+export class InvalidParameterException extends ParentException  {}
 export class AlreadyExistsException extends ParentException {} 
 export class BackupIsInProcessingException extends ParentException {} 
 export class BackupNotFoundException extends ParentException {} 
@@ -37,6 +38,7 @@ export class VaultForbiddenException extends ParentException {}
 export class VaultNotFoundException extends ParentException {}
 export class DIDResolveException extends ParentException {}
 export class JWTException extends ParentException {}
+export class IOException extends ParentException {}
 export class HttpException extends ParentException {
     private httpCode: number;
 
@@ -72,6 +74,15 @@ export class NetworkException extends ParentException {
 export class NodeRPCException extends ParentException {
     private readonly code: number;
     private readonly internalCode: number;
+   
+    public static BAD_REQUEST = 400;
+	public static UNAUTHORIZED = 401;
+	public static FORBIDDEN	= 403;
+	public static NOT_FOUND	= 404;
+	public static ALREADY_EXISTS = 455;
+	public static INSUFFICIENT_STORAGE = 507;
+	public static IC_INVALID_PARAMETER = 1;
+	public static IC_BACKUP_IS_IN_PROCESSING = 2;
 
     constructor(code: number, internalCode: number, message: string) {
         super(message);
