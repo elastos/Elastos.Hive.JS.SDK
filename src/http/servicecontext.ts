@@ -9,6 +9,8 @@ import { Claims } from '../domain/jwt/claims'
 import { NotImplementedException } from '../exceptions'
 import { NodeVersion } from '../domain/nodeversion'
 import { HttpClient } from './httpclient'
+import { AboutService } from '../restclient/about/aboutservice'
+import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder'
 
 export class ServiceContext {
 	private context: AppContext;
@@ -38,7 +40,7 @@ export class ServiceContext {
 
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
         this.accessToken = new AccessToken(this, this.dataStorage, new BridgeHandlerImpl(this));
-        this.aboutService = new this.aboutService(this, new HttpClient(this, HttpClient.DEFAULT_OPTIONS));
+        this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.DEFAULT_OPTIONS));
     }
 
     public getAccessToken(): AccessToken {
@@ -98,7 +100,7 @@ export class ServiceContext {
          return this.serviceInstanceDid;
      }
 
-     private flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
+     public flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
          this.appInstanceDid = appInstanceDId;
          this.serviceInstanceDid = serviceInstanceDid;
      }
@@ -125,24 +127,24 @@ export class ServiceContext {
         })
 
 
-        return CompletableFuture.supplyAsync(() -> {
-             try {
-                 return new AboutController(this).getNodeVersion();
-             } catch (HiveException | RuntimeException e) {
-                 throw new CompletionException(e);
-             }
-         });
-     }
+    //     return CompletableFuture.supplyAsync(() -> {
+    //          try {
+    //              return new AboutController(this).getNodeVersion();
+    //          } catch (HiveException | RuntimeException e) {
+    //              throw new CompletionException(e);
+    //          }
+    //      });
+    }
  
-     public async getLatestCommitId(): Promise<string> {
-         return CompletableFuture.supplyAsync(() -> {
-             try {
-                 return new AboutController(this).getCommitId();
-             } catch (HiveException | RuntimeException e) {
-                 throw new CompletionException(e);
-             }
-         });
-     }
+    //  public async getLatestCommitId(): Promise<string> {
+    //      return CompletableFuture.supplyAsync(() -> {
+    //          try {
+    //              return new AboutController(this).getCommitId();
+    //          } catch (HiveException | RuntimeException e) {
+    //              throw new CompletionException(e);
+    //          }
+    //      });
+    //  }
 }
 
 class BridgeHandlerImpl implements BridgeHandler {
@@ -152,12 +154,12 @@ class BridgeHandlerImpl implements BridgeHandler {
         this.ref = endpoint;
     }
 
-    public flush(value: string): void {
+    public async flush(value: string): Promise<void> {
         try {
             let endpoint = this.ref;
             let claims: Claims;
 
-            claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
+            claims = (await new JWTParserBuilder().build().parse(value)).getBody();
             endpoint.flushDids(claims.getAudience(), claims.getIssuer());
 
         } catch (e) {

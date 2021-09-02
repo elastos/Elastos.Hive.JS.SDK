@@ -34,90 +34,90 @@ export class AccessToken implements CodeFetcher {
 	 *
 	 * @return null if not exists.
 	 */
-	public String getCanonicalizedAccessToken() {
+	public async getCanonicalizedAccessToken(): Promise<string> {
 		try {
-			jwtCode = fetch();
-		} catch (Exception e) {
+			this.jwtCode = await this.fetch();
+		} catch (e) {
 			// TODO:
 			return null;
 		}
-		return "token " + jwtCode;
+		return "token " + this.jwtCode;
 	}
 
-	public fetch(): string {
-		if (jwtCode != null)
-			return jwtCode;
+	public async fetch(): Promise<string> {
+		if (this.jwtCode != null)
+			return this.jwtCode;
 
-		jwtCode = restoreToken();
-		if (jwtCode == null) {
-			jwtCode = this.authService.fetch();
+		this.jwtCode = this.restoreToken();
+		if (this.jwtCode == null) {
+			this.jwtCode = await this.authService.fetch();
 
-			if (jwtCode != null) {
-				bridge.flush(jwtCode);
-				saveToken(jwtCode);
+			if (this.jwtCode != null) {
+				this.bridge.flush(this.jwtCode);
+				this.saveToken(this.jwtCode);
 			}
 		} else {
-			bridge.flush(jwtCode);
+			this.bridge.flush(this.jwtCode);
 		}
-		return jwtCode;
+		return Promise.resolve(this.jwtCode);
 	}
 
 	public invalidate(): void {
 		this.clearToken();
 	}
 
-	private String restoreToken() {
-		ServiceContext endpoint = (ServiceContext)bridge.target();
+	private restoreToken() : string {
+		let endpoint = this.bridge.target() as ServiceContext;
 		if (endpoint == null)
 			return null;
 
-		String jwtCode = null;
-		String serviceDid;
-		String address;
+		let jwtCode = null;
+		let serviceDid;
+		let address;
 
 		serviceDid = endpoint.getServiceInstanceDid();
 		address	= endpoint.getProviderAddress();
 
 		if (serviceDid != null)
-			jwtCode = storage.loadAccessToken(serviceDid);
+			jwtCode = this.storage.loadAccessToken(serviceDid);
 
-		if (jwtCode != null && isExpired(jwtCode)) {
-			storage.clearAccessTokenByAddress(address);
-			storage.clearAccessToken(serviceDid);
+		if (jwtCode != null && this.isExpired(jwtCode)) {
+			this.storage.clearAccessTokenByAddress(address);
+			this.storage.clearAccessToken(serviceDid);
 		}
 
 		if (jwtCode == null)
-			jwtCode = storage.loadAccessTokenByAddress(address);
+			jwtCode = this.storage.loadAccessTokenByAddress(address);
 
 
-		if (jwtCode != null && isExpired(jwtCode)) {
-			storage.clearAccessTokenByAddress(address);
-			storage.clearAccessToken(serviceDid);
+		if (jwtCode != null && this.isExpired(jwtCode)) {
+			this.storage.clearAccessTokenByAddress(address);
+			this.storage.clearAccessToken(serviceDid);
 		}
 
 		return jwtCode;
 	}
 
-	private boolean isExpired(String jwtCode) {
+	private isExpired(jwtCode: string) : boolean {
 		// return System.currentTimeMillis() >= (getExpiresTime() * 1000);
 		return false;
 	}
 
-	private void saveToken(String jwtCode) {
-		ServiceContext endpoint = (ServiceContext)bridge.target();
+	private saveToken( jwtCode: string) : void {
+		let endpoint = this.bridge.target() as ServiceContext;
 		if (endpoint == null)
 			return;
 
-		storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
-		storage.storeAccessTokenByAddress(endpoint.getProviderAddress(), jwtCode);
+		this.storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
+		this.storage.storeAccessTokenByAddress(endpoint.getProviderAddress(), jwtCode);
 	}
 
-	private void clearToken() {
-		ServiceContext endpoint = (ServiceContext)bridge.target();
+	private clearToken(): void {
+		let endpoint = this.bridge.target() as ServiceContext;
 		if (endpoint == null)
 			return;
 
-		storage.clearAccessToken(endpoint.getServiceInstanceDid());
-		storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
+		this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
+		this.storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
 	}
 }

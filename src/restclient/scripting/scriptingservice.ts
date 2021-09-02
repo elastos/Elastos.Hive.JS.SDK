@@ -67,7 +67,7 @@ export class ScriptingService {
 					case NodeRPCException.BAD_REQUEST:
 						throw new InvalidParameterException(e.message);
 					default:
-						throw new ServerUnknownException(e);
+						throw new ServerUnknownException(e.message);
 				}
 			}
 			if (e instanceof IOException){

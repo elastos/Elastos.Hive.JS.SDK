@@ -1,10 +1,15 @@
 import { NodeVersion } from "../../domain/nodeversion";
 import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from "../../http/httpresponseparser";
 import { AppContextProvider } from "../../http/security/appcontextprovider";
 import { ServiceContext } from "../../http/servicecontext";
 
 export class AboutService {
+
+	private static API_ABOUT_ENDPOINT = "/api/v2/about/version";
+	private static API_COMMIT_ENDPOINT = "/api/v2/about/commit_id";
 
 	private httpClient: HttpClient;
 	private serviceContext: ServiceContext;
@@ -16,10 +21,17 @@ export class AboutService {
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
     }
 
-    public getNodeVersion(): NodeVersion {
+    public async getNodeVersion(): Promise<NodeVersion> {
 		try {
-			return aboutAPI.version().execute().body();
-		} catch (e) {
+			return await this.httpClient.send<NodeVersion>(`${AboutService.API_ABOUT_ENDPOINT}`, {}, <HttpResponseParser<NodeVersion>>{
+				deserialize(content: any): NodeVersion {
+					return this.rawContent(content) as NodeVersion;
+				},
+				rawContent(content: any): any {
+					return JSON.parse(content);
+				}},HttpMethod.GET);
+		}
+		catch (e) {
 			throw new NetworkException(e);
 		}
 	}
@@ -30,9 +42,15 @@ export class AboutService {
 	 * @return The commit id.
 	 * @throws HiveException The exception shows the error from the request.
 	 */
-	public getCommitId(): string {
+	public async getCommitId(): Promise<string> {
 		try {
-			return aboutAPI.commitId().execute().body().getCommitId();
+			return await this.httpClient.send<string>(`${AboutService.API_COMMIT_ENDPOINT}`, {}, <HttpResponseParser<string>>{
+				deserialize(content: any): string {
+					return this.rawContent(content) as string;
+				},
+				rawContent(content: any): any {
+					return JSON.parse(content);
+				}},HttpMethod.GET);
 		} catch (e) {
 			throw new NetworkException(e);
 		}

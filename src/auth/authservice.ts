@@ -8,6 +8,7 @@ import { ServiceContext } from '../http/servicecontext';
 import { HttpResponseParser } from '../http/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../exceptions';
 import { Claims } from '../domain/jwt/claims';
+import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder';
 
 export class AuthService {
 	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
@@ -77,13 +78,10 @@ export class AuthService {
 
     }
 
-	private checkValid(jwtCode: string, expectationDid: string): boolean {
+	private async checkValid(jwtCode: string, expectationDid: string): Promise<boolean> {
 		try {
-			let claims: Claims = new JwtParserBuilder()
-					.build()
-					.parseClaimsJws(jwtCode)
-					.getBody();
-			return claims.getExpiration().getTime() > System.currentTimeMillis() &&
+			let claims: Claims = (await new JWTParserBuilder().build().parse(jwtCode)).getBody();
+			return claims.getExpiration() > Date.now() &&
 					claims.getAudience().equals(expectationDid);
 		} catch (e) {
 			return false;

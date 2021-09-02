@@ -22,7 +22,8 @@
 
 import { JWTVerifyOptions } from "jose/jwt/verify";
 import { KeyProvider } from "../crypto/keyprovider";
-import { JWTParser } from "../internals";
+import { JWTParser } from "./jwtparser";
+
 
 export class JWTParserBuilder {
     private keyProvider : KeyProvider = null;

@@ -16,9 +16,12 @@
   "dependencies": {
     "@elastosfoundation/did-js-sdk": "^2.0.13",
     "dayjs": "^1.10.4",
+    "fs": "0.0.1-security",
     "jsrsasign": "^10.1.4",
     "jsrsasign-util": "^1.0.2",
-    "pretend": "^3.1.0"
+    "postcss": "^8.3.6",
+    "pretend": "^3.1.0",
+    "tslib": "^2.3.1"
   },
   "repository": {
     "type": "git",
@@ -38,7 +41,7 @@
     "@types/bn.js": "^5.1.0",
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.22",
-    "@types/node": "^14.14.33",
+    "@types/node": "^14.17.14",
     "antlr4ts-cli": "^0.5.0-alpha.4",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3",

@@ -8,7 +8,7 @@ export class NodeVersion {
 	}
 
 	public getMinor(): number {
-		return this.
+		return this.minor;
 	}
 
 	public getPatch(): number {
