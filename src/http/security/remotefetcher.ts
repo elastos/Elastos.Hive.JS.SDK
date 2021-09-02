@@ -1,4 +1,4 @@
-import { ServiceContext } from '../ServiceContext';
+import { ServiceContext } from '../servicecontext';
 import { CodeFetcher } from '../codefetcher';
 import { NodeRPCException } from '../../exceptions';
 

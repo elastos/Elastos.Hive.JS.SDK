@@ -9,7 +9,7 @@ import { BackupService } from "../restclient/backup/backupservice";
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
- export class Vault extends ServiceContext {
+ export class VaultServices extends ServiceContext {
 	private filesService: FilesService;
 	private database: DatabaseService;
 	private scripting: ScriptingService;

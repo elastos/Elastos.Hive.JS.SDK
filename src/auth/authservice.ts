@@ -7,6 +7,7 @@ import { HttpClient } from '../http/httpclient';
 import { ServiceContext } from '../http/servicecontext';
 import { HttpResponseParser } from '../http/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../exceptions';
+import { Claims } from '../domain/jwt/claims';
 
 export class AuthService {
 	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
@@ -27,7 +28,7 @@ export class AuthService {
 			let challenge: string  = await this.signIn(this.contextProvider.getAppInstanceDocument());
 
 			let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
-			return this.auth(challengeResponse);
+			return this.auth(challengeResponse, this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
 			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
 		}

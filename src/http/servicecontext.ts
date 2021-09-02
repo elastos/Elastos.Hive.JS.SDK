@@ -3,11 +3,17 @@ import { File } from '../domain/file'
 import { AppContext } from './security/appcontext'
 import { AccessToken } from './security/accesstoken'
 import { DataStorage } from '../domain/datastorage'
+import { FileStorage } from '../domain/filestorage'
+import { BridgeHandler } from './security/bridgehandler';
+import { Claims } from '../domain/jwt/claims'
+import { NotImplementedException } from '../exceptions'
+import { NodeVersion } from '../domain/nodeversion'
+import { HttpClient } from './httpclient'
 
 export class ServiceContext {
 	private context: AppContext;
 	private providerAddress: string;
-
+    private aboutService: AboutService;
 	private appDid: string;
 	private appInstanceDid: string;
 	private serviceInstanceDid: string;
@@ -21,6 +27,8 @@ export class ServiceContext {
 
         this.context = context;
         this.providerAddress = providerAddress;
+
+        this.init();
     }
 
     private init():void {
@@ -28,8 +36,9 @@ export class ServiceContext {
 		if (!dataDir.endsWith(File.SEPARATOR))
 			dataDir += File.SEPARATOR;
 
-        this.dataStorage = new FileStorage(dataDir, context.getUserDid());
-
+        this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
+        this.accessToken = new AccessToken(this, this.dataStorage, new BridgeHandlerImpl(this));
+        this.aboutService = new this.aboutService(this, new HttpClient(this, HttpClient.DEFAULT_OPTIONS));
     }
 
     public getAccessToken(): AccessToken {
@@ -44,7 +53,123 @@ export class ServiceContext {
 		return this.context;
 	}
 
-*/
+     /**
+      * Get the user DID string of this ServiceContext.
+      *
+      * @return user did
+      */
+     public getUserDid(): string {
+         return this.context.getUserDid();
+     }
+ 
+     /**
+      * Get the application DID in the current calling context.
+      *
+      * @return application did
+      */
+     public getAppDid(): string {
+         return this.appDid;
+     }
+
+     /**
+      * Get the application instance DID in the current calling context;
+      *
+      * @return application instance did
+      */
+     public getAppInstanceDid(): string {
+         return this.appInstanceDid;
+     }
+
+     /**
+      * Get the remote node service application DID.
+      *
+      * @return node service did
+      */
+     public getServiceDid(): string {
+         throw new NotImplementedException();
+     }
+ 
+     /**
+      * Get the remote node service instance DID where is serving the storage service.
+      *
+      * @return node service instance did
+      */
+     public getServiceInstanceDid(): string {
+         return this.serviceInstanceDid;
+     }
+
+     private flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
+         this.appInstanceDid = appInstanceDId;
+         this.serviceInstanceDid = serviceInstanceDid;
+     }
+ 
+     public getStorage(): DataStorage {
+         return this.dataStorage;
+     }
+ 
+     public refreshAccessToken(): void {
+         this.accessToken.fetch();
+     }
+
+     public async getNodeVersion(): Promise<NodeVersion> {
+        return new Promise((resolve, reject)=>{
+            try {
+                let result: T = exec((e)=>{
+                    reject(e);
+                });
+                resolve(result);
+            }
+            catch (e) {
+                reject (e);
+            }
+        })
+
+
+        return CompletableFuture.supplyAsync(() -> {
+             try {
+                 return new AboutController(this).getNodeVersion();
+             } catch (HiveException | RuntimeException e) {
+                 throw new CompletionException(e);
+             }
+         });
+     }
+ 
+     public async getLatestCommitId(): Promise<string> {
+         return CompletableFuture.supplyAsync(() -> {
+             try {
+                 return new AboutController(this).getCommitId();
+             } catch (HiveException | RuntimeException e) {
+                 throw new CompletionException(e);
+             }
+         });
+     }
+}
+
+class BridgeHandlerImpl implements BridgeHandler {
+    private ref: ServiceContext;
+
+    constructor(endpoint: ServiceContext) {
+        this.ref = endpoint;
+    }
+
+    public flush(value: string): void {
+        try {
+            let endpoint = this.ref;
+            let claims: Claims;
+
+            claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
+            endpoint.flushDids(claims.getAudience(), claims.getIssuer());
+
+        } catch (e) {
+            console.log("An error occured in the BridgeHandler");
+            return;
+        }
+    }
+
+    public target(): any {
+        return this.ref;
+    }
+}
 
 
 /*

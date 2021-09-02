@@ -11,7 +11,7 @@ import { ServiceContext } from "../http/servicecontext";
 
 	public constructor(context: AppContext, providerAddress: string) {
 		super(context, providerAddress);
-		let httpClient = new HttpClient(this, HttpClient.DEFAULT_OPTIONS)
+		let httpClient = new HttpClient(this, HttpClient.DEFAULT_OPTIONS);
 		this.promotionService  = new PromotionService(this, httpClient);
 	}
 

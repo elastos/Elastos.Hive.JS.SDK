@@ -23,7 +23,7 @@ export class AccessToken implements CodeFetcher {
 	 * @param storage The data storage which is used to save the access token.
 	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
-	public constructor(serviceContext: ServiceContext , storage: DataStorage , bridge: BridgeHandler) {
+	public constructor(serviceContext: ServiceContext, storage: DataStorage, bridge: BridgeHandler) {
 		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
 		this.bridge = bridge;
