@@ -114,37 +114,12 @@ export class ServiceContext {
      }
 
      public async getNodeVersion(): Promise<NodeVersion> {
-        return new Promise((resolve, reject)=>{
-            try {
-                let result: T = exec((e)=>{
-                    reject(e);
-                });
-                resolve(result);
-            }
-            catch (e) {
-                reject (e);
-            }
-        })
+        return await this.aboutService.getNodeVersion();
+     }
 
-
-    //     return CompletableFuture.supplyAsync(() -> {
-    //          try {
-    //              return new AboutController(this).getNodeVersion();
-    //          } catch (HiveException | RuntimeException e) {
-    //              throw new CompletionException(e);
-    //          }
-    //      });
-    }
- 
-    //  public async getLatestCommitId(): Promise<string> {
-    //      return CompletableFuture.supplyAsync(() -> {
-    //          try {
-    //              return new AboutController(this).getCommitId();
-    //          } catch (HiveException | RuntimeException e) {
-    //              throw new CompletionException(e);
-    //          }
-    //      });
-    //  }
+     public async getLatestCommitId(): Promise<string> {
+         return await this.aboutService.getCommitId();
+     }
 }
 
 class BridgeHandlerImpl implements BridgeHandler {
