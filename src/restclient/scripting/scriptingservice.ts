@@ -133,11 +133,9 @@ export class ScriptingService {
 
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, runScriptParams, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
-					return this.rawContent(content) as T;
-				},
-				rawContent(content: any): any {
-					return JSON.parse(content);
-				}},HttpMethod.PATCH);
+					return JSON.parse(content) as T;
+				}
+			}, HttpMethod.PATCH);
 			
 			return returnValue;
 		} 
@@ -180,11 +178,9 @@ export class ScriptingService {
 		try{
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, {}, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
-					return this.rawContent(content) as T;
-				},
-				rawContent(content: any): any {
-					return JSON.parse(content);
-				}},HttpMethod.GET);
+					return JSON.parse(content) as T;
+				}
+			},HttpMethod.GET);
 			
 			return returnValue;
 		} 
@@ -219,11 +215,9 @@ export class ScriptingService {
 		try {
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
-					return this.rawContent(content);
-				},
-				rawContent(content: any): any {
-					return content;
-				}},HttpMethod.GET);
+					return JSON.parse(content) as T;
+				}
+			},HttpMethod.GET);
 			
 			return returnValue;
 
@@ -238,7 +232,6 @@ export class ScriptingService {
 		
 	}
 
-
 	async downloadFile<T>(transactionId: string, resultType: Class<T>) {
 	
 		if (transactionId == null)
@@ -250,11 +243,9 @@ export class ScriptingService {
 		try {
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>>{
 				deserialize(content: any): T {
-					return this.rawContent(content);
-				},
-				rawContent(content: any): any {
-					return content;
-				}},HttpMethod.GET);
+					return JSON.parse(content) as T;
+				}
+			},HttpMethod.GET);
 		} catch (e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

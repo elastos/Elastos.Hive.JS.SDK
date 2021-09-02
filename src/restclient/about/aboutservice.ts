@@ -25,12 +25,10 @@ export class AboutService {
 		try {
 			return await this.httpClient.send<NodeVersion>(AboutService.API_ABOUT_ENDPOINT, {}, <HttpResponseParser<NodeVersion>>{
 				deserialize(content: any): NodeVersion {
-					let jsonObj = this.rawContent(content);
+					let jsonObj = JSON.parse(content);
 					return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
-				},
-				rawContent(content: any): any {
-					return JSON.parse(content);
-				}},HttpMethod.GET);
+				}
+			},HttpMethod.GET);
 		}
 		catch (e) {
 			throw new NetworkException(e);
@@ -47,11 +45,9 @@ export class AboutService {
 		try {
 			return await this.httpClient.send<string>(AboutService.API_COMMIT_ENDPOINT, {}, <HttpResponseParser<string>>{
 				deserialize(content: any): string {
-					return this.rawContent(content)['commit_hash'];
-				},
-				rawContent(content: any): any {
-					return JSON.parse(content);
-				}},HttpMethod.GET);
+					return JSON.parse(content)['commit_hash'];
+				}
+			},HttpMethod.GET);
 		} catch (e) {
 			throw new NetworkException(e);
 		}

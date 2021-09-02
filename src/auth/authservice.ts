@@ -40,9 +40,6 @@ export class AuthService {
     public async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
 		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, appInstanceDidDoc.toString(), <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				return this.rawContent(content);
-			},
-			rawContent(content: any): any {
 				return JSON.parse(content)['challenge'];
 			}
 		});
@@ -62,9 +59,6 @@ export class AuthService {
 		};
 		let token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, JSON.stringify(challengeResponseRequest), <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				return this.rawContent(content);
-			},
-			rawContent(content: any): any {
 				return JSON.parse(content)['token'];
 			}
 		});

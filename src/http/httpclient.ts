@@ -9,9 +9,6 @@ export class HttpClient {
     public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>> {
 			deserialize(content: any): string {
 				return JSON.stringify(content);
-			},
-			rawContent(content: any): any {
-				return JSON.stringify(content);
 			}
 		};
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
