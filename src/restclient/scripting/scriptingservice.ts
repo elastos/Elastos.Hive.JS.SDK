@@ -9,6 +9,7 @@ import { HttpResponseParser } from '../../http/httpresponseparser';
 import { Class } from '../../class';
 import { Context } from './Context';
 import { HttpMethod } from '../../http/httpmethod';
+import { checkNotNull } from '../../domain/utils';
 
 export class ScriptingService {
 
@@ -38,12 +39,8 @@ export class ScriptingService {
 	* @return Void
 	*/
 	async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
-		
-		if (name == null)
-		throw new IllegalArgumentException("Missing script name.");
-		
-        if (executable == null)
-		throw new IllegalArgumentException("Missing executable script");
+		checkNotNull(name, "Missing script name.");
+		checkNotNull(executable, "Missing executable script");
 		
 		let params = new RegScriptParams()
 			.setExecutable(executable)
@@ -108,21 +105,11 @@ export class ScriptingService {
 	}
 
 	async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string, resultType:  Class<T>) : Promise<T> {
-	
-		if (name === null)
-			throw new IllegalArgumentException("Missing script name.");
-
-		if (params === null)
-			throw new IllegalArgumentException("Missing parameters to run the script");
-
-		if (targetDid === null)
-			throw new IllegalArgumentException("Missing target user DID");
-
-		if (targetAppDid === null)
-			throw new IllegalArgumentException("Missing target application DID");
-
-		if (resultType === null)
-			throw new IllegalArgumentException("Missing result type");
+		checkNotNull(name, "Missing script name.");
+		checkNotNull(params, "Missing parameters to run the script");
+		checkNotNull(targetDid, "Missing target user DID");
+		checkNotNull(targetAppDid, "Missing target application DID");
+		checkNotNull(resultType, "Missing result type");
 
 		try {
 			// TODO: not sure about the returning types
@@ -160,20 +147,11 @@ export class ScriptingService {
 	}
 
 	async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: String, resultType: Class<T>) {
-		if (name === null)
-			throw new IllegalArgumentException("Missing script name.");
-
-		if (params === null)
-			throw new IllegalArgumentException("Missing parameters to run the script");
-
-		if (targetDid === null)
-			throw new IllegalArgumentException("Missing target user DID");
-
-		if (targetAppDid === null)
-			throw new IllegalArgumentException("Missing target application DID");
-
-		if (resultType === null)
-			throw new IllegalArgumentException("Missing result type");
+		checkNotNull(name, "Missing script name.");
+		checkNotNull(params, "Missing parameters to run the script");
+		checkNotNull(targetDid, "Missing target user DID");
+		checkNotNull(targetAppDid, "Missing target application DID");
+		checkNotNull(resultType, "Missing result type");
 		
 		try{
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, {}, <HttpResponseParser<T>> {
@@ -206,12 +184,9 @@ export class ScriptingService {
 		
 	
 	async uploadFile<T>(transactionId: string, resultType: Class<T>) {
-		if (transactionId == null)
-			throw new IllegalArgumentException("Missing transactionId.");
+		checkNotNull(transactionId, "Missing transactionId.");
+		checkNotNull(resultType, "Missing result type");
 
-		if (resultType == null)
-			throw new IllegalArgumentException("Missing result type");
-	
 		try {
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
@@ -233,12 +208,8 @@ export class ScriptingService {
 	}
 
 	async downloadFile<T>(transactionId: string, resultType: Class<T>) {
-	
-		if (transactionId == null)
-			throw new IllegalArgumentException("Missing transactionId.");
-
-		if (resultType == null)
-			throw new IllegalArgumentException("Missing result type");
+		checkNotNull(transactionId, "Missing transactionId.");
+		checkNotNull(resultType, "Missing result type");
 
 		try {
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>>{
