@@ -11,6 +11,12 @@ export class HttpClient {
 				return JSON.stringify(content);
 			}
 		};
+    public static NO_RESPONSE = <HttpResponseParser<void>> {
+			deserialize(content: any): void {
+				return;
+			}
+		};
+
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
     private static DEFAULT_TIMEOUT = 5000;
     private static DEFAULT_PROTOCOL = "http";
@@ -29,8 +35,8 @@ export class HttpClient {
     public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
-        return new Promise((resolve, reject) => {
-          let options = this.buildRequest(serviceEndpoint, method)
+        let options = await this.buildRequest(serviceEndpoint, method);
+        return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
               function(response) {
@@ -59,13 +65,13 @@ export class HttpClient {
         })
     }
 
-    private buildRequest(serviceEndpoint: string, method: HttpMethod): http.RequestOptions {
+    private async buildRequest(serviceEndpoint: string, method: HttpMethod): Promise<http.RequestOptions> {
         let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
         if (method) {
           requestOptions.method = method;
         }
         requestOptions.path = serviceEndpoint;
-        requestOptions.headers['Authorization'] = this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
+        requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
         return requestOptions;
     }

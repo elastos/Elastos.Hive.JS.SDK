@@ -41,7 +41,7 @@ export class ScriptingService {
 	async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
-		
+
 		let params = new RegScriptParams()
 			.setExecutable(executable)
 			.setCondition(condition)
@@ -81,7 +81,7 @@ export class ScriptingService {
 	async unregisterScript(name: string) : Promise<void>{
 
 		try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, {});
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, {}, HttpClient.DEFAULT_RESPONSE_PARSER, HttpMethod.DELETE);
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
