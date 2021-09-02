@@ -16,6 +16,7 @@ export class HttpClient {
 				return;
 			}
 		};
+    public static NO_PAYLOAD = {};
 
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
     private static DEFAULT_TIMEOUT = 5000;

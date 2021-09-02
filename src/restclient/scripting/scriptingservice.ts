@@ -50,7 +50,7 @@ export class ScriptingService {
 			.toString();
 
         try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, params);
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, params, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
@@ -81,7 +81,7 @@ export class ScriptingService {
 	async unregisterScript(name: string) : Promise<void>{
 
 		try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, {}, HttpClient.DEFAULT_RESPONSE_PARSER, HttpMethod.DELETE);
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
@@ -154,7 +154,7 @@ export class ScriptingService {
 		checkNotNull(resultType, "Missing result type");
 		
 		try{
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, {}, <HttpResponseParser<T>> {
+			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
 					return JSON.parse(content) as T;
 				}
@@ -188,7 +188,7 @@ export class ScriptingService {
 		checkNotNull(resultType, "Missing result type");
 
 		try {
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>> {
+			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
 					return JSON.parse(content) as T;
 				}
