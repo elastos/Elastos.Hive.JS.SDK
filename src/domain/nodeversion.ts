@@ -3,6 +3,12 @@ export class NodeVersion {
 	private minor: number;
 	private patch: number;
 
+	constructor(major: number, minor: number, patch: number) {
+		this.major = major;
+		this.minor = minor;
+		this.patch = patch;
+	}
+
 	public getMajor(): number {
 		return this.major;
 	}
@@ -16,6 +22,12 @@ export class NodeVersion {
 	}
 
 	public toString(): string {
-		return String(this.major) + String(this.minor) + String(this.patch);
+		let version = new Array<number>();
+
+		this.major && version.push(this.major);
+		this.minor && version.push(this.minor);
+		this.patch && version.push(this.patch);
+
+		return version.join(".");
 	}
 }
