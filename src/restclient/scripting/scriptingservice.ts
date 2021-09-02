@@ -3,7 +3,6 @@ import { Condition } from './condition';
 import { Executable } from './executable';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpClient } from '../../http/httpclient';
-import { AppContextProvider } from '../../http/security/appcontextprovider';
 import { RegScriptParams } from './RegScriptParams';
 import { RunScriptParams } from './RunScriptParams';
 import { HttpResponseParser } from '../../http/httpresponseparser';
@@ -17,10 +16,11 @@ export class ScriptingService {
 	private static API_SCRIPT_UPLOAD_ENDPOINT = "/api/v2/vault/scripting/stream"; 
 
 	private httpClient: HttpClient;
+	private serviceContext: ServiceContext;
 
-    constructor(httpClient: HttpClient) {
+    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+		this.serviceContext = serviceContext;
 		this.httpClient = httpClient;
-		
     }
     
 	async registerScript(name: string, executable: Executable) : Promise<void>;

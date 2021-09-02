@@ -15,7 +15,7 @@ export class ServiceContext {
 	private accessToken: AccessToken;
 	private dataStorage: DataStorage;
 
-    constructor(context: AppContext , providerAddress: string) {
+    constructor(context: AppContext, providerAddress: string) {
         checkNotNull(context, "Empty context parameter");
         checkNotNull(providerAddress, "Empty provider address parameter");
 

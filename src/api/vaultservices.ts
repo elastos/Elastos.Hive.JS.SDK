@@ -1,42 +1,42 @@
-/*
-package org.elastos.hive;
-
-import org.elastos.hive.service.*;
-import org.elastos.hive.vault.ServiceBuilder;
-*/
+import { HttpClient } from "../http/httpclient";
+import { AppContext } from "../http/security/appcontext";
+import { ServiceContext } from "../http/servicecontext";
+import { FilesService } from "../restclient/files/filesservice";
+import { DatabaseService } from "../restclient/database/databaseservice";
+import { ScriptingService } from "../restclient/scripting/scriptingservice";
+import { BackupService } from "../restclient/backup/backupservice";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
  export class Vault extends ServiceContext {
-	private FilesService 	filesService;
-	private DatabaseService database;
-	private ScriptingService scripting;
-	private BackupService 	backupService;
+	private filesService: FilesService;
+	private database: DatabaseService;
+	private scripting: ScriptingService;
+	private backupService: BackupService;
 
-	public Vault(AppContext context, String providerAddress) {
+	public constructor(context: AppContext, providerAddress: string) {
 		super(context, providerAddress);
-
-		ServiceBuilder builder = new ServiceBuilder(this);
-		this.filesService	= builder.createFilesService();
-		this.database		= builder.createDatabase();
-		this.scripting	 	= builder.createScriptingService();
-		this.backupService  = builder.createBackupService();
+		let httpClient = new HttpClient(this, HttpClient.DEFAULT_OPTIONS)
+		this.filesService	= new FilesService(this, httpClient);
+		this.database		= new DatabaseService(this, httpClient);
+		this.scripting	 	= new ScriptingService(this, httpClient);
+		this.backupService  = new BackupService(this, httpClient);
 	}
 
-	public FilesService getFilesService() {
+	public getFilesService(): FilesService {
 		return this.filesService;
 	}
 
-	public DatabaseService getDatabaseService() {
+	public getDatabaseService(): DatabaseService {
 		return this.database;
 	}
 
-	public ScriptingService getScriptingService() {
+	public getScriptingService(): ScriptingService {
 		return this.scripting;
 	}
 
-	public BackupService getBackupService() {
+	public getBackupService(): BackupService  {
 		return this.backupService;
 	}
 }
