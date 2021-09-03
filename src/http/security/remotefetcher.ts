@@ -2,7 +2,7 @@ import { ServiceContext } from '../servicecontext';
 import { CodeFetcher } from '../codefetcher';
 import { NodeRPCException } from '../../exceptions';
 import { AppContextProvider } from './appcontextprovider';
-import { AuthService } from '../../auth/authservice';
+import { AuthService } from '../../restclient/auth/authservice';
 
 export class RemoteFetcher implements CodeFetcher {
 	private contextProvider: AppContextProvider;

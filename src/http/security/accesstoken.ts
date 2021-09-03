@@ -2,7 +2,7 @@ import { CodeFetcher } from '../codefetcher';
 import { DataStorage } from '../../domain/datastorage';
 import { BridgeHandler } from './bridgehandler';
 import { ServiceContext } from '../servicecontext';
-import { AuthService } from '../../auth/authservice';
+import { AuthService } from '../../restclient/auth/authservice';
 import { HttpClient } from '../httpclient';
 
 /**

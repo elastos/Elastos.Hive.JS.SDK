@@ -1,15 +1,15 @@
 import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
 import { SignInRequest } from './signinrequest';
 import { ChallengeRequest } from './challengerequest';
-import { AppContextProvider } from '../http/security/appcontextprovider';
-import { AccessToken } from '../http/security/accesstoken';
-import { HttpClient } from '../http/httpclient';
-import { ServiceContext } from '../http/servicecontext';
-import { HttpResponseParser } from '../http/httpresponseparser';
-import { NodeRPCException, ServerUnknownException } from '../exceptions';
-import { Claims } from '../domain/jwt/claims';
-import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder';
-import { Logger } from '../logger';
+import { AppContextProvider } from '../../http/security/appcontextprovider';
+import { AccessToken } from '../../http/security/accesstoken';
+import { HttpClient } from '../../http/httpclient';
+import { ServiceContext } from '../../http/servicecontext';
+import { HttpResponseParser } from '../../http/httpresponseparser';
+import { NodeRPCException, ServerUnknownException } from '../../exceptions';
+import { Claims } from '../../domain/jwt/claims';
+import { JWTParserBuilder } from '../../domain/jwt/jwtparserbuilder';
+import { Logger } from '../../logger';
 
 export class AuthService {
 	private static LOG = new Logger("AuthService");
