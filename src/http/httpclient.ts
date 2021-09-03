@@ -36,10 +36,11 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    public async send<T>(serviceEndpoint: string, payload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
+    public async send<T>(serviceEndpoint: string, rawpayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let options = await this.buildRequest(serviceEndpoint, method);
+        let payload = this.parsePayload(rawpayload);
 
         HttpClient.LOG.initializeCID();
         HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
@@ -91,6 +92,10 @@ export class HttpClient {
         requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
         return requestOptions;
+    }
+
+    private parsePayload(payload: any): string {
+        return !payload || typeof payload === "string" ? payload : JSON.stringify(payload);
     }
 
     private validateOptions(httpOptions: http.RequestOptions): http.RequestOptions {

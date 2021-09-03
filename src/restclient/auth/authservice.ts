@@ -60,7 +60,7 @@ export class AuthService {
 		let challengeResponseRequest = {
 			"challenge_response": challengeResponse
 		};
-		let token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, JSON.stringify(challengeResponseRequest), <HttpResponseParser<string>> {
+		let token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, challengeResponseRequest, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
 				return JSON.parse(content)['token'];
 			}
