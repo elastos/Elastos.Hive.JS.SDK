@@ -1,4 +1,4 @@
-import { IllegalArgumentException, InvalidParameterException, IOException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from '../../exceptions';
+import { InvalidParameterException, IOException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
 import { ServiceContext } from '../../http/servicecontext';

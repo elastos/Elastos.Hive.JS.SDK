@@ -1,5 +1,6 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk/';
 import { DIDResolveException } from '@elastosfoundation/did-js-sdk/typings/exceptions/exceptions';
+import { DIDDocumentService } from '@elastosfoundation/did-js-sdk/typings/internals';
 import {
      IllegalArgumentException,
      DIDResoverAlreadySetupException,
@@ -110,7 +111,7 @@ export class AppContext {
             return(preferredProviderAddress);
 
         try {
-            let services: Array<DIDDocument.Service> = null;
+            let services: Array<DIDDocumentService> = null;
             let did: DID = new DID(targetDid);
             let doc: DIDDocument = await did.resolve();
             if (doc == null)
@@ -124,7 +125,7 @@ export class AppContext {
                 * Should we throw special exception when it has more than one end-point
                 * of service "HiveVault";
                 */
-            return services[0].serviceEndpoint;
+            return services[0].getServiceEndpoint();
 
         } catch (e) {
             if (e instanceof MalformedDIDException) {

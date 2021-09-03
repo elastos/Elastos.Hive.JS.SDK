@@ -39,6 +39,7 @@ export class VaultNotFoundException extends ParentException {}
 export class DIDResolveException extends ParentException {}
 export class JWTException extends ParentException {}
 export class IOException extends ParentException {}
+export class DeserializationError extends ParentException {}
 export class HttpException extends ParentException {
     private httpCode: number;
 

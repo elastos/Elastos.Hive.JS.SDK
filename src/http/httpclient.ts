@@ -2,10 +2,13 @@ import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { HttpException } from '../exceptions';
+import { DeserializationError, HttpException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
+import { Logger } from '../logger';
 
 export class HttpClient {
+    private static LOG = new Logger("HttpClient");
+
     public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>> {
 			deserialize(content: any): string {
 				return JSON.stringify(content);
@@ -37,6 +40,10 @@ export class HttpClient {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let options = await this.buildRequest(serviceEndpoint, method);
+
+        HttpClient.LOG.initializeCID();
+        HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
+
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
@@ -45,20 +52,29 @@ export class HttpClient {
                 if (statusCode >= 300) {
                   reject(
                     new HttpException(statusCode, response.statusMessage)
-                  )
+                  );
                 }
                 const chunks = [];
                 response.on('data', (chunk) => {
                   chunks.push(chunk);
                 });
                 response.on('end', () => {
-                  const result = Buffer.concat(chunks).toString();
-                  resolve(responseParser.deserialize(result));
+                  try {
+                    const result = Buffer.concat(chunks).toString();
+                    HttpClient.LOG.debug("HTTP Response: " + (result ? " response: " + result : ""));
+                    let response = responseParser.deserialize(result);
+
+                    resolve(response);
+                  } catch(e) {
+                    reject(
+                      new DeserializationError("Unable to deserialize content from " + serviceEndpoint, e)
+                    );
+                  }
                 });
               }
             );
             
-            if (options.method != "GET") {
+            if (payload != HttpClient.NO_PAYLOAD) {
                 request.write(JSON.stringify(payload));
             }
 
@@ -71,7 +87,7 @@ export class HttpClient {
         if (method) {
           requestOptions.method = method;
         }
-        requestOptions.path = serviceEndpoint;
+        requestOptions.path = this.serviceContext.getProviderAddress() + serviceEndpoint;
         requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
         return requestOptions;

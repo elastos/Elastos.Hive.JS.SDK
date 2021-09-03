@@ -23,7 +23,7 @@ export class AboutService {
 
     public async getNodeVersion(): Promise<NodeVersion> {
 		try {
-			return await this.httpClient.send<NodeVersion>(AboutService.API_ABOUT_ENDPOINT, {}, <HttpResponseParser<NodeVersion>>{
+			return await this.httpClient.send<NodeVersion>(AboutService.API_ABOUT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<NodeVersion>>{
 				deserialize(content: any): NodeVersion {
 					let jsonObj = JSON.parse(content);
 					return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
@@ -43,7 +43,7 @@ export class AboutService {
 	 */
 	public async getCommitId(): Promise<string> {
 		try {
-			return await this.httpClient.send<string>(AboutService.API_COMMIT_ENDPOINT, {}, <HttpResponseParser<string>>{
+			return await this.httpClient.send<string>(AboutService.API_COMMIT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>>{
 				deserialize(content: any): string {
 					return JSON.parse(content)['commit_hash'];
 				}
