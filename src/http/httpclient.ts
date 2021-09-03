@@ -20,13 +20,25 @@ export class HttpClient {
 			}
 		};
     public static NO_PAYLOAD = {};
-    public static DEFAULT_OPTIONS: http.RequestOptions = {};
     
     private static DEFAULT_TIMEOUT = 5000;
     private static DEFAULT_PROTOCOL = "http";
     private static DEFAULT_PORT = 80;
     private static DEFAULT_METHOD = "PUT";
     private static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
+    private static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
+        "Transfer-Encoding": "chunked",
+        "Connection": "Keep-Alive",
+        "User-Agent": HttpClient.DEFAULT_AGENT
+    };
+
+    public static DEFAULT_OPTIONS: http.RequestOptions = {
+        method: HttpClient.DEFAULT_METHOD,
+        protocol: HttpClient.DEFAULT_PROTOCOL,
+        port: HttpClient.DEFAULT_PORT,
+        timeout: HttpClient.DEFAULT_TIMEOUT,
+        headers: HttpClient.DEFAULT_HEADERS
+    };
 
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;
@@ -88,7 +100,7 @@ export class HttpClient {
         if (method) {
           requestOptions.method = method;
         }
-        requestOptions.path = this.serviceContext.getProviderAddress() + serviceEndpoint;
+        requestOptions.path = serviceEndpoint;
         requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
 
         return requestOptions;
@@ -105,12 +117,16 @@ export class HttpClient {
         httpOptions.port = httpOptions.port ?? HttpClient.DEFAULT_PORT;
         httpOptions.method = httpOptions.method ?? HttpClient.DEFAULT_METHOD;
         httpOptions.timeout = httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT;
-        httpOptions.host = this.serviceContext.getProviderAddress();
-        httpOptions.headers = httpOptions.headers ?? {
-            "Transfer-Encoding": "chunked",
-            "Connection": "Keep-Alive",
-            "User-Agent": HttpClient.DEFAULT_AGENT
-        };
+        httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
+
+        // If the providerAddress already contains the protocol, we extract it.
+        if (this.serviceContext.getProviderAddress().includes("://")) {
+          let urlPart = this.serviceContext.getProviderAddress().split("://");
+          httpOptions.protocol = urlPart[0];
+          httpOptions.host = urlPart[1];  
+        } else {
+          httpOptions.host = this.serviceContext.getProviderAddress();
+        }
 
         return httpOptions;
     }
