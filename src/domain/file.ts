@@ -23,7 +23,9 @@
 import path from "path";
 
 //import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from "./fs";
-import * as fs from "./fs";
+import * as fs from 'fs-extra';
+
+
 
 /**
  * Internal class mimicing Java File class in order to reduce the divergence with Java implementation

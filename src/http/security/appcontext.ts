@@ -1,6 +1,5 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk/';
 import { DIDResolveException } from '@elastosfoundation/did-js-sdk/typings/exceptions/exceptions';
-import { DIDDocumentService } from '@elastosfoundation/did-js-sdk/typings/internals';
 import {
      IllegalArgumentException,
      DIDResoverAlreadySetupException,
@@ -113,7 +112,7 @@ export class AppContext {
             return(preferredProviderAddress);
 
         try {
-            let services: Array<DIDDocumentService> = null;
+            let services: Array<DIDDocument.Service> = null;
             let did: DID = new DID(targetDid);
             let doc: DIDDocument = await did.resolve();
             if (doc == null)
