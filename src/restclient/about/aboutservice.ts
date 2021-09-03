@@ -5,8 +5,10 @@ import { HttpMethod } from "../../http/httpmethod";
 import { HttpResponseParser } from "../../http/httpresponseparser";
 import { AppContextProvider } from "../../http/security/appcontextprovider";
 import { ServiceContext } from "../../http/servicecontext";
+import { Logger } from '../../logger';
 
 export class AboutService {
+	private static LOG = new Logger("AboutService");
 
 	private static API_ABOUT_ENDPOINT = "/api/v2/about/version";
 	private static API_COMMIT_ENDPOINT = "/api/v2/about/commit_id";

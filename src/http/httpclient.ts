@@ -20,8 +20,8 @@ export class HttpClient {
 			}
 		};
     public static NO_PAYLOAD = {};
-
     public static DEFAULT_OPTIONS: http.RequestOptions = {};
+    
     private static DEFAULT_TIMEOUT = 5000;
     private static DEFAULT_PROTOCOL = "http";
     private static DEFAULT_PORT = 80;

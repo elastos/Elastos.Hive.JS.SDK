@@ -9,8 +9,11 @@ import { HttpResponseParser } from '../http/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../exceptions';
 import { Claims } from '../domain/jwt/claims';
 import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder';
+import { Logger } from '../logger';
 
 export class AuthService {
+	private static LOG = new Logger("AuthService");
+
 	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
 	private static AUTH_ENDPOINT = "/api/v2/did/auth";
 
@@ -45,7 +48,7 @@ export class AuthService {
 		});
 
 		if (!this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
-			console.log("Failed to check the valid of challenge code when sign in.");
+			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
 			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 		}
 		return challenge;
@@ -64,7 +67,7 @@ export class AuthService {
 		});
 
 		if (!this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
-			console.log("Failed to check the valid of access token when auth.");
+			AuthService.LOG.error("Failed to check the valid of access token when auth.");
 			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 		}
 		return token;

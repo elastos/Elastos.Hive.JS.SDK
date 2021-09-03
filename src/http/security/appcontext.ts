@@ -11,6 +11,7 @@ import {
      ProviderNotSetException,
      DIDNotPublishedException } from '../../exceptions';
 import { AppContextProvider } from './appcontextprovider';
+import { Logger } from '../../logger';
 
 /**
  * The application context would contain the resources list below:
@@ -22,9 +23,10 @@ import { AppContextProvider } from './appcontextprovider';
  *
  * <p>Normally, there are only one application context for one application.</p>
  */
-
 export class AppContext {
-    public static debug = false;
+	private static LOG = new Logger("AppContext");
+	
+	public static debug = false;
     private static resolverHasSetup = false;
 
     private contextProvider: AppContextProvider;
@@ -129,10 +131,10 @@ export class AppContext {
 
         } catch (e) {
             if (e instanceof MalformedDIDException) {
-                console.log("Malformed target did " + targetDid + " with error: " + e.message);
+                AppContext.LOG.error("Malformed target did " + targetDid + " with error: " + e.message);
                 throw new IllegalArgumentException("Malformed did string: " + targetDid);
             } else if (e instanceof DIDResolveException) {
-                console.log("Resolving the target DID " + targetDid + " failed: " + e.message);
+                AppContext.LOG.error("Resolving the target DID " + targetDid + " failed: " + e.message);
                 throw new NetworkException("Resolving DID failed: " + e.message);
             }
         }

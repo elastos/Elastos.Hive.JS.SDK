@@ -11,9 +11,12 @@ import { NodeVersion } from '../domain/nodeversion'
 import { HttpClient } from './httpclient'
 import { AboutService } from '../restclient/about/aboutservice'
 import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder'
+import { Logger } from '../logger';
 
 export class ServiceContext {
-	private context: AppContext;
+	private static LOG = new Logger("ServiceContext");
+
+    private context: AppContext;
 	private providerAddress: string;
     private aboutService: AboutService;
 	private appDid: string;
@@ -123,6 +126,8 @@ export class ServiceContext {
 }
 
 class BridgeHandlerImpl implements BridgeHandler {
+	private static LOG = new Logger("BridgeHandler");
+
     private ref: ServiceContext;
 
     constructor(endpoint: ServiceContext) {
@@ -138,7 +143,7 @@ class BridgeHandlerImpl implements BridgeHandler {
             endpoint.flushDids(claims.getAudience(), claims.getIssuer());
 
         } catch (e) {
-            console.log("An error occured in the BridgeHandler");
+            BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
             return;
         }
     }

@@ -10,8 +10,10 @@ import { Class } from '../../class';
 import { Context } from './Context';
 import { HttpMethod } from '../../http/httpmethod';
 import { checkNotNull } from '../../domain/utils';
+import { Logger } from '../../logger';
 
 export class ScriptingService {
+	private static LOG = new Logger("ScriptingService");
 
 	private static API_SCRIPT_ENDPOINT = "/api/v2/vault/scripting";
 	private static API_SCRIPT_UPLOAD_ENDPOINT = "/api/v2/vault/scripting/stream"; 

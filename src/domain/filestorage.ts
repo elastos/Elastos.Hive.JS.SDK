@@ -1,9 +1,11 @@
 import { File } from './file'
 import { DataStorage } from './datastorage'
 import { SHA256 } from './sha256'
-import { BASE64 } from './base64'
+import { Logger } from '../logger';
 
 export class FileStorage implements DataStorage {
+	private static LOG = new Logger("FileStorage");
+
 	private static BACKUP = "credential-backup";
 	private static TOKENS = "tokens";
 
@@ -68,7 +70,7 @@ export class FileStorage implements DataStorage {
 		try {
 			return new File(path).readText();
 		} catch (e) {
-            console.log(e.message);
+            FileStorage.LOG.error(e.message);
 			return null;
 		}
 	}
@@ -88,7 +90,7 @@ export class FileStorage implements DataStorage {
 		try {
             targetFile.writeText(content);
 		} catch (e) {
-			console.log(e.message);
+			FileStorage.LOG.error(e.message);
 		}
 	}
 
@@ -99,7 +101,7 @@ export class FileStorage implements DataStorage {
 		try {
             (new File(path)).delete();
 		} catch (e) {
-			console.log(e.message);
+			FileStorage.LOG.error(e.message);
 		}
 	}
 

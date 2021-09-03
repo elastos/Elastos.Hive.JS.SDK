@@ -1,8 +1,10 @@
 import { HttpClient } from "../../http/httpclient";
 import { AppContextProvider } from "../../http/security/appcontextprovider";
 import { ServiceContext } from "../../http/servicecontext";
+import { Logger } from '../../logger';
 
 export class PromotionService {
+	private static LOG = new Logger("PromotionService");
 
 	private httpClient: HttpClient;
 	private serviceContext: ServiceContext;

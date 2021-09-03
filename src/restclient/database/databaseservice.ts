@@ -1,8 +1,10 @@
 import { HttpClient } from "../../http/httpclient";
 import { AppContextProvider } from "../../http/security/appcontextprovider";
 import { ServiceContext } from "../../http/servicecontext";
+import { Logger } from '../../logger';
 
 export class DatabaseService {
+	private static LOG = new Logger("DatabaseService");
 
 	private httpClient: HttpClient;
 	private serviceContext: ServiceContext;
