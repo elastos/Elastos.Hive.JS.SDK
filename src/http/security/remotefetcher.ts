@@ -1,3 +1,4 @@
+import { HttpClient } from "../httpclient";
 import { ServiceContext } from '../servicecontext';
 import { CodeFetcher } from '../codefetcher';
 import { NodeRPCException } from '../../exceptions';
@@ -10,9 +11,7 @@ export class RemoteFetcher implements CodeFetcher {
 
 	public constructor(serviceContext: ServiceContext) {
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
-		
-		// TODO: Java version had a AuthController here which signature differs from our AuthService 
-		this.authService = new AuthService(serviceContext, undefined); // this.contextProvider.getAppInstanceDocument());
+		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.DEFAULT_OPTIONS));
 	}
 
 	public async fetch(): Promise<string> {

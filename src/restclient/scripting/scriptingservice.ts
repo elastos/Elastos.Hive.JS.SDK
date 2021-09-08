@@ -11,20 +11,17 @@ import { Context } from './context';
 import { HttpMethod } from '../../http/httpmethod';
 import { checkNotNull } from '../../domain/utils';
 import { Logger } from '../../logger';
+import { RestService } from '../restservice';
 
-export class ScriptingService {
+export class ScriptingService extends RestService {
 	private static LOG = new Logger("ScriptingService");
 
 	private static API_SCRIPT_ENDPOINT = "/api/v2/vault/scripting";
 	private static API_SCRIPT_UPLOAD_ENDPOINT = "/api/v2/vault/scripting/stream"; 
 
-	private httpClient: HttpClient;
-	private serviceContext: ServiceContext;
-
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
-		this.serviceContext = serviceContext;
-		this.httpClient = httpClient;
-    }
+		super(serviceContext, httpClient);
+	}
     
 	async registerScript(name: string, executable: Executable) : Promise<void>;
     

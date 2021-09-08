@@ -3,24 +3,18 @@ import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { HttpMethod } from "../../http/httpmethod";
 import { HttpResponseParser } from "../../http/httpresponseparser";
-import { AppContextProvider } from "../../http/security/appcontextprovider";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
+import { RestService } from "../restservice";
 
-export class AboutService {
+export class AboutService extends RestService {
 	private static LOG = new Logger("AboutService");
 
 	private static API_ABOUT_ENDPOINT = "/api/v2/about/version";
 	private static API_COMMIT_ENDPOINT = "/api/v2/about/commit_id";
 
-	private httpClient: HttpClient;
-	private serviceContext: ServiceContext;
-	private contextProvider: AppContextProvider;
-
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
-		this.serviceContext = serviceContext;
-		this.httpClient = httpClient;
-		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
+		super(serviceContext, httpClient);
     }
 
     public async getNodeVersion(): Promise<NodeVersion> {
