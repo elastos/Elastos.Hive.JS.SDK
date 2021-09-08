@@ -52,14 +52,14 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    public async send<T>(serviceEndpoint: string, rawpayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
+    public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let options = await this.buildRequest(serviceEndpoint, method);
-        let payload = this.parsePayload(rawpayload);
+        let payload = this.parsePayload(rawPayload);
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
+        HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
 
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
@@ -136,7 +136,7 @@ export class HttpClient {
 
         return httpOptions;
     }
-    
+
     private handleResponse(response: http.IncomingMessage, content: string): void {
       if (response.statusCode != 200) {
         if (this.withAuthorization && response.statusCode == 401) {
