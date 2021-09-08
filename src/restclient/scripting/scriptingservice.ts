@@ -231,6 +231,10 @@ export class ScriptingService extends RestService {
 			}
 		}
 	}
+
+	public isAuthorizationRequired(): boolean {
+        return true;
+    }
 }
 
 

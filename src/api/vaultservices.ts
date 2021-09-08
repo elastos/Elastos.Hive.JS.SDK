@@ -17,7 +17,7 @@ import { BackupService } from "../restclient/backup/backupservice";
 
 	public constructor(context: AppContext, providerAddress: string) {
 		super(context, providerAddress);
-		let httpClient = new HttpClient(this, HttpClient.DEFAULT_OPTIONS);
+		let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
 		this.filesService	= new FilesService(this, httpClient);
 		this.database		= new DatabaseService(this, httpClient);
 		this.scripting	 	= new ScriptingService(this, httpClient);

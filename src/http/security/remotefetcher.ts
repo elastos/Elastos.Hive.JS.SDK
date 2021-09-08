@@ -11,7 +11,7 @@ export class RemoteFetcher implements CodeFetcher {
 
 	public constructor(serviceContext: ServiceContext) {
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
-		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.DEFAULT_OPTIONS));
+		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 	}
 
 	public async fetch(): Promise<string> {

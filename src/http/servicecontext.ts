@@ -43,7 +43,7 @@ export class ServiceContext {
 
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
         this.accessToken = new AccessToken(this, this.dataStorage, new BridgeHandlerImpl(this));
-        this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.DEFAULT_OPTIONS));
+        this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
     }
 
     public getAccessToken(): AccessToken {

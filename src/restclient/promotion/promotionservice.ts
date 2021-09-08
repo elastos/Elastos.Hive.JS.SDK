@@ -10,4 +10,7 @@ export class PromotionService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
+	public isAuthorizationRequired(): boolean {
+        return true;
+    }
 }

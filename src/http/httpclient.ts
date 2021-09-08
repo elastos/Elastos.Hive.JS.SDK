@@ -2,7 +2,7 @@ import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { DeserializationError, HttpException } from '../exceptions';
+import { DeserializationError, HttpException, NodeRPCException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
 
@@ -20,6 +20,8 @@ export class HttpClient {
 			}
 		};
     public static NO_PAYLOAD = {};
+    public static WITH_AUTHORIZATION = true;
+    public static NO_AUTHORIZATION = false;
     
     private static DEFAULT_TIMEOUT = 5000;
     private static DEFAULT_PROTOCOL = "http";
@@ -40,11 +42,13 @@ export class HttpClient {
         headers: HttpClient.DEFAULT_HEADERS
     };
 
+    private withAuthorization: boolean = false;
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;
 
-    constructor(serviceContext: ServiceContext, httpOptions: http.RequestOptions) {
+    constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: http.RequestOptions) {
         this.serviceContext = serviceContext;
+        this.withAuthorization = withAuthorization;
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
@@ -60,7 +64,7 @@ export class HttpClient {
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
-              function(response) {
+              function(response: http.IncomingMessage) {
                 const { statusCode } = response;
                 if (statusCode >= 300) {
                   reject(
@@ -73,11 +77,10 @@ export class HttpClient {
                 });
                 response.on('end', () => {
                   try {
-                    const result = Buffer.concat(chunks).toString();
-                    HttpClient.LOG.debug("HTTP Response: " + (result ? " response: " + result : ""));
-                    let response = responseParser.deserialize(result);
-
-                    resolve(response);
+                    const rawContent = Buffer.concat(chunks).toString();
+                    HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
+                    this.handleResponse(response, rawContent);
+                    resolve(responseParser.deserialize(rawContent));
                   } catch(e) {
                     reject(
                       new DeserializationError("Unable to deserialize content from " + serviceEndpoint, e)
@@ -101,7 +104,10 @@ export class HttpClient {
           requestOptions.method = method;
         }
         requestOptions.path = serviceEndpoint;
-        requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
+
+        if (this.withAuthorization) {
+          requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
+        }
 
         return requestOptions;
     }
@@ -129,5 +135,21 @@ export class HttpClient {
         }
 
         return httpOptions;
+    }
+    
+    private handleResponse(response: http.IncomingMessage, content: string): void {
+      if (response.statusCode != 200) {
+        if (this.withAuthorization && response.statusCode == 401) {
+          this.serviceContext.getAccessToken().invalidate();
+        }
+        if (!content) {
+          throw new NodeRPCException(response.statusCode, -1, "Empty body.");
+        }
+        let httpError = JSON.parse(content);
+        let errorCode = httpError['internal_code'];
+        let errorMessage = httpError['message'];
+
+        throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
+      }
     }
 }
