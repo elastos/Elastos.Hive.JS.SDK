@@ -17,6 +17,7 @@
     "@elastosfoundation/did-js-sdk": "^2.0.13",
     "dayjs": "^1.10.4",
     "fs": "0.0.1-security",
+    "http-browserify": "^1.7.0",
     "jsrsasign": "^10.1.4",
     "jsrsasign-util": "^1.0.2",
     "postcss": "^8.3.6",
