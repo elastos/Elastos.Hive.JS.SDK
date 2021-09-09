@@ -1,4 +1,4 @@
-import { CodeFetcher } from '../codefetcher';
+//import { CodeFetcher } from '../codefetcher';
 import { DataStorage } from '../../domain/datastorage';
 import { BridgeHandler } from './bridgehandler';
 import { ServiceContext } from '../servicecontext';
@@ -10,7 +10,7 @@ import { HttpClient } from '../httpclient';
  *
  * <p>Some of the node APIs requires access token when handling request.</p>
  */
-export class AccessToken implements CodeFetcher {
+export class AccessToken {
 	private jwtCode: string;
 	private authService: AuthService;
 	private storage: DataStorage;

@@ -27,7 +27,7 @@ import { DIDResolveException, JWTException } from "../../exceptions";
 import { decodeProtectedHeader } from "jose/util/decode_protected_header";
 import { UnsecuredJWT } from "jose/jwt/unsecured";
 import { jwtVerify, JWTVerifyOptions } from "jose/jwt/verify";
-import { DID, DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { DID, DIDDocument } from '@elastosfoundation/did-js-sdk/';
 
 export class JWTParser {
     private keyprovider : KeyProvider;
