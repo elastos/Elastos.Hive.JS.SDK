@@ -1,5 +1,4 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk/';
-import { DIDResolveException } from '@elastosfoundation/did-js-sdk/typings/exceptions/exceptions';
 import {
      IllegalArgumentException,
      DIDResoverAlreadySetupException,
@@ -7,7 +6,8 @@ import {
      DIDResolverNotSetupException,
      MalformedDIDException,
      NetworkException,
-     ProviderNotSetException,
+	 ProviderNotSetException,
+	 DIDResolveException,
      DIDNotPublishedException } from '../../exceptions';
 import { AppContextProvider } from './appcontextprovider';
 import { Logger } from '../../logger';

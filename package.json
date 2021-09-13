@@ -1,6 +1,6 @@
 {
   "name": "@dchagastelles/elastos-hive-js-sdk",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Elastos Hive JS SDK",
   "main": "./dist/hive.js",
   "module": "./dist/es/hive.js",
@@ -19,7 +19,7 @@
   },
   "typings": "typings/",
   "dependencies": {
-    "@elastosfoundation/did-js-sdk": "^2.0.13",
+    "@elastosfoundation/did-js-sdk": "^2.1.0",
     "@rollup/plugin-alias": "^3.1.5",
     "@rollup/plugin-eslint": "^8.0.1",
     "@rollup/plugin-inject": "^4.0.2",
