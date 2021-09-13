@@ -22,7 +22,7 @@ export class NodeVersion {
 	}
 
 	public toString(): string {
-		let version = new Array<number>();
+		let version : number[] = [];
 
 		this.major && version.push(this.major);
 		this.minor && version.push(this.minor);
