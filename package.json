@@ -1,14 +1,19 @@
 {
   "name": "@dchagastelles/elastos-hive-js-sdk",
-  "version": "2.4.0",
+  "version": "2.7.0",
   "description": "Elastos Hive JS SDK",
-  "main_old": "dist/HiveClient.js",
-  "types_old": "dist/HiveClient.d.ts",
+  "main": "./dist/hive.js",
+  "module": "./dist/es/hive.js",
+  "browser": {
+    "./dist/hive.js": "./dist/hive.browser.js",
+    "./dist/es/hive.js": "./dist/es/hive.browser.js"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rm -rf dist/ dist.esm/ typings/",
     "tsc:build": "rollup -c",
+    "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:w": "tsc -w",
     "test": "jest"
   },
@@ -69,11 +74,11 @@
     "typescript": "^4.2.3"
   },
   "files": [
-    "src",
-    "dist"
+    "dist",
+    "typings"
   ],
   "include": [
-    "src",
+    "typings",
     "dist"
   ],
   "author": "Elastos",
@@ -82,7 +87,6 @@
     "url": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK/issues"
   },
   "homepage": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK#readme",
-  "main": "rollup.config.js",
   "directories": {
     "test": "tests"
   }

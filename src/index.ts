@@ -54,6 +54,16 @@ import { VaultSubscriptionService }  from "./restclient/vaultsubscription/vaults
 //Logger.setLevel(Logger.TRACE);
 
 
+export type {
+    KeyProvider,
+    Class,
+    
+    DataStorage,
+    HttpResponseParser,
+    AppContextProvider,
+    BridgeHandler,
+}
+
 export {
     //initialize,
     BackupServices,
@@ -63,20 +73,14 @@ export {
     CrossConfig,
     NodeConfig,
     UserConfig,
-    KeyProvider,
-    Class,
-    DataStorage,
-    File as fs,
+    File,
     FileStorage,
     HttpClient,
     HttpMethod,
-    HttpResponseParser,
     ServiceContext,
     AccessToken,
     NodeVersion,
     AppContext,
-    AppContextProvider,
-    BridgeHandler,
     AboutService,
     AuthService,
     BackupService,
