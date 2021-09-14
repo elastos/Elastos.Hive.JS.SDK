@@ -16,7 +16,7 @@ export interface AppContextProvider {
 	 * instance did document as the running context.
 	 * @return The application instance did document.
 	 */
-	getAppInstanceDocument(): DIDDocument;
+	getAppInstanceDocument(): Promise<DIDDocument>;
 
 	/**
 	 * The method for upper Application to implement to acquire the authorization

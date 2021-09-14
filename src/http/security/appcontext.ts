@@ -79,14 +79,14 @@ export class AppContext {
 	 * @param userDid The user DID.
 	 * @return The application context.
 	 */
-	public static build(provider: AppContextProvider, userDid: string): AppContext {
+	public static async build(provider: AppContextProvider, userDid: string): Promise<AppContext> {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");
 
-		if (provider.getAppInstanceDocument() == null)
+		if (await provider.getAppInstanceDocument() == null)
 			throw new BadContextProviderException("Missing method to acquire App instance DID document");
 
 		if (!AppContext.resolverHasSetup)

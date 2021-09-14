@@ -24,10 +24,10 @@ export class AuthService extends RestService {
 
 	public async fetch(): Promise<string> {
 		try {
-			let challenge: string  = await this.signIn(this.contextProvider.getAppInstanceDocument());
+			let challenge: string  = await this.signIn(await this.contextProvider.getAppInstanceDocument());
 
 			let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
-			return this.auth(challengeResponse, this.contextProvider.getAppInstanceDocument());
+			return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
 			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
 		}
