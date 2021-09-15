@@ -45,7 +45,7 @@ export class TestData {
 				userConfig.storepass).then(user => {
                     return user;
                 });
-		UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
+		let userConfigCaller = ClientConfig.get().cross.user;
 		callerDid = new UserDID(userConfigCaller.name(),
 				userConfigCaller.mnemonic(),
 				userConfigCaller.passPhrase(),

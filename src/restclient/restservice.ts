@@ -17,8 +17,4 @@ export class RestService {
     public getHttpClient(): HttpClient {
         return this.httpClient;
     }
-
-    public isAuthorizationRequired(): boolean {
-        return false;
-    }
 }

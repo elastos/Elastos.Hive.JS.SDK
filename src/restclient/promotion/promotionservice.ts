@@ -9,8 +9,4 @@ export class PromotionService extends RestService {
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
-
-	public isAuthorizationRequired(): boolean {
-        return true;
-    }
 }

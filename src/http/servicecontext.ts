@@ -14,8 +14,6 @@ import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder'
 import { Logger } from '../logger';
 
 export class ServiceContext {
-	private static LOG = new Logger("ServiceContext");
-
     private context: AppContext;
 	private providerAddress: string;
     private aboutService: AboutService;
