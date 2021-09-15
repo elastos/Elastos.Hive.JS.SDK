@@ -1,6 +1,6 @@
 {
-  "include": ["src"],
-  "exclude": ["node_modules", "tests", "dist"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "target": "es2015",
     "module": "es2015",
@@ -22,7 +22,7 @@
     "noImplicitAny": false,
     "removeComments": true,
     "resolveJsonModule": true,
-    "rootDirs": ["src/"],
+    "rootDirs": ["src/","src/tests/"],
     "typeRoots": ["node_modules/@types"]
   }
 }

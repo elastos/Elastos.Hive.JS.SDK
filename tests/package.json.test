@@ -15,7 +15,8 @@
       "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
     },
     "dependencies": {
-      "@elastosfoundation/did-js-sdk": "^2.0.0",
+      "@dchagastelles/elastos-hive-js-sdk": "file:../",
+      "@elastosfoundation/did-js-sdk": "^2.1.0",
       "buffer": "^5.6.0",
       "cd": "^0.3.3",
       "os-browserify": "^0.3.0",
@@ -44,6 +45,7 @@
       "jest-html-reporter": "^3.4.0",
       "jest-lite": "^1.0.0-alpha.4",
       "path-browserify": "^1.0.1",
+      "dayjs": "^1.10.4",
       "rollup": "^2.47.0",
       "rollup-plugin-analyzer": "^4.0.0",
       "rollup-plugin-copy-assets": "^2.0.3",
