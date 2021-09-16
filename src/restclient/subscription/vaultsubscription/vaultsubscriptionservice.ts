@@ -4,6 +4,10 @@ import { ServiceContext } from "../../../http/servicecontext";
 import { Logger } from '../../../logger';
 import { PaymentService } from "../../payment/paymentservice";
 import { SubscriptionService } from "../../subscription/subscriptionservice";
+import { PricingPlan } from "../../../domain/subscription/pricingplan";
+import { VaultInfo } from "../../../domain/subscription/vaultinfo";
+import { Receipt } from "../../../domain/payment/receipt";
+import { Order } from "../../../domain/payment/order";
 
 export class VaultSubscriptionService extends ServiceContext {
 	private static LOG = new Logger("VaultSubscriptionService");
@@ -18,127 +22,47 @@ export class VaultSubscriptionService extends ServiceContext {
         this.subscriptionService = new SubscriptionService(this, httpClient);
 	}
 
-	@Override
-	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return subscriptionController.getVaultPricingPlanList();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getPricingPlanList(): Promise<PricingPlan[]> {
+		return await this.subscriptionService.getVaultPricingPlanList();
 	}
 
-	@Override
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return CompletableFuture.supplyAsync(()-> {
-			if (planName == null)
-				throw new IllegalArgumentException("Empty plan name");
-
-			try {
-				return subscriptionController.getVaultPricingPlan(planName);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getPricingPlan(planName: string): Promise<PricingPlan> {
+		return await this.subscriptionService.getVaultPricingPlan(planName);
 	}
 
-	@Override
-	public CompletableFuture<VaultInfo> subscribe() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return subscriptionController.subscribeToVault();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async subscribe(): Promise<VaultInfo> {
+		return await this.subscriptionService.subscribeToVault();
 	}
 
-	@Override
-	public CompletableFuture<Void> unsubscribe() {
-		return CompletableFuture.runAsync(()-> {
-			try {
-				subscriptionController.unsubscribeVault();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async unsubscribe(): Promise<void> {
+		return await this.subscriptionService.unsubscribeVault();
 	}
 
-	@Override
-	public CompletableFuture<VaultInfo> checkSubscription() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return subscriptionController.getVaultInfo();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async checkSubscription(): Promise<VaultInfo> {
+		return await this.subscriptionService.getVaultInfo();
 	}
 
-	@Override
-	public CompletableFuture<Order> placeOrder(String planName) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.placeOrder("vault", planName);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async placeOrder(planName: string): Promise<Order> {
+		return await this.paymentService.placeOrder("vault", planName);
 	}
 
-	@Override
-	public CompletableFuture<Order> getOrder(String orderId) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.getOrder(orderId);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getOrder(orderId: string): Promise<Order> {
+		return await this.paymentService.getOrder(orderId);
 	}
 
-	@Override
-	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.payOrder(orderId, transactionId);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {
+		return await this.paymentService.payOrder(orderId, transactionId);
 	}
 
-	@Override
-	public CompletableFuture<List<Order>> getOrderList() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.getOrders("vault");
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getOrderList(): Promise<Order[]> {
+		return await this.paymentService.getOrders("vault");
 	}
 
-	@Override
-	public CompletableFuture<Receipt> getReceipt(String orderId) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.getReceipt(orderId);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getReceipt(orderId: string): Promise<Receipt> {
+		return await this.paymentService.getReceipt(orderId);
 	}
 
-	@Override
-	public CompletableFuture<String> getVersion() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return paymentController.getVersion();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
+	public async getVersion(): Promise<string> {
+		return await this.paymentService.getVersion();
 	}
 }
