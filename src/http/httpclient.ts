@@ -42,7 +42,7 @@ export class HttpClient {
         headers: HttpClient.DEFAULT_HEADERS
     };
 
-    private withAuthorization: boolean = false;
+    private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;
 
@@ -55,8 +55,10 @@ export class HttpClient {
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
+        let payload = this.parsePayload(rawPayload, method);
         let options = await this.buildRequest(serviceEndpoint, method);
-        let payload = this.parsePayload(rawPayload);
+
+        options.method === HttpMethod.GET && options.path.concat("?" + payload);
 
         HttpClient.LOG.initializeCID();
         HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
@@ -90,7 +92,7 @@ export class HttpClient {
               }
             );
             
-            if (payload != HttpClient.NO_PAYLOAD) {
+            if (options.method != HttpMethod.GET && payload != HttpClient.NO_PAYLOAD) {
                 request.write(JSON.stringify(payload));
             }
 
@@ -112,7 +114,16 @@ export class HttpClient {
         return requestOptions;
     }
 
-    private parsePayload(payload: any): string {
+    private parsePayload(payload: any, method: HttpMethod): string {
+        if (payload && method === HttpMethod.GET) {
+          //Create query parameters from map
+          let query = "";
+          for (let prop of Object.keys(payload)) {
+            query && query.concat("&");
+            query = query.concat(prop + "=" + payload[prop]);
+          }
+          return query;
+        }
         return !payload || typeof payload === "string" ? payload : JSON.stringify(payload);
     }
 
