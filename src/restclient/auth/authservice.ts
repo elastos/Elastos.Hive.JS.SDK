@@ -42,7 +42,7 @@ export class AuthService extends RestService {
 			}
 		});
 
-		if (!this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
+		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
 			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 		}
@@ -61,7 +61,7 @@ export class AuthService extends RestService {
 			}
 		});
 
-		if (!this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
+		if (! await this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of access token when auth.");
 			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 		}
