@@ -89,39 +89,35 @@ export class TestData {
 			}
 		}, this.userDid.getDid().toString());
 
-		callerContext = AppContext.build(new AppContextProvider() {
+		this.callerContext = await AppContext.build({
 			//@Override
-			public String getLocalDataDir() {
-				return getLocalStorePath();
-			}
+			getLocalDataDir = (): string => {
+				return this.getLocalStorePath();
+			},
 
-			//@Override
-			public DIDDocument getAppInstanceDocument() {
+			getAppInstanceDocument = async() : Promise<DIDDocument> =>  {
 				try {
-					return appInstanceDid.getDocument();
-				} catch (DIDException e) {
+					return this.appInstanceDid.getDocument();
+				} catch (e) {
 					e.printStackTrace();
 				}
 				return null;
-			}
+			},
 
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> {
-					try {
-						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
-						if (claims == null)
-							throw new HiveException("Invalid jwt token as authorization.");
-						return appInstanceDid.createToken(appInstanceDid.createPresentation(
-								callerDid.issueDiplomaFor(appInstanceDid),
-								claims.getIssuer(),
-								(String) claims.get("nonce")), claims.getIssuer());
-					} catch (Exception e) {
-						throw new CompletionException(new HiveException(e.getMessage()));
-					}
-				});
-			}
-		}, callerDid.toString());
+			getAuthorization = async(jwtToken : string) : Promise<string> => {
+				
+				try {
+					let claims : Claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+					if (claims == null)
+						throw new HiveException("Invalid jwt token as authorization.");
+					return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
+							await this.userDid.issueDiplomaFor(this.appInstanceDid),
+							claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
+				} catch (e) {
+					//throw new CompletionException(new HiveException(e.getMessage()));
+				}
+		}
+		}, this.callerDid.getDid().toString());
 	}
 
 	/**
@@ -130,7 +126,7 @@ export class TestData {
 	 *
 	 * @return Client configuration.
 	 */
-	private ClientConfig getClientConfig() {
+	getClientConfig = (): ClientConfig => {
 		String fileName, hiveEnv = System.getenv("HIVE_ENV");
 		if ("production".equals(hiveEnv))
 			fileName = "Production.conf";
@@ -140,38 +136,38 @@ export class TestData {
 			fileName = "Developing.conf";
 		log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
 		return ClientConfig.deserialize(Utils.getConfigure(fileName));
+	} 
+
+	getLocalStorePath = () : string => {
+		return ""; // System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
 	}
 
-	private String getLocalStorePath() {
-		return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
-	}
-
-	public AppContext getAppContext() {
+	getAppContext() : AppContext {
 		return this.context;
 	}
 
-	public String getProviderAddress() {
-		return nodeConfig.provider();
+	getProviderAddress() : AppContext {
+		return this.nodeConfig.provider();
 	}
 
-	public Vault newVault() {
+	newVault() : Vault {
 		return new Vault(context, getProviderAddress());
 	}
 
-	public ScriptRunner newScriptRunner() {
+	newScriptRunner(): ScriptRunner {
 		return new ScriptRunner(context, getProviderAddress());
 	}
 
-	public ScriptRunner newCallerScriptRunner() {
+	private newCallerScriptRunner() : ScriptRunner {
 		return new ScriptRunner(callerContext, getProviderAddress());
 	}
 
-	public Backup newBackup() {
+	newBackup(): Backup {
 		return new Backup(context, nodeConfig.targetHost());
 	}
 
-	public BackupService getBackupService() {
-		BackupService bs = this.newVault().getBackupService();
+	 getBackupService() : BackupService {
+		let bs : BackupService = this.newVault().getBackupService();
 		bs.setupContext(new HiveBackupContext() {
 			@Override
 			public String getType() {
@@ -206,8 +202,8 @@ export class TestData {
 		return appInstanceDid.getAppDid();
 	}
 
-	public String getUserDid() {
-		return userDid.toString();
+	getUserDid = () : string => {
+		return this.userDid.toString();
 	}
 
 	getCallerDid = () : string => {
