@@ -2,8 +2,11 @@ import { Logger } from '../../../logger';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { AppContext } from '../../../http/security/appcontext';
+import { AppContextProvider } from '../../../http/security/appcontextprovider';
 import { inheritInnerComments } from '@babel/types';
 import { ClientConfig } from './clientconfig';
+import { Claims, DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { HiveException } from '../../../exceptions';
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -39,61 +42,60 @@ export class TestData {
 				applicationConfig.storepass);
 
 		let userConfig = ClientConfig.get().user;
-		this.userDid = UserDID.create(userConfig.name,
+		this.userDid = await UserDID.create(userConfig.name,
 				userConfig.mnemonic,
 				userConfig.passPhrase,
 				userConfig.storepass).then(user => {
                     return user;
                 });
 		let userConfigCaller = ClientConfig.get().cross.user;
-		callerDid = new UserDID(userConfigCaller.name(),
-				userConfigCaller.mnemonic(),
-				userConfigCaller.passPhrase(),
-				userConfigCaller.storepass());
+		this.callerDid = new UserDID(userConfigCaller.name,
+				userConfigCaller.mnemonic,
+				userConfigCaller.passPhrase,
+				userConfigCaller.storepass);
 
-		nodeConfig = clientConfig.nodeConfig();
+		this.nodeConfig = ClientConfig.LOCAL;
 
 		//初始化Application Context
-		context = AppContext.build(new AppContextProvider() {
-			@Override
-			public String getLocalDataDir() {
-				return getLocalStorePath();
-			}
+		this.context = await AppContext.build({
 
-			@Override
-			public DIDDocument getAppInstanceDocument() {
+			getLocalDataDir = (): string => {
+				return this.getLocalStorePath();
+			},
+
+			
+			getAppInstanceDocument = async() : Promise<DIDDocument> =>  {
 				try {
-					return appInstanceDid.getDocument();
-				} catch (DIDException e) {
+					return this.appInstanceDid.getDocument();
+				} catch (e) {
 					e.printStackTrace();
 				}
 				return null;
-			}
+			},
 
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> {
+			
+			getAuthorization = async(jwtToken : string) : Promise<string> => {
+				
 					try {
-						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+						let claims : Claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
-						return appInstanceDid.createToken(appInstanceDid.createPresentation(
-								userDid.issueDiplomaFor(appInstanceDid),
-								claims.getIssuer(), (String) claims.get("nonce")), claims.getIssuer());
-					} catch (Exception e) {
-						throw new CompletionException(new HiveException(e.getMessage()));
+						return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
+								await this.userDid.issueDiplomaFor(this.appInstanceDid),
+								claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
+					} catch (e) {
+						//throw new CompletionException(new HiveException(e.getMessage()));
 					}
-				});
 			}
-		}, userDid.toString());
+		}, this.userDid.getDid().toString());
 
 		callerContext = AppContext.build(new AppContextProvider() {
-			@Override
+			//@Override
 			public String getLocalDataDir() {
 				return getLocalStorePath();
 			}
 
-			@Override
+			//@Override
 			public DIDDocument getAppInstanceDocument() {
 				try {
 					return appInstanceDid.getDocument();
@@ -208,7 +210,7 @@ export class TestData {
 		return userDid.toString();
 	}
 
-	public String getCallerDid() {
+	getCallerDid = () : string => {
 		return this.callerDid.toString();
 	}
 }

@@ -7,7 +7,7 @@ import { DIDEntity } from "./didentity";
 export class UserDID extends DIDEntity {
 	private issuer: Issuer;
 
-	private constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) {
+	constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) {
 		super(name, mnemonic, phrasepass, storepass);
 	}
 
