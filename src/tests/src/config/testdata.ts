@@ -3,10 +3,13 @@ import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { AppContext } from '../../../http/security/appcontext';
 import { AppContextProvider } from '../../../http/security/appcontextprovider';
+import { VaultServices } from '../../../api/vaultservices';
+import { BackupServices } from '../../../api/backupservices';
 import { inheritInnerComments } from '@babel/types';
 import { ClientConfig } from './clientconfig';
-import { Claims, DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/typings';
 import { HiveException } from '../../../exceptions';
+import { BackupService } from '../../../restclient/backup/backupservice';
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -77,7 +80,7 @@ export class TestData {
 			getAuthorization = async(jwtToken : string) : Promise<string> => {
 				
 					try {
-						let claims : Claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+						let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
@@ -107,7 +110,7 @@ export class TestData {
 			getAuthorization = async(jwtToken : string) : Promise<string> => {
 				
 				try {
-					let claims : Claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
 					if (claims == null)
 						throw new HiveException("Invalid jwt token as authorization.");
 					return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
@@ -150,23 +153,23 @@ export class TestData {
 		return this.nodeConfig.provider();
 	}
 
-	newVault() : Vault {
-		return new Vault(context, getProviderAddress());
+	newVault() : VaultServices {
+		return new VaultServices(this.context, ""); // this.getProviderAddress().);
 	}
 
 	newScriptRunner(): ScriptRunner {
-		return new ScriptRunner(context, getProviderAddress());
+		return new ScriptRunner(this.context, getProviderAddress());
 	}
 
-	private newCallerScriptRunner() : ScriptRunner {
-		return new ScriptRunner(callerContext, getProviderAddress());
+	newCallerScriptRunner() : ScriptRunner {
+		return new ScriptRunner(this.callerContext, getProviderAddress());
 	}
 
 	newBackup(): Backup {
 		return new Backup(context, nodeConfig.targetHost());
 	}
 
-	 getBackupService() : BackupService {
+	 getBackupService() : BackupServices {
 		let bs : BackupService = this.newVault().getBackupService();
 		bs.setupContext(new HiveBackupContext() {
 			@Override
@@ -198,8 +201,8 @@ export class TestData {
 		return bs;
 	}
 
-	public String getAppDid() {
-		return appInstanceDid.getAppDid();
+	getAppDid = () : string {
+		return this.appInstanceDid.getAppDid();
 	}
 
 	getUserDid = () : string => {
