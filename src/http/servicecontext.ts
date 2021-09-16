@@ -110,8 +110,8 @@ export class ServiceContext {
          return this.dataStorage;
      }
  
-     public refreshAccessToken(): void {
-         this.accessToken.fetch();
+     public async refreshAccessToken(): Promise<void> {
+         await this.accessToken.fetch();
      }
 
      public async getNodeVersion(): Promise<NodeVersion> {

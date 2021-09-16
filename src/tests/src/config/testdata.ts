@@ -23,8 +23,8 @@ export class TestData {
 	private context: AppContext ;
 	private callerContext: AppContext;
 
-    private constructor() {
-        this.init();
+    constructor() {
+        void this.init();
     }
 
     public static getInstance() {
@@ -34,7 +34,7 @@ export class TestData {
         return TestData.INSTANCE;
     }
 
-    public init(): void {
+    public init = async(): Promise<void> => {
 		ClientConfig.setConfiguration(ClientConfig.LOCAL);
 		AppContext.setupResolver(ClientConfig.get().resolverUrl, TestData.RESOLVE_CACHE);
 
@@ -62,14 +62,14 @@ export class TestData {
 		//初始化Application Context
 		this.context = await AppContext.build({
 
-			getLocalDataDir = (): string => {
+			getLocalDataDir() : string {
 				return this.getLocalStorePath();
 			},
 
 			
-			getAppInstanceDocument = async() : Promise<DIDDocument> =>  {
+			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-					return this.appInstanceDid.getDocument();
+					return await this.appInstanceDid.getDocument();
 				} catch (e) {
 					e.printStackTrace();
 				}
@@ -77,7 +77,7 @@ export class TestData {
 			},
 
 			
-			getAuthorization = async(jwtToken : string) : Promise<string> => {
+			async getAuthorization(jwtToken : string) : Promise<string> {
 				
 					try {
 						let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
@@ -94,20 +94,20 @@ export class TestData {
 
 		this.callerContext = await AppContext.build({
 			//@Override
-			getLocalDataDir = (): string => {
+			getLocalDataDir(): string {
 				return this.getLocalStorePath();
 			},
 
-			getAppInstanceDocument = async() : Promise<DIDDocument> =>  {
+			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-					return this.appInstanceDid.getDocument();
+					return await this.appInstanceDid.getDocument();
 				} catch (e) {
 					e.printStackTrace();
 				}
 				return null;
 			},
 
-			getAuthorization = async(jwtToken : string) : Promise<string> => {
+			async getAuthorization(jwtToken : string) : Promise<string>  {
 				
 				try {
 					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
@@ -129,17 +129,17 @@ export class TestData {
 	 *
 	 * @return Client configuration.
 	 */
-	getClientConfig = (): ClientConfig => {
-		String fileName, hiveEnv = System.getenv("HIVE_ENV");
-		if ("production".equals(hiveEnv))
-			fileName = "Production.conf";
-		else if ("local".equals(hiveEnv))
-			fileName = "Local.conf";
-		else
-			fileName = "Developing.conf";
-		log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
-		return ClientConfig.deserialize(Utils.getConfigure(fileName));
-	} 
+	// getClientConfig = (): ClientConfig => {
+	// 	String fileName, hiveEnv = System.getenv("HIVE_ENV");
+	// 	if ("production".equals(hiveEnv))
+	// 		fileName = "Production.conf";
+	// 	else if ("local".equals(hiveEnv))
+	// 		fileName = "Local.conf";
+	// 	else
+	// 		fileName = "Developing.conf";
+	// 	log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
+	// 	return ClientConfig.deserialize(Utils.getConfigure(fileName));
+	// } 
 
 	getLocalStorePath = () : string => {
 		return ""; // System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
@@ -157,51 +157,51 @@ export class TestData {
 		return new VaultServices(this.context, ""); // this.getProviderAddress().);
 	}
 
-	newScriptRunner(): ScriptRunner {
-		return new ScriptRunner(this.context, getProviderAddress());
-	}
+	// newScriptRunner(): ScriptRunner {
+	// 	return new ScriptRunner(this.context, getProviderAddress());
+	// }
 
-	newCallerScriptRunner() : ScriptRunner {
-		return new ScriptRunner(this.callerContext, getProviderAddress());
-	}
+	// newCallerScriptRunner() : ScriptRunner {
+	// 	return new ScriptRunner(this.callerContext, getProviderAddress());
+	// }
 
-	newBackup(): Backup {
-		return new Backup(context, nodeConfig.targetHost());
-	}
+	// newBackup(): Backup {
+	// 	return new Backup(context, nodeConfig.targetHost());
+	// }
 
-	 getBackupService() : BackupServices {
-		let bs : BackupService = this.newVault().getBackupService();
-		bs.setupContext(new HiveBackupContext() {
-			@Override
-			public String getType() {
-				return null;
-			}
+	//  getBackupService() : BackupServices {
+	// 	let bs : BackupService = this.newVault().getBackupService();
+	// 	bs.setupContext(new HiveBackupContext() {
+	// 		@Override
+	// 		public String getType() {
+	// 			return null;
+	// 		}
 
-			@Override
-			public String getTargetProviderAddress() {
-				return nodeConfig.targetHost();
-			}
+	// 		@Override
+	// 		public String getTargetProviderAddress() {
+	// 			return nodeConfig.targetHost();
+	// 		}
 
-			@Override
-			public String getTargetServiceDid() {
-				return nodeConfig.targetDid();
-			}
+	// 		@Override
+	// 		public String getTargetServiceDid() {
+	// 			return nodeConfig.targetDid();
+	// 		}
 
-			@Override
-			public CompletableFuture<String> getAuthorization(String srcDid, String targetDid, String targetHost) {
-				return CompletableFuture.supplyAsync(() -> {
-					try {
-						return userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
-					} catch (DIDException e) {
-						throw new CompletionException(new HiveException(e.getMessage()));
-					}
-				});
-			}
-		});
-		return bs;
-	}
+	// 		@Override
+	// 		public CompletableFuture<String> getAuthorization(String srcDid, String targetDid, String targetHost) {
+	// 			return CompletableFuture.supplyAsync(() -> {
+	// 				try {
+	// 					return userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
+	// 				} catch (DIDException e) {
+	// 					throw new CompletionException(new HiveException(e.getMessage()));
+	// 				}
+	// 			});
+	// 		}
+	// 	});
+	// 	return bs;
+	// }
 
-	getAppDid = () : string {
+	getAppDid = () : string  => {
 		return this.appInstanceDid.getAppDid();
 	}
 

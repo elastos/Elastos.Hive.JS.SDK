@@ -36,7 +36,7 @@ import { Logger }  from "./logger";
 import { AboutService }  from "./restclient/about/aboutservice";
 import { AuthService }  from "./restclient/auth/authservice";
 import { BackupService }  from "./restclient/backup/backupservice";
-import { BackupSubscriptionService }  from "./restclient/backupsubscription/backupsubscriptionservice";
+import { BackupSubscriptionService }  from "./restclient/subscription/backupsubscription/backupsubscriptionservice";
 import { DatabaseService }  from "./restclient/database/databaseservice";
 import { FilesService }  from "./restclient/files/filesservice";
 import { PaymentService }  from "./restclient/payment/paymentservice";
@@ -49,7 +49,7 @@ import { Context }  from "./restclient/scripting/context";
 import { RegScriptParams }  from "./restclient/scripting/regscriptparams";
 import { RunScriptParams }  from "./restclient/scripting/runscriptparams";
 import { SubscriptionService }  from "./restclient/subscription/subscriptionservice";
-import { VaultSubscriptionService }  from "./restclient/vaultsubscription/vaultsubscriptionservice";
+import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
 
 //Logger.setLevel(Logger.TRACE);
 
