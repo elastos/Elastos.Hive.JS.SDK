@@ -54,32 +54,13 @@ export class SubscriptionService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async getVaultPricingPlan(planName: string): Promise<PricingPlan> {
-		return await new Promise((resolve, reject)=>{
-			try {
-				resolve(null);
-			} catch (e) {
-				reject(e);
+		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"vault", "name": planName }, <HttpResponseParser<PricingPlan>> {
+			deserialize(content: any): PricingPlan {
+				let jsonObj = JSON.parse(content)['pricingPlans'];
+				let plan = jsonObj[0];
+				return (new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]);
 			}
-		});
-/*
-		try {
-			return subscriptionAPI.getPricePlans("vault", planName)
-								.execute()
-								.body()
-								.getPricingPlanCollection().get(0);
-		} catch (NodeRPCException e) {
-			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			case NodeRPCException.NOT_FOUND:
-				throw new PricingPlanNotFoundException(e);
-			default:
-				throw new ServerUnknownException(e);
-			}
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
-*/
+		}, HttpMethod.GET);
 	}
 
 	/**
@@ -89,29 +70,12 @@ export class SubscriptionService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async getVaultInfo(): Promise<VaultInfo> {
-		return await new Promise((resolve, reject)=>{
-			try {
-				resolve(null);
-			} catch (e) {
-				reject(e);
+		return await this.httpClient.send(SubscriptionService.VAULT_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
+			deserialize(content: any): VaultInfo {
+				let jsonObj = JSON.parse(content);
+				return (new VaultInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["price_plan"]);
 			}
-		});
-/*
-		try {
-			return subscriptionAPI.getVaultInfo().execute().body();
-		} catch (NodeRPCException e) {
-			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			case NodeRPCException.NOT_FOUND:
-				throw new VaultNotFoundException(e);
-			default:
-				throw new ServerUnknownException(e);
-			}
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
-*/
+		}, HttpMethod.GET);
 	}
 
 	/**
