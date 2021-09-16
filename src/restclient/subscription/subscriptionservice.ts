@@ -5,9 +5,23 @@ import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { VaultInfo } from "../../domain/subscription/vaultinfo";
 import { BackupInfo } from "../../domain/subscription/backupinfo";
+import { HttpMethod } from "../..";
+import { HttpResponseParser } from '../../http/httpresponseparser';
 
 export class SubscriptionService extends RestService {
 	private static LOG = new Logger("SubscriptionService");
+
+	private static PRICE_PLANS_ENDPOINT = "/api/v2/subscription/pricing_plan";
+	private static SUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
+	private static ACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=activation";
+	private static DEACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=deactivation";
+	private static UNSUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
+	private static VAULT_INFO_ENDPOINT = "/api/v2/subscription/vault";
+	private static SUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
+	private static ACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=activation";
+	private static DEACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=deactivation";
+	private static UNSUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
+	private static BACKUP_INFO_ENDPOINT = "/api/v2/subscription/backup";
 
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
@@ -20,33 +34,16 @@ export class SubscriptionService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	 public async getVaultPricingPlanList(): Promise<PricingPlan[]>  {
-		return await new Promise((resolve, reject)=>{
-			try {
-				resolve(null);
-			} catch (e) {
-				reject(e);
+		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"vault", "name":"" }, <HttpResponseParser<PricingPlan[]>> {
+			deserialize(content: any): PricingPlan[] {
+				let jsonObj = JSON.parse(content)['pricingPlans'];
+				let pricingPlans = [];
+				for (let plan of jsonObj) {
+					pricingPlans.push((new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]));
+				}
+				return pricingPlans;
 			}
-		});	
-/*
-	
-		try {
-			return subscriptionAPI.getPricePlans("vault", "")
-					.execute()
-					.body()
-					.getPricingPlanCollection();
-		} catch (NodeRPCException e) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e);
-				case NodeRPCException.NOT_FOUND:
-					throw new PricingPlanNotFoundException(e);
-				default:
-					throw new ServerUnknownException(e);
-			}
-		} catch (IOException e) {
-			throw new NetworkException(e);
-		}
-*/
+		}, HttpMethod.GET);
 	}
 
 	/**

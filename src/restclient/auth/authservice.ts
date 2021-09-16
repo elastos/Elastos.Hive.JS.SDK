@@ -8,6 +8,7 @@ import { Claims } from '../../domain/jwt/claims';
 import { JWTParserBuilder } from '../../domain/jwt/jwtparserbuilder';
 import { Logger } from '../../logger';
 import { RestService } from '../restservice';
+import { HttpMethod } from '../..';
 
 export class AuthService extends RestService {
 	private static LOG = new Logger("AuthService");
@@ -40,7 +41,7 @@ export class AuthService extends RestService {
 			deserialize(content: any): string {
 				return JSON.parse(content)['challenge'];
 			}
-		});
+		}, HttpMethod.POST);
 
 		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
@@ -59,7 +60,7 @@ export class AuthService extends RestService {
 			deserialize(content: any): string {
 				return JSON.parse(content)['token'];
 			}
-		});
+		}, HttpMethod.POST);
 
 		if (! await this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of access token when auth.");
