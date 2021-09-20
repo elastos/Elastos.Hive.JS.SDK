@@ -17,7 +17,13 @@ export class VaultSubscriptionService extends ServiceContext {
 
     public constructor(context: AppContext, providerAddress: string) {
 		super(context, providerAddress);
-        let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
+        let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, {
+			method: HttpClient.DEFAULT_METHOD,
+			protocol: HttpClient.DEFAULT_PROTOCOL,
+			port: 9001,
+			timeout: HttpClient.DEFAULT_TIMEOUT,
+			headers: HttpClient.DEFAULT_HEADERS
+		});
         this.paymentService = new PaymentService(this, httpClient);
         this.subscriptionService = new SubscriptionService(this, httpClient);
 	}

@@ -22,13 +22,12 @@ export class HttpClient {
     public static NO_PAYLOAD = {};
     public static WITH_AUTHORIZATION = true;
     public static NO_AUTHORIZATION = false;
-    
-    private static DEFAULT_TIMEOUT = 5000;
-    private static DEFAULT_PROTOCOL = "http";
-    private static DEFAULT_PORT = 80;
-    private static DEFAULT_METHOD = "PUT";
-    private static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
-    private static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
+    public static DEFAULT_TIMEOUT = 5000;
+    public static DEFAULT_PROTOCOL = "http";
+    public static DEFAULT_PORT = 80;
+    public static DEFAULT_METHOD = "PUT";
+    public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
+    public static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
         "Transfer-Encoding": "chunked",
         "Connection": "Keep-Alive",
         "User-Agent": HttpClient.DEFAULT_AGENT
