@@ -136,8 +136,8 @@ export class HttpClient {
         httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
 
         // If the providerAddress already contains the protocol, we extract it.
-        if (this.serviceContext.getProviderAddress().includes("://")) {
-          let urlPart = this.serviceContext.getProviderAddress().split("://");
+        if (this.serviceContext.getProviderAddress().includes("//")) {
+          let urlPart = this.serviceContext.getProviderAddress().split("//");
           httpOptions.protocol = urlPart[0];
           httpOptions.host = urlPart[1];  
         } else {
