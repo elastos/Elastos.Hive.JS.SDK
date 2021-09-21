@@ -35,20 +35,20 @@ export class TestData {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
 
 		let applicationConfig = this.clientConfig.application;
-		this.appInstanceDid = new AppDID(applicationConfig.name,
+		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonic,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass);
+
 
 		let userConfig = this.clientConfig.user;
 		this.userDid = await UserDID.create(userConfig.name,
 				userConfig.mnemonic,
 				userConfig.passPhrase,
-				userConfig.storepass).then(user => {
-                    return user;
-                });
+				userConfig.storepass);
+				
 		let userConfigCaller = this.clientConfig.cross.user;
-		this.callerDid = new UserDID(userConfigCaller.name,
+		this.callerDid = await UserDID.create(userConfigCaller.name,
 				userConfigCaller.mnemonic,
 				userConfigCaller.passPhrase,
 				userConfigCaller.storepass);

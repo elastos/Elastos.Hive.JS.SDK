@@ -9,6 +9,14 @@ export class AppDID extends DIDEntity {
 		super(name, mnemonic, phrasepass, storepass);
 	}
 
+	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string): Promise<AppDID> {
+        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass);
+		await newInstance.initPrivateIdentity(mnemonic);	
+		await newInstance.initDid();
+
+        return newInstance;
+    }
+
 	public getAppDid(): string {
 		return this.appId;
 	}

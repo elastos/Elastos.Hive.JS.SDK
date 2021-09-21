@@ -12,6 +12,8 @@ export class UserDID extends DIDEntity {
 
     public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string): Promise<UserDID> {
         let newInstance = new UserDID(name, mnemonic, phrasepass, storepass);
+		await newInstance.initPrivateIdentity(mnemonic);	
+		await newInstance.initDid();
 
         let doc = await newInstance.getDocument();
         newInstance.setIssuer(new Issuer(doc));

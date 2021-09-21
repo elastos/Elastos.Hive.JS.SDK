@@ -17,24 +17,28 @@ export class DIDEntity {
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
 
-		void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
+		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
+
+		
 	}
 
-	protected async initPrivateIdentity(mnemonic: string): Promise<void> {
+	public async initPrivateIdentity(mnemonic: string): Promise<void> {
 		let storePath = "data/didCache" + File.SEPARATOR + this.name;
 
 		this.store = await DIDStore.open(storePath);
 
 		let id = RootIdentity.getIdFromMnemonic(mnemonic, this.phrasepass);
-		if (this.store.containsRootIdentity(id))
+		if (this.store.containsRootIdentity(id)){
+			this.identity = await this.store.loadRootIdentity(id);
+			await this.identity.synchronize();
 			return; // Already exists
+		}
 
 		this.identity = RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.store, this.storepass);
-
 		await this.identity.synchronize();
 	}
 
-	protected async initDid(): Promise<void> {
+	public async initDid(): Promise<void> {
 		let dids = await this.store.listDids();
 		if (dids.length > 0) {
 			this.did = dids[0];
