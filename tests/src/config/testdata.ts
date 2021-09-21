@@ -31,6 +31,22 @@ export class TestData {
 		return testData.init();
     }
 
+	public getLocalStorePath(): string {
+		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
+	}
+
+	public getAppContext(): AppContext {
+		return this.context;
+	}
+
+	public getProviderAddress(): string {
+		return this.clientConfig.node.provider;
+	}
+
+	public newVault(): VaultServices {
+		return new VaultServices(this.context, ""); // this.getProviderAddress().);
+	}
+
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
 
@@ -47,23 +63,24 @@ export class TestData {
 				userConfig.passPhrase,
 				userConfig.storepass);
 				
-		let userConfigCaller = this.clientConfig.cross.user;
-		this.callerDid = await UserDID.create(userConfigCaller.name,
-				userConfigCaller.mnemonic,
-				userConfigCaller.passPhrase,
-				userConfigCaller.storepass);
-
-		//初始化Application Context
+				let userConfigCaller = this.clientConfig.cross.user;
+				this.callerDid = await UserDID.create(userConfigCaller.name,
+					userConfigCaller.mnemonic,
+					userConfigCaller.passPhrase,
+					userConfigCaller.storepass);
+					
+					//初始化Application Context
+		let self = this;
 		this.context = await AppContext.build({
 
 			getLocalDataDir() : string {
-				return this.getLocalStorePath();
+				return self.getLocalStorePath();
 			},
 
 			
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-					return await this.appInstanceDid.getDocument();
+					return await self.appInstanceDid.getDocument();
 				} catch (e) {
 					e.printStackTrace();
 				}
@@ -76,24 +93,24 @@ export class TestData {
 						let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
-						return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
-								await this.userDid.issueDiplomaFor(this.appInstanceDid),
+						return self.appInstanceDid.createToken(await self.appInstanceDid.createPresentation(
+								await self.userDid.issueDiplomaFor(self.appInstanceDid),
 								claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
 					} catch (e) {
 						//throw new CompletionException(new HiveException(e.getMessage()));
 					}
 			}
-		}, this.userDid.getDid().toString());
+		}, self.userDid.getDid().toString());
 
 		this.callerContext = await AppContext.build({
 			//@Override
 			getLocalDataDir(): string {
-				return this.getLocalStorePath();
+				return self.getLocalStorePath();
 			},
 
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-					return await this.appInstanceDid.getDocument();
+					return await self.appInstanceDid.getDocument();
 				} catch (e) {
 					e.printStackTrace();
 				}
@@ -106,8 +123,8 @@ export class TestData {
 					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
 					if (claims == null)
 						throw new HiveException("Invalid jwt token as authorization.");
-					return this.appInstanceDid.createToken(await this.appInstanceDid.createPresentation(
-							await this.userDid.issueDiplomaFor(this.appInstanceDid),
+					return self.appInstanceDid.createToken(await self.appInstanceDid.createPresentation(
+							await self.userDid.issueDiplomaFor(self.appInstanceDid),
 							claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
 				} catch (e) {
 					//throw new CompletionException(new HiveException(e.getMessage()));
@@ -136,21 +153,7 @@ export class TestData {
 	// 	return ClientConfig.deserialize(Utils.getConfigure(fileName));
 	// } 
 
-	public getLocalStorePath(): string {
-		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
-	}
 
-	public getAppContext(): AppContext {
-		return this.context;
-	}
-
-	public getProviderAddress(): string {
-		return this.clientConfig.node.provider;
-	}
-
-	public newVault(): VaultServices {
-		return new VaultServices(this.context, ""); // this.getProviderAddress().);
-	}
 
 	// newScriptRunner(): ScriptRunner {
 	// 	return new ScriptRunner(this.context, getProviderAddress());

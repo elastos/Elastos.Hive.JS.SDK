@@ -30,7 +30,6 @@ export class DIDEntity {
 		let id = RootIdentity.getIdFromMnemonic(mnemonic, this.phrasepass);
 		if (this.store.containsRootIdentity(id)){
 			this.identity = await this.store.loadRootIdentity(id);
-			await this.identity.synchronize();
 			return; // Already exists
 		}
 
