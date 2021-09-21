@@ -45,6 +45,7 @@ export class DIDEntity {
 		}
 
 		let doc = await this.identity.newDid(this.storepass);
+		this.store.storeDid(doc);
 		this.did = doc.getSubject();
 		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
 	}
