@@ -1,4 +1,3 @@
-import { is } from "@babel/types";
 import { VerifiableCredential, Issuer, VerifiablePresentation, DIDDocument, JWTHeader } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { AppDID } from "./appdid";

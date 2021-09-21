@@ -18,13 +18,11 @@ export class TestData {
 	private userDir: string;
 
     constructor(clientConfig: any, userDir: string) {
-		console.log("TestData.constructor");
 		this.userDir = userDir;
 		this.clientConfig = clientConfig;
     }
 
     public static async getInstance(clientConfig: any, userDir: string): Promise<TestData> {
-		console.log("TestData.getInstance()");
         if (!TestData.INSTANCE) {
             TestData.INSTANCE = new TestData(clientConfig, userDir);
         }
@@ -34,7 +32,6 @@ export class TestData {
     }
 
     public async init(): Promise<TestData> {
-		console.log("TestData.init()");
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
 
 		let applicationConfig = this.clientConfig.application;
