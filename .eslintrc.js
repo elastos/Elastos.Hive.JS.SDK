@@ -4,7 +4,10 @@ module.exports = {
     plugins: [
       '@typescript-eslint'
     ],
-    extends: [
+    parserOptions: {
+      project: "./tsconfig.json"
+    },
+     extends: [
       'eslint:recommended',
      // 'plugin:node/recommended',
       'plugin:@typescript-eslint/recommended',
