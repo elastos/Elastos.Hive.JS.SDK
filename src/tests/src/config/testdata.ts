@@ -2,14 +2,10 @@ import { Logger } from '../../../logger';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { AppContext } from '../../../http/security/appcontext';
-import { AppContextProvider } from '../../../http/security/appcontextprovider';
 import { VaultServices } from '../../../api/vaultservices';
-import { BackupServices } from '../../../api/backupservices';
-import { inheritInnerComments } from '@babel/types';
 import { ClientConfig } from './clientconfig';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/typings';
 import { HiveException } from '../../../exceptions';
-import { BackupService } from '../../../restclient/backup/backupservice';
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -34,7 +30,7 @@ export class TestData {
         return TestData.INSTANCE;
     }
 
-    public init = async(): Promise<void> => {
+    public async init(): Promise<void> {
 		ClientConfig.setConfiguration(ClientConfig.LOCAL);
 		AppContext.setupResolver(ClientConfig.get().resolverUrl, TestData.RESOLVE_CACHE);
 
@@ -141,19 +137,19 @@ export class TestData {
 	// 	return ClientConfig.deserialize(Utils.getConfigure(fileName));
 	// } 
 
-	getLocalStorePath = () : string => {
+	public getLocalStorePath(): string {
 		return ""; // System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
 	}
 
-	getAppContext() : AppContext {
+	public getAppContext(): AppContext {
 		return this.context;
 	}
 
-	getProviderAddress() : AppContext {
+	public getProviderAddress(): AppContext {
 		return this.nodeConfig.provider();
 	}
 
-	newVault() : VaultServices {
+	public newVault(): VaultServices {
 		return new VaultServices(this.context, ""); // this.getProviderAddress().);
 	}
 
@@ -201,15 +197,15 @@ export class TestData {
 	// 	return bs;
 	// }
 
-	getAppDid = () : string  => {
+	public getAppDid(): string {
 		return this.appInstanceDid.getAppDid();
 	}
 
-	getUserDid = () : string => {
+	public getUserDid(): string {
 		return this.userDid.toString();
 	}
 
-	getCallerDid = () : string => {
+	public getCallerDid(): string {
 		return this.callerDid.toString();
 	}
 }
