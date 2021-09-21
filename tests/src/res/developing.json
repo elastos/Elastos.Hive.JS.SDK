@@ -1,5 +1,5 @@
 {
-  "resolverUrl": "https://api-testnet.elastos.io/eid"",
+  "resolverUrl": "https://api-testnet.elastos.io/eid",
 
   "application": {
     "name": "developApp",
