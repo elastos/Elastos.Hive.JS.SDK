@@ -3,9 +3,9 @@ import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { AppContext } from '../../../http/security/appcontext';
 import { VaultServices } from '../../../api/vaultservices';
-import { ClientConfig } from './clientconfig';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/typings';
 import { HiveException } from '../../../exceptions';
+import { File } from '../../..';
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -18,42 +18,43 @@ export class TestData {
 	private nodeConfig: any;
 	private context: AppContext ;
 	private callerContext: AppContext;
+	private clientConfig: any;
+	private userDir: string;
 
-    constructor() {
+    constructor(clientConfig: any, userDir: string) {
+		this.userDir = userDir;
+		this.clientConfig = clientConfig;
         void this.init();
     }
 
-    public static getInstance() {
+    public static getInstance(clientConfig: any, userDir: string): TestData {
         if (!TestData.INSTANCE) {
-            TestData.INSTANCE = new TestData();
+            TestData.INSTANCE = new TestData(clientConfig, userDir);
         }
         return TestData.INSTANCE;
     }
 
     public async init(): Promise<void> {
-		ClientConfig.setConfiguration(ClientConfig.LOCAL);
-		AppContext.setupResolver(ClientConfig.get().resolverUrl, TestData.RESOLVE_CACHE);
+		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
 
-		let applicationConfig = ClientConfig.get().application;
+		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = new AppDID(applicationConfig.name,
 				applicationConfig.mnemonic,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass);
 
-		let userConfig = ClientConfig.get().user;
+		let userConfig = this.clientConfig.user;
 		this.userDid = await UserDID.create(userConfig.name,
 				userConfig.mnemonic,
 				userConfig.passPhrase,
 				userConfig.storepass).then(user => {
                     return user;
                 });
-		let userConfigCaller = ClientConfig.get().cross.user;
+		let userConfigCaller = this.clientConfig.cross.user;
 		this.callerDid = new UserDID(userConfigCaller.name,
 				userConfigCaller.mnemonic,
 				userConfigCaller.passPhrase,
 				userConfigCaller.storepass);
-
-		this.nodeConfig = ClientConfig.LOCAL;
 
 		//初始化Application Context
 		this.context = await AppContext.build({
@@ -71,7 +72,6 @@ export class TestData {
 				}
 				return null;
 			},
-
 			
 			async getAuthorization(jwtToken : string) : Promise<string> {
 				
@@ -138,15 +138,15 @@ export class TestData {
 	// } 
 
 	public getLocalStorePath(): string {
-		return ""; // System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
 	}
 
 	public getAppContext(): AppContext {
 		return this.context;
 	}
 
-	public getProviderAddress(): AppContext {
-		return this.nodeConfig.provider();
+	public getProviderAddress(): string {
+		return this.clientConfig.node.provider;
 	}
 
 	public newVault(): VaultServices {

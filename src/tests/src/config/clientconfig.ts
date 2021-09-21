@@ -13,7 +13,7 @@ export class ClientConfig {
         ClientConfig.CURRENT_CONFIG = config;
     }
 
-    public static get() {
+    public static get(): any {
         return ClientConfig.CURRENT_CONFIG;
     }
 }
