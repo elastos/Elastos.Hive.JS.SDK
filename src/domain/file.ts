@@ -24,6 +24,7 @@ import path from "path";
 
 //import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from "./fs";
 import * as fs from 'fs-extra';
+import { Logger } from "..";
 
 
 
@@ -37,10 +38,12 @@ import * as fs from 'fs-extra';
  export class File { // Exported, for test cases only
     public static SEPARATOR = "/";
 
+    private static LOG = new Logger("File");
     private fullPath: string;
     private fileStats?: fs.Stats;
 
     public constructor(path: File | string, subpath?: string) {
+        File.LOG.setLevel(Logger.DEBUG);
         let fullPath: string = path instanceof File ? path.getAbsolutePath() : path as string;
 
         if (subpath)
@@ -187,22 +190,21 @@ import * as fs from 'fs-extra';
     private mkdirpath(dirPath: string)
     {
         if(!fs.existsSync(dirPath)){
-            try
-            {
-                fs.mkdirSync(dirPath);
-            }
-            catch(e)
-            {
-                let dirname = path.dirname(dirPath);
-                if (dirname !== dirPath) {
-                    this.mkdirpath(dirname);
-                    this.mkdirpath(dirPath);
+            try {
+                let fromRoot = dirPath.startsWith(File.SEPARATOR);
+                let pathToParse = fromRoot ? dirPath.substring(1) : dirPath;
+                let dirs = pathToParse.split(File.SEPARATOR);
+                let completion = fromRoot ? File.SEPARATOR : "";
+                for (let dir of dirs) {
+                    completion = completion + dir + File.SEPARATOR;
+                    if(!fs.existsSync(completion)){
+                        fs.mkdirSync(completion);
+                    }
                 }
-                else {
-                    // We reached the root path. Folder creation has failed for some reason, so we
-                    // throw an error.
-                    throw e;
-                }
+            } catch(e) {
+                File.LOG.error("Unable to create {}", dirPath);
+                File.LOG.error("Error {}", e);
+                throw e;
             }
         }
     }

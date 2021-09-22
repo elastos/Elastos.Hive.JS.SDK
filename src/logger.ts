@@ -57,9 +57,9 @@ export class Logger {
         return this.logLevel ? this.logLevel : Logger.DEFAULT_LOG_LEVEL;
     }
 
-    public levelIs(level: LogLevel) {
+    public levelIs(level: LogLevel): boolean {
         let currentLevel = this.logLevel ? this.logLevel : Logger.DEFAULT_LOG_LEVEL;
-        return level.id <= currentLevel.id;
+        return level.id >= currentLevel.id;
     }
 
     constructor(context: string) {
@@ -87,37 +87,37 @@ export class Logger {
     }
 
     log(...data: any) {
-        if (this.getLevel().id >= Logger.INFO.id) {
+        if (this.getLevel().id <= Logger.INFO.id) {
             console.log(this.format(Logger.INFO, data));
         }
     }
 
     info(...data: any) {
-        if (this.getLevel().id >= Logger.INFO.id) {
+        if (this.getLevel().id <= Logger.INFO.id) {
             console.log(this.format(Logger.INFO, data));
         }
     }
 
     debug(...data: any) {
-        if (this.getLevel().id >= Logger.DEBUG.id) {
+        if (this.getLevel().id <= Logger.DEBUG.id) {
             console.log(this.format(Logger.DEBUG, data));
         }
     }
 
     trace(...data: any) {
-        if (this.getLevel().id >= Logger.TRACE.id) {
+        if (this.getLevel().id <= Logger.TRACE.id) {
             console.log(this.format(Logger.TRACE, data));
         }
     }
 
     warn(...data: any) {
-        if (this.getLevel().id >= Logger.WARNING.id) {
+        if (this.getLevel().id <= Logger.WARNING.id) {
             console.log(this.format(Logger.WARNING, data));
         }
     }
 
     error(...data: any) {
-        if (this.getLevel().id >= Logger.ERROR.id) {
+        if (this.getLevel().id <= Logger.ERROR.id) {
             console.log(this.format(Logger.ERROR, data));
         }
     }
