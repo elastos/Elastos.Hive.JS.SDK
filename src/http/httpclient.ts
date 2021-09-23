@@ -92,7 +92,8 @@ export class HttpClient {
             );
             
             if (options.method != HttpMethod.GET && payload != HttpClient.NO_PAYLOAD) {
-                request.write(JSON.stringify(payload));
+                request.write(payload);
+                //request.write(JSON.stringify(payload));
             }
 
             request.end();

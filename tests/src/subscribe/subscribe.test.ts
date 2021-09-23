@@ -17,7 +17,7 @@ describe("test subscribe function", () => {
     test("should return vault info", async () => {
         HttpClient.DEFAULT_OPTIONS.port = 9001;
         HttpClient.LOG.setLevel(Logger.DEBUG);
-
+        HttpClient.DEFAULT_OPTIONS.protocol = "http:";
         const vaultInfo = await subscriptionService.subscribe();
     });
 });

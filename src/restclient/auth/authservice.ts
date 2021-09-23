@@ -37,7 +37,8 @@ export class AuthService extends RestService {
     //@POST("/api/v2/did/signin")
 	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
     public async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
-		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, appInstanceDidDoc.toString(), <HttpResponseParser<string>> {
+		
+		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, appInstanceDidDoc.toString(true), <HttpResponseParser<string>> {
 			deserialize(content: any): string {
 				return JSON.parse(content)['challenge'];
 			}

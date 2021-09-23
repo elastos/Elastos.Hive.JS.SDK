@@ -16,7 +16,7 @@
   },
 
   "node": {
-    "provider": "https://hive-testnet1.trinity-tech.io",
+    "provider": "http://localhost",
     "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
     "targetHost": "https://hive-testnet2.trinity-tech.io",
     "storePath": "develop"
