@@ -1,4 +1,4 @@
-import { HiveException, VaultServices, AppContext, Logger } from "@dchagastelles/elastos-hive-js-sdk/"
+import { HiveException, VaultServices, AppContext, Logger, Utils } from "@dchagastelles/elastos-hive-js-sdk/"
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/';
@@ -23,12 +23,14 @@ export class TestData {
     }
 
     public static async getInstance(clientConfig: any, userDir: string): Promise<TestData> {
+		Utils.checkNotNull(clientConfig, "Test configuration cannot be empty");
+		Utils.checkNotNull(clientConfig.node, "A valid test configuration is mandatory");
         if (!TestData.INSTANCE) {
+			TestData.LOG.info("***** Running tests using '{}' configuration *****", clientConfig.node.storePath);
             TestData.INSTANCE = new TestData(clientConfig, userDir);
+			TestData.INSTANCE.init();
         }
-        let testData = TestData.INSTANCE;
-
-		return testData.init();
+        return TestData.INSTANCE;
     }
 
 	public getLocalStorePath(): string {
@@ -44,7 +46,7 @@ export class TestData {
 	}
 
 	public newVault(): VaultServices {
-		return new VaultServices(this.context, ""); // this.getProviderAddress().);
+		return new VaultServices(this.context, this.getProviderAddress());
 	}
 
     public async init(): Promise<TestData> {

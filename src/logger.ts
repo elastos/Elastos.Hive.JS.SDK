@@ -62,7 +62,7 @@ export class Logger {
         return level.id >= currentLevel.id;
     }
 
-    constructor(context: string) {
+    public constructor(context: string) {
         this.context = context ? context : "";
         this.cid = this.initializeCID();
     }
@@ -70,53 +70,53 @@ export class Logger {
     /**
      * Generates a unique ID to be used as a correlation id to link multiple related things.
      */
-    initializeCID(): string {
+    public initializeCID(): string {
         // Math.random should be unique because of its seeding algorithm.
         // Convert it to base 36 (numbers + letters), and grab the first 9 characters
         // after the decimal.
-        this.cid = '_' + Math.random().toString(36).substr(2, 9);
+        this.cid = Math.random().toString(36).substring(2, 9);
         return this.cid;
     }
 
-    currentCID(): string {
+    public currentCID(): string {
         return this.cid;
     }
 
-    resetCID(): void {
+    public resetCID(): void {
         this.cid = "";
     }
 
-    log(...data: any) {
+    public log(...data: any) {
         if (this.getLevel().id <= Logger.INFO.id) {
             console.log(this.format(Logger.INFO, data));
         }
     }
 
-    info(...data: any) {
+    public info(...data: any) {
         if (this.getLevel().id <= Logger.INFO.id) {
             console.log(this.format(Logger.INFO, data));
         }
     }
 
-    debug(...data: any) {
+    public debug(...data: any) {
         if (this.getLevel().id <= Logger.DEBUG.id) {
             console.log(this.format(Logger.DEBUG, data));
         }
     }
 
-    trace(...data: any) {
+    public trace(...data: any) {
         if (this.getLevel().id <= Logger.TRACE.id) {
             console.log(this.format(Logger.TRACE, data));
         }
     }
 
-    warn(...data: any) {
+    public warn(...data: any) {
         if (this.getLevel().id <= Logger.WARNING.id) {
             console.log(this.format(Logger.WARNING, data));
         }
     }
 
-    error(...data: any) {
+    public error(...data: any) {
         if (this.getLevel().id <= Logger.ERROR.id) {
             console.log(this.format(Logger.ERROR, data));
         }

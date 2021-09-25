@@ -30,6 +30,8 @@ plugins/android.json
 plugins/ios.json
 www/
 $RECYCLE.BIN/
+tests/data
+tests/test-report.html
 
 .DS_Store
 Thumbs.db
