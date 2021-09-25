@@ -35,6 +35,7 @@ export class ServiceContext {
     }
 
     private init():void {
+        
         let dataDir = this.context.getAppContextProvider().getLocalDataDir();
 		if (!dataDir.endsWith(File.SEPARATOR))
 			dataDir += File.SEPARATOR;

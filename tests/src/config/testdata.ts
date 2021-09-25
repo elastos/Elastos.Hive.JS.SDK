@@ -28,7 +28,7 @@ export class TestData {
         if (!TestData.INSTANCE) {
 			TestData.LOG.info("***** Running tests using '{}' configuration *****", clientConfig.node.storePath);
             TestData.INSTANCE = new TestData(clientConfig, userDir);
-			TestData.INSTANCE.init();
+			await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
     }
@@ -51,12 +51,14 @@ export class TestData {
 
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
+		
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonic,
+				applicationConfig.mnemonics2,
 				applicationConfig.passPhrase,
-				applicationConfig.storepass);
+				applicationConfig.storepass,
+				applicationConfig.did);
 
 
 		let userConfig = this.clientConfig.user;
@@ -65,11 +67,11 @@ export class TestData {
 				userConfig.passPhrase,
 				userConfig.storepass);
 				
-				let userConfigCaller = this.clientConfig.cross.user;
-				this.callerDid = await UserDID.create(userConfigCaller.name,
-					userConfigCaller.mnemonic,
-					userConfigCaller.passPhrase,
-					userConfigCaller.storepass);
+		let userConfigCaller = this.clientConfig.cross.user;
+		this.callerDid = await UserDID.create(userConfigCaller.name,
+			userConfigCaller.mnemonic,
+			userConfigCaller.passPhrase,
+			userConfigCaller.storepass);
 					
 					//初始化Application Context
 		let self = this;
@@ -82,6 +84,7 @@ export class TestData {
 			
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
+
 					return await self.appInstanceDid.getDocument();
 				} catch (e) {
 					e.printStackTrace();

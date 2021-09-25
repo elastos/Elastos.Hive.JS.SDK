@@ -1,16 +1,17 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { DIDEntity } from "./didentity";
 
 export class AppDID extends DIDEntity {
 	private appId = "appId";
 
-	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) {
-		super(name, mnemonic, phrasepass, storepass);
+	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
+		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
-	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string): Promise<AppDID> {
-        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass);
+	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
+		DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
+        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
 		await newInstance.initPrivateIdentity(mnemonic);	
 		await newInstance.initDid();
 

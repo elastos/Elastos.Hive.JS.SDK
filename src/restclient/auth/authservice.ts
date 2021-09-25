@@ -13,7 +13,7 @@ import { HttpMethod } from '../..';
 export class AuthService extends RestService {
 	private static LOG = new Logger("AuthService");
 
-	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
+	private static SIGN_IN_ENDPOINT = "/api/v1/did/sign_in";
 	private static AUTH_ENDPOINT = "/api/v2/did/auth";
 
 	private contextProvider: AppContextProvider;
@@ -38,8 +38,9 @@ export class AuthService extends RestService {
 	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
     public async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
 		
-		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, appInstanceDidDoc.toString(true), <HttpResponseParser<string>> {
+		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, { "document": JSON.parse(appInstanceDidDoc.toString(true)) }, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
+				AuthService.LOG.debug("return sign_in: " + content);				
 				return JSON.parse(content)['challenge'];
 			}
 		}, HttpMethod.POST);

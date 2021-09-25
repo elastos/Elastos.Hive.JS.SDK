@@ -5,6 +5,7 @@ import { HttpResponseParser } from './httpresponseparser';
 import { DeserializationError, HttpException, NodeRPCException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
+import { resolve } from 'path';
 
 export class HttpClient {
     public static LOG = new Logger("HttpClient");
@@ -81,7 +82,10 @@ export class HttpClient {
                     const rawContent = Buffer.concat(chunks).toString();
                     HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
                     this.handleResponse(response, rawContent);
-                    resolve(responseParser.deserialize(rawContent));
+
+                    let deserialized = responseParser.deserialize(rawContent);
+                    HttpClient.LOG.debug("deserialized: " + JSON.stringify(deserialized));
+                    resolve(deserialized);
                   } catch(e) {
                     reject(
                       new DeserializationError("Unable to deserialize content from " + serviceEndpoint, e)
@@ -150,6 +154,7 @@ export class HttpClient {
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
       if (response.statusCode != 200) {
+        HttpClient.LOG.debug("response code: " + response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }

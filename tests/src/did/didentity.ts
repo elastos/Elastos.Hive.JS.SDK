@@ -11,12 +11,13 @@ export class DIDEntity {
 	private identity: RootIdentity;
 	private store: DIDStore;
 	private did: DID;
+	private didString: string;
 
-	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string) {
+	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-
+		this.didString = did;
 		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
 
 		
@@ -38,14 +39,35 @@ export class DIDEntity {
 	}
 
 	public async initDid(): Promise<void> {
-		let dids = await this.store.listDids();
-		if (dids.length > 0) {
-			this.did = dids[0];
-			return;
-		}
+		
+	
 
-		let doc = await this.identity.newDid(this.storepass);
-		this.store.storeDid(doc);
+		let doc: DIDDocument = undefined;
+		if (this.didString === undefined){
+			let dids = await this.store.listDids();
+			if (dids.length > 0) {
+				this.did = dids[0];
+				return;
+			}
+			doc = await this.identity.newDid(this.storepass);
+		} 
+		else {
+			DIDEntity.LOG.info("trying to resolve did " + this.didString);
+			
+			let localDoc = await this.store.loadDid(this.didString);
+
+			if (localDoc === undefined || localDoc === null){
+				doc = await DID.from(this.didString).resolve(true);
+				await this.store.storeDid(doc);
+			} else
+			{
+				doc = localDoc;
+			}
+		}
+		if (!doc.isValid()){
+			DIDEntity.LOG.error("doc is not valid");
+			throw new Error("doc is not valid");
+		}
 		this.did = doc.getSubject();
 		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
 	}
