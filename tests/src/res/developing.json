@@ -1,5 +1,5 @@
 {
-  "resolverUrl": "mainnet",
+  "resolverUrl": "https://api-testnet.elastos.io/newid",
 
   "application": {
     "name": "developApp",
@@ -18,7 +18,7 @@
   },
 
   "node": {
-    "provider": "http://localhost",
+    "provider": "https://hive-testnet1.trinity-tech.io",
     "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
     "targetHost": "https://hive-testnet2.trinity-tech.io",
     "storePath": "develop"
