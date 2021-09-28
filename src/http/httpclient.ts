@@ -45,14 +45,12 @@ export class HttpClient {
     private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;
-    private self: HttpClient;
 
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: http.RequestOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = this.validateOptions(httpOptions);
 
-        this.self = this;
     }
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
@@ -73,6 +71,7 @@ export class HttpClient {
     }
 
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
+        let self = this;
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let payload = this.parsePayload(rawPayload, method);
@@ -98,30 +97,12 @@ export class HttpClient {
                   chunks.push(chunk);
                 });
 
-                
                 response.on('end', () => {
                   try {
                     const rawContent = Buffer.concat(chunks).toString();
                     HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
-                    
-                    //////////////////////////////////////////////////////
-                    if (response.statusCode != 200) {
-                      HttpClient.LOG.debug("response code: " + response.statusCode);
-                      if (this.withAuthorization && response.statusCode == 401) {
-                        this.serviceContext.getAccessToken().invalidate();
-                      }
-                      if (!rawContent) {
-                        throw new NodeRPCException(response.statusCode, -1, "Empty body.");
-                      }
-                      let httpError = JSON.parse(rawContent);
-                      let errorCode = httpError['internal_code'];
-                      let errorMessage = httpError['message'];
-              
-                      throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
-                    }
-                   //////////////////////////////////////////////////////////// 
 
-                   // this.handleResponse(response, rawContent);
+                    self.handleResponse(response, rawContent);
 
                     let deserialized = responseParser.deserialize(rawContent);
                     HttpClient.LOG.debug("deserialized: " + JSON.stringify(deserialized));
