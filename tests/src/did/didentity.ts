@@ -1,4 +1,4 @@
-import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
+import { RootIdentity, DIDStore, DID, DIDDocument, HDKey, DIDURL } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@dchagastelles/elastos-hive-js-sdk/"
 
 export class DIDEntity {
@@ -6,18 +6,20 @@ export class DIDEntity {
 
 	private name: string;
 	private phrasepass: string;
+	private mnemonic: string
 	protected storepass: string;
 
 	private identity: RootIdentity;
 	private store: DIDStore;
 	private did: DID;
-	private didString: string;
+	//private didString: string;
 
-	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
+	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string) {// , did?: string) {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-		this.didString = did;
+		//this.didString = did;
+		this.mnemonic = mnemonic;
 		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
 
 		
@@ -39,38 +41,55 @@ export class DIDEntity {
 	}
 
 	public async initDid(): Promise<void> {
-		
-	
-
-		let doc: DIDDocument = undefined;
-		if (this.didString === undefined){
-			let dids = await this.store.listDids();
-			if (dids.length > 0) {
-				this.did = dids[0];
-				return;
-			}
-			doc = await this.identity.newDid(this.storepass);
-		} 
-		else {
-			DIDEntity.LOG.info("trying to resolve did " + this.didString);
-			
-			let localDoc = await this.store.loadDid(this.didString);
-
-			if (localDoc === undefined || localDoc === null){
-				doc = await DID.from(this.didString).resolve(true);
-				await this.store.storeDid(doc);
-			} else
-			{
-				doc = localDoc;
-			}
+		let dids = await this.store.listDids();
+		if (dids.length > 0) {
+			this.did = dids[0];
+			return;
 		}
-		if (!doc.isValid()){
-			DIDEntity.LOG.error("doc is not valid");
-			throw new Error("doc is not valid");
-		}
+
+		let doc = await this.identity.newDid(this.storepass);
 		this.did = doc.getSubject();
 		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
 	}
+
+
+	// public async initDid(): Promise<void> {
+
+	// 	let doc: DIDDocument = undefined;
+	// 	if (this.didString === undefined){
+	// 		let dids = await this.store.listDids();
+	// 		if (dids.length > 0) {
+	// 			this.did = dids[0];
+	// 			return;
+	// 		}
+	// 		doc = await this.identity.newDid(this.storepass);
+	// 	} 
+	// 	else {
+	// 		DIDEntity.LOG.info("trying to resolve did " + this.didString);
+			
+	// 		let localDoc = await this.store.loadDid(this.didString);
+
+	// 		if (localDoc === undefined || localDoc === null){
+	// 			doc = await DID.from(this.didString).resolve(true);
+	// 			let key = HDKey.newWithMnemonic(this.mnemonic, "").deriveWithPath(
+	// 				HDKey.DERIVE_PATH_PREFIX + 0
+	// 			  );
+			  
+	// 			  this.store.storePrivateKey(DIDURL.from('#primary', this.didString), key.serialize(), this.storepass);
+
+	// 			await this.store.storeDid(doc);
+	// 		} else
+	// 		{
+	// 			doc = localDoc;
+	// 		}
+	// 	}
+	// 	if (!doc.isValid()){
+	// 		DIDEntity.LOG.error("doc is not valid");
+	// 		throw new Error("doc is not valid");
+	// 	}
+	// 	this.did = doc.getSubject();
+	// 	DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
+	// }
 
 	protected getDIDStore(): DIDStore {
 		return this.store;

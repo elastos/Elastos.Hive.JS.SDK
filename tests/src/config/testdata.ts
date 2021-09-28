@@ -55,10 +55,10 @@ export class TestData {
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonics2,
+				applicationConfig.mnemonics,
 				applicationConfig.passPhrase,
-				applicationConfig.storepass,
-				applicationConfig.did);
+				applicationConfig.storepass); //,
+				//applicationConfig.did);
 
 
 		let userConfig = this.clientConfig.user;
@@ -102,7 +102,8 @@ export class TestData {
 						let presentation = await self.appInstanceDid.createPresentation(
 							await self.userDid.issueDiplomaFor(self.appInstanceDid),
 							claims.getIssuer(), claims.get("nonce") as string);
-							TestData.LOG.info("TestData->presentation: " + presentation.toString(true)); 
+							
+						TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
 						return self.appInstanceDid.createToken(presentation,  claims.getIssuer());
 					} catch (e) {
 						TestData.LOG.info("TestData->getAuthorization error: " + e); 					}

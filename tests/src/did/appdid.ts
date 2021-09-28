@@ -1,17 +1,18 @@
 import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
+import { TestData } from "../config/testdata";
 import { DIDEntity } from "./didentity";
 
 export class AppDID extends DIDEntity {
 	private appId = "appId";
 
-	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
-		super(name, mnemonic, phrasepass, storepass, did);
+	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) { // , did: string) {
+		super(name, mnemonic, phrasepass, storepass); //, did);
 	}
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
-		DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
-        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
+		//DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
+        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass); //, did);
 		await newInstance.initPrivateIdentity(mnemonic);	
 		await newInstance.initDid();
 
@@ -23,6 +24,8 @@ export class AppDID extends DIDEntity {
 	}
 
 	public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
+
+		
 		let vpb = await VerifiablePresentation.createFor(this.getDid(), null, this.getDIDStore());
 		let vp = await vpb.credentials(vc)
 				.realm(realm)
@@ -35,7 +38,6 @@ export class AppDID extends DIDEntity {
 	}
 
 	public async createToken(vp: VerifiablePresentation, hiveDid: string): Promise<string> {
-
         let cal = dayjs();
         let iat = cal.unix();
         let nbf = cal.unix();
