@@ -8,7 +8,7 @@ describe("test subscribe function", () => {
     let subscriptionService: VaultSubscriptionService;
 
     beforeEach(async () => {
-        testData = await TestData.getInstance(ClientConfig.DEV, "/home/diego/temp");
+        testData = await TestData.getInstance(ClientConfig.DEV, "/home/carlduranleau/temp");
         subscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());
