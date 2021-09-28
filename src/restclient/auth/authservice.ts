@@ -25,9 +25,17 @@ export class AuthService extends RestService {
 
 	public async fetch(): Promise<string> {
 		try {
-			let challenge: string  = await this.signIn(await this.contextProvider.getAppInstanceDocument());
+			HttpClient.LOG.debug("AuthService=>fetch");
 
+			let appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
+			HttpClient.LOG.debug("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
+
+			let challenge: string  = await this.signIn(appInstanceDoc);
+			HttpClient.LOG.debug("AuthService=>challenge :" + challenge);
+
+			
 			let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
+			HttpClient.LOG.debug("challenge response " + challengeResponse);
 			return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
 			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
@@ -40,7 +48,7 @@ export class AuthService extends RestService {
 		
 		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, { "document": JSON.parse(appInstanceDidDoc.toString(true)) }, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				AuthService.LOG.debug("return sign_in: " + content);				
+				HttpClient.LOG.debug("return sign_in: " + content);				
 				return JSON.parse(content)['challenge'];
 			}
 		}, HttpMethod.POST);
@@ -76,8 +84,11 @@ export class AuthService extends RestService {
 	private async checkValid(jwtCode: string, expectationDid: string): Promise<boolean> {
 		try {
 			let claims: Claims = (await new JWTParserBuilder().build().parse(jwtCode)).getBody();
-			return claims.getExpiration() > Date.now() &&
-					claims.getAudience().equals(expectationDid);
+
+			HttpClient.LOG.debug("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
+			HttpClient.LOG.debug("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
+			HttpClient.LOG.debug("is equal:" + (claims.getAudience() === expectationDid).toString());
+			return claims.getExpiration()*1000 > Date.now() && claims.getAudience() === expectationDid;
 		} catch (e) {
 			return false;
 		}

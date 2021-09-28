@@ -45,11 +45,31 @@ export class HttpClient {
     private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;
+    private self: HttpClient;
 
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: http.RequestOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = this.validateOptions(httpOptions);
+
+        this.self = this;
+    }
+
+    private handleResponse(response: http.IncomingMessage, content: string): void {
+      if (response.statusCode != 200) {
+        HttpClient.LOG.debug("response code: " + response.statusCode);
+        if (this.withAuthorization && response.statusCode == 401) {
+          this.serviceContext.getAccessToken().invalidate();
+        }
+        if (!content) {
+          throw new NodeRPCException(response.statusCode, -1, "Empty body.");
+        }
+        let httpError = JSON.parse(content);
+        let errorCode = httpError['internal_code'];
+        let errorMessage = httpError['message'];
+
+        throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
+      }
     }
 
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
@@ -62,7 +82,7 @@ export class HttpClient {
 
         HttpClient.LOG.initializeCID();
         HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
-
+        HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
@@ -77,11 +97,31 @@ export class HttpClient {
                 response.on('data', (chunk) => {
                   chunks.push(chunk);
                 });
+
+                
                 response.on('end', () => {
                   try {
                     const rawContent = Buffer.concat(chunks).toString();
                     HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
-                    this.handleResponse(response, rawContent);
+                    
+                    //////////////////////////////////////////////////////
+                    if (response.statusCode != 200) {
+                      HttpClient.LOG.debug("response code: " + response.statusCode);
+                      if (this.withAuthorization && response.statusCode == 401) {
+                        this.serviceContext.getAccessToken().invalidate();
+                      }
+                      if (!rawContent) {
+                        throw new NodeRPCException(response.statusCode, -1, "Empty body.");
+                      }
+                      let httpError = JSON.parse(rawContent);
+                      let errorCode = httpError['internal_code'];
+                      let errorMessage = httpError['message'];
+              
+                      throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
+                    }
+                   //////////////////////////////////////////////////////////// 
+
+                   // this.handleResponse(response, rawContent);
 
                     let deserialized = responseParser.deserialize(rawContent);
                     HttpClient.LOG.debug("deserialized: " + JSON.stringify(deserialized));
@@ -112,7 +152,11 @@ export class HttpClient {
         requestOptions.path = serviceEndpoint;
 
         if (this.withAuthorization) {
-          requestOptions.headers['Authorization'] = await this.serviceContext.getAccessToken().getCanonicalizedAccessToken();
+          let accessToken = this.serviceContext.getAccessToken();
+          let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
+          HttpClient.LOG.debug("Access Token: " + accessToken);
+          HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+          requestOptions.headers['Authorization'] = canonicalAccessToken;
         }
 
         return requestOptions;
@@ -152,20 +196,5 @@ export class HttpClient {
         return httpOptions;
     }
 
-    private handleResponse(response: http.IncomingMessage, content: string): void {
-      if (response.statusCode != 200) {
-        HttpClient.LOG.debug("response code: " + response.statusCode);
-        if (this.withAuthorization && response.statusCode == 401) {
-          this.serviceContext.getAccessToken().invalidate();
-        }
-        if (!content) {
-          throw new NodeRPCException(response.statusCode, -1, "Empty body.");
-        }
-        let httpError = JSON.parse(content);
-        let errorCode = httpError['internal_code'];
-        let errorMessage = httpError['message'];
-
-        throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
-      }
-    }
+    
 }

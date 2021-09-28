@@ -98,13 +98,15 @@ export class TestData {
 						let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
-						return self.appInstanceDid.createToken(await self.appInstanceDid.createPresentation(
-								await self.userDid.issueDiplomaFor(self.appInstanceDid),
-								claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
+
+						let presentation = await self.appInstanceDid.createPresentation(
+							await self.userDid.issueDiplomaFor(self.appInstanceDid),
+							claims.getIssuer(), claims.get("nonce") as string);
+							TestData.LOG.info("TestData->presentation: " + presentation.toString(true)); 
+						return self.appInstanceDid.createToken(presentation,  claims.getIssuer());
 					} catch (e) {
-						//throw new CompletionException(new HiveException(e.getMessage()));
+						TestData.LOG.info("TestData->getAuthorization error: " + e); 					}
 					}
-			}
 		}, self.userDid.getDid().toString());
 
 		this.callerContext = await AppContext.build({
