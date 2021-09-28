@@ -80,8 +80,9 @@ export class HttpClient {
         options.method === HttpMethod.GET && options.path.concat("?" + payload);
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.debug("HTTP Request: " + options.method + ": " +  options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
+        HttpClient.LOG.debug("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
         HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
+
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
