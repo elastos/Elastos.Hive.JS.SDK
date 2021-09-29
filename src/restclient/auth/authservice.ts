@@ -11,7 +11,7 @@ import { HttpMethod } from '../..';
 export class AuthService extends RestService {
 	private static LOG = new Logger("AuthService");
 
-	private static SIGN_IN_ENDPOINT = "/api/v1/did/sign_in";
+	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
 	private static AUTH_ENDPOINT = "/api/v2/did/auth";
 
 	private contextProvider: AppContextProvider;

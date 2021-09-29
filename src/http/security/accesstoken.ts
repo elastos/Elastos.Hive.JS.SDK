@@ -3,6 +3,7 @@ import { BridgeHandler } from './bridgehandler';
 import { ServiceContext } from '../servicecontext';
 import { AuthService } from '../../restclient/auth/authservice';
 import { HttpClient } from '../httpclient';
+import { Logger } from '@elastosfoundation/did-js-sdk/';
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
@@ -15,6 +16,7 @@ export class AccessToken {
 	private storage: DataStorage;
 	private bridge: BridgeHandler;
 
+	private static LOG = new Logger("AccessToken");
 	/**
 	 * Create the access token by service end point, data storage, and bridge handler.
 	 *
@@ -39,16 +41,19 @@ export class AccessToken {
 	 * @return null if not exists.
 	 */
 	public async getCanonicalizedAccessToken(): Promise<string> {
+		HttpClient.LOG.debug("getCanonicalizedAccessToken");
 		try {
 			this.jwtCode = await this.fetch();
 		} catch (e) {
-			// TODO:
+			HttpClient.LOG.error("error on getCanonicalizedAccessToken: " + e);
 			return null;
 		}
 		return "token " + this.jwtCode;
 	}
 
 	public async fetch(): Promise<string> {
+		HttpClient.LOG.debug("fetch");
+
 		if (this.jwtCode != null)
 			return this.jwtCode;
 
@@ -71,7 +76,11 @@ export class AccessToken {
 	}
 
 	private restoreToken() : string {
+		AccessToken.LOG.debug("Restore Token");
+
 		let endpoint = this.bridge.target() as ServiceContext;
+		AccessToken.LOG.debug("Endpoint :" + endpoint);
+
 		if (endpoint == null)
 			return null;
 
@@ -81,6 +90,7 @@ export class AccessToken {
 
 		serviceDid = endpoint.getServiceInstanceDid();
 		address	= endpoint.getProviderAddress();
+		AccessToken.LOG.debug("address :" + address);
 
 		if (serviceDid != null)
 			jwtCode = this.storage.loadAccessToken(serviceDid);

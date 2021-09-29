@@ -10,7 +10,7 @@ export class AppDID extends DIDEntity {
 	}
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
-		//DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
+		DIDBackend.initialize(new DefaultDIDAdapter("https://api-testnet.elastos.io/newid")); 
         let newInstance = new AppDID(name, mnemonic, phrasepass, storepass); //, did);
 		await newInstance.initPrivateIdentity(mnemonic);	
 		await newInstance.initDid();

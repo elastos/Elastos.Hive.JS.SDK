@@ -23,6 +23,7 @@ export class ServiceContext {
 	private accessToken: AccessToken;
 	private dataStorage: DataStorage;
 
+    private static LOG_SERVICE_CONTEXT = new Logger("ServiceContext");
     constructor(context: AppContext, providerAddress: string) {
         checkNotNull(context, "Empty context parameter");
         checkNotNull(providerAddress, "Empty provider address parameter");
@@ -39,9 +40,12 @@ export class ServiceContext {
 		if (!dataDir.endsWith(File.SEPARATOR))
 			dataDir += File.SEPARATOR;
 
+        ServiceContext.LOG_SERVICE_CONTEXT.debug("Init Service Context");
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
         this.accessToken = new AccessToken(this, this.dataStorage, new BridgeHandlerImpl(this));
         this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+    
+        ServiceContext.LOG_SERVICE_CONTEXT.debug("Access Token: " + this.accessToken);
     }
 
     public getAccessToken(): AccessToken {
