@@ -1,7 +1,7 @@
-import { HiveException, VaultServices, AppContext, Logger, Utils } from "@dchagastelles/elastos-hive-js-sdk/"
+import { HiveException, VaultServices, AppContext, Logger, Utils, JWTParserBuilder } from "@dchagastelles/elastos-hive-js-sdk/"
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/';
+import { Claims, DIDDocument } from '@elastosfoundation/did-js-sdk/';
 import { File } from '../../..';
 
 export class TestData {

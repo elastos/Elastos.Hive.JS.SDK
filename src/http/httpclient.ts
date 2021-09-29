@@ -25,7 +25,7 @@ export class HttpClient {
     public static NO_AUTHORIZATION = false;
     public static DEFAULT_TIMEOUT = 5000;
     public static DEFAULT_PROTOCOL = "http";
-    public static DEFAULT_PORT = 80;
+    public static DEFAULT_PORT = 9001;
     public static DEFAULT_METHOD = "PUT";
     public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     public static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
@@ -136,8 +136,12 @@ export class HttpClient {
         if (this.withAuthorization) {
           let accessToken = this.serviceContext.getAccessToken();
           let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
-          HttpClient.LOG.debug("Access Token: " + accessToken);
-          HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+          try {
+            HttpClient.LOG.debug("Access Token: " + JSON.stringify(accessToken));
+            HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+          } catch(e) {
+            HttpClient.LOG.error("Request parsing error: {}", e);
+          }
           requestOptions.headers['Authorization'] = canonicalAccessToken;
         }
 

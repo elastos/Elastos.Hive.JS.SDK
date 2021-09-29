@@ -1,11 +1,13 @@
 import localConfig from "../res/local.json";
 import devConfig from "../res/developing.json";
 import prodConfig from "../res/production.json";
+import customConfig from "../res/custom.json";
 
 export class ClientConfig {
     public static LOCAL = localConfig;
     public static DEV = devConfig;
     public static PRODUCTION = prodConfig;
+    public static CUSTOM = customConfig;
 
     private static CURRENT_CONFIG = ClientConfig.LOCAL;
 

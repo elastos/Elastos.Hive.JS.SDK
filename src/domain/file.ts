@@ -43,7 +43,6 @@ import { Logger } from "..";
     private fileStats?: fs.Stats;
 
     public constructor(path: File | string, subpath?: string) {
-        File.LOG.setLevel(Logger.DEBUG);
         let fullPath: string = path instanceof File ? path.getAbsolutePath() : path as string;
 
         if (subpath)
