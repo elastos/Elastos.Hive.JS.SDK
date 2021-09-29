@@ -3,24 +3,12 @@
 
 import { BackupServices } from "./api/backupservices";
 import { VaultServices } from "./api/vaultservices";
-import { ApplicationConfig } from "./config/applicationconfig";
-import { ClientConfig } from "./config/clientconfig";
-import { CrossConfig } from "./config/crossconfig";
-import { NodeConfig } from "./config/nodeconfig";
-import { UserConfig } from "./config/userconfig";
 import { KeyProvider } from "./domain/crypto/keyprovider";
 import { Class } from "./domain/class";
 import { DataStorage } from "./domain/datastorage";
 import { File } from "./domain/file";
 import { FileStorage } from "./domain/filestorage";
-import { Claims } from "./domain/jwt/claims";
-import { JWT } from "./domain/jwt/jwt";
-import { JWTBuilder } from "./domain/jwt/jwtbuilder";
-import { JWTHeader } from "./domain/jwt/jwtheader";
-import { JWTParser } from "./domain/jwt/jwtparser";
-import { JWTParserBuilder } from "./domain/jwt/jwtparserbuilder";
 import { NodeVersion } from "./domain/nodeversion";
-//import { Provider } from "./domain/provider/"
 import { SHA256 } from "./domain/sha256";
 import * as Utils from "./domain/utils";
 import * as exceptions from "./exceptions";
@@ -68,11 +56,6 @@ export {
     //initialize,
     BackupServices,
     VaultServices,
-    ApplicationConfig,
-    ClientConfig,
-    CrossConfig,
-    NodeConfig,
-    UserConfig,
     File,
     FileStorage,
     HttpClient,
@@ -98,14 +81,6 @@ export {
     RunScriptParams,
     SubscriptionService,
     VaultSubscriptionService,
-
-    // jwt
-    JWT,
-    Claims,
-    JWTHeader,
-    JWTBuilder,
-    JWTParser,
-    JWTParserBuilder,
 
     // Utilities
     SHA256,

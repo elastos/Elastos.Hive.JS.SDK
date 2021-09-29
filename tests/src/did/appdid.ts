@@ -1,6 +1,5 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
-import { TestData } from "../config/testdata";
 import { DIDEntity } from "./didentity";
 
 export class AppDID extends DIDEntity {

@@ -1,11 +1,9 @@
-import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppContextProvider } from '../../http/security/appcontextprovider';
 import { HttpClient } from '../../http/httpclient';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpResponseParser } from '../../http/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../../exceptions';
-import { Claims } from '../../domain/jwt/claims';
-import { JWTParserBuilder } from '../../domain/jwt/jwtparserbuilder';
 import { Logger } from '../../logger';
 import { RestService } from '../restservice';
 import { HttpMethod } from '../..';
@@ -91,6 +89,7 @@ export class AuthService extends RestService {
 			HttpClient.LOG.debug("is equal:" + (claims.getAudience() === expectationDid).toString());
 			return claims.getExpiration()*1000 > Date.now() && claims.getAudience() === expectationDid;
 		} catch (e) {
+			AuthService.LOG.error("checkValid error: {}", e);
 			return false;
 		}
 	}

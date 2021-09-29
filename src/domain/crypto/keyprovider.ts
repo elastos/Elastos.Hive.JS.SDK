@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+// TODO: **** SHOULD BE EXPORTED FROM DID JS ****
+
 import { KeyLike } from 'jose/types'
 
 export interface KeyProvider {

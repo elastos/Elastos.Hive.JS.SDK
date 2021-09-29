@@ -5,13 +5,12 @@ import { AccessToken } from './security/accesstoken'
 import { DataStorage } from '../domain/datastorage'
 import { FileStorage } from '../domain/filestorage'
 import { BridgeHandler } from './security/bridgehandler';
-import { Claims } from '../domain/jwt/claims'
 import { NotImplementedException } from '../exceptions'
 import { NodeVersion } from '../domain/nodeversion'
 import { HttpClient } from './httpclient'
 import { AboutService } from '../restclient/about/aboutservice'
-import { JWTParserBuilder } from '../domain/jwt/jwtparserbuilder'
 import { Logger } from '../logger';
+import { Claims, JWTParserBuilder } from '@elastosfoundation/did-js-sdk'
 
 export class ServiceContext {
     private context: AppContext;

@@ -5,7 +5,6 @@ import { HttpResponseParser } from './httpresponseparser';
 import { DeserializationError, HttpException, NodeRPCException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
-import { resolve } from 'path';
 
 export class HttpClient {
     public static LOG = new Logger("HttpClient");
@@ -137,7 +136,7 @@ export class HttpClient {
           let accessToken = this.serviceContext.getAccessToken();
           let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
           try {
-            HttpClient.LOG.debug("Access Token: " + JSON.stringify(accessToken));
+            HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
             HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
           } catch(e) {
             HttpClient.LOG.error("Request parsing error: {}", e);

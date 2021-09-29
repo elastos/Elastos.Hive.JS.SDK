@@ -1,4 +1,4 @@
-import { DIDDocument } from '@elastosfoundation/did-js-sdk/typings';
+import { DIDDocument } from '@elastosfoundation/did-js-sdk';
 
 /**
  * The application context provider.

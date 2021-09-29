@@ -1,4 +1,3 @@
-//import { CodeFetcher } from '../codefetcher';
 import { DataStorage } from '../../domain/datastorage';
 import { BridgeHandler } from './bridgehandler';
 import { ServiceContext } from '../servicecontext';
@@ -27,6 +26,11 @@ export class AccessToken {
 		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
 		this.bridge = bridge;
+	}
+
+	// TEMPORARY DEBUG METHOD
+	public getJwtCode(): string {
+		return this.jwtCode;
 	}
 
 	/**
