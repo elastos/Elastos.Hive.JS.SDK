@@ -2,13 +2,14 @@ import { Logger } from ".";
 
 export class ParentException extends Error{
     private causedBy?: Error;
-    private logger = new Logger("");
+    
     constructor(message?: string, causedBy?: Error) {
         super(message + (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : ""));
         this.causedBy = causedBy;
         Object.setPrototypeOf(this, new.target.prototype);
+        let logger = new Logger(this.constructor.name);
         let stack = causedBy ? " Caused by: " + causedBy.stack  : "";
-        this.logger.error(this.constructor.name + ": " + message + stack);
+        logger.error(message + stack);
     }
 
     public from(e:any) {
