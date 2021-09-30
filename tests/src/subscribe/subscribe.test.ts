@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, PricingPlan } from "@dchagastelles/elastos-hive-js-sdk/"
+import { VaultSubscriptionService, PricingPlan, VaultInfo } from "@dchagastelles/elastos-hive-js-sdk/"
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -25,6 +25,11 @@ describe("test subscribe function", () => {
         let plan: PricingPlan = await subscriptionService.getPricingPlan("Rookie");
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe("Rookie");
+    });
+
+    test("Check subscription", async() => {
+        let info: VaultInfo = await subscriptionService.checkSubscription();
+        expect(info).not.toBeNull();
     });
 
 

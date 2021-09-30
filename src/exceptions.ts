@@ -1,10 +1,14 @@
+import { Logger } from ".";
+
 export class ParentException extends Error{
     private causedBy?: Error;
-
+    private logger = new Logger("");
     constructor(message?: string, causedBy?: Error) {
         super(message + (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : ""));
         this.causedBy = causedBy;
         Object.setPrototypeOf(this, new.target.prototype);
+        let stack = causedBy ? " Caused by: " + causedBy.stack  : "";
+        this.logger.error(this.constructor.name + ": " + message + stack);
     }
 
     public from(e:any) {
@@ -43,8 +47,8 @@ export class DeserializationError extends ParentException {}
 export class HttpException extends ParentException {
     private httpCode: number;
 
-    constructor(httpCode: number, message: string) {
-        super(message);
+    constructor(httpCode: number, message: string, causedBy?: Error) {
+        super(message, causedBy);
         this.httpCode = httpCode;
     }
 
@@ -57,8 +61,8 @@ export class MalformedDIDException extends IllegalArgumentException {}
 
 export class ServerUnknownException extends ParentException {
 
-    constructor(message?: string) {
-        super(message ? message : "Impossible failure happened");
+    constructor(message?: string, causedBy?: Error) {
+        super(message ? message : "Impossible failure happened", causedBy);
     }
     public static withHttpCode(httpCode: number, message: string) {
         return new ServerUnknownException("Exception (http code: " + String(httpCode) + ", message: " + message);
@@ -66,8 +70,8 @@ export class ServerUnknownException extends ParentException {
 }
 
 export class NetworkException extends ParentException {
-    constructor(message: string) {
-        super("Unkown network exception with message: " + message);
+    constructor(message: string, causedBy?: Error) {
+        super("Unkown network exception with message: " + message, causedBy);
     }
 
 } 
@@ -85,8 +89,8 @@ export class NodeRPCException extends ParentException {
 	public static IC_INVALID_PARAMETER = 1;
 	public static IC_BACKUP_IS_IN_PROCESSING = 2;
 
-    constructor(code: number, internalCode: number, message: string) {
-        super(message);
+    constructor(code: number, internalCode: number, message: string, causedBy?: Error) {
+        super(message, causedBy);
         this.code = code;
         this.internalCode = internalCode;
     }

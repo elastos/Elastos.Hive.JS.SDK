@@ -3,6 +3,8 @@ import { BridgeHandler } from './bridgehandler';
 import { ServiceContext } from '../servicecontext';
 import { AuthService } from '../../restclient/auth/authservice';
 import { HttpClient } from '../httpclient';
+import { Logger } from '../../logger';
+import { Claims, JWTParserBuilder } from '@elastosfoundation/did-js-sdk'
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
@@ -10,6 +12,7 @@ import { HttpClient } from '../httpclient';
  * <p>Some of the node APIs requires access token when handling request.</p>
  */
 export class AccessToken {
+	private static LOG = new Logger("AccessToken");
 	private jwtCode: string;
 	private authService: AuthService;
 	private storage: DataStorage;
@@ -22,10 +25,10 @@ export class AccessToken {
 	 * @param storage The data storage which is used to save the access token.
 	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
-	public constructor(serviceContext: ServiceContext, storage: DataStorage, bridge: BridgeHandler) {
+	public constructor(serviceContext: ServiceContext, storage: DataStorage) {
 		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
-		this.bridge = bridge;
+		this.bridge = new BridgeHandlerImpl(serviceContext);
 	}
 
 	// TEMPORARY DEBUG METHOD
@@ -49,20 +52,31 @@ export class AccessToken {
 	}
 
 	public async fetch(): Promise<string> {
-		if (this.jwtCode != null)
+		AccessToken.LOG.debug("fetch: start");
+		if (this.jwtCode != null) {
+			AccessToken.LOG.debug("fetch: jwtCode={}", this.jwtCode);
 			return this.jwtCode;
+		}
 
+		AccessToken.LOG.debug("fetch: restoreToken");
 		this.jwtCode = this.restoreToken();
+		AccessToken.LOG.debug("fetch: restored jwtCode={}", this.jwtCode);
 		if (this.jwtCode == null) {
+			AccessToken.LOG.debug("fetch: jwtCode is null");
 			this.jwtCode = await this.authService.fetch();
+			AccessToken.LOG.debug("fetch: authenticated jwtCode={}", this.jwtCode);
 
 			if (this.jwtCode != null) {
+				AccessToken.LOG.debug("fetch: flushing jwtCode");
 				this.bridge.flush(this.jwtCode);
+				AccessToken.LOG.debug("fetch: saving jwtCode");
 				this.saveToken(this.jwtCode);
 			}
 		} else {
+			AccessToken.LOG.debug("fetch: flushing jwtCode");
 			this.bridge.flush(this.jwtCode);
 		}
+		AccessToken.LOG.debug("fetch: end");
 		return Promise.resolve(this.jwtCode);
 	}
 
@@ -124,4 +138,34 @@ export class AccessToken {
 		this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
 		this.storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
 	}
+}
+
+class BridgeHandlerImpl implements BridgeHandler {
+	private static LOG = new Logger("BridgeHandler");
+
+    private ref: ServiceContext;
+
+    constructor(endpoint: ServiceContext) {
+        this.ref = endpoint;
+    }
+
+    public async flush(value: string): Promise<void> {
+        try {
+			BridgeHandlerImpl.LOG.debug("flush: start");
+            let endpoint = this.ref;
+            let claims: Claims;
+			BridgeHandlerImpl.LOG.debug("flush: {}", value);
+            claims = (await new JWTParserBuilder().build().parse(value)).getBody();
+			BridgeHandlerImpl.LOG.debug("flush: 2");
+            endpoint.flushDids(claims.getAudience(), claims.getIssuer());
+			BridgeHandlerImpl.LOG.debug("flush: 3");
+        } catch (e) {
+            BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
+            return;
+        }
+    }
+
+    public target(): any {
+        return this.ref;
+    }
 }

@@ -36,7 +36,7 @@ export class AuthService extends RestService {
 			HttpClient.LOG.debug("challenge response " + challengeResponse);
 			return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
-			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
+			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.", e);
 		}
 	}
 

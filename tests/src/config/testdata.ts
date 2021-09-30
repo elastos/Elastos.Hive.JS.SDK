@@ -84,10 +84,11 @@ export class TestData {
 			
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-
+					TestData.LOG.debug("TestData.getAppInstanceDocument");
 					return await self.appInstanceDid.getDocument();
 				} catch (e) {
-					e.printStackTrace();
+					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
+					TestData.LOG.error(e.stack);
 				}
 				return null;
 			},
@@ -106,7 +107,8 @@ export class TestData {
 						TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
 						return self.appInstanceDid.createToken(presentation,  claims.getIssuer());
 					} catch (e) {
-						TestData.LOG.info("TestData->getAuthorization error: " + e); 					}
+						TestData.LOG.info("TestData->getAuthorization error: " + e); 	
+						TestData.LOG.error(e.stack);				}
 					}
 		}, self.userDid.getDid().toString());
 
@@ -120,7 +122,7 @@ export class TestData {
 				try {
 					return await self.appInstanceDid.getDocument();
 				} catch (e) {
-					e.printStackTrace();
+					TestData.LOG.error(e.stack);
 				}
 				return null;
 			},
@@ -135,7 +137,7 @@ export class TestData {
 							await self.userDid.issueDiplomaFor(self.appInstanceDid),
 							claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
 				} catch (e) {
-					//throw new CompletionException(new HiveException(e.getMessage()));
+					throw new HiveException(e.getMessage(), e);
 				}
 		}
 		}, this.callerDid.getDid().toString());

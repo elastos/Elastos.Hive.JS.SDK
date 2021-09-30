@@ -2,7 +2,7 @@ import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { DeserializationError, HttpException, NodeRPCException } from '../exceptions';
+import { DeserializationError, HttpException, NodeRPCException, UnauthorizedException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
 
@@ -54,16 +54,27 @@ export class HttpClient {
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
       if (response.statusCode != 200) {
-        HttpClient.LOG.debug("response code: " + response.statusCode);
+        HttpClient.LOG.debug("response code: {}", response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
+        HttpClient.LOG.debug("response dbg1");
         if (!content) {
+          HttpClient.LOG.debug("response dbg2");
           throw new NodeRPCException(response.statusCode, -1, "Empty body.");
         }
-        let httpError = JSON.parse(content);
+        HttpClient.LOG.debug("response dbg3");
+        let jsonObj = JSON.parse(content);
+        HttpClient.LOG.debug("response dbg4");
+        if (!jsonObj["error"]) {
+          HttpClient.LOG.debug("response dbg5");
+          throw new NodeRPCException(response.statusCode, -1, content);
+        }
+        HttpClient.LOG.debug("response dbg6");
+        let httpError = jsonObj["error"];
         let errorCode = httpError['internal_code'];
         let errorMessage = httpError['message'];
+        HttpClient.LOG.debug("response dbg7");
 
         throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
       }
@@ -89,12 +100,6 @@ export class HttpClient {
             let request = http.request(
               options,
               function(response: http.IncomingMessage) {
-                const { statusCode } = response;
-                if (statusCode >= 300) {
-                  reject(
-                    new HttpException(statusCode, response.statusMessage)
-                  );
-                }
                 const chunks = [];
                 response.on('data', (chunk) => {
                   chunks.push(chunk);
@@ -143,15 +148,16 @@ export class HttpClient {
         }
 
         if (this.withAuthorization) {
-          let accessToken = this.serviceContext.getAccessToken();
-          let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
           try {
+            let accessToken = this.serviceContext.getAccessToken();
+            let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
             HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
             HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+            requestOptions.headers['Authorization'] = canonicalAccessToken;
           } catch(e) {
-            HttpClient.LOG.error("Request parsing error: {}", e);
+            HttpClient.LOG.error("Authentication error: {}", e);
+            throw new UnauthorizedException("Authentication error", e);
           }
-          requestOptions.headers['Authorization'] = canonicalAccessToken;
         }
 
         return requestOptions;
