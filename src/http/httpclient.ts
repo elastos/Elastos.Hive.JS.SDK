@@ -74,12 +74,15 @@ export class HttpClient {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let payload = this.parsePayload(rawPayload, method);
-        let options = await this.buildRequest(serviceEndpoint, method);
+        let options = await this.buildRequest(serviceEndpoint, method, payload);
 
-        options.method === HttpMethod.GET && options.path.concat("?" + payload);
+        // Remove payload for GET requests.
+        if (options.method === HttpMethod.GET) {
+          payload = "";
+        }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.debug("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
+        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD && options.method != HttpMethod.GET ? " payload: " + payload : ""));
         HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
 
         return new Promise<T>((resolve, reject) => {
@@ -100,7 +103,7 @@ export class HttpClient {
                 response.on('end', () => {
                   try {
                     const rawContent = Buffer.concat(chunks).toString();
-                    HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
+                    HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
 
                     self.handleResponse(response, rawContent);
 
@@ -116,21 +119,28 @@ export class HttpClient {
               }
             );
             
-            if (options.method != HttpMethod.GET && payload != HttpClient.NO_PAYLOAD) {
-                request.write(payload);
-                //request.write(JSON.stringify(payload));
+            if (payload && payload != HttpClient.NO_PAYLOAD) {
+              request.write(payload);
             }
 
             request.end();
         })
     }
 
-    private async buildRequest(serviceEndpoint: string, method: HttpMethod): Promise<http.RequestOptions> {
+    /**
+     * Build Http RequestOptions from endpoint, method and payload.
+     * For GET requests, the payload is added to the endpoint url.
+     */
+    private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<http.RequestOptions> {
         let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
         if (method) {
           requestOptions.method = method;
         }
         requestOptions.path = serviceEndpoint;
+
+        if (payload && method === HttpMethod.GET) {
+          requestOptions.path += ("?" + payload);
+        }
 
         if (this.withAuthorization) {
           let accessToken = this.serviceContext.getAccessToken();
@@ -147,13 +157,21 @@ export class HttpClient {
         return requestOptions;
     }
 
+    /**
+     * Return provided payload as a serialized JSON object or as url
+     * parameters for GET requests.
+     */
     private parsePayload(payload: any, method: HttpMethod): string {
         if (payload && method === HttpMethod.GET) {
-          //Create query parameters from map
+          if (typeof payload === 'string') {
+            return payload;
+          }
           let query = "";
           for (let prop of Object.keys(payload)) {
-            query && query.concat("&");
-            query = query.concat(prop + "=" + payload[prop]);
+            if (query) {
+              query += "&";
+            }
+            query += (prop + "=" + payload[prop]);
           }
           return query;
         }
