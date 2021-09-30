@@ -20,6 +20,14 @@ describe("test subscribe function", () => {
         expect(plans.length).toBeGreaterThan(0);
     });
 
+
+    test("get pricing plan", async() => {
+        let plan: PricingPlan = await subscriptionService.getPricingPlan("Rookie");
+        expect(plan).not.toBeNull();
+        expect(plan.getName()).toBe("Rookie");
+    });
+
+
 /*    test("should return vault info", async () => {
         const vaultInfo = await subscriptionService.subscribe();
     });*/
