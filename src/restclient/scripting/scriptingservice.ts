@@ -145,7 +145,7 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: String, resultType: Class<T>) {
+	async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string, resultType: Class<T>) {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");

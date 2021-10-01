@@ -1,226 +1,156 @@
-// package org.elastos.hive;
+import { DatabaseService, ScriptingService } from "../../../typings";
+import { ClientConfig } from "../config/clientconfig";
+import { TestData } from "../config/testdata";
+import { FileHashExecutable } from "../../../src/restclient//scripting/hashExecutable";
+import { DeleteExecutable } from "../../../src/restclient//scripting/deleteExecutable";
+import { InsertExecutable } from "../../../src/restclient//scripting/insertExecutable";
+import { FindExecutable } from "../../../src/restclient//scripting/findExecutable";
+import { UpdateExecutable } from "../../../src/restclient//scripting/updateExecutable";
+import { QueryHasResultCondition } from "../../../src/restclient//scripting/queryHasResultCondition";
 
-// import com.fasterxml.jackson.databind.JsonNode;
-// import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-// import com.fasterxml.jackson.databind.node.ObjectNode;
-// import com.google.common.base.Throwables;
-// import org.elastos.hive.config.TestData;
-// import org.elastos.hive.service.DatabaseService;
-// import org.elastos.hive.service.FilesService;
-// import org.elastos.hive.service.ScriptingService;
-// import org.elastos.hive.vault.scripting.*;
-// import org.junit.jupiter.api.*;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 
-// import java.io.FileReader;
-// import java.io.Reader;
-// import java.io.Writer;
 
-// @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-// class ScriptingServiceTest {
-// 	private static final Logger log = LoggerFactory.getLogger(ScriptingServiceTest.class);
-// 	private static final String FIND_NAME = "get_group_messages";
-// 	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
-// 	private static final String INSERT_NAME = "database_insert";
-// 	private static final String UPDATE_NAME = "database_update";
-// 	private static final String DELETE_NAME = "database_delete";
-// 	private static final String UPLOAD_FILE_NAME = "upload_file";
-// 	private static final String DOWNLOAD_FILE_NAME = "download_file";
-// 	private static final String FILE_PROPERTIES_NAME = "file_properties";
-// 	private static final String FILE_HASH_NAME = "file_hash";
 
-// 	private static final String COLLECTION_NAME = "script_database";
 
-// 	private static String targetDid;
-// 	private static String appDid;
+describe("test scripting service", () => {
+    
+    let testData: TestData;
+    //let subscriptionService: VaultSubscriptionService;
+    const PRICING_PLAN_NAME: String = "Rookie";
+    //private static log = LoggerFactory.getLogger(ScriptingServiceTest.class);
+    const FIND_NAME = "get_group_messages";
+    const FIND_NO_CONDITION_NAME = "script_no_condition";
+    const INSERT_NAME = "database_insert";
+    const UPDATE_NAME = "database_update";
+    const DELETE_NAME = "database_delete";
+    const UPLOAD_FILE_NAME = "upload_file";
+    const DOWNLOAD_FILE_NAME = "download_file";
+    const FILE_PROPERTIES_NAME = "file_properties";
+    const FILE_HASH_NAME = "file_hash";
+    
+    const COLLECTION_NAME = "script_database";
+    
+    let targetDid: string;
+    let appDid: string;
+    
+    let filesService: string;
+    let databaseService: DatabaseService;
+    let scriptingService: ScriptingService;
+    //let scriptRunner:  ScriptRunner;
+    
+    let localSrcFilePath: string;
+    let localDstFileRoot: string;
+    let localDstFilePath: string;
+    let fileName: string;
 
-// 	private static FilesService filesService;
-// 	private static DatabaseService databaseService;
-// 	private static ScriptingService scriptingService;
-// 	private static ScriptRunner scriptRunner;
+    
+    function create_test_database() {
+        try {
+            databaseService.createCollection(COLLECTION_NAME).get();
+        } catch (e) {
+            //log.error("Failed to create collection: {}", e.getMessage());
+        }
+    }
 
-// 	private final String localSrcFilePath;
-// 	private final String localDstFileRoot;
-// 	private final String localDstFilePath;
-// 	private final String fileName;
+    	/**
+	 * If not exists, also return OK(_status).
+	 */
+	function remove_test_database() {
+		try {
+			databaseService.deleteCollection(COLLECTION_NAME).get();
+		} catch (e) {
+			//log.error("Failed to remove collection: {}", e.getMessage());
+		}
+    }
+    
+    function registerScriptDelete( scriptName: string) {
+        let filter = { "author": "$params.author" };
+        expect(scriptingService.registerScript(scriptName, new DeleteExecutable(scriptName, COLLECTION_NAME, filter), false, false).get()).not.toThrow();
+    }
 
-// 	public ScriptingServiceTest() {
-// 		fileName = "test.txt";
-// 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
-// 		localSrcFilePath = localRootPath + fileName;
-// 		localDstFileRoot = localRootPath + "cache/script/";
-// 		localDstFilePath = localDstFileRoot + fileName;
-// 	}
+    function registerScriptInsert(scriptName: string) {
+        //Assertions.assertDoesNotThrow(() -> {
+        let doc = {"author": "$params.author", "content": "$params.content"};
+        let options = { "bypass_document_validation": false, "ordered": true};
+        scriptingService.registerScript(scriptName,
+                new InsertExecutable(scriptName, COLLECTION_NAME, doc, options),
+                false, false).get();
+    }
 
-// 	@BeforeAll public static void setUp() {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			TestData testData = TestData.getInstance();
-// 			scriptingService = testData.newVault().getScriptingService();
-// 			scriptRunner = testData.newScriptRunner();
-// 			filesService = testData.newVault().getFilesService();
-// 			databaseService = testData.newVault().getDatabaseService();
-// 			targetDid = testData.getUserDid();
-// 			appDid = testData.getAppDid();
-// 		});
-// 	}
+    function callScriptInsert( scriptName: string) {
+       
+        let params = {"author":"John", "content": "message"}
+        let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+        expect(result).not.toBeNull();
+        expect(result.has(scriptName)).toBeTruthy();
+        expect(result.get(scriptName).has("inserted_id")).toBeTruthy();
+    }
 
-// 	@AfterAll public static void tearDown() {
-// 	}
+    function registerScriptFindWithoutCondition(scriptName: string) {
+		
+        let filter = {"author":"John"};
+        scriptingService.registerScript(scriptName,
+                 new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true),
+                 false, false).get();
+	
+	}
 
-// 	@Test @Order(1) void testInsert() {
-// 		remove_test_database();
-// 		create_test_database();
-// 		registerScriptInsert(INSERT_NAME);
-// 		callScriptInsert(INSERT_NAME);
-// 	}
+    function callScriptFindWithoutCondition( scriptName: string) {
+		//Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
+		expect(scriptingService.callScriptUrl(scriptName, "{}", targetDid, appDid).get()).not.toBeNull();
+    }
+    
+    function registerScriptFind( scriptName: string) {
+        //Assertions.assertDoesNotThrow(()->{
+        let filter = { "author":"John" };
+        scriptingService.registerScript(scriptName,
+                new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null),
+                new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true),
+                false, false).get();
+       
+	}
 
-// 	private void registerScriptInsert(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() -> {
-// 			ObjectNode doc = JsonNodeFactory.instance.objectNode();
-// 			doc.put("author", "$params.author");
-// 			doc.put("content", "$params.content");
-// 			ObjectNode options = JsonNodeFactory.instance.objectNode();
-// 			options.put("bypass_document_validation", false);
-// 			options.put("ordered", true);
-// 			scriptingService.registerScript(scriptName,
-// 					new InsertExecutable(scriptName, COLLECTION_NAME, doc, options),
-// 					false, false).get();
-// 		});
-// 	}
+	function callScriptFind(scriptName: string) {
+		// Assertions.assertDoesNotThrow(()->{
+		// 	Assertions.assertNotNull(
+		expect(this.scriptingService.callScript(scriptName, null, this.targetDid, this.appDid).get()).not.toBeNull();
+		// });
+	}
 
-// 	private void callScriptInsert(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			ObjectNode params = JsonNodeFactory.instance.objectNode();
-// 			params.put("author","John");
-// 			params.put("content", "message");
-// 			JsonNode result = scriptRunner.callScript(scriptName, params,
-// 					targetDid, appDid, JsonNode.class).get();
-// 			Assertions.assertNotNull(result);
-// 			Assertions.assertTrue(result.has(scriptName));
-// 			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
-// 		});
-// 	}
+    function registerScriptUpdate( scriptName: string) {
+ 			let filter = {"author": "$params.author"};
+ 			let set = {"author": "$params.author", "content": "$params.content" };
+ 			let update = {"$set": set};
+            let options = { "bypass_document_validation": false, "upsert": true};
+ 			expect(scriptingService.registerScript(scriptName,
+ 					new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options),
+                     false, false).get()).not.toThrow();
+    }
 
-// 	@Test @Order(2) void testFindWithoutCondition() {
-// 		registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-// 		callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-// 	}
+    function callScriptUpdate( scriptName: string) {
+        let params = {"author": "John", "content": "message" };
+     	let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+ 		expect(result).not.toBeNull();
+        expect(result.has(scriptName)).toBeTruthy();
+        expect(result.get(scriptName).has("upserted_id")).toBeTruthy();
+ 	}
 
-// 	private void registerScriptFindWithoutCondition(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-// 			filter.put("author","John");
-// 			scriptingService.registerScript(scriptName,
-// 					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
-// 					false, false).get();
-// 		});
-// 	}
-
-// 	private void callScriptFindWithoutCondition(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-// 				scriptRunner.callScriptUrl(scriptName, "{}", targetDid, appDid, String.class).get()));
-// 	}
-
-// 	@Test @Order(3) void testFind() {
-// 		registerScriptFind(FIND_NAME);
-// 		callScriptFind(FIND_NAME);
-// 	}
-
-// 	private void registerScriptFind(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-// 			filter.put("author","John");
-// 			scriptingService.registerScript(scriptName,
-// 					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
-// 					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
-// 					false, false).get();
-// 		});
-// 	}
-
-// 	private void callScriptFind(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			Assertions.assertNotNull(
-// 				scriptRunner.callScript(scriptName, null, targetDid, appDid, String.class).get());
-// 		});
-// 	}
-
-// 	@Test @Order(4) void testUpdate() {
-// 		registerScriptUpdate(UPDATE_NAME);
-// 		callScriptUpdate(UPDATE_NAME);
-// 	}
-
-// 	private void registerScriptUpdate(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() -> {
-// 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-// 			filter.put("author", "$params.author");
-// 			ObjectNode set = JsonNodeFactory.instance.objectNode();
-// 			set.put("author", "$params.author");
-// 			set.put("content", "$params.content");
-// 			ObjectNode update = JsonNodeFactory.instance.objectNode();
-// 			update.put("$set", set);
-// 			ObjectNode options = JsonNodeFactory.instance.objectNode();
-// 			options.put("bypass_document_validation", false);
-// 			options.put("upsert", true);
-// 			scriptingService.registerScript(scriptName,
-// 					new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options),
-// 					false, false).get();
-// 		});
-// 	}
-
-// 	private void callScriptUpdate(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			ObjectNode params = JsonNodeFactory.instance.objectNode();
-// 			params.put("author", "John");
-// 			params.put("content", "message");
-// 			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
-// 			Assertions.assertNotNull(result);
-// 			Assertions.assertTrue(result.has(scriptName));
-// 			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
-// 		});
-// 	}
-
-// 	@Test @Order(5) void testDelete() {
-// 		registerScriptDelete(DELETE_NAME);
-// 		callScriptDelete(DELETE_NAME);
-// 	}
-
-// 	private void registerScriptDelete(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() -> {
-// 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-// 			filter.put("author", "$params.author");
-// 			scriptingService.registerScript(scriptName,
-// 					new DeleteExecutable(scriptName, COLLECTION_NAME, filter),
-// 					false, false).get();
-// 		});
-// 	}
-
-// 	private void callScriptDelete(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			ObjectNode params = JsonNodeFactory.instance.objectNode();
-// 			params.put("author", "John");
-// 			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
-// 			Assertions.assertNotNull(result);
-// 			Assertions.assertTrue(result.has(scriptName));
-// 			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
-// 		});
-// 	}
-
-// 	@Test @Order(6) void testUploadFile() {
-// 		registerScriptFileUpload(UPLOAD_FILE_NAME);
-// 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-// 		uploadFileByTransActionId(transactionId);
-// 		FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
-// 	}
-
-// 	private void registerScriptFileUpload(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() ->
-// 				scriptingService.registerScript(scriptName,
-// 						new FileUploadExecutable(scriptName).setOutput(true),
-// 						false, false).get());
-// 	}
-
-// 	private String callScriptFileUpload(String scriptName, String fileName) {
+	function callScriptDelete( scriptName: string) {
+		let params =  {"author": "John"};
+		let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+		expect(result).not.toBeNull();
+		expect(result.has(scriptName)).toBeTruthy();
+		expect(result.get(scriptName).has("deleted_count")).toBeTruthy();
+    }
+    
+    function registerScriptFileUpload(scriptName: string) {
+		//Assertions.assertDoesNotThrow(() ->
+        // scriptingService.registerScript(scriptName,
+        //         new FileUploadExecutable(scriptName).setOutput(true),
+        //         false, false).get());
+    }
+    
+    function callScriptFileUpload(scriptName: string, fileName: string) {
 // 		try {
 // 			JsonNode result = scriptRunner.callScript(scriptName,
 // 					Executable.createRunFileParams(fileName),
@@ -235,71 +165,27 @@
 // 		}
 // 	}
 
-// 	private void uploadFileByTransActionId(String transactionId) {
-// 		try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
-// 			 FileReader fileReader = new FileReader(localSrcFilePath)) {
-// 			Assertions.assertNotNull(writer);
-// 			char[] buffer = new char[1];
-// 			while (fileReader.read(buffer) != -1) {
-// 				writer.write(buffer);
-// 			}
-// 		} catch (Exception e) {
-// 			Assertions.fail(Throwables.getStackTraceAsString(e));
-// 		}
-// 	}
+	function uploadFileByTransActionId( transactionId: string) {
+		// try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
+		// 	 FileReader fileReader = new FileReader(localSrcFilePath)) {
+		// 	Assertions.assertNotNull(writer);
+		// 	char[] buffer = new char[1];
+		// 	while (fileReader.read(buffer) != -1) {
+		// 		writer.write(buffer);
+		// 	}
+		// } catch (Exception e) {
+		// 	Assertions.fail(Throwables.getStackTraceAsString(e));
+		// }
+    }
+    
+    function registerScriptFileProperties( scriptName: string) {
+		//Assertions.assertDoesNotThrow(() ->
+        // scriptingService.registerScript(scriptName,
+        //         new FilePropertiesExecutable(scriptName).setOutput(true),
+        //         false, false).get());
+	}
 
-// 	@Test @Order(7) void testFileDownload() {
-// 		FilesServiceTest.removeLocalFile(localDstFilePath);
-// 		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-// 		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-// 		downloadFileByTransActionId(transactionId);
-// 		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
-// 	}
-
-// 	private void registerScriptFileDownload(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() ->
-// 				scriptingService.registerScript(scriptName,
-// 						new FileDownloadExecutable(scriptName).setOutput(true),
-// 						false, false).get());
-// 	}
-
-// 	private String callScriptFileDownload(String scriptName, String fileName) {
-// 		try {
-// 			JsonNode result = scriptRunner.callScript(scriptName,
-// 					Executable.createRunFileParams(fileName),
-// 					targetDid, appDid, JsonNode.class).get();
-// 			Assertions.assertNotNull(result);
-// 			Assertions.assertTrue(result.has(scriptName));
-// 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
-// 			return result.get(scriptName).get("transaction_id").textValue();
-// 		} catch (Exception e) {
-// 			Assertions.fail(Throwables.getStackTraceAsString(e));
-// 			return null;
-// 		}
-// 	}
-
-// 	private void downloadFileByTransActionId(String transactionId) {
-// 		try (Reader reader = scriptRunner.downloadFile(transactionId, Reader.class).get()) {
-// 			Assertions.assertNotNull(reader);
-// 			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
-// 		} catch (Exception e) {
-// 			Assertions.fail(Throwables.getStackTraceAsString(e));
-// 		}
-// 	}
-
-// 	@Test @Order(8) void testFileProperties() {
-// 		registerScriptFileProperties(FILE_PROPERTIES_NAME);
-// 		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
-// 	}
-
-// 	private void registerScriptFileProperties(String scriptName) {
-// 		Assertions.assertDoesNotThrow(() ->
-// 				scriptingService.registerScript(scriptName,
-// 						new FilePropertiesExecutable(scriptName).setOutput(true),
-// 						false, false).get());
-// 	}
-
-// 	private void callScriptFileProperties(String scriptName, String fileName) {
+    function callScriptFileProperties(scriptName: string, fileName: string) {
 // 		Assertions.assertDoesNotThrow(()->{
 // 			JsonNode result = scriptRunner.callScript(scriptName,
 // 					Executable.createRunFileParams(fileName),
@@ -309,56 +195,103 @@
 // 			Assertions.assertTrue(result.get(scriptName).has("size"));
 // 			Assertions.assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
 // 		});
-// 	}
+    }
 
-// 	@Test @Order(9) void testFileHash() {
-// 		registerScriptFileHash(FILE_HASH_NAME);
-// 		callScriptFileHash(FILE_HASH_NAME, fileName);
-// 	}
+    function registerScriptFileHash(scriptName: string) {
+		expect(scriptingService.registerScript(scriptName,
+						new FileHashExecutable(scriptName).setOutput(true),
+				false, false).get()).not.toThrow();
+    }
 
-// 	private void registerScriptFileHash(String scriptName) {
-// 		Assertions.assertDoesNotThrow(()->
-// 				scriptingService.registerScript(scriptName,
-// 						new FileHashExecutable(scriptName).setOutput(true),
-// 				false, false).get());
-// 	}
+    function callScriptFileHash(scriptName: string, fileName: string) {
+        // Assertions.assertDoesNotThrow(()->{
+        //     JsonNode result = scriptRunner.callScript(scriptName,
+        //             Executable.createRunFileParams(fileName),
+        //             targetDid, appDid, JsonNode.class).get();
+        //     Assertions.assertNotNull(result);
+        //     Assertions.assertTrue(result.has(scriptName));
+        //     Assertions.assertTrue(result.get(scriptName).has("SHA256"));
+        //     Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
+        // });
+    }
 
-// 	private void callScriptFileHash(String scriptName, String fileName) {
-// 		Assertions.assertDoesNotThrow(()->{
-// 			JsonNode result = scriptRunner.callScript(scriptName,
-// 					Executable.createRunFileParams(fileName),
-// 					targetDid, appDid, JsonNode.class).get();
-// 			Assertions.assertNotNull(result);
-// 			Assertions.assertTrue(result.has(scriptName));
-// 			Assertions.assertTrue(result.get(scriptName).has("SHA256"));
-// 			Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
-// 		});
-// 	}
+	function registerScriptFileDownload( scriptName: string) {
+		// expect(scriptingService.registerScript(scriptName,
+		// 				new FileDownloadExecutable(scriptName).setOutput(true),
+		// 				false, false).get()).not.toThrow();
+	}
 
-// 	@Test @Order(10) void testUnregister() {
-// 		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(FILE_HASH_NAME).get(); });
-// 		remove_test_database();
-// 	}
+    beforeAll(async () => {
+        let testData = await TestData.getInstance(ClientConfig.DEV, "/home/diego/temp");
+        scriptingService = testData.newVault().getScriptingService();
+        //scriptRunner = testData.newScriptRunner();
+        filesService = testData.newVault().getFilesService();
+        databaseService = testData.newVault().getDatabaseService();
+        targetDid = testData.getUserDid();
+        appDid = testData.getAppDid();
+    });
 
-// 	/**
-// 	 * If exists, also return OK(_status).
-// 	 */
-// 	private static void create_test_database() {
-// 		try {
-// 			databaseService.createCollection(COLLECTION_NAME).get();
-// 		} catch (Exception e) {
-// 			log.error("Failed to create collection: {}", e.getMessage());
-// 		}
-// 	}
 
-// 	/**
-// 	 * If not exists, also return OK(_status).
-// 	 */
-// 	private static void remove_test_database() {
-// 		try {
-// 			databaseService.deleteCollection(COLLECTION_NAME).get();
-// 		} catch (Exception e) {
-// 			log.error("Failed to remove collection: {}", e.getMessage());
-// 		}
-// 	}
-// }
+    test.skip("testInsert", async () => {
+        remove_test_database();
+        create_test_database();
+        registerScriptInsert(INSERT_NAME);
+        callScriptInsert(INSERT_NAME);
+    });
+
+    test.skip("testFindWithoutCondition", async () => {
+        registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+		callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+    });
+
+    test.skip("testFind", async () => {
+        registerScriptFind(FIND_NAME);
+        callScriptFind(FIND_NAME);
+    });
+
+
+    test.skip("testUpdate", async () => {
+        registerScriptUpdate(UPDATE_NAME);
+    	callScriptUpdate(UPDATE_NAME);
+    });
+
+
+    test.skip("testDelete", async () => {
+        registerScriptDelete(DELETE_NAME);
+ 		callScriptDelete(DELETE_NAME);
+    });
+
+
+    test.skip("testUploadFile", async () => {
+        // registerScriptFileUpload(UPLOAD_FILE_NAME);
+        // let transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
+        // uploadFileByTransActionId(transactionId);
+        // FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
+    });
+
+
+    test.skip("testFileDownload", async () => {
+        // FilesServiceTest.removeLocalFile(localDstFilePath);
+        // registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        // String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+        // downloadFileByTransActionId(transactionId);
+        // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+    });
+
+    test.skip("testFileProperties", async () => {
+        registerScriptFileProperties(FILE_PROPERTIES_NAME);
+        callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+    });
+
+    test.skip("testFileHash", async () => {
+        registerScriptFileHash(FILE_HASH_NAME);
+        callScriptFileHash(FILE_HASH_NAME, fileName);
+    });
+
+
+    test.skip("testUnregister", async () => {
+        expect(scriptingService.unregisterScript(FILE_HASH_NAME).get()).not.toThrow();
+ 		remove_test_database();
+    });
+  
+}});
