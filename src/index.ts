@@ -41,6 +41,7 @@ import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscr
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
 import { HiveException } from "./exceptions";
+import { QueryHasResultCondition } from "./restclient/scripting/queryHasResultCondition";
 
 //Logger.setLevel(Logger.TRACE);
 
@@ -87,7 +88,7 @@ export {
     SubscriptionService,
     VaultSubscriptionService,
     HiveException,
-
+    QueryHasResultCondition,
 
     // Utilities
     SHA256,

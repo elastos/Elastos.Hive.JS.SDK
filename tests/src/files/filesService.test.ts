@@ -3,7 +3,7 @@ import { VaultSubscriptionService, PricingPlan, VaultInfo, FilesService } from "
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe("test file service", () => {
+describe.skip("test file service", () => {
 
 	const FILE_NAME_TXT = "test.txt";
 	const FILE_NAME_IMG = "big.png";
