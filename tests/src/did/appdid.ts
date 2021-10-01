@@ -1,4 +1,4 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend, VerificationEventListener } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { DIDEntity } from "./didentity";
 
@@ -32,7 +32,13 @@ export class AppDID extends DIDEntity {
 				.nonce(nonce)
 				.seal(this.getStorePassword());
 
+
+				
 		AppDID.LOG.info("VerifiablePresentation:{}", vp.toString());
+
+		let listener = VerificationEventListener.getDefaultWithIdent("isValid");
+		AppDID.LOG.info("VerifiablePresentation is Valid :{}", await vp.isValid(listener));
+		AppDID.LOG.info("Listener :{}", listener.toString());
 
 		return vp;
 	}
@@ -48,7 +54,6 @@ export class AppDID extends DIDEntity {
 		let token = await doc.jwtBuilder()
 				.addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
 				.addHeader("version", "1.0")
-
 				.setSubject("DIDAuthResponse")
 				.setAudience(hiveDid)
 				.setIssuedAt(iat)
