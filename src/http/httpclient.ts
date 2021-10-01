@@ -53,7 +53,7 @@ export class HttpClient {
     }
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
-      if (response.statusCode != 200) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
         HttpClient.LOG.debug("response code: {}", response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
@@ -63,9 +63,9 @@ export class HttpClient {
           HttpClient.LOG.debug("response dbg2");
           throw new NodeRPCException(response.statusCode, -1, "Empty body.");
         }
-        HttpClient.LOG.debug("response dbg3");
+        HttpClient.LOG.debug("response dbg3: " + content);
         let jsonObj = JSON.parse(content);
-        HttpClient.LOG.debug("response dbg4");
+        HttpClient.LOG.debug("response dbg4");response.statusCode
         if (!jsonObj["error"]) {
           HttpClient.LOG.debug("response dbg5");
           throw new NodeRPCException(response.statusCode, -1, content);
