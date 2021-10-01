@@ -57,7 +57,7 @@ export class TestData {
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonic,
+				applicationConfig.mnemonics2,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass); //,
 				//applicationConfig.did);

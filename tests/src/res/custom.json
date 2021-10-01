@@ -1,5 +1,5 @@
 {
-    "resolverUrl": "https://api-testnet.elastos.io/newid",
+    "resolverUrl": "mainnet",
   
     "application": {
       "name": "developApp",
