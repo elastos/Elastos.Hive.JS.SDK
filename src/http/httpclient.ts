@@ -7,7 +7,7 @@ import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
 
 export class HttpClient {
-    public static LOG = new Logger("HttpClient");
+    private static LOG = new Logger("HttpClient");
 
     public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>> {
 			deserialize(content: any): string {

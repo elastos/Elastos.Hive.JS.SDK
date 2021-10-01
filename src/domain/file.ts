@@ -24,7 +24,7 @@ import path from "path";
 
 //import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from "./fs";
 import * as fs from 'fs-extra';
-import { Logger } from "..";
+import { Logger } from "../logger";
 
 
 

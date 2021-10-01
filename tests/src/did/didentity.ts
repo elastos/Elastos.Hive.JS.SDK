@@ -1,5 +1,5 @@
 import { RootIdentity, DIDStore, DID, DIDDocument, HDKey, DIDURL } from "@elastosfoundation/did-js-sdk";
-import { File, Logger } from "@dchagastelles/elastos-hive-js-sdk/"
+import { File, Logger } from "@dchagastelles/elastos-hive-js-sdk"
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");

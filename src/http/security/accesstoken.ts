@@ -42,11 +42,11 @@ export class AccessToken {
 	 * @return null if not exists.
 	 */
 	public async getCanonicalizedAccessToken(): Promise<string> {
-		HttpClient.LOG.debug("getCanonicalizedAccessToken");
+		AccessToken.LOG.debug("getCanonicalizedAccessToken");
 		try {
 			this.jwtCode = await this.fetch();
 		} catch (e) {
-			HttpClient.LOG.error("error on getCanonicalizedAccessToken: " + e);
+			AccessToken.LOG.error("error on getCanonicalizedAccessToken: " + e);
 			return null;
 		}
 		return "token " + this.jwtCode;
