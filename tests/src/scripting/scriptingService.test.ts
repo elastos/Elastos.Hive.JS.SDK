@@ -1,18 +1,3 @@
-
-
-// import { ClientConfig } from "../config/clientconfig";
-// import { TestData } from "../config/testdata";
-// import { FileHashExecutable } from "../../../src/restclient//scripting/hashExecutable";
-// import { DeleteExecutable } from "../../../src/restclient//scripting/deleteExecutable";
-// import { InsertExecutable } from "../../../src/restclient//scripting/insertExecutable";
-// import { FindExecutable } from "../../../src/restclient//scripting/findExecutable";
-// import { UpdateExecutable } from "../../../src/restclient//scripting/updateExecutable";
-// import { DatabaseService, ScriptingService, QueryHasResultCondition } from "@dchagastelles/elastos-hive-js-sdk";
-
-
-
-
-
 // describe.skip("test scripting service", () => {
     
 //     let testData: TestData;
@@ -289,5 +274,4 @@
 //         expect(await this.scriptingService.unregisterScript(this.FILE_HASH_NAME)).not.toThrow();
 //  		this.remove_test_database();
 //     });
-  
 // }});

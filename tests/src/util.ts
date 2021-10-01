@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { File } from "@elastosfoundation/did-js-sdk";
+import { File } from "@dchagastelles/elastos-hive-js-sdk";
 
 /* declare global {
     interface Array<T> {

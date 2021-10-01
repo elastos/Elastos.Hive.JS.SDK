@@ -23,17 +23,17 @@ export class AuthService extends RestService {
 
 	public async fetch(): Promise<string> {
 		try {
-			HttpClient.LOG.debug("AuthService=>fetch");
+			AuthService.LOG.debug("AuthService=>fetch");
 
 			let appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
-			HttpClient.LOG.debug("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
+			AuthService.LOG.debug("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
 
 			let challenge: string  = await this.signIn(appInstanceDoc);
-			HttpClient.LOG.debug("AuthService=>challenge :" + challenge);
+			AuthService.LOG.debug("AuthService=>challenge :" + challenge);
 
 			
 			let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
-			HttpClient.LOG.debug("challenge response " + challengeResponse);
+			AuthService.LOG.debug("challenge response " + challengeResponse);
 			return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
 			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.", e);
@@ -46,7 +46,7 @@ export class AuthService extends RestService {
 		
 		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, { "id": JSON.parse(appInstanceDidDoc.toString(true)) }, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				HttpClient.LOG.debug("return sign_in: " + content);				
+				AuthService.LOG.debug("return sign_in: " + content);				
 				return JSON.parse(content)['challenge'];
 			}
 		}, HttpMethod.POST);
@@ -84,9 +84,9 @@ export class AuthService extends RestService {
 		try {
 			let claims: Claims = (await new JWTParserBuilder().build().parse(jwtCode)).getBody();
 
-			HttpClient.LOG.debug("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
-			HttpClient.LOG.debug("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
-			HttpClient.LOG.debug("is equal:" + (claims.getAudience() === expectationDid).toString());
+			AuthService.LOG.debug("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
+			AuthService.LOG.debug("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
+			AuthService.LOG.debug("is equal:" + (claims.getAudience() === expectationDid).toString());
 			return claims.getExpiration()*1000 > Date.now() && claims.getAudience() === expectationDid;
 		} catch (e) {
 			AuthService.LOG.error("checkValid error: {}", e);

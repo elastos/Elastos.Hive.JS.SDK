@@ -1,11 +1,12 @@
-import { HiveException, VaultServices, AppContext, Logger, Utils } from "@dchagastelles/elastos-hive-js-sdk/"
+import { HiveException, VaultServices, AppContext, Logger, Utils, File } from "@dchagastelles/elastos-hive-js-sdk"
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk/';
-import { File } from '../../..';
 
 export class TestData {
-    private static LOG = new Logger("TestData");
+	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
+
+	private static LOG = new Logger("TestData");
     private static readonly RESOLVE_CACHE = "data/didCache";
     private static INSTANCE: TestData;
 
@@ -27,6 +28,7 @@ export class TestData {
 		Utils.checkNotNull(clientConfig.node, "A valid test configuration is mandatory");
         if (!TestData.INSTANCE) {
 			TestData.LOG.info("***** Running tests using '{}' configuration *****", clientConfig.node.storePath);
+			TestData.LOG.info("***** Data directory: '{}' *****", userDir);
             TestData.INSTANCE = new TestData(clientConfig, userDir);
 			await TestData.INSTANCE.init();
         }
@@ -144,70 +146,6 @@ export class TestData {
 
 		return this;
 	}
-
-	/**
-	 * If run test cases for production environment, please try this:
-	 * 	- HIVE_ENV=production ./gradlew build
-	 *
-	 * @return Client configuration.
-	 */
-	// getClientConfig = (): ClientConfig => {
-	// 	String fileName, hiveEnv = System.getenv("HIVE_ENV");
-	// 	if ("production".equals(hiveEnv))
-	// 		fileName = "Production.conf";
-	// 	else if ("local".equals(hiveEnv))
-	// 		fileName = "Local.conf";
-	// 	else
-	// 		fileName = "Developing.conf";
-	// 	log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
-	// 	return ClientConfig.deserialize(Utils.getConfigure(fileName));
-	// } 
-
-
-
-	// newScriptRunner(): ScriptRunner {
-	// 	return new ScriptRunner(this.context, getProviderAddress());
-	// }
-
-	// newCallerScriptRunner() : ScriptRunner {
-	// 	return new ScriptRunner(this.callerContext, getProviderAddress());
-	// }
-
-	// newBackup(): Backup {
-	// 	return new Backup(context, nodeConfig.targetHost());
-	// }
-
-	//  getBackupService() : BackupServices {
-	// 	let bs : BackupService = this.newVault().getBackupService();
-	// 	bs.setupContext(new HiveBackupContext() {
-	// 		@Override
-	// 		public String getType() {
-	// 			return null;
-	// 		}
-
-	// 		@Override
-	// 		public String getTargetProviderAddress() {
-	// 			return nodeConfig.targetHost();
-	// 		}
-
-	// 		@Override
-	// 		public String getTargetServiceDid() {
-	// 			return nodeConfig.targetDid();
-	// 		}
-
-	// 		@Override
-	// 		public CompletableFuture<String> getAuthorization(String srcDid, String targetDid, String targetHost) {
-	// 			return CompletableFuture.supplyAsync(() -> {
-	// 				try {
-	// 					return userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
-	// 				} catch (DIDException e) {
-	// 					throw new CompletionException(new HiveException(e.getMessage()));
-	// 				}
-	// 			});
-	// 		}
-	// 	});
-	// 	return bs;
-	// }
 
 	public getAppDid(): string {
 		return this.appInstanceDid.getAppDid();

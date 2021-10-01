@@ -1,6 +1,6 @@
 {
   "name": "@elastos/elastos-hive-js-sdk-tests",
-  "version": "0.0.0",
+  "version": "3.0.3",
   "description": "Elastos Hive Typescript SDK Tests",
   "scripts": {
     "dev": "rollup -c -w",
@@ -15,7 +15,7 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "@dchagastelles/elastos-hive-js-sdk": "file:///home/diego/projects/Elastos/Elastos.NET.Hive.JS.SDK",
+    "@dchagastelles/elastos-hive-js-sdk": "file:../../Elastos.NET.Hive.JS.SDK",
     "@elastosfoundation/did-js-sdk": "^2.1.0",
     "buffer": "^5.6.0",
     "cd": "^0.3.3",
