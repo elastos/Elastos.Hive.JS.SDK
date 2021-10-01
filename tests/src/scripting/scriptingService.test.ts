@@ -1,4 +1,3 @@
-import { DatabaseService, ScriptingService } from "../../../typings";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 import { FileHashExecutable } from "../../../src/restclient//scripting/hashExecutable";
@@ -7,6 +6,8 @@ import { InsertExecutable } from "../../../src/restclient//scripting/insertExecu
 import { FindExecutable } from "../../../src/restclient//scripting/findExecutable";
 import { UpdateExecutable } from "../../../src/restclient//scripting/updateExecutable";
 import { QueryHasResultCondition } from "../../../src/restclient//scripting/queryHasResultCondition";
+import { DatabaseService } from "../../../src/restclient/database/databaseservice";
+import { ScriptingService } from "../../../src/restclient/scripting/scriptingservice";
 
 
 
@@ -46,7 +47,7 @@ describe("test scripting service", () => {
     
     function create_test_database() {
         try {
-            databaseService.createCollection(COLLECTION_NAME).get();
+            //databaseService.createCollection(COLLECTION_NAME).get();
         } catch (e) {
             //log.error("Failed to create collection: {}", e.getMessage());
         }
@@ -57,56 +58,53 @@ describe("test scripting service", () => {
 	 */
 	function remove_test_database() {
 		try {
-			databaseService.deleteCollection(COLLECTION_NAME).get();
+			//databaseService.deleteCollection(COLLECTION_NAME).get();
 		} catch (e) {
 			//log.error("Failed to remove collection: {}", e.getMessage());
 		}
     }
     
-    function registerScriptDelete( scriptName: string) {
+    async function registerScriptDelete( scriptName: string) {
         let filter = { "author": "$params.author" };
-        expect(scriptingService.registerScript(scriptName, new DeleteExecutable(scriptName, COLLECTION_NAME, filter), false, false).get()).not.toThrow();
+        expect(await this.scriptingService.registerScript(scriptName, new DeleteExecutable(scriptName, COLLECTION_NAME, filter))).not.toThrow();
     }
 
-    function registerScriptInsert(scriptName: string) {
+    async function registerScriptInsert(scriptName: string) {
         //Assertions.assertDoesNotThrow(() -> {
         let doc = {"author": "$params.author", "content": "$params.content"};
         let options = { "bypass_document_validation": false, "ordered": true};
-        scriptingService.registerScript(scriptName,
-                new InsertExecutable(scriptName, COLLECTION_NAME, doc, options),
-                false, false).get();
+        await scriptingService.registerScript(scriptName,
+                new InsertExecutable(scriptName, COLLECTION_NAME, doc, options));
     }
 
-    function callScriptInsert( scriptName: string) {
+    async function callScriptInsert( scriptName: string) {
        
         let params = {"author":"John", "content": "message"}
-        let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+        let result = await this.scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
         expect(result).not.toBeNull();
         expect(result.has(scriptName)).toBeTruthy();
         expect(result.get(scriptName).has("inserted_id")).toBeTruthy();
     }
 
-    function registerScriptFindWithoutCondition(scriptName: string) {
+    async function registerScriptFindWithoutCondition(scriptName: string) {
 		
         let filter = {"author":"John"};
-        scriptingService.registerScript(scriptName,
-                 new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true),
-                 false, false).get();
+        await this.scriptingService.registerScript(scriptName,
+                 new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true));
 	
 	}
 
     function callScriptFindWithoutCondition( scriptName: string) {
 		//Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-		expect(scriptingService.callScriptUrl(scriptName, "{}", targetDid, appDid).get()).not.toBeNull();
+		expect(this.scriptingService.callScriptUrl(scriptName, "{}", targetDid, appDid).get()).not.toBeNull();
     }
     
-    function registerScriptFind( scriptName: string) {
+    async function registerScriptFind( scriptName: string) {
         //Assertions.assertDoesNotThrow(()->{
         let filter = { "author":"John" };
-        scriptingService.registerScript(scriptName,
+        (await this.scriptingService.registerScript(scriptName,
                 new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null),
-                new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true),
-                false, false).get();
+                new FindExecutable(scriptName, COLLECTION_NAME, filter, null))).setOutput(true);
        
 	}
 
@@ -117,27 +115,26 @@ describe("test scripting service", () => {
 		// });
 	}
 
-    function registerScriptUpdate( scriptName: string) {
+    async function registerScriptUpdate( scriptName: string) {
  			let filter = {"author": "$params.author"};
  			let set = {"author": "$params.author", "content": "$params.content" };
  			let update = {"$set": set};
             let options = { "bypass_document_validation": false, "upsert": true};
- 			expect(scriptingService.registerScript(scriptName,
- 					new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options),
-                     false, false).get()).not.toThrow();
+ 			expect(await this.scriptingService.registerScript(scriptName,
+ 					new UpdateExecutable(scriptName, this.COLLECTION_NAME, filter, update, options))).not.toThrow();
     }
 
-    function callScriptUpdate( scriptName: string) {
+    async function callScriptUpdate( scriptName: string) {
         let params = {"author": "John", "content": "message" };
-     	let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+     	let result = await this.scriptingService.callScript(scriptName, params, this.targetDid, this.appDid, undefined);
  		expect(result).not.toBeNull();
         expect(result.has(scriptName)).toBeTruthy();
         expect(result.get(scriptName).has("upserted_id")).toBeTruthy();
  	}
 
-	function callScriptDelete( scriptName: string) {
+	async function callScriptDelete( scriptName: string) {
 		let params =  {"author": "John"};
-		let result = scriptingService.callScript(scriptName, params, targetDid, appDid).get();
+		let result = await this.scriptingService.callScript(scriptName, params, this.targetDid, this.appDid, undefined);
 		expect(result).not.toBeNull();
 		expect(result.has(scriptName)).toBeTruthy();
 		expect(result.get(scriptName).has("deleted_count")).toBeTruthy();
@@ -197,10 +194,9 @@ describe("test scripting service", () => {
 // 		});
     }
 
-    function registerScriptFileHash(scriptName: string) {
-		expect(scriptingService.registerScript(scriptName,
-						new FileHashExecutable(scriptName).setOutput(true),
-				false, false).get()).not.toThrow();
+    async function registerScriptFileHash(scriptName: string) {
+		expect(await this.scriptingService.registerScript(scriptName,
+						new FileHashExecutable(scriptName).setOutput(true))).not.toThrow();
     }
 
     function callScriptFileHash(scriptName: string, fileName: string) {
@@ -223,42 +219,42 @@ describe("test scripting service", () => {
 
     beforeAll(async () => {
         let testData = await TestData.getInstance(ClientConfig.DEV, "/home/diego/temp");
-        scriptingService = testData.newVault().getScriptingService();
+        this.scriptingService = testData.newVault().getScriptingService();
         //scriptRunner = testData.newScriptRunner();
-        filesService = testData.newVault().getFilesService();
-        databaseService = testData.newVault().getDatabaseService();
-        targetDid = testData.getUserDid();
-        appDid = testData.getAppDid();
+        this.filesService = testData.newVault().getFilesService();
+        this.databaseService = testData.newVault().getDatabaseService();
+        this.targetDid = testData.getUserDid();
+        this.appDid = testData.getAppDid();
     });
 
 
     test.skip("testInsert", async () => {
-        remove_test_database();
-        create_test_database();
-        registerScriptInsert(INSERT_NAME);
-        callScriptInsert(INSERT_NAME);
+        this.remove_test_database();
+        this.create_test_database();
+        this.registerScriptInsert(this.INSERT_NAME);
+        this.callScriptInsert(this.INSERT_NAME);
     });
 
     test.skip("testFindWithoutCondition", async () => {
-        registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-		callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+        this.registerScriptFindWithoutCondition(this.FIND_NO_CONDITION_NAME);
+		this.callScriptFindWithoutCondition(this.FIND_NO_CONDITION_NAME);
     });
 
     test.skip("testFind", async () => {
-        registerScriptFind(FIND_NAME);
-        callScriptFind(FIND_NAME);
+        this.registerScriptFind(this.FIND_NAME);
+        this.callScriptFind(this.FIND_NAME);
     });
 
 
     test.skip("testUpdate", async () => {
-        registerScriptUpdate(UPDATE_NAME);
-    	callScriptUpdate(UPDATE_NAME);
+        this.registerScriptUpdate(this.UPDATE_NAME);
+    	this.callScriptUpdate(this.UPDATE_NAME);
     });
 
 
     test.skip("testDelete", async () => {
-        registerScriptDelete(DELETE_NAME);
- 		callScriptDelete(DELETE_NAME);
+        this.registerScriptDelete(this.DELETE_NAME);
+ 		this.callScriptDelete(this.DELETE_NAME);
     });
 
 
@@ -279,19 +275,19 @@ describe("test scripting service", () => {
     });
 
     test.skip("testFileProperties", async () => {
-        registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+        registerScriptFileProperties(this.FILE_PROPERTIES_NAME);
+        callScriptFileProperties(this.FILE_PROPERTIES_NAME, fileName);
     });
 
     test.skip("testFileHash", async () => {
-        registerScriptFileHash(FILE_HASH_NAME);
-        callScriptFileHash(FILE_HASH_NAME, fileName);
+        registerScriptFileHash(this.FILE_HASH_NAME);
+        callScriptFileHash(this.FILE_HASH_NAME, fileName);
     });
 
 
     test.skip("testUnregister", async () => {
-        expect(scriptingService.unregisterScript(FILE_HASH_NAME).get()).not.toThrow();
- 		remove_test_database();
+        expect(await this.scriptingService.unregisterScript(this.FILE_HASH_NAME)).not.toThrow();
+ 		this.remove_test_database();
     });
   
 }});

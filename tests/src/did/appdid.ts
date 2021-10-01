@@ -1,4 +1,4 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { DIDEntity } from "./didentity";
 

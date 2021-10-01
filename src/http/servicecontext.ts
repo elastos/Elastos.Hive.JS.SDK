@@ -8,6 +8,7 @@ import { NotImplementedException } from '../exceptions'
 import { NodeVersion } from '../domain/nodeversion'
 import { HttpClient } from './httpclient'
 import { AboutService } from '../restclient/about/aboutservice'
+import { Logger } from '../logger'
 
 export class ServiceContext {
     private context: AppContext;

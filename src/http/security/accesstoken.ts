@@ -18,7 +18,6 @@ export class AccessToken {
 	private storage: DataStorage;
 	private bridge: BridgeHandler;
 
-	private static LOG = new Logger("AccessToken");
 	/**
 	 * Create the access token by service end point, data storage, and bridge handler.
 	 *

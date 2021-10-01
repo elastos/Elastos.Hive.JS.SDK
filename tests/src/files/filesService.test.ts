@@ -1,4 +1,5 @@
-import { FilesService, VaultSubscriptionService } from "../../../typings";
+import { VaultSubscriptionService, PricingPlan, VaultInfo, FilesService } from "@dchagastelles/elastos-hive-js-sdk/";
+
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -27,7 +28,7 @@ describe("test file service", () => {
 	}
 
 	function verifyRemoteFileExists(filesService: FilesService,  path: String) {
-		expect(filesService.stat(path).get()).not.toBeNull();
+		//expect(filesService.stat(path).get()).not.toBeNull();
 	}
 
 	beforeAll(async () => {
@@ -43,7 +44,7 @@ describe("test file service", () => {
 
 	
 
-}
+});
 
 // package org.elastos.hive;
 
@@ -266,3 +267,4 @@ describe("test file service", () => {
 // 		return false;
 // 	}
 // }
+

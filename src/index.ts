@@ -38,6 +38,9 @@ import { RegScriptParams }  from "./restclient/scripting/regscriptparams";
 import { RunScriptParams }  from "./restclient/scripting/runscriptparams";
 import { SubscriptionService }  from "./restclient/subscription/subscriptionservice";
 import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
+import { PricingPlan } from "./domain/subscription/pricingplan";
+import { VaultInfo } from "./domain/subscription/vaultinfo";
+import { HiveException } from "./exceptions";
 
 //Logger.setLevel(Logger.TRACE);
 
@@ -56,6 +59,8 @@ export {
     //initialize,
     BackupServices,
     VaultServices,
+    PricingPlan,
+    VaultInfo,
     File,
     FileStorage,
     HttpClient,
@@ -81,6 +86,8 @@ export {
     RunScriptParams,
     SubscriptionService,
     VaultSubscriptionService,
+    HiveException,
+
 
     // Utilities
     SHA256,
