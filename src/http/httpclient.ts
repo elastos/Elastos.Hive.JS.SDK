@@ -2,7 +2,7 @@ import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { DeserializationError, HttpException, NodeRPCException } from '../exceptions';
+import { DeserializationError, HttpException, NodeRPCException, UnauthorizedException } from '../exceptions';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
 
@@ -54,16 +54,27 @@ export class HttpClient {
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
       if (response.statusCode != 200) {
-        HttpClient.LOG.debug("response code: " + response.statusCode);
+        HttpClient.LOG.debug("response code: {}", response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
+        HttpClient.LOG.debug("response dbg1");
         if (!content) {
+          HttpClient.LOG.debug("response dbg2");
           throw new NodeRPCException(response.statusCode, -1, "Empty body.");
         }
-        let httpError = JSON.parse(content);
+        HttpClient.LOG.debug("response dbg3");
+        let jsonObj = JSON.parse(content);
+        HttpClient.LOG.debug("response dbg4");
+        if (!jsonObj["error"]) {
+          HttpClient.LOG.debug("response dbg5");
+          throw new NodeRPCException(response.statusCode, -1, content);
+        }
+        HttpClient.LOG.debug("response dbg6");
+        let httpError = jsonObj["error"];
         let errorCode = httpError['internal_code'];
         let errorMessage = httpError['message'];
+        HttpClient.LOG.debug("response dbg7");
 
         throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
       }
@@ -74,24 +85,21 @@ export class HttpClient {
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let payload = this.parsePayload(rawPayload, method);
-        let options = await this.buildRequest(serviceEndpoint, method);
+        let options = await this.buildRequest(serviceEndpoint, method, payload);
 
-        options.method === HttpMethod.GET && options.path.concat("?" + payload);
+        // Remove payload for GET requests.
+        if (options.method === HttpMethod.GET) {
+          payload = "";
+        }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.debug("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD ? " payload: " + payload : ""));
+        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD && options.method != HttpMethod.GET ? " payload: " + payload : ""));
         HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
 
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
               function(response: http.IncomingMessage) {
-                const { statusCode } = response;
-                if (statusCode >= 300) {
-                  reject(
-                    new HttpException(statusCode, response.statusMessage)
-                  );
-                }
                 const chunks = [];
                 response.on('data', (chunk) => {
                   chunks.push(chunk);
@@ -100,7 +108,7 @@ export class HttpClient {
                 response.on('end', () => {
                   try {
                     const rawContent = Buffer.concat(chunks).toString();
-                    HttpClient.LOG.debug("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
+                    HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
 
                     self.handleResponse(response, rawContent);
 
@@ -116,44 +124,60 @@ export class HttpClient {
               }
             );
             
-            if (options.method != HttpMethod.GET && payload != HttpClient.NO_PAYLOAD) {
-                request.write(payload);
-                //request.write(JSON.stringify(payload));
+            if (payload && payload != HttpClient.NO_PAYLOAD) {
+              request.write(payload);
             }
 
             request.end();
         })
     }
 
-    private async buildRequest(serviceEndpoint: string, method: HttpMethod): Promise<http.RequestOptions> {
+    /**
+     * Build Http RequestOptions from endpoint, method and payload.
+     * For GET requests, the payload is added to the endpoint url.
+     */
+    private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<http.RequestOptions> {
         let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
         if (method) {
           requestOptions.method = method;
         }
         requestOptions.path = serviceEndpoint;
 
+        if (payload && method === HttpMethod.GET) {
+          requestOptions.path += ("?" + payload);
+        }
+
         if (this.withAuthorization) {
-          let accessToken = this.serviceContext.getAccessToken();
-          let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
           try {
+            let accessToken = this.serviceContext.getAccessToken();
+            let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
             HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
             HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+            requestOptions.headers['Authorization'] = canonicalAccessToken;
           } catch(e) {
-            HttpClient.LOG.error("Request parsing error: {}", e);
+            HttpClient.LOG.error("Authentication error: {}", e);
+            throw new UnauthorizedException("Authentication error", e);
           }
-          requestOptions.headers['Authorization'] = canonicalAccessToken;
         }
 
         return requestOptions;
     }
 
+    /**
+     * Return provided payload as a serialized JSON object or as url
+     * parameters for GET requests.
+     */
     private parsePayload(payload: any, method: HttpMethod): string {
         if (payload && method === HttpMethod.GET) {
-          //Create query parameters from map
+          if (typeof payload === 'string') {
+            return payload;
+          }
           let query = "";
           for (let prop of Object.keys(payload)) {
-            query && query.concat("&");
-            query = query.concat(prop + "=" + payload[prop]);
+            if (query) {
+              query += "&";
+            }
+            query += (prop + "=" + payload[prop]);
           }
           return query;
         }

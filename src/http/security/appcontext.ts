@@ -132,10 +132,10 @@ export class AppContext {
         } catch (e) {
             if (e instanceof MalformedDIDException) {
                 AppContext.LOG.error("Malformed target did " + targetDid + " with error: " + e.message);
-                throw new IllegalArgumentException("Malformed did string: " + targetDid);
+                throw new IllegalArgumentException("Malformed did string: " + targetDid, e);
             } else if (e instanceof DIDResolveException) {
                 AppContext.LOG.error("Resolving the target DID " + targetDid + " failed: " + e.message);
-                throw new NetworkException("Resolving DID failed: " + e.message);
+                throw new NetworkException("Resolving DID failed: " + e.message, e);
             }
         }
 	}

@@ -4,13 +4,10 @@ import { AppContext } from './security/appcontext'
 import { AccessToken } from './security/accesstoken'
 import { DataStorage } from '../domain/datastorage'
 import { FileStorage } from '../domain/filestorage'
-import { BridgeHandler } from './security/bridgehandler';
 import { NotImplementedException } from '../exceptions'
 import { NodeVersion } from '../domain/nodeversion'
 import { HttpClient } from './httpclient'
 import { AboutService } from '../restclient/about/aboutservice'
-import { Logger } from '../logger';
-import { Claims, JWTParserBuilder } from '@elastosfoundation/did-js-sdk'
 
 export class ServiceContext {
     private context: AppContext;
@@ -42,7 +39,7 @@ export class ServiceContext {
 
         ServiceContext.LOG_SERVICE_CONTEXT.debug("Init Service Context");
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
-        this.accessToken = new AccessToken(this, this.dataStorage, new BridgeHandlerImpl(this));
+        this.accessToken = new AccessToken(this, this.dataStorage);
         this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
     
         ServiceContext.LOG_SERVICE_CONTEXT.debug("Access Token: " + this.accessToken);
@@ -125,32 +122,4 @@ export class ServiceContext {
      public async getLatestCommitId(): Promise<string> {
          return await this.aboutService.getCommitId();
      }
-}
-
-class BridgeHandlerImpl implements BridgeHandler {
-	private static LOG = new Logger("BridgeHandler");
-
-    private ref: ServiceContext;
-
-    constructor(endpoint: ServiceContext) {
-        this.ref = endpoint;
-    }
-
-    public async flush(value: string): Promise<void> {
-        try {
-            let endpoint = this.ref;
-            let claims: Claims;
-
-            claims = (await new JWTParserBuilder().build().parse(value)).getBody();
-            endpoint.flushDids(claims.getAudience(), claims.getIssuer());
-
-        } catch (e) {
-            BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
-            return;
-        }
-    }
-
-    public target(): any {
-        return this.ref;
-    }
 }

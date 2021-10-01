@@ -57,17 +57,17 @@ export class ScriptingService extends RestService {
 				// TODO: waiting for the codes
 				switch (e.getCode()) {
 					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message);
+						throw new UnauthorizedException(e.message, e);
 					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message);
+						throw new VaultForbiddenException(e.message, e);
 					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message);
+						throw new InvalidParameterException(e.message, e);
 					default:
-						throw new ServerUnknownException(e.message);
+						throw new ServerUnknownException(e.message, e);
 				}
 			}
 			if (e instanceof IOException){
-				throw new NetworkException(e.message);
+				throw new NetworkException(e.message, e);
 			}	
 		}
 	}
@@ -86,18 +86,18 @@ export class ScriptingService extends RestService {
 			if (e instanceof NodeRPCException) {
 				switch (e.getCode()) {
 					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message);
+						throw new UnauthorizedException(e.message, e);
 					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message);
+						throw new VaultForbiddenException(e.message, e);
 					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message);
+						throw new InvalidParameterException(e.message, e);
 					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message);
+						throw new NotFoundException(e.message, e);
 					default:
-						throw new ServerUnknownException(e.message);
+						throw new ServerUnknownException(e.message, e);
 				}
 			} else if (e instanceof IOException){
-				throw new NetworkException(e.message);
+				throw new NetworkException(e.message, e);
 			}	
 		}
 	
@@ -129,18 +129,18 @@ export class ScriptingService extends RestService {
 			if (e instanceof NodeRPCException) {
 				switch (e.getCode()) {
 					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message);
+						throw new UnauthorizedException(e.message, e);
 					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message);
+						throw new VaultForbiddenException(e.message, e);
 					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message);
+						throw new InvalidParameterException(e.message, e);
 					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message);
+						throw new NotFoundException(e.message, e);
 					default:
-						throw new ServerUnknownException(e.message);
+						throw new ServerUnknownException(e.message, e);
 				}
 			} else if (e instanceof IOException){
-				throw new NetworkException(e.message);
+				throw new NetworkException(e.message, e);
 			}	
 		}
 	}
@@ -165,18 +165,18 @@ export class ScriptingService extends RestService {
 			if (e instanceof NodeRPCException) {
 				switch (e.getCode()) {
 					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message);
+						throw new UnauthorizedException(e.message, e);
 					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message);
+						throw new VaultForbiddenException(e.message, e);
 					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message);
+						throw new InvalidParameterException(e.message, e);
 					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message);
+						throw new NotFoundException(e.message, e);
 					default:
-						throw new ServerUnknownException(e.message);
+						throw new ServerUnknownException(e.message, e);
 				}
 			} else if (e instanceof IOException){
-				throw new NetworkException(e.message);
+				throw new NetworkException(e.message, e);
 			}	
 		}
 	}
@@ -197,9 +197,9 @@ export class ScriptingService extends RestService {
 
 		} catch (e) {
 			if (e instanceof NodeRPCException) {
-				throw new ServerUnknownException(e.message);
+				throw new ServerUnknownException(e.message, e);
 			} else if (e instanceof IOException) {
-				throw new NetworkException(e.message);
+				throw new NetworkException(e.message, e);
 			}
 
 		}
@@ -219,15 +219,15 @@ export class ScriptingService extends RestService {
 		} catch (e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e);
+					throw new UnauthorizedException(e.getMessage(), e);
 				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e);
+					throw new VaultForbiddenException(e.getMessage(), e);
 				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.getMessage());
+					throw new InvalidParameterException(e.getMessage(), e);
 				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e);
+					throw new NotFoundException(e.getMessage(), e);
 				default:
-					throw new ServerUnknownException(e);
+					throw new ServerUnknownException(e.getMessage(), e);
 			}
 		}
 	}

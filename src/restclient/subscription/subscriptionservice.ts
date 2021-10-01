@@ -38,6 +38,9 @@ export class SubscriptionService extends RestService {
 			deserialize(content: any): PricingPlan[] {
 				let jsonObj = JSON.parse(content)['pricingPlans'];
 				let pricingPlans = [];
+				if (!Array.isArray(jsonObj)) {
+					return [];
+				}
 				for (let plan of jsonObj) {
 					pricingPlans.push((new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]));
 				}

@@ -1,4 +1,4 @@
-import { VaultSubscriptionService } from "@dchagastelles/elastos-hive-js-sdk/"
+import { VaultSubscriptionService, PricingPlan, VaultInfo } from "@dchagastelles/elastos-hive-js-sdk/"
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -15,37 +15,28 @@ describe("test subscribe function", () => {
             testData.getProviderAddress());
     });
 
-    test.skip("testGetPricingPlanList", async () => {
-        let plans = subscriptionService.getPricingPlanList().get();
+    test("get pricing plans", async() => {
+        let plans: PricingPlan[] = await subscriptionService.getPricingPlanList();
         expect(plans).not.toBeNull();
-        expect(plans.isEmpty()).toBeFalsy();
+        expect(plans.length).toBeGreaterThan(0);
     });
 
-    test.skip("testGetPricingPlan", async () => {
-        let plan = subscriptionService.getPricingPlan(PRICING_PLAN_NAME).get();
+
+    test("get pricing plan", async() => {
+        let plan: PricingPlan = await subscriptionService.getPricingPlan("Rookie");
         expect(plan).not.toBeNull();
-        expect(plan.getName()===PRICING_PLAN_NAME).toBeTruthy();
+        expect(plan.getName()).toBe("Rookie");
     });
 
-    test("testSubscribe", async () => {
+    test("Check subscription", async() => {
+        let info: VaultInfo = await subscriptionService.checkSubscription();
+        expect(info).not.toBeNull();
+    });
+
+
+/*    test("should return vault info", async () => {
         const vaultInfo = await subscriptionService.subscribe();
-    });
-    
-    test.skip("testCheckSubscription", async () => {
-        expect(await subscriptionService.checkSubscription().get()).not.toBeNull();
-    });
-
-  
-    test.skip("testUnsubscribe", async () => {
-        expect(await subscriptionService.unsubscribe().get()).not.toThrow();
-    });
-
-    test.skip("testGetFileHashProcess", async () => {
-        expect(await subscriptionService.subscribe().get()).not.toThrow();
-        // TODO: new FilesServiceTest().testHash();
-        expect(await subscriptionService.unsubscribe().get()).not.toThrow();
-    });
-
+    });*/
 });
 
 
