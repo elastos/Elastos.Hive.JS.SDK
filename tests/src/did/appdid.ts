@@ -5,14 +5,14 @@ import { DIDEntity } from "./didentity";
 export class AppDID extends DIDEntity {
 	private appId = "appId";
 
-	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) { // , did: string) {
-		super(name, mnemonic, phrasepass, storepass); //, did);
+	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
+		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
 		DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
 		//DIDBackend.initialize(new DefaultDIDAdapter("https://api-testnet.elastos.io/newid")); 
-        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass); //, did);
+        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
 		await newInstance.initPrivateIdentity(mnemonic);	
 		await newInstance.initDid();
 

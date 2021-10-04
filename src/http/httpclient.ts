@@ -53,7 +53,7 @@ export class HttpClient {
     }
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
-      if (response.statusCode != 200 && response.statusCode != 201) {
+      if (response.statusCode >= 300) {
         HttpClient.LOG.debug("response code: {}", response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();

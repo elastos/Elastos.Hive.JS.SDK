@@ -12,13 +12,13 @@ export class DIDEntity {
 	private identity: RootIdentity;
 	private store: DIDStore;
 	private did: DID;
-	//private didString: string;
+	private didString: string;
 
-	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string) {// , did?: string) {
+	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-		//this.didString = did;
+		this.didString = did;
 		this.mnemonic = mnemonic;
 		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
 
@@ -36,8 +36,28 @@ export class DIDEntity {
 			return; // Already exists
 		}
 
-		this.identity = RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.store, this.storepass);
+
+		DIDEntity.LOG.info("Creating root identity for mnemonic {}", mnemonic);
+
+		try {
+			this.identity = RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.store, this.storepass);
+		} catch (e){
+			DIDEntity.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, e);
+			throw new Error("Error Creating root identity for mnemonic");
+		}
+		
+
+		
 		await this.identity.synchronize();
+
+		if (this.didString !== undefined){
+			this.identity.setDefaultDid(this.didString);
+			let defaultDid = this.identity.getDefaultDid();
+			DIDEntity.LOG.info("************************************* default DID: {}", defaultDid.toString());
+		}
+
+
+		return;
 	}
 
 	public async initDid(): Promise<void> {
@@ -47,8 +67,12 @@ export class DIDEntity {
 			return;
 		}
 		
-		let doc = await this.identity.newDid(this.storepass);
-		this.did = doc.getSubject();
+		this.did = await this.identity.getDefaultDid();
+		DIDEntity.LOG.info("************************************* default DID: {}", this.did.toString());
+		let resolvedDoc = await this.did.resolve();
+		DIDEntity.LOG.info("************************************* My new DIDDOC resolved: {}", resolvedDoc.toString(true));
+
+
 		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
 	}
 
