@@ -59,21 +59,24 @@ export class TestData {
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonics2,
 				applicationConfig.passPhrase,
-				applicationConfig.storepass); //,
-				//applicationConfig.did);
+				applicationConfig.storepass,
+				applicationConfig.did);
 
-
+		
 		let userConfig = this.clientConfig.user;
 		this.userDid = await UserDID.create(userConfig.name,
 				userConfig.mnemonic,
 				userConfig.passPhrase,
-				userConfig.storepass);
+				userConfig.storepass,
+				userConfig.did);
 				
+		TestData.LOG.debug("UserDid created"); 
 		let userConfigCaller = this.clientConfig.cross.user;
 		this.callerDid = await UserDID.create(userConfigCaller.name,
 			userConfigCaller.mnemonic,
 			userConfigCaller.passPhrase,
-			userConfigCaller.storepass);
+			userConfigCaller.storepass,
+			userConfigCaller.did);
 					
 					//初始化Application Context
 		let self = this;

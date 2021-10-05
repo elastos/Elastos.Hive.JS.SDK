@@ -6,12 +6,12 @@ import { DIDEntity } from "./didentity";
 export class UserDID extends DIDEntity {
 	private issuer: Issuer;
 
-	constructor(name: string, mnemonic: string, phrasepass: string, storepass: string) {
-		super(name, mnemonic, phrasepass, storepass);
+	constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
+		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
-    public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string): Promise<UserDID> {
-        let newInstance = new UserDID(name, mnemonic, phrasepass, storepass);
+    public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?:string): Promise<UserDID> {
+        let newInstance = new UserDID(name, mnemonic, phrasepass, storepass, did);
 		await newInstance.initPrivateIdentity(mnemonic);	
 		await newInstance.initDid();
 
@@ -30,7 +30,7 @@ export class UserDID extends DIDEntity {
 		subject["appDid"] = appInstanceDid.getAppDid();
 
         let cal = dayjs();
-        cal.add(5, 'year');
+        cal = cal.add(5, 'year');
 
 		let cb = this.issuer.issueFor(appInstanceDid.getDid());
 		let vc = await cb.id("didapp")
