@@ -46,10 +46,12 @@ export interface IUpdateManyResponse {
 
 export interface IDeleteOneResponse {
   acknowledged: boolean;
+  deleted_count: number;
 }
 
 export interface IDeleteManyResponse {
   acknowledged: boolean;
+  deleted_count: number;
 }
 
 export interface ICountDocumentsOptions {
@@ -155,10 +157,14 @@ export class DatabaseService implements IDatabaseService {
   async createCollection(collectionName: string): Promise<IDatabaseCollection> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collections/${collectionName}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/create_collection`;
+    let document = {
+      collection: collectionName,
+    };
 
-    await Util.SendPut({
+    await Util.SendPost({
       url: url,
+      body: document,
       userToken: this._session.userToken,
     });
 
@@ -172,10 +178,13 @@ export class DatabaseService implements IDatabaseService {
   async deleteCollection(collectionName: string) {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/${collectionName}`;
-
-    await Util.SendDelete({
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_collection`;
+    let document = {
+      collection: collectionName,
+    };
+    await Util.SendPost({
       url: url,
+      body: document,
       userToken: this._session.userToken,
     });
   }
@@ -187,9 +196,10 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IInsertOneResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/insert_one`;
 
     let document: any = {
+      collection: collectionName,
       document: newDocument,
     };
     if (options) document.options = options;
@@ -200,13 +210,10 @@ export class DatabaseService implements IDatabaseService {
       userToken: this._session.userToken,
     });
 
-    let res: any = {
+    return {
       acknowledged: response.acknowledged,
+      inserted_id: response.inserted_id,
     };
-    if (response.inserted_ids.length > 0) {
-      res.inserted_id = response.inserted_ids[0];
-    }
-    return res;
   }
 
   async insertMany(
@@ -216,7 +223,7 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IInsertManyResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/insert_many`;
 
     if (!options) {
       options = {
@@ -226,8 +233,8 @@ export class DatabaseService implements IDatabaseService {
     }
 
     let document: any = {
+      collection: collectionName,
       document: newDocuments,
-      options: options,
     };
 
     let response = await Util.SendPost({
@@ -250,15 +257,16 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IUpdateOneResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?updateone=true`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/update_one`;
 
     let document: any = {
+      collection: collectionName,
       filter: filter,
       update: updateCommand,
     };
     if (options) document.options = options;
 
-    let response = await Util.SendPatch({
+    let response = await Util.SendPost({
       url: url,
       body: document,
       userToken: this._session.userToken,
@@ -280,15 +288,16 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IUpdateManyResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/update_many`;
 
     let document: any = {
+      collection: collectionName,
       filter: filter,
       update: updateCommand,
     };
     if (options) document.options = options;
 
-    let response = await Util.SendPatch({
+    let response = await Util.SendPost({
       url: url,
       body: document,
       userToken: this._session.userToken,
@@ -308,20 +317,22 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IDeleteOneResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?deleteone=true`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_one`;
 
     let document: any = {
+      collection: collectionName,
       filter: filter,
     };
 
-    let response = await Util.SendDelete({
+    let response = await Util.SendPost({
       url: url,
       body: document,
       userToken: this._session.userToken,
     });
 
     return {
-      acknowledged: true,
+      acknowledged: response.acknowledged,
+      deleted_count: response.deleted_count,
     };
   }
 
@@ -331,20 +342,22 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<IDeleteManyResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_many`;
 
     let document: any = {
+      collection: collectionName,
       filter: filter,
     };
 
-    let response = await Util.SendDelete({
+    let response = await Util.SendPost({
       url: url,
       body: document,
       userToken: this._session.userToken,
     });
 
     return {
-      acknowledged: true,
+      acknowledged: response.acknowledged,
+      deleted_count: response.deleted_count,
     };
   }
 
@@ -355,11 +368,13 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<ICountDocumentsResponse> {
     this.checkConnection();
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?op=count`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/count_documents`;
 
     let document: any = {
+      collection: collectionName,
       filter: filter,
     };
+
     if (options) document.options = options;
 
     let response = await Util.SendPost({
@@ -380,12 +395,17 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<any> {
     this.checkConnection();
 
-    let url = `${
-      this._session.hiveInstanceUrl
-    }/api/v2/vault/db/${collectionName}?filter=${JSON.stringify(filter)}`;
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/find_one`;
 
-    let response = await Util.SendGet({
+    let document: any = {
+      collection: collectionName,
+      filter: filter,
+    };
+    if (options) document.options = options;
+
+    let response = await Util.SendPost({
       url: url,
+      body: document,
       userToken: this._session.userToken,
     });
 
@@ -399,35 +419,17 @@ export class DatabaseService implements IDatabaseService {
   ): Promise<any[]> {
     this.checkConnection();
 
-    let urlParams = "";
-    if (filter) {
-      urlParams += `?filter=${JSON.stringify(filter)}`;
-    }
-    if (options) {
-      if (options.skip) {
-        if (!filter) {
-          urlParams += `?skip=${options.skip}`;
-        } else {
-          urlParams += `&skip=${options.skip}`;
-        }
-      }
-      if (options.limit) {
-        if (!filter) {
-          if (!options.skip) {
-            urlParams += `?limit=${options.limit}`;
-          } else {
-            urlParams += `&limit=${options.limit}`;
-          }
-        } else {
-          urlParams += `&limit=${options.limit}`;
-        }
-      }
-    }
+    let url = `${this._session.hiveInstanceUrl}/api/v1/db/find_many`;
 
-    let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/${collectionName}${urlParams}`;
+    let document: any = {
+      collection: collectionName,
+    };
+    if (filter) document.filter = filter;
+    if (options) document.options = options;
 
-    let response = await Util.SendGet({
+    let response = await Util.SendPost({
       url: url,
+      body: document,
       userToken: this._session.userToken,
     });
 

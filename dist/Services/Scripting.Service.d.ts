@@ -36,7 +36,10 @@ export interface ISetScriptBody {
 export interface ISetScriptResponse {
     isSuccess: boolean;
     error?: any;
-    response?: any;
+    acknowledged?: boolean;
+    matched_count?: number;
+    modified_count?: number;
+    upserted_id?: string;
 }
 export interface IRunScriptData {
     name: string;

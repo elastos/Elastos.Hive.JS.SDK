@@ -9,12 +9,13 @@ export declare enum EnumVaultPackage {
     Advanced = "Advanced"
 }
 export interface IVaultServiceInfo {
-    service_did: string;
-    storage_quota: number;
-    storage_used: number;
-    created: Date;
-    updated: Date;
-    pricing_plan: string;
+    max_storage: number;
+    file_use_storage: number;
+    db_use_storage: number;
+    modify_time: Date;
+    start_time: Date;
+    end_time: Date;
+    pricing_using: EnumVaultPackage;
 }
 export declare class PaymentService implements IPaymentService {
     private _isConnected;

@@ -92,7 +92,7 @@ export class AuthService {
   }
 
   private async AuthenticateUser(authToken: string): Promise<string> {
-    let url = `${this._options.hiveUrl}/api/v1/did/backup_auth`;
+    let url = `${this._options.hiveUrl}/api/v1/did/auth`;
     let document = {
       jwt: authToken,
     };

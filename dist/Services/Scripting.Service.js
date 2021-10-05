@@ -29,17 +29,20 @@ class ScriptingService {
             this.checkConnection();
             try {
                 if (this._session.isAnonymous) {
-                    throw Error("Anonymous users are not authorized to set scripts");
+                    throw Error("Anonymous users is not authorized to set scripts");
                 }
                 let postData = {
-                    url: `${this._session.hiveInstanceUrl}/api/v2/vault/scripting/${script.name}`,
+                    url: `${this._session.hiveInstanceUrl}/api/v1/scripting/set_script`,
                     userToken: this._session.userToken,
                     body: script,
                 };
-                let response = yield Util_1.Util.SendPut(postData);
+                let response = yield Util_1.Util.SendPost(postData);
                 return {
                     isSuccess: true,
-                    response,
+                    acknowledged: response.acknowledged,
+                    matched_count: response.matched_count,
+                    modified_count: response.modified_count,
+                    upserted_id: response.upserted_id,
                 };
             }
             catch (error) {
@@ -55,13 +58,13 @@ class ScriptingService {
             this.checkConnection();
             try {
                 let postData = {
-                    url: `${this._session.hiveInstanceUrl}/api/v2/vault/scripting/${script.name}`,
+                    url: `${this._session.hiveInstanceUrl}/api/v1/scripting/run_script`,
                     body: script,
                 };
                 if (!this._session.isAnonymous) {
                     postData["userToken"] = this._session.userToken;
                 }
-                let response = yield Util_1.Util.SendPatch(postData);
+                let response = yield Util_1.Util.SendPost(postData);
                 return {
                     isSuccess: true,
                     response: response,

@@ -13,12 +13,13 @@ export enum EnumVaultPackage {
 }
 
 export interface IVaultServiceInfo {
-  service_did: string;
-  storage_quota: number;
-  storage_used: number;
-  created: Date;
-  updated: Date;
-  pricing_plan: string;
+  max_storage: number;
+  file_use_storage: number;
+  db_use_storage: number;
+  modify_time: Date;
+  start_time: Date;
+  end_time: Date;
+  pricing_using: EnumVaultPackage;
 }
 
 export class PaymentService implements IPaymentService {
@@ -46,8 +47,8 @@ export class PaymentService implements IPaymentService {
   async CreateFreeVault() {
     this.checkConnection();
 
-    await Util.SendPut({
-      url: `${this._session.hiveInstanceUrl}/api/v2/subscription/vault`,
+    await Util.SendPost({
+      url: `${this._session.hiveInstanceUrl}/api/v1/service/vault/create`,
       userToken: this._session.userToken,
     });
   }
@@ -56,17 +57,18 @@ export class PaymentService implements IPaymentService {
     this.checkConnection();
 
     let response = await Util.SendGet({
-      url: `${this._session.hiveInstanceUrl}/api/v2/subscription/vault`,
+      url: `${this._session.hiveInstanceUrl}/api/v1/service/vault`,
       userToken: this._session.userToken,
     });
 
     return {
-      service_did: response.service_did,
-      storage_quota: response.storage_quota,
-      storage_used: response.storage_used,
-      created: new Date(response.created * 1000),
-      updated: new Date(response.updated * 1000),
-      pricing_plan: response.pricing_plan,
+      max_storage: response.vault_service_info.max_storage,
+      file_use_storage: response.vault_service_info.file_use_storage,
+      db_use_storage: response.vault_service_info.db_use_storage,
+      modify_time: new Date(response.vault_service_info.modify_time * 1000),
+      start_time: new Date(response.vault_service_info.start_time * 1000),
+      end_time: new Date(response.vault_service_info.end_time * 1000),
+      pricing_using: response.vault_service_info.pricing_using,
     };
   }
 }
