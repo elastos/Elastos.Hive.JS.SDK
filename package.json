@@ -1,5 +1,5 @@
 {
-  "name": "@elastosfoundation/elastos-hive-js-sdk",
+  "name": "@tuum-tech/elastos-hive-js-sdk",
   "version": "1.0.0",
   "description": "Elastos Hive JS SDK",
   "main": "dist/HiveClient.js",

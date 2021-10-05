@@ -1,7 +1,7 @@
 import { IOptions } from "../HiveClient";
 import { Util } from "../Util";
 
-import rs from "jsrsasign";
+const rs = require("jsrsasign");
 
 export interface IAppChallenge {
   challenge: string;
