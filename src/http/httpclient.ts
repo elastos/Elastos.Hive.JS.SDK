@@ -49,7 +49,6 @@ export class HttpClient {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = this.validateOptions(httpOptions);
-
     }
 
     private handleResponse(response: http.IncomingMessage, content: string): void {

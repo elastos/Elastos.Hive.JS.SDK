@@ -96,22 +96,22 @@ export class TestData {
 			},
 			
 			async getAuthorization(jwtToken : string) : Promise<string> {
-				
-					try {
-						let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
-						if (claims == null)
-							throw new HiveException("Invalid jwt token as authorization.");
+				try {
+					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
+					if (claims == null)
+						throw new HiveException("Invalid jwt token as authorization.");
 
-						let presentation = await self.appInstanceDid.createPresentation(
-							await self.userDid.issueDiplomaFor(self.appInstanceDid),
-							claims.getIssuer(), claims.get("nonce") as string);
-							
-						TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
-						return await self.appInstanceDid.createToken(presentation,  claims.getIssuer());
-					} catch (e) {
-						TestData.LOG.info("TestData->getAuthorization error: " + e); 	
-						TestData.LOG.error(e.stack);				}
-					}
+					let presentation = await self.appInstanceDid.createPresentation(
+						await self.userDid.issueDiplomaFor(self.appInstanceDid),
+						claims.getIssuer(), claims.get("nonce") as string);
+						
+					TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
+					return await self.appInstanceDid.createToken(presentation,  claims.getIssuer());
+				} catch (e) {
+					TestData.LOG.info("TestData->getAuthorization error: " + e); 	
+					TestData.LOG.error(e.stack);
+				}
+			}
 		}, self.userDid.getDid().toString());
 
 		this.callerContext = await AppContext.build({

@@ -107,7 +107,7 @@ export class AccessToken {
 
 		if (jwtCode != null && this.isExpired(jwtCode)) {
 			this.storage.clearAccessTokenByAddress(address);
-			this.storage.clearAccessToken(serviceDid);
+			serviceDid && this.storage.clearAccessToken(serviceDid);
 		}
 
 		if (jwtCode == null)
@@ -116,7 +116,7 @@ export class AccessToken {
 
 		if (jwtCode != null && this.isExpired(jwtCode)) {
 			this.storage.clearAccessTokenByAddress(address);
-			this.storage.clearAccessToken(serviceDid);
+			serviceDid && this.storage.clearAccessToken(serviceDid);
 		}
 
 		return jwtCode;
@@ -129,7 +129,7 @@ export class AccessToken {
 
 	private saveToken( jwtCode: string) : void {
 		let endpoint = this.bridge.target() as ServiceContext;
-		if (endpoint == null)
+		if (endpoint == null || !endpoint.getServiceInstanceDid())
 			return;
 
 		this.storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
@@ -141,7 +141,9 @@ export class AccessToken {
 		if (endpoint == null)
 			return;
 
-		this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
+		if (endpoint.getServiceInstanceDid()) {
+			this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
+		}
 		this.storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
 	}
 }
