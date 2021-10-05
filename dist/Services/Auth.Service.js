@@ -8,13 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const Util_1 = require("../Util");
-const jsrsasign_1 = __importDefault(require("jsrsasign"));
+const rs = require("jsrsasign");
 class AuthService {
     constructor(options) {
         this._options = options;
@@ -38,10 +35,10 @@ class AuthService {
     }
     getAuthenticationToken(userVerifiablePresentation) {
         return __awaiter(this, void 0, void 0, function* () {
-            let ec = new jsrsasign_1.default.KJUR.crypto.ECDSA({ curve: "secp256r1" });
+            let ec = new rs.KJUR.crypto.ECDSA({ curve: "secp256r1" });
             ec.setPrivateKeyHex(this._options.appInstance.privateKey);
-            var tNow = jsrsasign_1.default.KJUR.jws.IntDate.get("now");
-            var tEnd = jsrsasign_1.default.KJUR.jws.IntDate.get("now + 1month");
+            var tNow = rs.KJUR.jws.IntDate.get("now");
+            var tEnd = rs.KJUR.jws.IntDate.get("now + 1month");
             var oHeader = { alg: "ES256", typ: "JWT", cty: "json" };
             var oPayload = {
                 iss: this._options.appInstance.did,
@@ -51,16 +48,16 @@ class AuthService {
             };
             var sHeader = JSON.stringify(oHeader);
             var sPayload = JSON.stringify(oPayload);
-            var sJWT = jsrsasign_1.default.KJUR.jws.JWS.sign("ES256", sHeader, sPayload, ec);
+            var sJWT = rs.KJUR.jws.JWS.sign("ES256", sHeader, sPayload, ec);
             return yield this.AuthenticateUser(sJWT);
         });
     }
     getElastosQrCode() {
         return __awaiter(this, void 0, void 0, function* () {
-            let ec = new jsrsasign_1.default.KJUR.crypto.ECDSA({ curve: "secp256r1" });
+            let ec = new rs.KJUR.crypto.ECDSA({ curve: "secp256r1" });
             ec.setPrivateKeyHex(this._options.appInstance.privateKey);
-            var tNow = jsrsasign_1.default.KJUR.jws.IntDate.get("now");
-            var tEnd = jsrsasign_1.default.KJUR.jws.IntDate.get("now + 1month");
+            var tNow = rs.KJUR.jws.IntDate.get("now");
+            var tEnd = rs.KJUR.jws.IntDate.get("now + 1month");
             var oHeader = { alg: "ES256", typ: "JWT", cty: "json" };
             var oPayload = {
                 iss: this._options.appInstance.did,
@@ -73,7 +70,7 @@ class AuthService {
             };
             var sHeader = JSON.stringify(oHeader);
             var sPayload = JSON.stringify(oPayload);
-            var sJWT = jsrsasign_1.default.KJUR.jws.JWS.sign("ES256", sHeader, sPayload, ec);
+            var sJWT = rs.KJUR.jws.JWS.sign("ES256", sHeader, sPayload, ec);
             return `https://did.elastos.net/appidcredissue/${sJWT}`;
         });
     }

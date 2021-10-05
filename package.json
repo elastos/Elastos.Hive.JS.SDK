@@ -1,6 +1,6 @@
 {
-  "name": "@tuum-tech/elastos-hive-js-sdk",
-  "version": "1.0.0",
+  "name": "@elastosfoundation/elastos-hive-js-sdk",
+  "version": "0.1.0",
   "description": "Elastos Hive JS SDK",
   "main": "dist/HiveClient.js",
   "types": "dist/HiveClient.d.ts",
