@@ -1,4 +1,4 @@
-import { VerifiableCredential, Issuer, VerifiablePresentation, DIDDocument, JWTHeader } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, Issuer, VerifiablePresentation, DIDDocument, JWTHeader, DIDURL } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { AppDID } from "./appdid";
 import { DIDEntity } from "./didentity";
@@ -26,21 +26,40 @@ export class UserDID extends DIDEntity {
     }
 
 	public async issueDiplomaFor(appInstanceDid: AppDID): Promise<VerifiableCredential> {
+		
+	// 	let issuerObject = new Issuer(userDocument, id);
+    // let vcBuilder = new VerifiableCredential.Builder(issuerObject, appDid);
+    // let vc = await vcBuilder
+    //   .expirationDate(this.getExpirationDate())
+    //   .type('AppIdCredential')
+    //   .property('appDid', appDid.toString())
+    //   .property('appInstanceDid', appDid.toString())
+    //   .id(DIDURL.from('#app-id-credential', appDid) as DIDURL)
+    //   .seal(process.env.REACT_APP_DID_STORE_PASSWORD as string); // and we sign so it creates a Proof with method and signature
+
+		
+		
 		let subject = {};
-		subject["appDid"] = appInstanceDid.getAppDid();
+
+		subject["appDid"] = appInstanceDid.getDid();
+		subject["appInstanceDid"] = appInstanceDid.getDid();
 
         let cal = dayjs();
         cal = cal.add(5, 'year');
 
+		let id: DIDURL = DIDURL.from('#primary', this.getDid()) as DIDURL;
+		//await this.storePrivatekey(id, userMnemonic, password, 0);
+	
+		let issuerObject = new Issuer(await this.getDocument(), id);
 		let cb = this.issuer.issueFor(appInstanceDid.getDid());
-		let vc = await cb.id("didapp")
+		let vc = await cb.id(DIDURL.from('#app-id-credential', appInstanceDid.getDid()) as DIDURL)
 				.type("AppIdCredential")
 				.properties(subject)
 				.expirationDate(cal.toDate())
 				.seal(this.getStorePassword());
 
 		UserDID.LOG.info("VerifiableCredential: {}", vc.toString());
-
+		UserDID.LOG.info("VerifiableCredential IsValid: {}", vc.isValid());
 		return vc;
 	}
 

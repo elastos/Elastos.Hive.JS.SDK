@@ -32,7 +32,8 @@ export class AppDID extends DIDEntity {
 				.nonce(nonce)
 				.seal(this.getStorePassword());
 
-
+		
+			
 				
 		AppDID.LOG.info("VerifiablePresentation:{}", vp.toString());
 
@@ -59,7 +60,7 @@ export class AppDID extends DIDEntity {
 				.setIssuedAt(iat)
 				.setExpiration(exp)
 				.setNotBefore(nbf)
-				.claimsWithJson("presentation", vp.toString())
+				.claimsWithJson("presentation", vp.toString(true))
 				.sign(this.storepass);
 
 		AppDID.LOG.info("JWT Token: {}", token);
