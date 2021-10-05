@@ -1,4 +1,4 @@
-import { IOptions } from '../HiveClient';
+import { IOptions } from "../HiveClient";
 export interface IAppChallenge {
     challenge: string;
 }
