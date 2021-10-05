@@ -76,7 +76,7 @@ class AuthService {
     }
     AuthenticateUser(authToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = `${this._options.hiveUrl}/api/v1/did/auth`;
+            let url = `${this._options.hiveUrl}/api/v1/did/backup_auth`;
             let document = {
                 jwt: authToken,
             };

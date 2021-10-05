@@ -11,17 +11,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Util = void 0;
 class Util {
+    static SendGet(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let payload = {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            };
+            if (options.userToken) {
+                payload.headers["Authorization"] = "token " + options.userToken;
+            }
+            let response = yield fetch(options.url, payload);
+            if (response.ok) {
+                let json = yield response.json();
+                if (json._status != "OK") {
+                    throw new Error(`Error on send GET to ${options.url} - ${json._error.code} - ${json._error.message}`);
+                }
+                return json;
+            }
+            throw new Error(`Error on send GET to ${options.url} - ${response.status} - ${response.statusText}`);
+        });
+    }
     static SendPost(options) {
         return __awaiter(this, void 0, void 0, function* () {
             let payload = {
                 method: "POST",
                 headers: {
-                    "Accept": "application/json",
+                    Accept: "application/json",
                     "Content-Type": "application/json",
                 },
             };
             if (options.userToken) {
-                payload.headers["Authorization"] = 'token ' + options.userToken;
+                payload.headers["Authorization"] = "token " + options.userToken;
             }
             if (options.body) {
                 payload.headers["Content-Length"] = JSON.stringify(options.body).length;
@@ -36,6 +59,75 @@ class Util {
                 return json;
             }
             throw new Error(`Error on send POST to ${options.url} - ${response.status} - ${response.statusText}`);
+        });
+    }
+    static SendPut(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let payload = {
+                method: "PUT",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            };
+            if (options.userToken) {
+                payload.headers["Authorization"] = "token " + options.userToken;
+            }
+            let response = yield fetch(options.url, payload);
+            if (response.ok) {
+                let json = yield response.json();
+                if (json._status != "OK") {
+                    throw new Error(`Error on send PUT to ${options.url} - ${json._error.code} - ${json._error.message}`);
+                }
+                return json;
+            }
+            throw new Error(`Error on send PUT to ${options.url} - ${response.status} - ${response.statusText}`);
+        });
+    }
+    static SendPatch(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let payload = {
+                method: "PATCH",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            };
+            if (options.userToken) {
+                payload.headers["Authorization"] = "token " + options.userToken;
+            }
+            let response = yield fetch(options.url, payload);
+            if (response.ok) {
+                let json = yield response.json();
+                if (json._status != "OK") {
+                    throw new Error(`Error on send PATCH to ${options.url} - ${json._error.code} - ${json._error.message}`);
+                }
+                return json;
+            }
+            throw new Error(`Error on send PATCH to ${options.url} - ${response.status} - ${response.statusText}`);
+        });
+    }
+    static SendDelete(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let payload = {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            };
+            if (options.userToken) {
+                payload.headers["Authorization"] = "token " + options.userToken;
+            }
+            let response = yield fetch(options.url, payload);
+            if (response.ok) {
+                let json = yield response.json();
+                if (json._status != "OK") {
+                    throw new Error(`Error on send DELETE to ${options.url} - ${json._error.code} - ${json._error.message}`);
+                }
+                return json;
+            }
+            throw new Error(`Error on send DELETE to ${options.url} - ${response.status} - ${response.statusText}`);
         });
     }
 }

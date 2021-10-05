@@ -19,7 +19,10 @@ var EnumDirection;
 class DatabaseService {
     constructor(session) {
         this._isConnected = false;
-        if (session && !session.isAnonymous && session.userToken && session.userToken.length > 0) {
+        if (session &&
+            !session.isAnonymous &&
+            session.userToken &&
+            session.userToken.length > 0) {
             this._isConnected = true;
         }
         this._session = session;
@@ -32,14 +35,10 @@ class DatabaseService {
     createCollection(collectionName) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/create_collection`;
-            let document = {
-                "collection": collectionName
-            };
-            yield Util_1.Util.SendPost({
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collections/${collectionName}`;
+            yield Util_1.Util.SendPut({
                 url: url,
-                body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return this.getCollection(collectionName);
         });
@@ -50,183 +49,167 @@ class DatabaseService {
     deleteCollection(collectionName) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_collection`;
-            let document = {
-                "collection": collectionName
-            };
-            yield Util_1.Util.SendPost({
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/${collectionName}`;
+            yield Util_1.Util.SendDelete({
                 url: url,
-                body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
         });
     }
     insertOne(collectionName, newDocument, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/insert_one`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
             let document = {
-                "collection": collectionName,
-                "document": newDocument
+                document: newDocument,
             };
             if (options)
                 document.options = options;
             let response = yield Util_1.Util.SendPost({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
-            return {
+            let res = {
                 acknowledged: response.acknowledged,
-                inserted_id: response.inserted_id
             };
+            if (response.inserted_ids.length > 0) {
+                res.inserted_id = response.inserted_ids[0];
+            }
+            return res;
         });
     }
     insertMany(collectionName, newDocuments, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/insert_many`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
             if (!options) {
                 options = {
                     bypass_document_validation: false,
-                    ordered: true
+                    ordered: true,
                 };
             }
             let document = {
-                "collection": collectionName,
-                "document": newDocuments,
+                document: newDocuments,
+                options: options,
             };
             let response = yield Util_1.Util.SendPost({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
                 acknowledged: response.acknowledged,
-                inserted_ids: response.inserted_ids
+                inserted_ids: response.inserted_ids,
             };
         });
     }
     updateOne(collectionName, filter, updateCommand, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/update_one`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?updateone=true`;
             let document = {
-                "collection": collectionName,
-                "filter": filter,
-                "update": updateCommand
+                filter: filter,
+                update: updateCommand,
             };
             if (options)
                 document.options = options;
-            let response = yield Util_1.Util.SendPost({
+            let response = yield Util_1.Util.SendPatch({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
                 acknowledged: response.acknowledged,
                 matched_count: response.matched_count,
                 modified_count: response.modified_count,
-                upserted_id: response.upserted_id
+                upserted_id: response.upserted_id,
             };
         });
     }
     updateMany(collectionName, filter, updateCommand, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/update_many`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
             let document = {
-                "collection": collectionName,
-                "filter": filter,
-                "update": updateCommand
+                filter: filter,
+                update: updateCommand,
             };
             if (options)
                 document.options = options;
-            let response = yield Util_1.Util.SendPost({
+            let response = yield Util_1.Util.SendPatch({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
                 acknowledged: response.acknowledged,
                 matched_count: response.matched_count,
                 modified_count: response.modified_count,
-                upserted_id: response.upserted_id
+                upserted_id: response.upserted_id,
             };
         });
     }
     deleteOne(collectionName, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_one`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?deleteone=true`;
             let document = {
-                "collection": collectionName,
-                "filter": filter
+                filter: filter,
             };
-            let response = yield Util_1.Util.SendPost({
+            let response = yield Util_1.Util.SendDelete({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
-                acknowledged: response.acknowledged,
-                deleted_count: response.deleted_count
+                acknowledged: true,
             };
         });
     }
     deleteMany(collectionName, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/delete_many`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}`;
             let document = {
-                "collection": collectionName,
-                "filter": filter
+                filter: filter,
             };
-            let response = yield Util_1.Util.SendPost({
+            let response = yield Util_1.Util.SendDelete({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
-                acknowledged: response.acknowledged,
-                deleted_count: response.deleted_count
+                acknowledged: true,
             };
         });
     }
     countDocuments(collectionName, filter = {}, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/count_documents`;
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/collection/${collectionName}?op=count`;
             let document = {
-                "collection": collectionName,
-                "filter": filter
+                filter: filter,
             };
             if (options)
                 document.options = options;
             let response = yield Util_1.Util.SendPost({
                 url: url,
                 body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return {
-                count: response.count
+                count: response.count,
             };
         });
     }
     findOne(collectionName, filter, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/find_one`;
-            let document = {
-                "collection": collectionName,
-                "filter": filter
-            };
-            if (options)
-                document.options = options;
-            let response = yield Util_1.Util.SendPost({
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/${collectionName}?filter=${JSON.stringify(filter)}`;
+            let response = yield Util_1.Util.SendGet({
                 url: url,
-                body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return response.items;
         });
@@ -234,18 +217,37 @@ class DatabaseService {
     findMany(collectionName, filter, options) {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let url = `${this._session.hiveInstanceUrl}/api/v1/db/find_many`;
-            let document = {
-                "collection": collectionName,
-            };
-            if (filter)
-                document.filter = filter;
-            if (options)
-                document.options = options;
-            let response = yield Util_1.Util.SendPost({
+            let urlParams = "";
+            if (filter) {
+                urlParams += `?filter=${JSON.stringify(filter)}`;
+            }
+            if (options) {
+                if (options.skip) {
+                    if (!filter) {
+                        urlParams += `?skip=${options.skip}`;
+                    }
+                    else {
+                        urlParams += `&skip=${options.skip}`;
+                    }
+                }
+                if (options.limit) {
+                    if (!filter) {
+                        if (!options.skip) {
+                            urlParams += `?limit=${options.limit}`;
+                        }
+                        else {
+                            urlParams += `&limit=${options.limit}`;
+                        }
+                    }
+                    else {
+                        urlParams += `&limit=${options.limit}`;
+                    }
+                }
+            }
+            let url = `${this._session.hiveInstanceUrl}/api/v2/vault/db/${collectionName}${urlParams}`;
+            let response = yield Util_1.Util.SendGet({
                 url: url,
-                body: document,
-                userToken: this._session.userToken
+                userToken: this._session.userToken,
             });
             return response.items;
         });

@@ -20,7 +20,10 @@ var EnumVaultPackage;
 class PaymentService {
     constructor(session) {
         this._isConnected = false;
-        if (session && !session.isAnonymous && session.userToken && session.userToken.length > 0) {
+        if (session &&
+            !session.isAnonymous &&
+            session.userToken &&
+            session.userToken.length > 0) {
             this._isConnected = true;
         }
         this._session = session;
@@ -33,27 +36,26 @@ class PaymentService {
     CreateFreeVault() {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            yield Util_1.Util.SendPost({
-                url: `${this._session.hiveInstanceUrl}/api/v1/service/vault/create`,
-                userToken: this._session.userToken
+            yield Util_1.Util.SendPut({
+                url: `${this._session.hiveInstanceUrl}/api/v2/subscription/vault`,
+                userToken: this._session.userToken,
             });
         });
     }
     GetVaultServiceInfo() {
         return __awaiter(this, void 0, void 0, function* () {
             this.checkConnection();
-            let response = yield Util_1.Util.SendPost({
-                url: `${this._session.hiveInstanceUrl}/api/v1/service/vault`,
-                userToken: this._session.userToken
+            let response = yield Util_1.Util.SendGet({
+                url: `${this._session.hiveInstanceUrl}/api/v2/subscription/vault`,
+                userToken: this._session.userToken,
             });
             return {
-                max_storage: response.vault_service_info.max_storage,
-                file_use_storage: response.vault_service_info.file_use_storage,
-                db_use_storage: response.vault_service_info.db_use_storage,
-                modify_time: new Date(response.vault_service_info.modify_time * 1000),
-                start_time: new Date(response.vault_service_info.start_time * 1000),
-                end_time: new Date(response.vault_service_info.end_time * 1000),
-                pricing_using: response.vault_service_info.pricing_using
+                service_did: response.service_did,
+                storage_quota: response.storage_quota,
+                storage_used: response.storage_used,
+                created: new Date(response.created * 1000),
+                updated: new Date(response.updated * 1000),
+                pricing_plan: response.pricing_plan,
             };
         });
     }

@@ -36,11 +36,9 @@ export interface IUpdateManyResponse {
 }
 export interface IDeleteOneResponse {
     acknowledged: boolean;
-    deleted_count: number;
 }
 export interface IDeleteManyResponse {
     acknowledged: boolean;
-    deleted_count: number;
 }
 export interface ICountDocumentsOptions {
     skip?: number;
