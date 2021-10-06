@@ -58,23 +58,16 @@ export class HttpClient {
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
-        HttpClient.LOG.debug("response dbg1");
         if (!content) {
-          HttpClient.LOG.debug("response dbg2");
           throw new NodeRPCException(response.statusCode, -1, "Empty body.");
         }
-        HttpClient.LOG.debug("response dbg3: " + content);
         let jsonObj = JSON.parse(content);
-        HttpClient.LOG.debug("response dbg4");response.statusCode
         if (!jsonObj["error"]) {
-          HttpClient.LOG.debug("response dbg5");
           throw new NodeRPCException(response.statusCode, -1, content);
         }
-        HttpClient.LOG.debug("response dbg6");
         let httpError = jsonObj["error"];
         let errorCode = httpError['internal_code'];
         let errorMessage = httpError['message'];
-        HttpClient.LOG.debug("response dbg7");
 
         throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
       }
@@ -113,7 +106,6 @@ export class HttpClient {
                     self.handleResponse(response, rawContent);
 
                     let deserialized = responseParser.deserialize(rawContent);
-                    HttpClient.LOG.debug("deserialized: " + JSON.stringify(deserialized));
                     resolve(deserialized);
                   } catch(e) {
                     reject(
@@ -151,8 +143,8 @@ export class HttpClient {
           try {
             let accessToken = this.serviceContext.getAccessToken();
             let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
-            HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
-            HttpClient.LOG.debug("CanoniCAL Access Token: " + canonicalAccessToken);
+            //HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
+            HttpClient.LOG.debug("Canonical Access Token: " + canonicalAccessToken);
             requestOptions.headers['Authorization'] = canonicalAccessToken;
           } catch(e) {
             HttpClient.LOG.error("Authentication error: {}", e);

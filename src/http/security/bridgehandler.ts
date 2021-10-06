@@ -8,7 +8,7 @@ export interface BridgeHandler {
 	 *
 	 * @param value The value of the access token.
 	 */
-	flush(value: string): void;
+	flush(value: string): Promise<void>;
 
 	/**
 	 * The target is what the access token for.

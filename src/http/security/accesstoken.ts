@@ -42,7 +42,6 @@ export class AccessToken {
 	 * @return null if not exists.
 	 */
 	public async getCanonicalizedAccessToken(): Promise<string> {
-		AccessToken.LOG.debug("getCanonicalizedAccessToken");
 		try {
 			this.jwtCode = await this.fetch();
 		} catch (e) {
@@ -53,31 +52,21 @@ export class AccessToken {
 	}
 
 	public async fetch(): Promise<string> {
-		AccessToken.LOG.debug("fetch: start");
 		if (this.jwtCode != null) {
-			AccessToken.LOG.debug("fetch: jwtCode={}", this.jwtCode);
 			return this.jwtCode;
 		}
 
-		AccessToken.LOG.debug("fetch: restoreToken");
 		this.jwtCode = this.restoreToken();
-		AccessToken.LOG.debug("fetch: restored jwtCode={}", this.jwtCode);
 		if (this.jwtCode == null) {
-			AccessToken.LOG.debug("fetch: jwtCode is null");
 			this.jwtCode = await this.authService.fetch();
-			AccessToken.LOG.debug("fetch: authenticated jwtCode={}", this.jwtCode);
 
 			if (this.jwtCode != null) {
-				AccessToken.LOG.debug("fetch: flushing jwtCode");
-				this.bridge.flush(this.jwtCode);
-				AccessToken.LOG.debug("fetch: saving jwtCode");
+				await this.bridge.flush(this.jwtCode);
 				this.saveToken(this.jwtCode);
 			}
 		} else {
-			AccessToken.LOG.debug("fetch: flushing jwtCode");
-			this.bridge.flush(this.jwtCode);
+			await this.bridge.flush(this.jwtCode);
 		}
-		AccessToken.LOG.debug("fetch: end");
 		return Promise.resolve(this.jwtCode);
 	}
 
@@ -86,10 +75,7 @@ export class AccessToken {
 	}
 
 	private restoreToken() : string {
-		AccessToken.LOG.debug("Restore Token");
-
 		let endpoint = this.bridge.target() as ServiceContext;
-		AccessToken.LOG.debug("Endpoint :" + endpoint);
 
 		if (endpoint == null)
 			return null;
@@ -100,7 +86,6 @@ export class AccessToken {
 
 		serviceDid = endpoint.getServiceInstanceDid();
 		address	= endpoint.getProviderAddress();
-		AccessToken.LOG.debug("address :" + address);
 
 		if (serviceDid != null)
 			jwtCode = this.storage.loadAccessToken(serviceDid);
@@ -129,6 +114,7 @@ export class AccessToken {
 
 	private saveToken( jwtCode: string) : void {
 		let endpoint = this.bridge.target() as ServiceContext;
+
 		if (endpoint == null)
 			return;
 
@@ -152,19 +138,14 @@ class BridgeHandlerImpl implements BridgeHandler {
     private ref: ServiceContext;
 
     constructor(endpoint: ServiceContext) {
-        this.ref = endpoint;
+		this.ref = endpoint;
     }
 
     public async flush(value: string): Promise<void> {
         try {
-			BridgeHandlerImpl.LOG.debug("flush: start");
-            let endpoint = this.ref;
             let claims: Claims;
-			BridgeHandlerImpl.LOG.debug("flush: {}", value);
             claims = (await new JWTParserBuilder().build().parse(value)).getBody();
-			BridgeHandlerImpl.LOG.debug("flush: 2");
-            endpoint.flushDids(claims.getAudience(), claims.getIssuer());
-			BridgeHandlerImpl.LOG.debug("flush: 3");
+			this.ref.flushDids(claims.getAudience(), claims.getIssuer());
         } catch (e) {
             BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
             return;

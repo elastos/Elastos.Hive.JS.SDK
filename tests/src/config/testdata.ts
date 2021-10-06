@@ -89,7 +89,6 @@ export class TestData {
 			
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
-					TestData.LOG.debug("TestData.getAppInstanceDocument");
 					return await self.appInstanceDid.getDocument();
 				} catch (e) {
 					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);

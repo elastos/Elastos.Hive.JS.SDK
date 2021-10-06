@@ -12,7 +12,7 @@ export class SubscriptionService extends RestService {
 	private static LOG = new Logger("SubscriptionService");
 
 	private static PRICE_PLANS_ENDPOINT = "/api/v2/subscription/pricing_plan";
-	private static SUBSCRIBE_VAULT_ENDPOINT = "/api/v1/service/vault/create"; //"/api/v2/subscription/vault";
+	private static SUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
 	private static ACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=activation";
 	private static DEACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=deactivation";
 	private static UNSUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
@@ -95,9 +95,10 @@ export class SubscriptionService extends RestService {
 		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
 			deserialize(content: any): VaultInfo {
 				let jsonObj = JSON.parse(content);
+				SubscriptionService.LOG.debug(JSON.stringify(jsonObj));
 				return (new VaultInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["price_plan"]);
 			}
-		}, HttpMethod.POST);
+		}, HttpMethod.PUT);
 	}
 
 	/**
