@@ -38,12 +38,10 @@ export class ServiceContext {
 		if (!dataDir.endsWith(File.SEPARATOR))
 			dataDir += File.SEPARATOR;
 
-        ServiceContext.LOG_SERVICE_CONTEXT.debug("Init Service Context");
+        //ServiceContext.LOG_SERVICE_CONTEXT.debug("Init Service Context");
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
         this.accessToken = new AccessToken(this, this.dataStorage);
         this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
-    
-        ServiceContext.LOG_SERVICE_CONTEXT.debug("Access Token: " + this.accessToken);
     }
 
     public getAccessToken(): AccessToken {
