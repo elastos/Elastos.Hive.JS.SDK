@@ -1,4 +1,4 @@
-import { Logger } from ".";
+import { Logger } from "./logger";
 
 export class ParentException extends Error{
     private causedBy?: Error;

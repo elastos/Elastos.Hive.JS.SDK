@@ -1,4 +1,4 @@
-import { Condition } from "../..";
+import { Condition } from "./executable";
 
 export class QueryHasResultCondition extends Condition {
     

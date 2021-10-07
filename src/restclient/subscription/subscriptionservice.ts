@@ -5,8 +5,8 @@ import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { VaultInfo } from "../../domain/subscription/vaultinfo";
 import { BackupInfo } from "../../domain/subscription/backupinfo";
-import { HttpMethod } from "../..";
 import { HttpResponseParser } from '../../http/httpresponseparser';
+import { HttpMethod } from "../../http/httpmethod";
 
 export class SubscriptionService extends RestService {
 	private static LOG = new Logger("SubscriptionService");

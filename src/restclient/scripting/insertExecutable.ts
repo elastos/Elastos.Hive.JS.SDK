@@ -1,4 +1,4 @@
-import { Executable } from "../..";
+import { Executable } from "./executable";
 import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 
 export class InsertExecutable extends Executable {

@@ -1,4 +1,3 @@
-
 export class Condition {
 	private name: string;
 	private type: string;
