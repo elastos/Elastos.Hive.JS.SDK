@@ -42,6 +42,9 @@ import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
 import { HiveException } from "./exceptions";
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryHasResultCondition";
+import { DeleteExecutable } from "./restclient/scripting/deleteexecutable";
+import { FindExecutable } from "./restclient/scripting/findexecutable";
+import { InsertExecutable } from "./restclient/scripting/insertexecutable";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -92,7 +95,10 @@ export {
     QueryHasResultCondition,
     QueryHasResultConditionOptions,
     QueryHasResultConditionBody,
-
+    DeleteExecutable,
+    InsertExecutable,
+    FindExecutable,
+    
     // Utilities
     SHA256,
     Utils,
