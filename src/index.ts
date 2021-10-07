@@ -43,8 +43,7 @@ import { VaultInfo } from "./domain/subscription/vaultinfo";
 import { HiveException } from "./exceptions";
 import { QueryHasResultCondition } from "./restclient/scripting/queryHasResultCondition";
 
-//Logger.setLevel(Logger.TRACE);
-
+Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
     KeyProvider,

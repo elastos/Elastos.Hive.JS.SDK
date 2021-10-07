@@ -23,10 +23,10 @@ export class AuthService extends RestService {
 
 	public async fetch(): Promise<string> {
 		try {
-			AuthService.LOG.debug("AuthService=>fetch");
+			AuthService.LOG.trace("AuthService=>fetch");
 
 			let appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
-			AuthService.LOG.debug("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
+			AuthService.LOG.trace("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
 
 			let challenge: string  = await this.signIn(appInstanceDoc);
 			AuthService.LOG.debug("AuthService=>challenge :" + challenge);
@@ -46,12 +46,12 @@ export class AuthService extends RestService {
 		
 		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, { "id": JSON.parse(appInstanceDidDoc.toString(true)) }, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				AuthService.LOG.debug("return sign_in: " + content);				
+				AuthService.LOG.trace("return sign_in: " + content);				
 				return JSON.parse(content)['challenge'];
 			}
 		}, HttpMethod.POST);
 
-		AuthService.LOG.debug("challenge={} appInstanceDidDoc.getSubject().toString()={}", challenge, appInstanceDidDoc.getSubject().toString());
+		AuthService.LOG.trace("challenge={} appInstanceDidDoc.getSubject().toString()={}", challenge, appInstanceDidDoc.getSubject().toString());
 		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
 			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
@@ -84,9 +84,9 @@ export class AuthService extends RestService {
 		try {
 			let claims: Claims = (await new JWTParserBuilder().build().parse(jwtCode)).getBody();
 
-			AuthService.LOG.debug("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
-			AuthService.LOG.debug("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
-			AuthService.LOG.debug("is equal:" + (claims.getAudience() === expectationDid).toString());
+			AuthService.LOG.trace("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
+			AuthService.LOG.trace("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
+			AuthService.LOG.trace("is equal:" + (claims.getAudience() === expectationDid).toString());
 			return claims.getExpiration()*1000 > Date.now() && claims.getAudience() === expectationDid;
 		} catch (e) {
 			AuthService.LOG.error("checkValid error: {}", e);

@@ -95,7 +95,7 @@ export class SubscriptionService extends RestService {
 		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
 			deserialize(content: any): VaultInfo {
 				let jsonObj = JSON.parse(content);
-				SubscriptionService.LOG.debug(JSON.stringify(jsonObj));
+				SubscriptionService.LOG.trace(JSON.stringify(jsonObj));
 				return (new VaultInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["price_plan"]);
 			}
 		}, HttpMethod.PUT);

@@ -53,7 +53,6 @@ export class HttpClient {
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
       if (response.statusCode >= 300) {
-        HttpClient.LOG.debug("response code: {}", response.statusCode);
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
@@ -108,7 +107,7 @@ export class HttpClient {
                     resolve(deserialized);
                   } catch(e) {
                     reject(
-                      new DeserializationError("Unable to deserialize content from " + serviceEndpoint, e)
+                      new HttpException(response.statusCode, e.message, e)
                     );
                   }
                 });
@@ -142,7 +141,6 @@ export class HttpClient {
           try {
             let accessToken = this.serviceContext.getAccessToken();
             let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
-            //HttpClient.LOG.debug("Access Token: " + accessToken.getJwtCode());
             HttpClient.LOG.debug("Canonical Access Token: " + canonicalAccessToken);
             requestOptions.headers['Authorization'] = canonicalAccessToken;
           } catch(e) {
