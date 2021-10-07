@@ -58,8 +58,8 @@ export class UserDID extends DIDEntity {
 				.expirationDate(cal.toDate())
 				.seal(this.getStorePassword());
 
-		UserDID.LOG.info("VerifiableCredential: {}", vc.toString());
-		UserDID.LOG.info("VerifiableCredential IsValid: {}", vc.isValid());
+		UserDID.LOG.debug("VerifiableCredential: {}", vc.toString());
+		UserDID.LOG.debug("VerifiableCredential IsValid: {}", vc.isValid());
 		return vc;
 	}
 

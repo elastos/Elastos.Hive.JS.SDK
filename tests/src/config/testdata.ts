@@ -52,8 +52,11 @@ export class TestData {
 	}
 
     public async init(): Promise<TestData> {
+
+		let userDirFile = new File(this.userDir);
+		userDirFile.delete();
+
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
-		
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
