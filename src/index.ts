@@ -32,7 +32,7 @@ import { PromotionService }  from "./restclient/promotion/promotionservice";
 import { RestService }  from "./restclient/restservice";
 import { ScriptingService }  from "./restclient/scripting/scriptingservice";
 import { Condition }  from "./restclient/scripting/condition";
-import { Executable }  from "./restclient/scripting/executable";
+import { Executable, ExecutableDatabaseBody, ExecutableFileBody }  from "./restclient/scripting/executable";
 import { Context }  from "./restclient/scripting/context";
 import { RegScriptParams }  from "./restclient/scripting/regscriptparams";
 import { RunScriptParams }  from "./restclient/scripting/runscriptparams";
@@ -41,7 +41,7 @@ import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscr
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
 import { HiveException } from "./exceptions";
-import { QueryHasResultCondition } from "./restclient/scripting/queryHasResultCondition";
+import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryHasResultCondition";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -81,6 +81,8 @@ export {
     ScriptingService,
     Condition,
     Executable,
+    ExecutableFileBody,
+    ExecutableDatabaseBody,
     Context,
     RegScriptParams,
     RunScriptParams,
@@ -88,6 +90,8 @@ export {
     VaultSubscriptionService,
     HiveException,
     QueryHasResultCondition,
+    QueryHasResultConditionOptions,
+    QueryHasResultConditionBody,
 
     // Utilities
     SHA256,
