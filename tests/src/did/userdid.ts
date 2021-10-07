@@ -47,10 +47,7 @@ export class UserDID extends DIDEntity {
         let cal = dayjs();
         cal = cal.add(5, 'year');
 
-		let id: DIDURL = DIDURL.from('#primary', this.getDid()) as DIDURL;
-		//await this.storePrivatekey(id, userMnemonic, password, 0);
-	
-		let issuerObject = new Issuer(await this.getDocument(), id);
+		
 		let cb = this.issuer.issueFor(appInstanceDid.getDid());
 		let vc = await cb.id(DIDURL.from('#app-id-credential', appInstanceDid.getDid()) as DIDURL)
 				.type("AppIdCredential")
