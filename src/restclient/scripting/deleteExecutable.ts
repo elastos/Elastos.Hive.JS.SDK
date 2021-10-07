@@ -1,8 +1,9 @@
 import { Executable } from "../..";
+import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 
 export class DeleteExecutable extends Executable {
     constructor(name: string, collectionName: string, filter: any) {
-        super(name, Executable.Type.DELETE, null);
+        super(name, ExecutableType.DELETE, null);
         super.setBody(new DeleteExecutable.Body(collectionName, filter));
     }
 
@@ -14,7 +15,7 @@ export class DeleteExecutable extends Executable {
 
 export namespace DeleteExecutable {
 
-    export class Body extends Executable.DatabaseBody {
+    export class Body extends ExecutableDatabaseBody {
         private filter: any;
 
         constructor( collection: string, filter: any) {

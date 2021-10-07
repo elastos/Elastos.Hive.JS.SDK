@@ -1,8 +1,9 @@
 import { Executable } from "../..";
+import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 
 export class FindExecutable extends Executable {
 	constructor( name: string,  collectionName: string,  filter: any,  options: any) {
-		super(name, Executable.Type.FIND, null);
+		super(name, ExecutableType.FIND, null);
 		super.setBody(new FindExecutable.Body(collectionName, filter, options));
     }
 }
@@ -10,7 +11,7 @@ export class FindExecutable extends Executable {
 
 export namespace FindExecutable {
 
-        export class Body extends Executable.DatabaseBody {
+        export class Body extends ExecutableDatabaseBody {
         private filter: any;
         private options: any;
 

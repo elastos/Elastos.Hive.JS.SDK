@@ -1,8 +1,9 @@
 import { Executable } from "../..";
+import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 
 export class UpdateExecutable extends Executable {
 	constructor( name: string,  collectionName: string,  filter: any,  update:any,  options: any) {
-		super(name, Executable.Type.UPDATE, null);
+		super(name, ExecutableType.UPDATE, null);
 		super.setBody(new UpdateExecutable.Body(collectionName, filter, update, options));
     }
 }
@@ -10,7 +11,7 @@ export class UpdateExecutable extends Executable {
 
 export namespace UpdateExecutable {
 
-    export class Body extends Executable.DatabaseBody {
+    export class Body extends ExecutableDatabaseBody {
         private filter: any;
         private update: any;
         private options: any;

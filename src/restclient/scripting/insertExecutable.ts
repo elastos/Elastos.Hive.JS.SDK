@@ -1,8 +1,9 @@
 import { Executable } from "../..";
+import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 
 export class InsertExecutable extends Executable {
     constructor( name: string, collectionName: string, document: any, options: any) {
-        super(name, Executable.Type.INSERT, null);
+        super(name, ExecutableType.INSERT, null);
         super.setBody(new InsertExecutable.Body(collectionName, document, options));
     }
         
@@ -15,7 +16,7 @@ export class InsertExecutable extends Executable {
 
 export namespace InsertExecutable {
 
-    export class Body extends Executable.DatabaseBody {
+    export class Body extends ExecutableDatabaseBody {
         private document: any;
         private options: any;
 

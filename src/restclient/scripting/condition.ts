@@ -10,6 +10,22 @@ export class Condition {
 		this.body = body;
 	}
 
+	setName(value: any) {
+		this.name = value;
+	}
+
+    getName() : any {
+		return this.name;
+	}
+
+	setType(value: any) {
+		this.type = value;
+	}
+
+    getType() : any {
+		return this.type;
+	}
+
 	setBody(value: any) {
 		this.body = value;
 	}

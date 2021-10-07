@@ -1,12 +1,22 @@
 import { Condition } from "./condition";
 
-
+export class ExecutableType {
+    public static AGGREGATED = "aggregated";
+    public static FIND = "find";
+    public static INSERT = "insert";
+    public static UPDATE = "update";
+    public static DELETE = "delete";
+    public static FILE_UPLOAD = "fileUpload";
+    public static FILE_DOWNLOAD = "fileDownload";
+    public static FILE_PROPERTIES = "fileProperties";
+    public static FILE_HASH = "fileHash";
+}
 export class Executable extends Condition {
 
     //@SerializedName("output")
     output: boolean;
    
-    constructor(name: string, type: Executable.Type, body: object) {
+    constructor(name: string, type: ExecutableType, body: any) {
         super(name, type as string, body);
     }
 
@@ -14,57 +24,21 @@ export class Executable extends Condition {
         this.output = output;
         return this;
     }
-
-
-
 }
 
-export namespace Executable {
-
-    export enum Type {
-        AGGREGATED = "aggregated",
-        FIND = "find",
-        INSERT = "insert",
-		UPDATE = "update",
-		DELETE = "delete",
-		FILE_UPLOAD = "fileUpload",
-		FILE_DOWNLOAD = "fileDownload",
-		FILE_PROPERTIES = "fileProperties",
-        FILE_HASH = "fileHash"
-
-        // Do we need that? ***************************************
-        // 		private String value;
-        // 		Type(String value) {
-        // 			this.value = value;
-        // 		}
-        // 		String getValue() {
-        // 			return value;
-        // 		}
+export class ExecutableDatabaseBody {
+    //@SerializedName("collection")
+    collection: string;
+    constructor(collection: string) {
+        this.collection = collection;
     }
+}
 
-    export class DatabaseBody {
-		//@SerializedName("collection")
-		collection: string;
-		constructor(collection: string) {
-			this.collection = collection;
-		}
+export class ExecutableFileBody {
+    //@SerializedName("path")
+    private path: string;
+
+    public FileBody() {
+        this.path = "$params.path";
     }
-    
-    export class FileBody {
-		//@SerializedName("path")
-		private path: string;
-
-		public FileBody() {
-			this.path = "$params.path";
-		}
-	}
-
-    // TODO: serialization strategy
-	// static JsonNode createRunFileParams(path: string) {
-	// 	ObjectNode node = JsonNodeFactory.instance.objectNode();
-	// 	node.put("path", path);
-	// 	return node;
-	// }
-
-    
 }
