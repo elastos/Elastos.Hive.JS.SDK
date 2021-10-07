@@ -1,20 +1,10 @@
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
-import fs from 'fs';
-import { terser } from 'rollup-plugin-terser';
 import typescript from "@rollup/plugin-typescript";
-import pkg from './package.json';
 import replace from '@rollup/plugin-replace';
-import globals from 'rollup-plugin-node-globals';
-import alias from "@rollup/plugin-alias";
-import inject from "@rollup/plugin-inject";
 import size from 'rollup-plugin-size';
-import { visualizer } from 'rollup-plugin-visualizer';
-import replaceFiles from 'rollup-plugin-file-content-replace';
 import eslint from '@rollup/plugin-eslint';
-
-import { writeFileSync } from "fs";
 
 const production = !process.env.ROLLUP_WATCH;
 
