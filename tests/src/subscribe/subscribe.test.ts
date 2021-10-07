@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, PricingPlan, VaultInfo } from "@dchagastelles/elastos-hive-js-sdk";
+import { VaultSubscriptionService, PricingPlan, VaultInfo, BackupSubscriptionService } from "@dchagastelles/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -6,7 +6,7 @@ describe("test subscribe function", () => {
 
     let testData: TestData;
     let subscriptionService: VaultSubscriptionService;
-    let PRICING_PLAN_NAME: String = "Rookie";
+    let PRICING_PLAN_NAME: string = "Rookie";
 
     beforeEach(async () => {
         testData = await TestData.getInstance(ClientConfig.CUSTOM, TestData.USER_DIR);
@@ -28,11 +28,6 @@ describe("test subscribe function", () => {
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
-    test.skip("subscribe to vault", async () => {
-        let vaultInfo : VaultInfo = await subscriptionService.subscribe();
-        expect(vaultInfo).not.toBeNull();
-    });
-
     test.skip("Check subscription", async() => {
         let info: VaultInfo = await subscriptionService.checkSubscription();
         expect(info).not.toBeNull();
@@ -40,10 +35,17 @@ describe("test subscribe function", () => {
 
     });
 
-    test.skip("unsubscrile to vault", async () => {
-        let vaultInfo : VaultInfo = await subscriptionService.unsubscribe();
+    test.skip("should unsubscribe", async () => {
+        await subscriptionService.unsubscribe();
+        //expect(vaultInfo).not.toBeNull();
+        //console.log(JSON.stringify(vaultInfo));
+    });
+
+    test.skip("should return vault info", async () => {
+        let vaultInfo : VaultInfo = await subscriptionService.subscribe();
         expect(vaultInfo).not.toBeNull();
     });
+    
 });
 
 

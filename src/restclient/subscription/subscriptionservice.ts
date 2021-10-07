@@ -149,7 +149,7 @@ export class SubscriptionService extends RestService {
 	public async getBackupPricingPlanList(): Promise<PricingPlan[]>  {
 		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"backup", "name":"" }, <HttpResponseParser<PricingPlan[]>> {
 			deserialize(content: any): PricingPlan[] {
-				let jsonObj = JSON.parse(content)['pricingPlans'];
+				let jsonObj = JSON.parse(content)['backupPlans'];
 				let pricingPlans = [];
 				for (let plan of jsonObj) {
 					pricingPlans.push((new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]));
@@ -169,7 +169,7 @@ export class SubscriptionService extends RestService {
 	public async getBackupPricingPlan(planName: string): Promise<PricingPlan> {
 		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"backup", "name": planName }, <HttpResponseParser<PricingPlan>> {
 			deserialize(content: any): PricingPlan {
-				let jsonObj = JSON.parse(content)['pricingPlans'];
+				let jsonObj = JSON.parse(content)['backupPlans'];
 				let plan = jsonObj[0];
 				return (new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]);
 			}
