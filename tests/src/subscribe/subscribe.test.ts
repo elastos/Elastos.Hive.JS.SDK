@@ -23,23 +23,26 @@ describe("test subscribe function", () => {
 
 
     test("get pricing plan", async() => {
-        let plan: PricingPlan = await subscriptionService.getPricingPlan("Rookie");
+        let plan: PricingPlan = await subscriptionService.getPricingPlan(PRICING_PLAN_NAME);
         expect(plan).not.toBeNull();
-        expect(plan.getName()).toBe("Rookie");
+        expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
-    test("Check subscription", async() => {
+    test.skip("subscribe to vault", async () => {
+        let vaultInfo : VaultInfo = await subscriptionService.subscribe();
+        expect(vaultInfo).not.toBeNull();
+    });
+
+    test.skip("Check subscription", async() => {
         let info: VaultInfo = await subscriptionService.checkSubscription();
         expect(info).not.toBeNull();
         console.log(JSON.stringify(info));
 
     });
 
-
-    test.skip("should return vault info", async () => {
-        let vaultInfo : VaultInfo = await subscriptionService.subscribe();
+    test.skip("unsubscrile to vault", async () => {
+        let vaultInfo : VaultInfo = await subscriptionService.unsubscribe();
         expect(vaultInfo).not.toBeNull();
-        console.log(JSON.stringify(vaultInfo));
     });
 });
 

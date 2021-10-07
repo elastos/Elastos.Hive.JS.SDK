@@ -4,7 +4,7 @@
   "description": "Elastos Hive Typescript SDK Tests",
   "scripts": {
     "dev": "rollup -c -w",
-    "clean": "rm -rf public/tests generated/",
+    "clean": "rm -rf public/tests generated/ node_modules/",
     "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:build": "rollup -c",
     "tsc:w": "tsc -w",
