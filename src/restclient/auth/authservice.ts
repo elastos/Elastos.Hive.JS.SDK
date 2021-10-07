@@ -6,7 +6,7 @@ import { HttpResponseParser } from '../../http/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../../exceptions';
 import { Logger } from '../../logger';
 import { RestService } from '../restservice';
-import { HttpMethod } from '../..';
+import { HttpMethod } from '../../http/httpmethod';
 
 export class AuthService extends RestService {
 	private static LOG = new Logger("AuthService");
