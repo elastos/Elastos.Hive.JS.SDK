@@ -29,6 +29,11 @@ describe("test subscribe function", () => {
     });
 
     test("should subscribe and unsubscribe", async () => {
+        // Reset subscription
+        try {
+            await subscriptionService.unsubscribe()
+        } catch (e) {}
+
         expect(await subscriptionService.subscribe()).not.toBeNull();
         expect(await subscriptionService.checkSubscription()).not.toBeNull();
         expect(await subscriptionService.unsubscribe()).not.toThrow();
