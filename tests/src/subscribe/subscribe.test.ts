@@ -33,12 +33,14 @@ describe("test subscribe function", () => {
     });
 
     test("should subscribe and unsubscribe to vault", async () => {
-        // Reset subscription
+        let vaultInfo = {}
         try {
+            vaultInfo = await vaultsubscriptionService.subscribe();
+        } catch (e) {
             await vaultsubscriptionService.unsubscribe()
-        } catch (e) {}
-
-        expect(await vaultsubscriptionService.subscribe()).not.toBeNull();
+            vaultInfo = await vaultsubscriptionService.subscribe();
+        }
+        expect(vaultInfo).not.toBeNull();
         expect(await vaultsubscriptionService.checkSubscription()).not.toBeNull();
         expect(await vaultsubscriptionService.unsubscribe()).not.toThrow();
     });
@@ -57,12 +59,14 @@ describe("test subscribe function", () => {
 
 
     test("should subscribe and unsubscribe to backup", async () => {
-        // Reset subscription
+        let backupInfo = {}
         try {
+            backupInfo = await backupsubscriptionService.subscribe();
+        } catch (e) {
             await backupsubscriptionService.unsubscribe()
-        } catch (e) {}
-
-        expect(await backupsubscriptionService.subscribe()).not.toBeNull();
+            backupInfo = await backupsubscriptionService.subscribe();
+        }
+        expect(backupInfo).not.toBeNull();
         expect(await backupsubscriptionService.checkSubscription()).not.toBeNull();
         expect(await backupsubscriptionService.unsubscribe()).not.toThrow();
     });
