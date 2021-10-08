@@ -91,7 +91,7 @@ export class SubscriptionService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async subscribeToVault(): Promise<VaultInfo> {
-		SubscriptionService.LOG.info("Subscribe to vault");
+		SubscriptionService.LOG.trace("Subscribe to vault");
 		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
 			deserialize(content: any): VaultInfo {
 				let jsonObj = JSON.parse(content);

@@ -56,7 +56,7 @@ export class UserDID extends DIDEntity {
 				.seal(this.getStorePassword());
 
 		UserDID.LOG.debug("VerifiableCredential: {}", vc.toString());
-		UserDID.LOG.debug("VerifiableCredential IsValid: {}", vc.isValid());
+		UserDID.LOG.trace("VerifiableCredential IsValid: {}", vc.isValid());
 		return vc;
 	}
 

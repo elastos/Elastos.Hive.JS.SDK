@@ -68,7 +68,7 @@ export class AppContext {
 		if (AppContext.resolverHasSetup)
 			throw new DIDResoverAlreadySetupException();
 
-		this.LOG.error("Initializing DIDBackend with " + resolver);
+		this.LOG.trace("Initializing DIDBackend with " + resolver);
 		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
 		AppContext.resolverHasSetup = true;
 	}
