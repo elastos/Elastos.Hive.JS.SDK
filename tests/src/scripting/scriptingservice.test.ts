@@ -57,8 +57,14 @@ describe("test scripting function", () => {
     
     async function registerScriptDelete( scriptName: string) {
         let filter = { "author": "$params.author" };
-        expect(await scriptingService.registerScript(scriptName, 
-            new DeleteExecutable(scriptName, COLLECTION_NAME, filter))).not.toThrow();
+        let error;
+        try {
+            await scriptingService.registerScript(scriptName, 
+                new DeleteExecutable(scriptName, COLLECTION_NAME, filter));
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeNull();
     }
     
     // beforeAll(async () => {
@@ -212,8 +218,14 @@ describe("test scripting function", () => {
     }
         
     async function registerScriptFileHash(scriptName: string) {
-        expect(await this.scriptingService.registerScript(scriptName,
-                        new FileHashExecutable(scriptName).setOutput(true))).not.toThrow();
+        let error;
+        try {
+            await this.scriptingService.registerScript(scriptName,
+                new FileHashExecutable(scriptName).setOutput(true));
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeNull();
     }
 
     function callScriptFileHash(scriptName: string, fileName: string) {
@@ -292,7 +304,13 @@ describe("test scripting function", () => {
 
 
     test.skip("testUnregister", async () => {
-        expect(await scriptingService.unregisterScript(FILE_HASH_NAME)).not.toThrow();
+        let error;
+        try {
+            await scriptingService.unregisterScript(FILE_HASH_NAME);
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeNull();
         remove_test_database();
     });
 
