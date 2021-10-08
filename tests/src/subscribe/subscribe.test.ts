@@ -33,16 +33,22 @@ describe("test subscribe function", () => {
     });
 
     test("should subscribe and unsubscribe to vault", async () => {
-        let vaultInfo = {}
+        let vaultInfo;
         try {
             vaultInfo = await vaultsubscriptionService.subscribe();
         } catch (e) {
-            await vaultsubscriptionService.unsubscribe()
+            await vaultsubscriptionService.unsubscribe();
             vaultInfo = await vaultsubscriptionService.subscribe();
         }
         expect(vaultInfo).not.toBeNull();
         expect(await vaultsubscriptionService.checkSubscription()).not.toBeNull();
-        expect(await vaultsubscriptionService.unsubscribe()).not.toThrow();
+        let error = null;
+        try {
+            await vaultsubscriptionService.unsubscribe()
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeNull();
     });
 
     test("get backup pricing plans", async() => {
@@ -59,16 +65,22 @@ describe("test subscribe function", () => {
 
 
     test("should subscribe and unsubscribe to backup", async () => {
-        let backupInfo = {}
+        let backupInfo;
         try {
             backupInfo = await backupsubscriptionService.subscribe();
         } catch (e) {
-            await backupsubscriptionService.unsubscribe()
+            await backupsubscriptionService.unsubscribe();
             backupInfo = await backupsubscriptionService.subscribe();
         }
         expect(backupInfo).not.toBeNull();
         expect(await backupsubscriptionService.checkSubscription()).not.toBeNull();
-        expect(await backupsubscriptionService.unsubscribe()).not.toThrow();
+        let error = null;
+        try {
+            await backupsubscriptionService.unsubscribe()
+        } catch (e) {
+            error = e;
+        }
+        expect(error).toBeNull();
     });
 });
 

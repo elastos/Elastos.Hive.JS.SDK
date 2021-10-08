@@ -73,7 +73,7 @@ export class TestData {
 				userConfig.storepass,
 				userConfig.did);
 				
-		TestData.LOG.debug("UserDid created"); 
+		TestData.LOG.trace("UserDid created"); 
 		let userConfigCaller = this.clientConfig.cross.user;
 		this.callerDid = await UserDID.create(userConfigCaller.name,
 			userConfigCaller.mnemonic,
@@ -81,7 +81,7 @@ export class TestData {
 			userConfigCaller.storepass,
 			userConfigCaller.did);
 					
-					//初始化Application Context
+		//Application Context
 		let self = this;
 		this.context = await AppContext.build({
 
