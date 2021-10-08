@@ -13,7 +13,6 @@ export class ExecutableType {
 }
 export class Executable extends Condition {
 
-    //@SerializedName("output")
     output: boolean;
    
     constructor(name: string, type: ExecutableType, body: any) {
@@ -27,7 +26,6 @@ export class Executable extends Condition {
 }
 
 export class ExecutableDatabaseBody {
-    //@SerializedName("collection")
     collection: string;
     constructor(collection: string) {
         this.collection = collection;
@@ -35,7 +33,6 @@ export class ExecutableDatabaseBody {
 }
 
 export class ExecutableFileBody {
-    //@SerializedName("path")
     private path: string;
 
     public FileBody() {

@@ -45,6 +45,7 @@ import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResult
 import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/insertexecutable";
+import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -101,6 +102,7 @@ export {
     InsertExecutableBody,
     FindExecutable,
     FindExecutableBody,
+    FileHashExecutable,
     
     // Utilities
     SHA256,

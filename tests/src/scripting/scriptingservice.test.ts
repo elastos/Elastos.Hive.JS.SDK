@@ -1,4 +1,4 @@
-import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, ScriptingService, VaultServices, QueryHasResultCondition } from "@dchagastelles/elastos-hive-js-sdk";
+import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService } from "@dchagastelles/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -25,10 +25,9 @@ describe("test scripting function", () => {
     let targetDid: string;
     let appDid: string;
     
-    let filesService: string;
+    let filesService: FilesService;
     let databaseService: DatabaseService;
     let scriptingService: ScriptingService;
-    //let scriptRunner:  ScriptRunner;
     
     let localSrcFilePath: string;
     let localDstFileRoot: string;
@@ -36,11 +35,11 @@ describe("test scripting function", () => {
     let fileName: string;
 
     
-    function create_test_database() {
+    async function create_test_database() {
         try {
-            //databaseService.createCollection(COLLECTION_NAME).get();
+            await databaseService.createCollection(COLLECTION_NAME);
         } catch (e) {
-            //log.error("Failed to create collection: {}", e.getMessage());
+            console.error("Failed to create collection: {}", e.getMessage());
         }
     }
 
@@ -64,18 +63,9 @@ describe("test scripting function", () => {
         } catch (e) {
             error = e;
         }
-        expect(error).toBeNull();
+        expect(error).toBeUndefined();
     }
     
-    // beforeAll(async () => {
-    //     let testData = await TestData.getInstance(ClientConfig.DEV, "/home/diego/temp");
-    //     this.scriptingService = testData.newVault().getScriptingService();
-    //     //scriptRunner = testData.newScriptRunner();
-    //     this.filesService = testData.newVault().getFilesService();
-    //     this.databaseService = testData.newVault().getDatabaseService();
-    //     this.targetDid = testData.getUserDid();
-    //     this.appDid = testData.getAppDid();
-    // });
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
@@ -85,18 +75,17 @@ describe("test scripting function", () => {
 
         
         scriptingService = vaultServices.getScriptingService();
+        filesService = testData.newVault().getFilesService();
+        databaseService = testData.newVault().getDatabaseService();
+        targetDid = testData.getUserDid();
+        appDid = testData.getAppDid();
     });
 
-    test("testDelete", async () => {
-        await registerScriptDelete(DELETE_NAME);
- 		callScriptDelete(DELETE_NAME);
-    });
 
     async function registerScriptInsert(scriptName: string) {
-        //Assertions.assertDoesNotThrow(() -> {
         let doc = {"author": "$params.author", "content": "$params.content"};
         let options = { "bypass_document_validation": false, "ordered": true};
-        await await this.scriptingService.registerScript(scriptName,
+        await this.scriptingService.registerScript(scriptName,
                 new InsertExecutable(scriptName, COLLECTION_NAME, doc, options));
     }
         
@@ -155,12 +144,18 @@ describe("test scripting function", () => {
         expect(result.get(scriptName).has("upserted_id")).toBeTruthy();
     }
 
+    interface DatabaseDeleteResponse {
+        database_delete: { acknowledged: boolean, deleted_count: number};
+    }
+
     async function callScriptDelete( scriptName: string) {
         let params =  {"author": "John"};
-        let result = await this.scriptingService.callScript(scriptName, params, this.targetDid, this.appDid, undefined);
+        let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid, undefined);
+
+        //console.log("result :" + JSON.parse(result).);
         expect(result).not.toBeNull();
-        expect(result.has(scriptName)).toBeTruthy();
-        expect(result.get(scriptName).has("deleted_count")).toBeTruthy();
+        expect(result.database_delete).not.toBeNull();
+        expect(result.database_delete.deleted_count).not.toBeNull();
     }
     
     function registerScriptFileUpload(scriptName: string) {
@@ -265,14 +260,16 @@ describe("test scripting function", () => {
 
 
     test.skip("testUpdate", async () => {
-        registerScriptUpdate(UPDATE_NAME);
-        callScriptUpdate(UPDATE_NAME);
+        await registerScriptUpdate(UPDATE_NAME);
+        await callScriptUpdate(UPDATE_NAME);
     });
 
 
-    test.skip("testDelete", async () => {
-        registerScriptDelete(DELETE_NAME);
-        callScriptDelete(DELETE_NAME);
+    test("testDelete", async () => {
+        await create_test_database();
+        await registerScriptDelete(DELETE_NAME);
+        console.log("script registered");
+        await callScriptDelete(DELETE_NAME);
     });
 
 
