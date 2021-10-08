@@ -41,7 +41,7 @@ import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscr
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
 import { HiveException } from "./exceptions";
-import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryHasResultCondition";
+import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/insertexecutable";
