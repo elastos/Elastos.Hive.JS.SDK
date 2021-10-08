@@ -10,7 +10,7 @@ describe("test subscribe function", () => {
     let PRICING_PLAN_NAME: string = "Rookie";
 
     beforeEach(async () => {
-        testData = await TestData.getInstance(ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
         vaultsubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());

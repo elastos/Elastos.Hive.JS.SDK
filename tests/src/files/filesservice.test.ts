@@ -31,7 +31,7 @@ describe.skip("test file service", () => {
 	}
 
 	beforeAll(async () => {
-		let testData = await TestData.getInstance(ClientConfig.CUSTOM, TestData.USER_DIR);
+		let testData = await TestData.getInstance("filesservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
 		expect(new VaultSubscriptionService(testData.getAppContext(),testData.getProviderAddress())).not.toThrow();
 		expect(filesService = testData.newVault().getFilesService()).not.toThrow();
 	});

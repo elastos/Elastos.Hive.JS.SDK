@@ -78,7 +78,7 @@ describe("test scripting function", () => {
     // });
 
     beforeAll(async () => {
-        testData = await TestData.getInstance(ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
         vaultServices = new VaultServices(
             testData.getAppContext(),
             testData.getProviderAddress());

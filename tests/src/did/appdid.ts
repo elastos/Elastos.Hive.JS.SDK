@@ -38,8 +38,8 @@ export class AppDID extends DIDEntity {
 		AppDID.LOG.info("VerifiablePresentation:{}", vp.toString());
 
 		let listener = VerificationEventListener.getDefaultWithIdent("isValid");
-		AppDID.LOG.info("VerifiablePresentation is Valid :{}", await vp.isValid(listener));
-		AppDID.LOG.info("Listener :{}", listener.toString());
+		AppDID.LOG.trace("VerifiablePresentation is Valid :{}", await vp.isValid(listener));
+		AppDID.LOG.trace("Listener :{}", listener.toString());
 
 		return vp;
 	}
