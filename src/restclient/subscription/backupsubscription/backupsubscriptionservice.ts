@@ -35,7 +35,7 @@ export class BackupSubscriptionService extends ServiceContext {
 	}
 
 	public async unsubscribe(): Promise<void> {
-		await await this.subscriptionService.unsubscribeBackup();
+		return await this.subscriptionService.unsubscribeBackup();
 	}
 
 	public async checkSubscription(): Promise<BackupInfo> {

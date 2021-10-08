@@ -201,6 +201,7 @@ export class SubscriptionService extends RestService {
 		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupInfo>> {
 			deserialize(content: any): BackupInfo {
 				let jsonObj = JSON.parse(content);
+				SubscriptionService.LOG.trace(JSON.stringify(jsonObj));
 				return (new BackupInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["price_plan"]);
 			}
 		}, HttpMethod.PUT);
