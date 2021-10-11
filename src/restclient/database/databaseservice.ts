@@ -12,6 +12,8 @@ export class DatabaseService extends RestService {
 	private static LOG = new Logger("DatabaseService");
 
 	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
+	private static API_DELETE_COLLECTIONS_ENDPOINT = "/api/v2/vault/db";
+
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
@@ -61,9 +63,27 @@ export class DatabaseService extends RestService {
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
-	// async deleteCollection(name:string) : Promise<void>{
-	// 	throw new Error("not implemented");
-	// }
+	async deleteCollection(collectionName: string) : Promise<void>{
+		try {
+			await this.httpClient.send(`${DatabaseService.API_DELETE_COLLECTIONS_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
+		} catch (e){
+			if (e instanceof NodeRPCException) {
+
+				// TODO: waiting for the codes
+				switch (e.getCode()) {
+					case NodeRPCException.UNAUTHORIZED:
+						throw new UnauthorizedException(e.message, e);
+					case NodeRPCException.FORBIDDEN:
+						throw new VaultForbiddenException(e.message, e);
+					default:
+						throw new ServerUnknownException(e.message, e);
+				}
+			}
+			if (e instanceof IOException){
+				throw new NetworkException(e.message, e);
+			}	
+		}
+	}
 }
 
 
