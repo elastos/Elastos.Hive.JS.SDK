@@ -46,11 +46,11 @@ describe("test scripting function", () => {
     	/**
 	 * If not exists, also return OK(_status).
 	 */
-	function remove_test_database() {
+	async function remove_test_database() {
 		try {
-			//databaseService.deleteCollection(COLLECTION_NAME).get();
+			await databaseService.deleteCollection(COLLECTION_NAME);
 		} catch (e) {
-			//log.error("Failed to remove collection: {}", e.getMessage());
+			console.error("Failed to remove collection: {}", e.getMessage());
 		}
     }
     
@@ -85,17 +85,20 @@ describe("test scripting function", () => {
     async function registerScriptInsert(scriptName: string) {
         let doc = {"author": "$params.author", "content": "$params.content"};
         let options = { "bypass_document_validation": false, "ordered": true};
-        await this.scriptingService.registerScript(scriptName,
+        await scriptingService.registerScript(scriptName,
                 new InsertExecutable(scriptName, COLLECTION_NAME, doc, options));
     }
         
     async function callScriptInsert( scriptName: string) {
         
         let params = {"author":"John", "content": "message"}
-        let result = await this.scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
+        let result : DatabaseInsertResponse = await scriptingService.callScript<DatabaseInsertResponse>(scriptName, params, targetDid, appDid, undefined);
+
+        //console.log("result :" + JSON.stringify(result));
+
         expect(result).not.toBeNull();
-        expect(result.has(scriptName)).toBeTruthy();
-        expect(result.get(scriptName).has("inserted_id")).toBeTruthy();
+        expect(result.database_insert).not.toBeNull();
+        expect(result.database_insert.inserted_id).not.toBeNull();
     }
 
     async function registerScriptFindWithoutCondition(scriptName: string) {
@@ -146,6 +149,10 @@ describe("test scripting function", () => {
 
     interface DatabaseDeleteResponse {
         database_delete: { acknowledged: boolean, deleted_count: number};
+    }
+
+    interface DatabaseInsertResponse {
+        database_insert: { acknowledged: boolean, inserted_id: string};
     }
 
     async function callScriptDelete( scriptName: string) {
@@ -241,11 +248,11 @@ describe("test scripting function", () => {
         // 				false, false).get()).not.toThrow();
     }
     
-    test.skip("testInsert", async () => {
-        remove_test_database();
-        create_test_database();
-        registerScriptInsert(INSERT_NAME);
-        callScriptInsert(INSERT_NAME);
+    test("testInsert", async () => {
+        await remove_test_database();
+        await create_test_database();
+        await registerScriptInsert(INSERT_NAME);
+        await callScriptInsert(INSERT_NAME);
     });
 
     test.skip("testFindWithoutCondition", async () => {
