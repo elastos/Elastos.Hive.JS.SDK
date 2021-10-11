@@ -123,20 +123,20 @@ describe("test scripting function", () => {
         
     }
 
-    function callScriptFind(scriptName: string) {
+    async function callScriptFind(scriptName: string) {
         // Assertions.assertDoesNotThrow(()->{
         // 	Assertions.assertNotNull(
-        expect(this.scriptingService.callScript(scriptName, null, this.targetDid, this.appDid).get()).not.toBeNull();
+        expect(await scriptingService.callScript<any>(scriptName, null, this.targetDid, this.appDid, undefined)).not.toBeNull();
         // });
     }
 
     async function registerScriptUpdate( scriptName: string) {
-            // let filter = {"author": "$params.author"};
-            // let set = {"author": "$params.author", "content": "$params.content" };
-            // let update = {"$set": set};
-            // let options = { "bypass_document_validation": false, "upsert": true};
-            // expect(await this.scriptingService.registerScript(scriptName,
-            //         new UpdateExecutable(scriptName, this.COLLECTION_NAME, filter, update, options))).not.toThrow();
+        // let filter = {"author": "$params.author"};
+        // let set = {"author": "$params.author", "content": "$params.content" };
+        // let update = {"$set": set};
+        // let options = { "bypass_document_validation": false, "upsert": true};
+        // expect(await this.scriptingService.registerScript(scriptName,
+        //         new UpdateExecutable(scriptName, this.COLLECTION_NAME, filter, update, options))).not.toThrow();
     }
 
     async function callScriptUpdate( scriptName: string) {
@@ -159,7 +159,6 @@ describe("test scripting function", () => {
         let params =  {"author": "John"};
         let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid, undefined);
 
-        //console.log("result :" + JSON.parse(result).);
         expect(result).not.toBeNull();
         expect(result.database_delete).not.toBeNull();
         expect(result.database_delete.deleted_count).not.toBeNull();
@@ -260,9 +259,9 @@ describe("test scripting function", () => {
         callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
     });
 
-    test.skip("testFind", async () => {
-        registerScriptFind(FIND_NAME);
-        callScriptFind(FIND_NAME);
+    test("testFind", async () => {
+        await registerScriptFind(FIND_NAME);
+        await callScriptFind(FIND_NAME);
     });
 
 
@@ -307,15 +306,16 @@ describe("test scripting function", () => {
     });
 
 
-    test.skip("testUnregister", async () => {
+    test("testUnregister", async () => {
         let error;
         try {
             await scriptingService.unregisterScript(FILE_HASH_NAME);
         } catch (e) {
             error = e;
+            console.log(e);
         }
         expect(error).toBeNull();
-        remove_test_database();
+        await remove_test_database();
     });
 
 });
