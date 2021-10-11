@@ -117,17 +117,26 @@ describe("test scripting function", () => {
     async function registerScriptFind( scriptName: string) {
         //Assertions.assertDoesNotThrow(()->{
         let filter = { "author":"John" };
-        (await this.scriptingService.registerScript(scriptName,
-                new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null),
-                new FindExecutable(scriptName, COLLECTION_NAME, filter, null))).setOutput(true);
+
+        try {
+
+            await scriptingService.registerScript(scriptName,
+                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null),
+                    new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+        } catch(e)
+        {
+            console.error("error: " + e);
+            
+        }
         
     }
 
     async function callScriptFind(scriptName: string) {
         // Assertions.assertDoesNotThrow(()->{
         // 	Assertions.assertNotNull(
-        expect(await scriptingService.callScript<any>(scriptName, null, this.targetDid, this.appDid, undefined)).not.toBeNull();
-        // });
+        let returnScriptFind : any = await scriptingService.callScript<any>(scriptName, {}, targetDid, appDid, undefined);    
+        console.info("returnScriptFind " + returnScriptFind);
+        expect(returnScriptFind).not.toBeNull();
     }
 
     async function registerScriptUpdate( scriptName: string) {
@@ -261,6 +270,7 @@ describe("test scripting function", () => {
 
     test("testFind", async () => {
         await registerScriptFind(FIND_NAME);
+        console.log("************* testfind");
         await callScriptFind(FIND_NAME);
     });
 
@@ -314,7 +324,9 @@ describe("test scripting function", () => {
             error = e;
             console.log(e);
         }
-        expect(error).toBeNull();
+
+        //console.error("error: " + error);
+        expect(error).toBeUndefined();
         await remove_test_database();
     });
 
