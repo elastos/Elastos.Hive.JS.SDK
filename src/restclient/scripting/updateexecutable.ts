@@ -4,24 +4,22 @@ import { ExecutableDatabaseBody, ExecutableType } from "./executable";
 export class UpdateExecutable extends Executable {
 	constructor( name: string,  collectionName: string,  filter: any,  update:any,  options: any) {
 		super(name, ExecutableType.UPDATE, null);
-		super.setBody(new UpdateExecutable.Body(collectionName, filter, update, options));
+		super.setBody(new UpdateExecutableBody(collectionName, filter, update, options));
     }
 }
 
 
-export namespace UpdateExecutable {
 
-    export class Body extends ExecutableDatabaseBody {
-        private filter: any;
-        private update: any;
-        private options: any;
+export class UpdateExecutableBody extends ExecutableDatabaseBody {
+    private filter: any;
+    private update: any;
+    private options: any;
 
-        constructor(collection:string, filter: any, update:any, options: any) {
-            super(collection);
-            this.filter = filter;
-            this.update = update;
-            this.options = options;
-        }
+    constructor(collection:string, filter: any, update:any, options: any) {
+        super(collection);
+        this.filter = filter;
+        this.update = update;
+        this.options = options;
     }
 }
 

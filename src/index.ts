@@ -46,6 +46,7 @@ import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/d
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/insertexecutable";
 import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
+import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -103,7 +104,8 @@ export {
     FindExecutable,
     FindExecutableBody,
     FileHashExecutable,
-    
+    UpdateExecutable,
+    UpdateExecutableBody,
     // Utilities
     SHA256,
     Utils,

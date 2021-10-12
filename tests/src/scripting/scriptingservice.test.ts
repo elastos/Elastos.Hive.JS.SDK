@@ -1,4 +1,4 @@
-import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService } from "@dchagastelles/elastos-hive-js-sdk";
+import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService } from "@dchagastelles/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -104,14 +104,15 @@ describe("test scripting function", () => {
     async function registerScriptFindWithoutCondition(scriptName: string) {
         
         let filter = {"author":"John"};
-        await this.scriptingService.registerScript(scriptName,
-                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null).setOutput(true));
+        await scriptingService.registerScript(scriptName,
+                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null));
     
     }
 
-    function callScriptFindWithoutCondition( scriptName: string) {
+    async function callScriptFindWithoutCondition( scriptName: string) {
         //Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-        expect(this.scriptingService.callScriptUrl(scriptName, "{}", targetDid, appDid).get()).not.toBeNull();
+        await scriptingService.callScriptUrl<any>(scriptName, "{}", targetDid, appDid, undefined);
+        
     }
     
     async function registerScriptFind( scriptName: string) {
@@ -140,20 +141,25 @@ describe("test scripting function", () => {
     }
 
     async function registerScriptUpdate( scriptName: string) {
-        // let filter = {"author": "$params.author"};
-        // let set = {"author": "$params.author", "content": "$params.content" };
-        // let update = {"$set": set};
-        // let options = { "bypass_document_validation": false, "upsert": true};
-        // expect(await this.scriptingService.registerScript(scriptName,
-        //         new UpdateExecutable(scriptName, this.COLLECTION_NAME, filter, update, options))).not.toThrow();
+        let filter = {"author": "$params.author"};
+        let set = {"author": "$params.author", "content": "$params.content" };
+        let update = {"$set": set};
+        let options = { "bypass_document_validation": false, "upsert": true};
+        await scriptingService.registerScript(scriptName,
+            new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options));
+
+        console.log("registerScriptUpdate done");
+        
     }
 
     async function callScriptUpdate( scriptName: string) {
         let params = {"author": "John", "content": "message" };
-        let result = await this.scriptingService.callScript(scriptName, params, this.targetDid, this.appDid, undefined);
+        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
+
+        console.log(JSON.stringify(result));
         expect(result).not.toBeNull();
-        expect(result.has(scriptName)).toBeTruthy();
-        expect(result.get(scriptName).has("upserted_id")).toBeTruthy();
+        //expect(result.database_delete).not.toBeNull();
+        //expect(result.database_delete.upserted_id).not.toBeNull();
     }
 
     interface DatabaseDeleteResponse {
@@ -263,9 +269,9 @@ describe("test scripting function", () => {
         await callScriptInsert(INSERT_NAME);
     });
 
-    test.skip("testFindWithoutCondition", async () => {
-        registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-        callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+    test("testFindWithoutCondition", async () => {
+        await registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+        await callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
     });
 
     test("testFind", async () => {
@@ -275,7 +281,7 @@ describe("test scripting function", () => {
     });
 
 
-    test.skip("testUpdate", async () => {
+    test("testUpdate", async () => {
         await registerScriptUpdate(UPDATE_NAME);
         await callScriptUpdate(UPDATE_NAME);
     });
@@ -305,9 +311,9 @@ describe("test scripting function", () => {
         // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
     });
 
-    test.skip("testFileProperties", async () => {
-        registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+    test("testFileProperties", async () => {
+        await registerScriptFileProperties(FILE_PROPERTIES_NAME);
+        await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
     });
 
     test.skip("testFileHash", async () => {
