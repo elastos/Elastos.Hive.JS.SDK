@@ -23,6 +23,11 @@ export class Executable extends Condition {
         this.output = output;
         return this;
     }
+
+    public static createRunFileParams(path: string) : any {
+		let node = {"path": path};
+		return node;
+	}
 }
 
 export class ExecutableDatabaseBody {

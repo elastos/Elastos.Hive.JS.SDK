@@ -1,4 +1,4 @@
-import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService } from "@dchagastelles/elastos-hive-js-sdk";
+import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@dchagastelles/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -244,16 +244,16 @@ describe("test scripting function", () => {
         expect(error).toBeNull();
     }
 
-    function callScriptFileHash(scriptName: string, fileName: string) {
-        // Assertions.assertDoesNotThrow(()->{
-        //     JsonNode result = scriptRunner.callScript(scriptName,
-        //             Executable.createRunFileParams(fileName),
-        //             targetDid, appDid, JsonNode.class).get();
-        //     Assertions.assertNotNull(result);
-        //     Assertions.assertTrue(result.has(scriptName));
-        //     Assertions.assertTrue(result.get(scriptName).has("SHA256"));
-        //     Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
-        // });
+    async function callScriptFileHash(scriptName: string, fileName: string) {
+        //Assertions.assertDoesNotThrow(()->{
+        let result = await scriptingService.callScript(scriptName,
+                Executable.createRunFileParams(fileName),
+                targetDid, appDid, undefined);
+        //Assertions.assertNotNull(result);
+        //Assertions.assertTrue(result.has(scriptName));
+        //Assertions.assertTrue(result.get(scriptName).has("SHA256"));
+        //Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
+        //});
     }
         
     function registerScriptFileDownload( scriptName: string) {
@@ -276,7 +276,6 @@ describe("test scripting function", () => {
 
     test("testFind", async () => {
         await registerScriptFind(FIND_NAME);
-        console.log("************* testfind");
         await callScriptFind(FIND_NAME);
     });
 
@@ -317,8 +316,8 @@ describe("test scripting function", () => {
     });
 
     test.skip("testFileHash", async () => {
-        registerScriptFileHash(FILE_HASH_NAME);
-        callScriptFileHash(FILE_HASH_NAME, fileName);
+        await registerScriptFileHash(FILE_HASH_NAME);
+        await callScriptFileHash(FILE_HASH_NAME, fileName);
     });
 
 
