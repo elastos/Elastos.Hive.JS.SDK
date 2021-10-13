@@ -79,7 +79,7 @@ testData = await TestData.getInstance("My service tests", ClientConfig.LOCAL);
 ### Test example
 
 ```javascript
-import { VaultSubscriptionService, PricingPlan } from "@dchagastelles/elastos-hive-js-sdk";
+import { VaultSubscriptionService, PricingPlan } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
