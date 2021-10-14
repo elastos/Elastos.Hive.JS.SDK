@@ -52,7 +52,9 @@ export class HttpClient {
     }
 
     private handleResponse(response: http.IncomingMessage, content: string): void {
+
       if (response.statusCode >= 300) {
+
         if (this.withAuthorization && response.statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
@@ -61,6 +63,7 @@ export class HttpClient {
         }
         let jsonObj = JSON.parse(content);
         if (!jsonObj["error"]) {
+
           throw new NodeRPCException(response.statusCode, -1, content);
         }
         let httpError = jsonObj["error"];
@@ -106,8 +109,11 @@ export class HttpClient {
                     self.handleResponse(response, rawContent);
 
                     let deserialized = responseParser.deserialize(rawContent);
+
+
                     resolve(deserialized);
                   } catch(e) {
+
                     reject(
                       new HttpException(response.statusCode, e.message, e)
                     );

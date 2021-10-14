@@ -1,4 +1,4 @@
-import { VaultServices, DatabaseService } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, DatabaseService, AlreadyExistsException, InsertOptions } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -20,20 +20,32 @@ describe("test database services", () => {
             testData.getProviderAddress());
 
         
-        databaseService = testData.newVault().getDatabaseService();
+        databaseService = vaultServices.getDatabaseService();
     });
 
     test("testCreateCollection", async () => {
         await deleteCollectionAnyway();
-        await databaseService.createCollection(COLLECTION_NAME);
+        await expect(databaseService.createCollection(COLLECTION_NAME)).resolves.not.toThrow();
+        
     });
 
+    test("testCreateCollection4AlreadyExistsException", async () => {
+        let collectionName = `collection_${Date.now().toString()}`; 
+        await databaseService.createCollection(collectionName);
+        await expect(databaseService.createCollection(collectionName)).rejects.toThrow(AlreadyExistsException);
+    });   
+
+    test("testInsertOne", async () => {
+        let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
+        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false).getBypassDocumentValidation(false));
+        expect(result).not.toBeNull();
+        expect(result.inserted_ids.length).toEqual(1);
+
+    });
+
+
     async function deleteCollectionAnyway() {
-        try {
-            databaseService.deleteCollection(COLLECTION_NAME);
-        } catch (e) {
-            console.info("deleteCollectionAnyway() with exception: " + e);
-        }
+        await expect(databaseService.deleteCollection(COLLECTION_NAME)).resolves.not.toThrow();
     }
    
 });

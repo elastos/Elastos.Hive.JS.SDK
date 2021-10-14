@@ -1,4 +1,4 @@
-import { AlreadyExistsException, IOException, NetworkException, NodeRPCException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import { AlreadyExistsException, HttpException, InvalidParameterException, IOException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { HttpMethod } from "../../http/httpmethod";
 import { ServiceContext } from "../../http/servicecontext";
@@ -6,11 +6,15 @@ import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { CreateCollectionResult } from "./createcollectionresult";
 import { HttpResponseParser } from '../../http/httpresponseparser';
+import { InsertOptions } from "./insertoptions";
+import { InsertResult } from "./insertresult";
+import { InsertParams } from "./insertparams";
 
 
 export class DatabaseService extends RestService {
 	private static LOG = new Logger("DatabaseService");
 
+	private static API_COLLECTION_ENDPOINT = "/api/v2/vault/db/collection";
 	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
 	private static API_DELETE_COLLECTIONS_ENDPOINT = "/api/v2/vault/db";
 
@@ -33,13 +37,12 @@ export class DatabaseService extends RestService {
 					return JSON.parse(content) as CreateCollectionResult;
 				}}, HttpMethod.PUT);
 
-			if (collectionName !== result.getName())
+			if (collectionName !== result.name)
 				throw new ServerUnknownException("Different collection created, impossible to happen");
-		} catch (e){
-			if (e instanceof NodeRPCException) {
-
-				// TODO: waiting for the codes
-				switch (e.getCode()) {
+		}
+		catch (e){
+			if (e instanceof HttpException) {
+				switch (e.getHttpCode()) {
 					case NodeRPCException.UNAUTHORIZED:
 						throw new UnauthorizedException(e.message, e);
 					case NodeRPCException.FORBIDDEN:
@@ -55,6 +58,8 @@ export class DatabaseService extends RestService {
 			}	
 		}
 	}
+		
+	
 
 
 	/**
@@ -84,6 +89,65 @@ export class DatabaseService extends RestService {
 			}	
 		}
 	}
+
+	/**
+	* Insert a new document in a given collection.
+	*
+	* @param collection the collection name
+	* @param doc The document to insert. Must be a mutable mapping type. If
+	*			the document does not have an _id field one will be added automatically
+	* @param options bypass_document_validation: (optional) If True, allows
+	*				the write to opt-out of document level validation. Default is False.
+	* @return Results returned by {@link InsertResult} wrapper
+	*/
+	async insertOne( collection: string, doc: any, options: InsertOptions) : Promise<InsertResult>{
+		return await this.insertMany(collection, [doc], options);
+	}
+
+	/**
+	* Insert many new documents in a given collection.
+	*
+	* @param collection the collection name
+	* @param docs The document to insert. Must be a mutable mapping type. If the
+	*			 document does not have an _id field one will be added automatically.
+	* @param options ordered (optional): If True (the default) documents will be inserted on the server serially,
+	*				in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
+	*				will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
+	*				bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
+	* @return Results returned by {@link InsertResult} wrapper
+	*/
+	async insertMany(collection: string, docs: any[], options: InsertOptions) : Promise<InsertResult>{
+		try {
+			let result = await this.httpClient.send<InsertResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}`, new InsertParams(docs, options), <HttpResponseParser<InsertResult>> {
+				deserialize(content: any): InsertResult {
+					return JSON.parse(content) as InsertResult;
+				}}, HttpMethod.POST);
+			
+			return result;
+		} catch (e){
+			if (e instanceof NodeRPCException) {
+
+				// TODO: waiting for the codes
+				switch (e.getCode()) {
+					case NodeRPCException.UNAUTHORIZED:
+						throw new UnauthorizedException(e.message, e);
+					case NodeRPCException.FORBIDDEN:
+						throw new VaultForbiddenException(e.message, e);
+					case NodeRPCException.BAD_REQUEST:
+						throw new InvalidParameterException(e.message, e);
+					case NodeRPCException.NOT_FOUND:
+						throw new NotFoundException(e.message, e);
+					default:
+						throw new ServerUnknownException(e.message, e);
+				}
+			}
+			if (e instanceof IOException){
+				throw new NetworkException(e.message, e);
+			}	
+		}
+	}
+
+
 }
 
 

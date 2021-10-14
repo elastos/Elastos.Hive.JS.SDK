@@ -35,12 +35,8 @@ describe("test scripting function", () => {
     let fileName: string;
 
     
-    async function create_test_database() {
-        try {
-            await databaseService.createCollection(COLLECTION_NAME);
-        } catch (e) {
-            console.error("Failed to create collection: {}", e.getMessage());
-        }
+    async function create_test_database(collectionName: string = COLLECTION_NAME) {
+        await expect(databaseService.createCollection(collectionName)).resolves.not.toThrow();
     }
 
     	/**
@@ -54,12 +50,12 @@ describe("test scripting function", () => {
 		}
     }
     
-    async function registerScriptDelete( scriptName: string) {
+    async function registerScriptDelete( scriptName: string, collectionName: string = COLLECTION_NAME) {
         let filter = { "author": "$params.author" };
         let error;
         try {
             await scriptingService.registerScript(scriptName, 
-                new DeleteExecutable(scriptName, COLLECTION_NAME, filter));
+                new DeleteExecutable(scriptName, collectionName, filter));
         } catch (e) {
             error = e;
         }
@@ -287,9 +283,10 @@ describe("test scripting function", () => {
 
 
     test("testDelete", async () => {
-        await create_test_database();
-        await registerScriptDelete(DELETE_NAME);
-        console.log("script registered");
+
+        let collectionName = "collectionToDelete";
+        await create_test_database(collectionName);
+        await registerScriptDelete(DELETE_NAME, collectionName);
         await callScriptDelete(DELETE_NAME);
     });
 

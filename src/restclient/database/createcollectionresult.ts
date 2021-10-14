@@ -1,7 +1,5 @@
 export class CreateCollectionResult {
-	private name: string;
+	public name: string;
 
-	getName(): string {
-		return this.name;
-	}
+
 }
