@@ -40,7 +40,7 @@ import { SubscriptionService }  from "./restclient/subscription/subscriptionserv
 import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
-import { AlreadyExistsException, HiveException } from "./exceptions";
+import { AlreadyExistsException, HiveException, NotFoundException } from "./exceptions";
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
@@ -48,6 +48,7 @@ import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/i
 import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
 import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
 import { InsertOptions } from "./restclient/database/insertoptions";
+import { FindOptions } from "./restclient/database/findoptions";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -108,7 +109,9 @@ export {
     UpdateExecutable,
     UpdateExecutableBody,
     InsertOptions,
+    FindOptions,
     AlreadyExistsException,
+    NotFoundException,
     // Utilities
     SHA256,
     Utils,

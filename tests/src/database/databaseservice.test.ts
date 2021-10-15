@@ -1,4 +1,4 @@
-import { VaultServices, DatabaseService, AlreadyExistsException, InsertOptions } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -41,6 +41,39 @@ describe("test database services", () => {
         expect(result).not.toBeNull();
         expect(result.inserted_ids.length).toEqual(1);
 
+    });
+
+    test("testInsertOne4NotFoundException", async () => {
+        let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
+        await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode, new InsertOptions(false, false).getBypassDocumentValidation(false)))
+            .rejects.toThrow(NotFoundException);
+ 	});
+
+     test("testInsertMany", async () => {
+        
+        let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
+                     {"author": "john doe3", "title": "Eve for Dummies3"}];
+
+        let result = await databaseService.insertMany(COLLECTION_NAME, nodes, new InsertOptions(false, true)); 
+        expect(result).not.toBeNull();
+        expect(result.inserted_ids.length).toEqual(2);
+
+    });
+
+    test("testInsertManyNotFound", async () => {
+        
+        let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
+                     {"author": "john doe3", "title": "Eve for Dummies3"}];
+
+        await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes, new InsertOptions(false, false))).rejects.toThrow(NotFoundException); 
+    });
+
+    test("testFindOne", async () => {
+		//Assertions.assertDoesNotThrow(()->{
+		let query = {"author": "john doe1"};
+        let result = await databaseService.findOne(COLLECTION_NAME, query, (new FindOptions()).setSkip(0).setLimit(0));
+        expect(result).not.toBeNull();
+    
     });
 
 
