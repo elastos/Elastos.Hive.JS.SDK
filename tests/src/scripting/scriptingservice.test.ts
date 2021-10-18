@@ -1,4 +1,4 @@
-import { DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -6,6 +6,7 @@ import { TestData } from "../config/testdata";
 describe("test scripting function", () => {
 
     let testData: TestData;
+    let vaultSubscriptionService: VaultSubscriptionService;
     let vaultServices: VaultServices;
     let PRICING_PLAN_NAME: string = "Rookie";
 
@@ -65,6 +66,18 @@ describe("test scripting function", () => {
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+
+        vaultSubscriptionService = new VaultSubscriptionService(
+            testData.getAppContext(),
+            testData.getProviderAddress());
+        
+        try {
+            await vaultSubscriptionService.subscribe();    
+        } catch (e){
+            console.log("vault is already subscribed");
+        }
+
+
         vaultServices = new VaultServices(
             testData.getAppContext(),
             testData.getProviderAddress());
