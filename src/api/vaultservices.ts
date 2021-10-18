@@ -5,6 +5,7 @@ import { FilesService } from "../restclient/files/filesservice";
 import { DatabaseService } from "../restclient/database/databaseservice";
 import { ScriptingService } from "../restclient/scripting/scriptingservice";
 import { BackupService } from "../restclient/backup/backupservice";
+import { PromotionService } from "..";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
@@ -14,6 +15,7 @@ import { BackupService } from "../restclient/backup/backupservice";
 	private database: DatabaseService;
 	private scripting: ScriptingService;
 	private backupService: BackupService;
+	private promotionService: PromotionService;
 
 	public constructor(context: AppContext, providerAddress: string) {
 		super(context, providerAddress);
@@ -22,6 +24,7 @@ import { BackupService } from "../restclient/backup/backupservice";
 		this.database		= new DatabaseService(this, httpClient);
 		this.scripting	 	= new ScriptingService(this, httpClient);
 		this.backupService  = new BackupService(this, httpClient);
+		this.promotionService  = new PromotionService(this, httpClient);
 	}
 
 	public getFilesService(): FilesService {
@@ -38,5 +41,9 @@ import { BackupService } from "../restclient/backup/backupservice";
 
 	public getBackupService(): BackupService  {
 		return this.backupService;
+	}
+
+	public getPromotionService(): PromotionService  {
+		return this.promotionService;
 	}
 }

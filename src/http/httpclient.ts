@@ -127,7 +127,7 @@ export class HttpClient {
             }
 
             request.end();
-        })
+        });
     }
 
     /**

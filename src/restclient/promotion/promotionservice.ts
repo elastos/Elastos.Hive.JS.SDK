@@ -1,6 +1,6 @@
 import { UnknownInternalException } from "@elastosfoundation/did-js-sdk/typings/exceptions/exceptions";
 import { HttpMethod } from "../..";
-import { NodeRPCException, NotImplementedException, ServerUnknownException } from "../../exceptions";
+import { NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
@@ -24,6 +24,7 @@ export class PromotionService extends RestService {
 			if (e instanceof NodeRPCException) {
 				throw new ServerUnknownException(e.message, e);
 			}
+			throw new NetworkException(e.message, e);
 		}
 	}
 }

@@ -74,7 +74,6 @@ export class ScriptingService extends RestService {
 	// }
 		
 	async unregisterScript(name: string) : Promise<void>{
-
 		try {	
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} 

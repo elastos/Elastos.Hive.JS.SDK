@@ -1,7 +1,6 @@
 
 'use strict';
 
-import { BackupServices } from "./api/backupservices";
 import { VaultServices } from "./api/vaultservices";
 import { KeyProvider } from "./domain/crypto/keyprovider";
 import { Class } from "./domain/class";
@@ -64,7 +63,6 @@ export type {
 
 export {
     //initialize,
-    BackupServices,
     VaultServices,
     PricingPlan,
     VaultInfo,
