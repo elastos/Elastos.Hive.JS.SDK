@@ -23,10 +23,6 @@ export class ScriptingService extends RestService {
 		super(serviceContext, httpClient);
 	}
     
-	async registerScript(name: string, executable: Executable) : Promise<void>;
-    
-	async registerScript(name: string, executable: Executable, condition?: Condition) : Promise<void>;
-	
 	/**
 	* Let the vault owner register a script on his vault for a given application.
 	*
