@@ -142,7 +142,8 @@ export class HttpClient {
         requestOptions.path = serviceEndpoint;
 
         if (payload && method === HttpMethod.GET) {
-          requestOptions.path += ("?" + payload);
+          let delimiter = serviceEndpoint.includes("?") ? "&" :"?";
+          requestOptions.path += (delimiter + payload);
         }
 
         if (this.withAuthorization) {
