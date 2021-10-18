@@ -1,6 +1,6 @@
 {
   "name": "@elastos/elastos-hive-js-sdk-tests",
-  "version": "3.0.3",
+  "version": "2.3.0",
   "description": "Elastos Hive Typescript SDK Tests",
   "scripts": {
     "dev": "rollup -c -w",
