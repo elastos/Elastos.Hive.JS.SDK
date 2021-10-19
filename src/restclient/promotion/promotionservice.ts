@@ -1,5 +1,4 @@
-import { UnknownInternalException } from "@elastosfoundation/did-js-sdk/typings/exceptions/exceptions";
-import { HttpMethod } from "../..";
+import { HttpMethod } from "../../http/httpmethod";
 import { NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";

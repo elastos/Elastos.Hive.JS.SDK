@@ -1,5 +1,7 @@
-import { HttpMethod, HttpResponseParser, NotFoundException, StreamResponseParser } from "../..";
-import { InvalidParameterException, NetworkException, NodeRPCException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from "../../http/httpresponseparser";
+import { StreamResponseParser } from "../../http/streamresponseparser";
+import { NotFoundException, InvalidParameterException, NetworkException, NodeRPCException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
