@@ -2,7 +2,8 @@ import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { DeserializationError, HttpException, NodeRPCException, UnauthorizedException } from '../exceptions';
+import { HttpException, NodeRPCException, UnauthorizedException } from '../exceptions';
+import { StreamResponseParser } from './streamresponseparser';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
 
@@ -86,6 +87,13 @@ export class HttpClient {
           payload = "";
         }
 
+        let isStream = ('onData' in responseParser);
+        let streamParser: StreamResponseParser;
+        if (isStream) {
+          streamParser = isStream ? (responseParser as unknown) as StreamResponseParser : undefined;
+          streamParser.deserialize = HttpClient.NO_RESPONSE.deserialize;
+        }
+
         HttpClient.LOG.initializeCID();
         HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD && options.method != HttpMethod.GET ? " payload: " + payload : ""));
         if (options.headers['Authorization']) {
@@ -98,22 +106,28 @@ export class HttpClient {
               function(response: http.IncomingMessage) {
                 const chunks = [];
                 response.on('data', (chunk) => {
-                  chunks.push(chunk);
+                  if (isStream) {
+                    streamParser.onData(chunk);
+                  } else {
+                    chunks.push(chunk);
+                  }
                 });
 
                 response.on('end', () => {
                   try {
-                    const rawContent = Buffer.concat(chunks).toString();
-                    HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
-
-                    self.handleResponse(response, rawContent);
-
-                    let deserialized = responseParser.deserialize(rawContent);
-
-
-                    resolve(deserialized);
+                    if (isStream) {
+                      HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + " (\"STREAM\")");
+                      self.handleResponse(response, "{}");
+                      streamParser.onEnd();
+                      resolve(null as T);
+                    } else {
+                      const rawContent = Buffer.concat(chunks).toString();
+                      HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
+                      self.handleResponse(response, rawContent);
+                      let deserialized = responseParser.deserialize(rawContent);
+                      resolve(deserialized);
+                    }
                   } catch(e) {
-
                     reject(
                       new HttpException(response.statusCode, e.message, e)
                     );

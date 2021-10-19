@@ -1,4 +1,4 @@
-import { HttpMethod, HttpResponseParser, NotFoundException } from "../..";
+import { HttpMethod, HttpResponseParser, NotFoundException, StreamResponseParser } from "../..";
 import { InvalidParameterException, NetworkException, NodeRPCException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
@@ -15,22 +15,34 @@ export class FilesService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
-	private handleError(e: Error): unknown {
-		if (e instanceof NodeRPCException) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.message, e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.message, e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.message, e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.message, e);
-				default:
-					throw new ServerUnknownException(e.message, e);
-			}
+
+	/**
+	 * Start an async file download
+	 * 
+	 * @param path Path to the remote file to get
+	 * @param dataParser Instance of StreamResponseParser
+	 * 
+	 * 
+	 * Sample usage
+	 * 
+	 * public async testIt() {
+	 * 		await this.download("someFile", <StreamResponseParser> {
+	 * 			onData(chunk: any): void {
+	 * 				// Process chunk of data.
+	 * 			},
+	 * 			onEnd(): void {
+	 * 				// Process end.
+	 * 			}
+	 * 		});
+	 * }
+	 */
+
+	public async download(path: string, dataParser: StreamResponseParser): Promise<void> {
+		try {
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
+		} catch (e) {
+			this.handleError(e);
 		}
-		throw new NetworkException(e.message, e);
 	}
 
 	/**
@@ -99,7 +111,7 @@ export class FilesService extends RestService {
 	 */
 	public async hash(path: string): Promise<string> {
 		try {
-			let hash: string = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+			let hash: string = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
 				deserialize(content: any): string {
 					return JSON.parse(content)['hash'];
 				}
@@ -171,5 +183,23 @@ export class FilesService extends RestService {
 		} catch (e) {
 			this.handleError(e);
 		}
+	}
+
+	private handleError(e: Error): unknown {
+		if (e instanceof NodeRPCException) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e.message, e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e.message, e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.message, e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.message, e);
+				default:
+					throw new ServerUnknownException(e.message, e);
+			}
+		}
+		throw new NetworkException(e.message, e);
 	}
 }
