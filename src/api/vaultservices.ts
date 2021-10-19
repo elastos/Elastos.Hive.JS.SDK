@@ -5,7 +5,7 @@ import { FilesService } from "../restclient/files/filesservice";
 import { DatabaseService } from "../restclient/database/databaseservice";
 import { ScriptingService } from "../restclient/scripting/scriptingservice";
 import { BackupService } from "../restclient/backup/backupservice";
-import { PromotionService } from "..";
+import { PromotionService } from "../restclient/promotion/promotionservice";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".

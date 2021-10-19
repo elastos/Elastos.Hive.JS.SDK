@@ -165,7 +165,9 @@ export class DatabaseService extends RestService {
 	 */
 	async findOne(collection: string, filter: JSONObject, options: FindOptions): Promise<JSONObject>{
 		let docs = await this.find(collection, filter, options);
-		return docs !== null && !(docs.length === 0) ? docs[0] : null;
+
+		DatabaseService.LOG.debug(JSON.stringify(docs));
+		return docs !== undefined && !(docs.length === 0) ? docs[0] : null;
 	}
 
 	/**
@@ -179,10 +181,11 @@ export class DatabaseService extends RestService {
 
 	async find(collectionName: string, filter: JSONObject, options: FindOptions) : Promise<JSONObject[]> {
 		try {
-			let filterStr = filter === null ? "" : filter.toString();
+			let filterStr = filter === null ? "" : encodeURIComponent(JSON.stringify(filter));
+			DatabaseService.LOG.debug("FILTER_STR: " + filterStr);
 			let skip = options !== null ? options.getSkip().toString() : "";
 			let limit = options !== null ? options.getLimit().toString() : "";
-			let ret = await this.httpClient.send<FindResult>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}?skip=${skip}&limit=${limit}&filter=${filter}`, 
+			let ret = await this.httpClient.send<FindResult>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}?skip=${skip}&limit=${limit}&filter=${filterStr}`, 
 				HttpClient.NO_PAYLOAD, <HttpResponseParser<FindResult>> {
 					deserialize(content: any): FindResult {
 						return JSON.parse(content) as FindResult;

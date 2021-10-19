@@ -1,9 +1,10 @@
-import { HttpMethod, HttpResponseParser } from "../..";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from '../../http/httpresponseparser';
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -48,7 +49,7 @@ export class FilesService extends RestService {
 	  *		 if success; null otherwise
 	  */
 	 public async stat(path: string): Promise<FileInfo> {
-
+		return await Promise.resolve(new FileInfo());
 	 }
  
 	 /**
@@ -59,6 +60,7 @@ export class FilesService extends RestService {
 	  *		 if the hash successfully calculated; null otherwise
 	  */
 	 public async hash(path: string): Promise<string> {
+		return await Promise.resolve("");
 
 	 }
  
@@ -72,8 +74,7 @@ export class FilesService extends RestService {
 	  *  	   been moved to target path in success. Otherwise, it will return
 	  *  	   result with false.
 	  */
-	 public async move(source: string, target: string): Promise­<void> {
-
+	 public async move(source: string, target: string) {
 	 }
  
 	 /**
@@ -84,7 +85,7 @@ export class FilesService extends RestService {
 	  * @return the new CompletionStage, the result is true if the file or folder
 	  *		 successfully copied; false otherwise
 	  */
-	 public async copy(source: string, target: string): Promise<void> {
+	 public async copy(source: string, target: string) {
 
 	 }
  

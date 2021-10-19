@@ -23,6 +23,10 @@ export class TestData {
 		this.clientConfig = clientConfig;
     }
 
+	public static getUniqueName(prefix: string){
+		return `${prefix}_${Date.now().toString()}`;
+	}
+
     public static async getInstance(testName: string, clientConfig: any, userDir?: string): Promise<TestData> {
 		Utils.checkNotNull(clientConfig, "Test configuration cannot be empty");
 		Utils.checkNotNull(clientConfig.node, "A valid test configuration is mandatory");

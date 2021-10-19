@@ -81,12 +81,18 @@ describe("test database services", () => {
         await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes, new InsertOptions(false, false))).rejects.toThrow(NotFoundException); 
     });
 
-    test.skip("testFindOne", async () => {
-		//Assertions.assertDoesNotThrow(()->{
-		let query = {"author": "john doe1"};
-        let result = await databaseService.findOne(COLLECTION_NAME, query, (new FindOptions()).setSkip(0).setLimit(0));
+    test("testFindOne", async () => {
+        //setup
+        let collectionName = TestData.getUniqueName("testFindOne");
+        await databaseService.createCollection(collectionName);
+
+        let nodes = {"author": "john doe1", "title": "Eve for Dummies1"};
+        await expect(databaseService.insertOne(collectionName, nodes, new InsertOptions(false, false))).resolves.not.toThrow(); 
+
+
+        let query = {"author": "john doe1"};
+        let result = await databaseService.findOne(collectionName, query, (new FindOptions()).setSkip(0).setLimit(0));
         expect(result).not.toBeNull();
-    
     });
 
 
