@@ -16,7 +16,7 @@ const config: InitialOptionsTsJest = {
     "default",
     [
       "jest-html-reporter", {
-        pageTitle: "DID JS SDK NodeJS test report",
+        pageTitle: "Hive JS SDK NodeJS test report",
         includeFailureMsg: true,
         includeSuiteFailure: true
       }

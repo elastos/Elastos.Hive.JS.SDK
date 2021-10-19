@@ -1,7 +1,6 @@
 
 'use strict';
 
-import { BackupServices } from "./api/backupservices";
 import { VaultServices } from "./api/vaultservices";
 import { KeyProvider } from "./domain/crypto/keyprovider";
 import { Class } from "./domain/class";
@@ -15,6 +14,7 @@ import * as exceptions from "./exceptions";
 import { HttpClient }  from "./http/httpclient";
 import { HttpMethod }  from "./http/httpmethod";
 import { HttpResponseParser }  from "./http/httpresponseparser";
+import { StreamResponseParser }  from "./http/streamresponseparser";
 import { ServiceContext }  from "./http/servicecontext";
 import { AccessToken }  from "./http/security/accesstoken";
 import { AppContext }  from "./http/security/appcontext";
@@ -40,12 +40,15 @@ import { SubscriptionService }  from "./restclient/subscription/subscriptionserv
 import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
-import { HiveException } from "./exceptions";
+import { AlreadyExistsException, HiveException, NotFoundException } from "./exceptions";
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/insertexecutable";
 import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
+import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
+import { InsertOptions } from "./restclient/database/insertoptions";
+import { FindOptions } from "./restclient/database/findoptions";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -55,13 +58,13 @@ export type {
     
     DataStorage,
     HttpResponseParser,
+    StreamResponseParser,
     AppContextProvider,
     BridgeHandler,
 }
 
 export {
     //initialize,
-    BackupServices,
     VaultServices,
     PricingPlan,
     VaultInfo,
@@ -103,7 +106,12 @@ export {
     FindExecutable,
     FindExecutableBody,
     FileHashExecutable,
-    
+    UpdateExecutable,
+    UpdateExecutableBody,
+    InsertOptions,
+    FindOptions,
+    AlreadyExistsException,
+    NotFoundException,
     // Utilities
     SHA256,
     Utils,

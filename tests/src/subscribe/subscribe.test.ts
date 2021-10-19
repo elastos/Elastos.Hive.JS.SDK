@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService } from "@dchagastelles/elastos-hive-js-sdk";
+import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
