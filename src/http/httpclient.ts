@@ -191,14 +191,15 @@ export class HttpClient {
         httpOptions.timeout = httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT;
         httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
 
-        // If the providerAddress already contains the protocol, we extract it.
-        if (this.serviceContext.getProviderAddress().includes("//")) {
-          let urlPart = this.serviceContext.getProviderAddress().split("//");
-          httpOptions.protocol = urlPart[0];
-          httpOptions.host = urlPart[1];  
-        } else {
-          httpOptions.host = this.serviceContext.getProviderAddress();
-        }
+        // If the providerAddress already contains the protocol and/or the port, we override provided configuration.
+        let protocol = this.serviceContext.getProviderAddress().includes("//") ? this.serviceContext.getProviderAddress().split("//")[0] : undefined;
+        let port = this.serviceContext.getProviderAddress().includes(":") ? (this.serviceContext.getProviderAddress().split(":")[1]).replace(/\D/g,'') : undefined;
+        let host = this.serviceContext.getProviderAddress();
+        host = protocol ? host.split("//")[1] : host;
+        host = port ? host.split(":")[0] : host;
+        httpOptions.host = protocol ? protocol : httpOptions.host;
+        httpOptions.port = port ? port : httpOptions.port;
+        httpOptions.host = host;
 
         return httpOptions;
     }
