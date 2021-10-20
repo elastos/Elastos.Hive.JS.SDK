@@ -19,7 +19,7 @@
     },
   
     "node": {
-      "provider": "http://localhost:9100",
+      "provider": "http://localhost:9001",
       "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
       "targetHost": "http://127.0.0.1:5001",
       "storePath": "develop"
