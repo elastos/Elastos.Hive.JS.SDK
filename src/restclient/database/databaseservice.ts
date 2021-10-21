@@ -1,5 +1,6 @@
 import {  
 	AlreadyExistsException, 
+	HttpException, 
 	InvalidParameterException,
 	NetworkException,
 	NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
@@ -219,8 +220,9 @@ export class DatabaseService extends RestService {
 	}
 
 	private handleError(e: Error): void {
-		if (e instanceof NodeRPCException) {
-			switch (e.getCode()) {
+
+		if (e instanceof HttpException) {
+			switch (e.getHttpCode()) {
 				case NodeRPCException.UNAUTHORIZED:
 					throw new UnauthorizedException(e.message, e);
 				case NodeRPCException.FORBIDDEN:
