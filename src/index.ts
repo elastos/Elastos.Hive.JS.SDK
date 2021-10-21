@@ -48,6 +48,11 @@ import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
 import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
 import { InsertOptions } from "./restclient/database/insertoptions";
 import { FindOptions } from "./restclient/database/findoptions";
+import { UpdateOptions } from "./restclient/database/updateoptions";
+import { QueryOptions } from "./restclient/database/queryoptions";
+import { CountOptions } from "./restclient/database/countoptions";
+import { SortItem } from "./restclient/database/sortitem";
+
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -108,6 +113,10 @@ export {
     UpdateExecutableBody,
     InsertOptions,
     FindOptions,
+    UpdateOptions,
+    QueryOptions,
+    CountOptions,
+    SortItem,
     AlreadyExistsException,
     NotFoundException,
     // Utilities

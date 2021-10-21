@@ -33,7 +33,7 @@ export class ScriptingService extends RestService {
 	* @param allowAnonymousApp whether allows anonymous application.
 	* @return Void
 	*/
-	async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
+	public async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
@@ -73,7 +73,7 @@ export class ScriptingService extends RestService {
 	// 	this.registerScript(name, executable, undefined, allowAnonymousUser, allowAnonymousApp);
 	// }
 		
-	async unregisterScript(name: string) : Promise<void>{
+	public async unregisterScript(name: string) : Promise<void>{
 		try {	
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} 
@@ -98,7 +98,7 @@ export class ScriptingService extends RestService {
 	
 	}
 
-	async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string, resultType:  Class<T>) : Promise<T> {
+	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string, resultType:  Class<T>) : Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
@@ -140,7 +140,7 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string, resultType: Class<T>) {
+	public async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string, resultType: Class<T>) {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
@@ -177,7 +177,7 @@ export class ScriptingService extends RestService {
 	}
 		
 	
-	async uploadFile<T>(transactionId: string, resultType: Class<T>) {
+	public async uploadFile<T>(transactionId: string, resultType: Class<T>) {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(resultType, "Missing result type");
 
@@ -201,7 +201,7 @@ export class ScriptingService extends RestService {
 		
 	}
 
-	async downloadFile<T>(transactionId: string, resultType: Class<T>) {
+	public async downloadFile<T>(transactionId: string, resultType: Class<T>) {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(resultType, "Missing result type");
 
@@ -227,6 +227,3 @@ export class ScriptingService extends RestService {
 		}
 	}
 }
-
-
-
