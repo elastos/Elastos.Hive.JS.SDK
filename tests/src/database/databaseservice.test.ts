@@ -50,7 +50,7 @@ describe("test database services", () => {
 
     test("testInsertOne", async () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
-        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false).getBypassDocumentValidation(false));
+        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false));
         expect(result).not.toBeNull();
         expect(result.inserted_ids.length).toEqual(1);
 
@@ -58,7 +58,7 @@ describe("test database services", () => {
 
     test("testInsertOne4NotFoundException", async () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
-        await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode, new InsertOptions(false, false).getBypassDocumentValidation(false)))
+        await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode, new InsertOptions(false, false)))
             .rejects.toThrow(NotFoundException);
  	});
 
@@ -98,7 +98,7 @@ describe("test database services", () => {
     test("testFindOne4NotFoundException", async () => {
 
 		let query = {"author": "john doe1"};
-        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query, new FindOptions(false, false))).rejects.toThrow(NotFoundException); 
+        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query, new FindOptions())).rejects.toThrow(NotFoundException); 
 	});
 
 

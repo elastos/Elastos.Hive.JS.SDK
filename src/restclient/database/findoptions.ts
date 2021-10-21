@@ -2,11 +2,6 @@ export class FindOptions {
     skip: number;
     limit: number;
 
-    // constructor(skip: number, limit: number){
-    //     this.skip = skip;
-    //     this.limit = limit;
-    // }
-
     constructor(){
         this.limit = 0;
         this.skip = 0;
