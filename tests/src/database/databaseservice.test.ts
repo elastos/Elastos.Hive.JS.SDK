@@ -95,6 +95,12 @@ describe("test database services", () => {
         expect(result).not.toBeNull();
     });
 
+    test("testFindOne4NotFoundException", async () => {
+
+		let query = {"author": "john doe1"};
+        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query, new FindOptions(false, false))).rejects.toThrow(NotFoundException); 
+	});
+
 
     async function deleteCollectionAnyway() {
         await expect(databaseService.deleteCollection(COLLECTION_NAME)).resolves.not.toThrow();
