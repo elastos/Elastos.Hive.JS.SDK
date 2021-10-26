@@ -3,7 +3,7 @@ import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExec
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe.skip("test scripting function", () => {
+describe("test scripting function", () => {
 
     let testData: TestData;
     let vaultSubscriptionService: VaultSubscriptionService;

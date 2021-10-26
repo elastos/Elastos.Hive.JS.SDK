@@ -2,103 +2,102 @@ import { Claims, DID, DIDBackend, DIDDocument, DIDStore, DIDURL, Issuer, JWTHead
 import { HiveException } from "../../exceptions";
 import { AppContextProvider } from "./appcontextprovider";
 import dayjs from "dayjs";
+import { Logger } from "../../logger";
+import { ShorthandPropertyAssignment } from "typescript";
 
+
+export class AppContextParameters {
+	storePath: string;
+	appDID: string | DID;
+	appMnemonics: string;
+	appPhrasePass: string;
+	appStorePass: string;
+	
+	userDID: string | DID;
+	userMnemonics:string;
+	userPhrasePass: string;
+	userStorePass: string;
+}
 
 
 export class DefaultAppContextProvider implements AppContextProvider {
 
-    private storePath: string;
-    private appDid: string | DID;
-    private userDid: string | DID;
-    private appStorePass: string;
-    private userStorePass: string;
-    private appMnemonics: string;
-    private userMnemonics: string;
+	private static LOG = new Logger("DefaultAppContextProvider");
 
-    private appPhrasePass: string;
 
-    private appRootId: RootIdentity;
+    private contextParameters: AppContextParameters;
 
+	private appRootId: RootIdentity;
+	private userRootId: RootIdentity;
     private store: DIDStore;
     
-    constructor(storePath: string, appStorePass: string, appDid: string | DID,  appMnemonics: string, appPhrasePass: string, userDID: string | DID, userMnemonics:string, userStorePass: string) {
-        this.storePath = storePath;
-        this.appStorePass = appStorePass;    
-        this.userStorePass = userStorePass;
-        this.appDid = appDid;
-        this.userDid = userDID;
-        this.appMnemonics = appMnemonics;
-        this.userMnemonics = userMnemonics;
-        this.appPhrasePass = appPhrasePass;
+    constructor(contextParameters: AppContextParameters) {
+		this.contextParameters = contextParameters;
     }
     
-    public static async create(storePath: string, appStorePass: string, appDid: string | DID, appMnemonics: string, appPhrasePass: string, userDID: string | DID, userMnemonics:string, userStorePass: string) : Promise<DefaultAppContextProvider> {
-        let defaultAppContext = new DefaultAppContextProvider(storePath, appStorePass, appDid, appMnemonics, appPhrasePass, userDID, userMnemonics, userStorePass);
+    public static async create(contextParameters: AppContextParameters) : Promise<DefaultAppContextProvider> {
+        let defaultAppContext = new DefaultAppContextProvider(contextParameters);
         await defaultAppContext.init();
         return defaultAppContext;
     }
 
     async init() : Promise<void>{
-        await this.initPrivateIdentity(this.appMnemonics, this.appStorePass);
-        await this.initPrivateIdentity(this.userMnemonics, this.userStorePass);
+		this.appRootId = await this.initPrivateIdentity(this.contextParameters.appMnemonics, this.contextParameters.appDID, this.contextParameters.appStorePass);
+		DefaultAppContextProvider.LOG.debug("Init app private identity");
 
-        await this.initDid();
+
+        this.userRootId = await this.initPrivateIdentity(this.contextParameters.userMnemonics, this.contextParameters.userDID, this.contextParameters.userStorePass);
+		DefaultAppContextProvider.LOG.debug("Init user private identity");
+
+		await this.initDid(this.appRootId);
+		await this.initDid(this.userRootId);
     }
 
-    public async initPrivateIdentity(mnemonic: string, storePass: string): Promise<void> {
-		//let storePath = "data/didCache" + File.SEPARATOR + this.name;
+    public async initPrivateIdentity(mnemonic: string, did: string|DID, storePass: string): Promise<RootIdentity> {
+		this.store = await DIDStore.open(this.contextParameters.storePath);
 
-		this.store = await DIDStore.open(this.storePath);
+		DefaultAppContextProvider.LOG.debug("Opens store");
+		let id = RootIdentity.getIdFromMnemonic(mnemonic, this.contextParameters.appPhrasePass);
 
-		let id = RootIdentity.getIdFromMnemonic(mnemonic, this.appPhrasePass);
+		DefaultAppContextProvider.LOG.debug("ID from mnemonic {} : {}", mnemonic, id);
+
 		if (this.store.containsRootIdentity(id)){
-			this.appRootId = await this.store.loadRootIdentity(id);
-			return; // Already exists
+			DefaultAppContextProvider.LOG.debug("Store constains RootIdentity");
+			return await this.store.loadRootIdentity(id);
 		}
 
-
-		//DIDEntity.LOG.info("Creating root identity for mnemonic {}", mnemonic);
-
+		let rootIdentity : RootIdentity = undefined;
 		try {
-			this.appRootId = RootIdentity.createFromMnemonic(mnemonic, this.appPhrasePass, this.store, storePass);
+			DefaultAppContextProvider.LOG.info("Creating root identity for mnemonic {}", mnemonic);
+			rootIdentity = RootIdentity.createFromMnemonic(mnemonic, this.contextParameters.appPhrasePass, this.store, storePass);
 		} catch (e){
-			//DIDEntity.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, e);
+			DefaultAppContextProvider.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, JSON.stringify(e));
 			throw new Error("Error Creating root identity for mnemonic");
 		}
 		
+		await rootIdentity.synchronize();
+		rootIdentity.setDefaultDid(this.contextParameters.appDID);
 
-		
-		await this.appRootId.synchronize();
-
-		if (this.appDid !== undefined){
-			this.appRootId.setDefaultDid(this.appDid);
-			let defaultDid = this.appRootId.getDefaultDid();
-			//DIDEntity.LOG.info("************************************* default DID: {}", defaultDid.toString());
-		}
-
-
-		return;
+		return rootIdentity;
 	}
 
-	public async initDid(): Promise<void> {
+	public async initDid(rootIdentity: RootIdentity): Promise<void> {
 		let dids = await this.store.listDids();
 		if (dids.length > 0) {
-			this.appDid = dids[0];
+			this.contextParameters.appDID = dids[0];
 			return;
 		}
-		
-		this.appDid = await this.appRootId.getDefaultDid();
-		//DIDEntity.LOG.info("************************************* default DID: {}", this.did.toString());
-		let resolvedDoc = await this.appDid.resolve();
-		//DIDEntity.LOG.info("************************************* My new DIDDOC resolved: {}", resolvedDoc.toString(true));
+		DefaultAppContextProvider.LOG.debug("Init app did");
 
-
-		//DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
+		let did = await rootIdentity.getDefaultDid();
+		let resolvedDoc = await did.resolve();
+		await this.store.storeDid(resolvedDoc);
+		DefaultAppContextProvider.LOG.debug("Resolve app doc");
 	}
 
 
     getLocalDataDir(): string {
-        return this.storePath;
+        return this.contextParameters.storePath;
     }
 
 	/**
@@ -107,7 +106,7 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 * @return The application instance did document.
 	 */
 	async getAppInstanceDocument(): Promise<DIDDocument> {
-        return await this.store.loadDid(this.appDid);
+        return await this.store.loadDid(this.contextParameters.appDID);
     }
 
 	/**
@@ -122,26 +121,45 @@ export class DefaultAppContextProvider implements AppContextProvider {
             if (claims == null)
                 throw new HiveException("Invalid jwt token as authorization.");
 
-            let presentation = await this.createPresentation(
-                await this.issueDiplomaFor(DID.from(this.appDid)),
+
+			DefaultAppContextProvider.LOG.debug("getAuthorization createPresentation");	
+			
+			let diploma = await this.issueDiplomaFor(DID.from(this.contextParameters.appDID));
+			DefaultAppContextProvider.LOG.debug("diploma created");	
+
+			let presentation = await this.createPresentation(
+                diploma,
                 claims.getIssuer(), claims.get("nonce") as string);
                 
             //TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
             return await this.createToken(presentation,  claims.getIssuer());
         } catch (e) {
-            //TestData.LOG.info("TestData->getAuthorization error: " + e); 	
-            //TestData.LOG.error(e.stack);
+			DefaultAppContextProvider.LOG.error("TestData->getAuthorization error: {} stack {}", e, e.stack);	
         }
     }
 
     private async getIssuer(){
+		DefaultAppContextProvider.LOG.debug("getIssuer");	
 
-        let userDocument = await DID.from(this.userDid).resolve();
-        return new Issuer(userDocument);
+		let userDocument = await this.store.loadDid(this.contextParameters.userDID);
+		
+		DefaultAppContextProvider.LOG.debug("userDocument: {}", userDocument.toString(true));	
+
+		try {
+
+			let issuer = new Issuer(userDocument);
+			return issuer;
+		} catch (e){
+			DefaultAppContextProvider.LOG.debug("error new Issuer {}", e);	
+
+			return null;
+		}
+
     }
 
     public async issueDiplomaFor(appInstanceDid: DID): Promise<VerifiableCredential> {
-		
+			DefaultAppContextProvider.LOG.debug("issueDiplomaFor");	
+
             let subject = {};
     
             subject["appDid"] = appInstanceDid.toString();
@@ -159,14 +177,13 @@ export class DefaultAppContextProvider implements AppContextProvider {
                     .expirationDate(cal.toDate())
                     .seal(this.getUserStorePassword());
     
-            //UserDID.LOG.debug("VerifiableCredential: {}", vc.toString());
-            //UserDID.LOG.trace("VerifiableCredential IsValid: {}", vc.isValid());
+			DefaultAppContextProvider.LOG.debug("VerifiableCredential IsValid: {}", vc.isValid());	
             return vc;
         }
     
 
     public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
-
+		DefaultAppContextProvider.LOG.debug("create Presentation");
 		
 		let vpb = await VerifiablePresentation.createFor(this.getAppDid(), null, this.getDIDStore());
 		let vp = await vpb.credentials(vc)
@@ -174,25 +191,20 @@ export class DefaultAppContextProvider implements AppContextProvider {
 				.nonce(nonce)
 				.seal(this.getAppStorePassword());
 				
-		//AppDID.LOG.info("VerifiablePresentation:{}", vp.toString());
-
-		//let listener = VerificationEventListener.getDefaultWithIdent("isValid");
-		//AppDID.LOG.trace("VerifiablePresentation is Valid :{}", await vp.isValid(listener));
-		//AppDID.LOG.trace("Listener :{}", listener.toString());
-
+		DefaultAppContextProvider.LOG.debug("VerifiablePresentation:{}", vp.toString());
 		return vp;
 	}
 
 	private getAppStorePassword(): string {
-		return this.appStorePass;
+		return this.contextParameters.appStorePass;
 	}
 
     private getUserStorePassword(): string {
-		return this.userStorePass;
+		return this.contextParameters.userStorePass;
 	}
 
     private async getAppDocument() : Promise<DIDDocument> {
-        return await this.store.loadDid(this.appDid)
+        return await this.store.loadDid(this.contextParameters.appDID)
     }
 
 	private async createToken(vp: VerifiablePresentation, hiveDid: string): Promise<string> {
@@ -212,9 +224,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 				.setExpiration(exp)
 				.setNotBefore(nbf)
 				.claimsWithJson("presentation", vp.toString(true))
-				.sign(this.appStorePass);
+				.sign(this.contextParameters.appStorePass);
 
-		//AppDID.LOG.info("JWT Token: {}", token);
 		return token;
     }
 
@@ -223,6 +234,6 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	}
 
 	public getAppDid(): DID {
-		return DID.from(this.appDid);
+		return DID.from(this.contextParameters.appDID);
 	}
 }

@@ -1,20 +1,48 @@
-import { VaultServices, DefaultAppContextProvider, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { DefaultDIDAdapter, DIDBackend } from "@elastosfoundation/did-js-sdk";
+import { VaultServices, AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { ClientConfig } from "../config/clientconfig";
+import { TestData } from "../config/testdata";
 
 
-describe("test database services", () => {
+
+describe("test default appcontext provider", () => {
    
-    //let testData: TestData;
     let vaultSubscriptionService: VaultSubscriptionService;
-    // let vaultServices: VaultServices;
-    // let databaseService: DatabaseService;
+    
+    beforeAll(async() => {
+        DIDBackend.initialize(new DefaultDIDAdapter("mainnet"));
+        AppContext.setupResolver("mainnet", "data/didcache");
 
-    // 	private static final Logger log = LoggerFactory.getLogger(DatabaseServiceTest.class);
-    let COLLECTION_NAME = "works";
-    let COLLECTION_NAME_NOT_EXIST = "works_not_exists";
+        let clientConfig = ClientConfig.CUSTOM;
+
+        let appContextParameters = {
+            storePath: `${process.env["HIVE_USER_DIR"]}/data/store/app`,
+            appDID: clientConfig.application.did, 
+            appMnemonics: clientConfig.application.mnemonics2, 
+            appPhrasePass: clientConfig.application.passPhrase,
+            appStorePass: clientConfig.application.storepass,
+            userDID: clientConfig.user.did, 
+            userMnemonics: clientConfig.user.mnemonic,
+            userPhrasePass: clientConfig.user.passPhrase,
+            userStorePass: clientConfig.user.storepass
+        } as AppContextParameters;
+
+        try{
+            let appProvider = await DefaultAppContextProvider.create(appContextParameters);
+            let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string);
+            vaultSubscriptionService = new VaultSubscriptionService(appContext, clientConfig.node.provider);
+        } catch(e){
+            console.debug(e);
+            fail("failed");
+        }
+    });
 
     test("test", async () => {
-
-        //DefaultAppContextProvider.
+        try {
+            await vaultSubscriptionService.subscribe();
+        } catch(e) {
+            console.debug("error on subscribe:" +e);
+        }
     });
 
 });

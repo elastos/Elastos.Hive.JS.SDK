@@ -52,7 +52,7 @@ import { UpdateOptions } from "./restclient/database/updateoptions";
 import { QueryOptions } from "./restclient/database/queryoptions";
 import { CountOptions } from "./restclient/database/countoptions";
 import { SortItem } from "./restclient/database/sortitem";
-import { DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
+import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
 
 
 Logger.setDefaultLevel(Logger.DEBUG);
@@ -70,6 +70,7 @@ export type {
 export {
     //initialize,
     DefaultAppContextProvider,
+    AppContextParameters,
     VaultServices,
     PricingPlan,
     VaultInfo,
