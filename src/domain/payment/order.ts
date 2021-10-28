@@ -2,25 +2,20 @@
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 export class Order {
-//	@SerializedName("order_id")
-	private orderId: string;
+	private order_id: string;
 	private subscription: string;
-//	@SerializedName("pricing_name")
-	private pricingName: string;
-//	@SerializedName("ela_amount")
-	private elaAmount: number;
-//	@SerializedName("ela_address")
-	private elaAddress: string;
+	private pricing_name: string;
+	private ela_amount: number;
+	private ela_address: string;
 	private proof: string;
-//	@SerializedName("create_time")
-	private createTime: Date;
+	private create_time: Date;
 
 	public getOrderId(): string {
-		return this.orderId;
+		return this.order_id;
 	}
 
 	public setOrderId(orderId: string): Order {
-		this.orderId = orderId;
+		this.order_id = orderId;
         return this;
 	}
 
@@ -34,29 +29,29 @@ export class Order {
 	}
 
 	public getPricingName(): string {
-		return this.pricingName;
+		return this.pricing_name;
 	}
 
 	public setPricingName(pricingName: string): Order {
-		this.pricingName = pricingName;
+		this.pricing_name = pricingName;
         return this;
 	}
 
 	public getElaAmount(): number {
-		return this.elaAmount;
+		return this.ela_amount;
 	}
 
 	public setElaAmount(elaAmount: number): Order {
-		this.elaAmount = elaAmount;
+		this.ela_amount = elaAmount;
         return this;
 	}
 
 	public getElaAddress(): string {
-		return this.elaAddress;
+		return this.ela_address;
 	}
 
 	public setElaAddress(elaAddress: string): Order {
-		this.elaAddress = elaAddress;
+		this.ela_address = elaAddress;
         return this;
 	}
 
@@ -70,11 +65,11 @@ export class Order {
 	}
 
 	public getCreateTime(): Date {
-		return this.createTime;
+		return this.create_time;
 	}
 
 	public setCreateTime(createTime: Date): Order {
-		this.createTime = createTime;
+		this.create_time = createTime;
         return this;
 	}
 }
