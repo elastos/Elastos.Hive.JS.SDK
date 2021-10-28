@@ -31,10 +31,11 @@ import { PromotionService }  from "./restclient/promotion/promotionservice";
 import { RestService }  from "./restclient/restservice";
 import { ScriptingService }  from "./restclient/scripting/scriptingservice";
 import { Condition }  from "./restclient/scripting/condition";
+import { OrCondition }  from "./restclient/scripting/orcondition";
+import { AndCondition }  from "./restclient/scripting/andcondition";
+import { AggregatedCondition }  from "./restclient/scripting/aggregatedcondition";
 import { Executable, ExecutableDatabaseBody, ExecutableFileBody }  from "./restclient/scripting/executable";
 import { Context }  from "./restclient/scripting/context";
-import { RegScriptParams }  from "./restclient/scripting/regscriptparams";
-import { RunScriptParams }  from "./restclient/scripting/runscriptparams";
 import { SubscriptionService }  from "./restclient/subscription/subscriptionservice";
 import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
 import { PricingPlan } from "./domain/subscription/pricingplan";
@@ -45,6 +46,10 @@ import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/d
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./restclient/scripting/insertexecutable";
 import { FileHashExecutable } from "./restclient/scripting/filehashexecutable";
+import { AggregatedExecutable } from "./restclient/scripting/aggregatedexecutable";
+import { FileUploadExecutable } from "./restclient/scripting/fileuploadexecutable";
+import { FileDownloadExecutable } from "./restclient/scripting/filedownloadexecutable";
+import { FilePropertiesExecutable } from "./restclient/scripting/filepropertiesexecutable";
 import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
 import { InsertOptions } from "./restclient/database/insertoptions";
 import { FindOptions } from "./restclient/database/findoptions";
@@ -52,6 +57,8 @@ import { UpdateOptions } from "./restclient/database/updateoptions";
 import { QueryOptions } from "./restclient/database/queryoptions";
 import { CountOptions } from "./restclient/database/countoptions";
 import { SortItem } from "./restclient/database/sortitem";
+import { Order } from "./domain/payment/order";
+import { Receipt } from "./domain/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
 
 
@@ -93,12 +100,13 @@ export {
     RestService,
     ScriptingService,
     Condition,
+    AggregatedCondition,
+    OrCondition,
+    AndCondition,
     Executable,
     ExecutableFileBody,
     ExecutableDatabaseBody,
     Context,
-    RegScriptParams,
-    RunScriptParams,
     SubscriptionService,
     VaultSubscriptionService,
     HiveException,
@@ -114,12 +122,18 @@ export {
     FileHashExecutable,
     UpdateExecutable,
     UpdateExecutableBody,
+    AggregatedExecutable,
+    FileUploadExecutable,
+    FileDownloadExecutable,
+    FilePropertiesExecutable,
     InsertOptions,
     FindOptions,
     UpdateOptions,
     QueryOptions,
     CountOptions,
     SortItem,
+    Order,
+    Receipt,
     AlreadyExistsException,
     NotFoundException,
     // Utilities
