@@ -57,6 +57,8 @@ import { UpdateOptions } from "./restclient/database/updateoptions";
 import { QueryOptions } from "./restclient/database/queryoptions";
 import { CountOptions } from "./restclient/database/countoptions";
 import { SortItem } from "./restclient/database/sortitem";
+import { Order } from "./domain/payment/order";
+import { Receipt } from "./domain/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
 
 
@@ -130,6 +132,8 @@ export {
     QueryOptions,
     CountOptions,
     SortItem,
+    Order,
+    Receipt,
     AlreadyExistsException,
     NotFoundException,
     // Utilities
