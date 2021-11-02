@@ -16,7 +16,7 @@ import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
 
-import { writeFileSync } from "fs";
+//import { writeFileSync } from "fs";
 
 
 const production = !process.env.ROLLUP_WATCH;
@@ -30,13 +30,13 @@ export function emitModulePackageFile() {
 	};
 }
 
-const commitHash = (function () {
-    try {
-        return fs.readFileSync('.commithash', 'utf-8');
-    } catch (err) {
-        return 'unknown';
-    }
-})();
+// const commitHash = (function () {
+//     try {
+//         return fs.readFileSync('.commithash', 'utf-8');
+//     } catch (err) {
+//         return 'unknown';
+//     }
+// })();
 
 const prodBuild = process.env.prodbuild || false;
 console.log("Prod build: ", prodBuild);
@@ -45,13 +45,13 @@ const now = new Date(
     process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
 ).toUTCString();
 
-const banner = `/*
-  @license
-    hive.js v${pkg.version}
-    ${now} - commit ${commitHash}
+// const banner = `/*
+//   @license
+//     hive.js v${pkg.version}
+//     ${now} - commit ${commitHash}
 
-    Released under the MIT License.
-*/`;
+//     Released under the MIT License.
+// */`;
 
 const onwarn = warning => {
     // eslint-disable-next-line no-console
@@ -191,12 +191,11 @@ export default command => {
             //collectLicenses(),
             //writeLicense(),
             // Replace some node files with their browser-specific versions.
-            // Ex: fs.browser.ts -> fs.ts
-            // replaceFiles({
-            //     fileReplacements: [
-            //         { replace: "fs.ts", with: "fs.browser.ts" }
-            //     ]
-            // }),
+            //Ex: fs.browser.ts -> fs.ts
+            replaceFiles({
+                fileReplacements: [
+                    { replace: "src/domain/fs.ts", with: "src/domain/fs.browser.ts" }                ]
+            }),
             // Dirty circular dependency removal atttempt
             replace({
                 delimiters: ['', ''],
@@ -268,7 +267,7 @@ export default command => {
                 transformMixedEsModules: true, // TMP trying to solve commonjs "circular dependency" errors at runtime
                 dynamicRequireTargets: [],
             }),
-            //globals(), // Defines process, Buffer, etc
+            globals(), // Defines process, Buffer, etc
             typescript({
                 exclude: "*.node.ts"
             }),
@@ -292,7 +291,7 @@ export default command => {
             {
                 file: 'dist/es/hive.browser.js',
                 format: 'es',
-                banner,
+                //banner,
                 sourcemap: !prodBuild,
                 //intro: 'var process: { env: {}};'
                 //intro: 'var global = typeof self !== undefined ? self : this;' // Fix "global is not defined"

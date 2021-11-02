@@ -7,7 +7,7 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -22,8 +22,8 @@
 
 import path from "path";
 
-//import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from "./fs";
-import * as fs from 'fs-extra';
+import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs.browser";
+//import * as fs from 'fs-extra';
 import { Logger } from "../logger";
 
 
@@ -40,7 +40,7 @@ import { Logger } from "../logger";
 
     private static LOG = new Logger("File");
     private fullPath: string;
-    private fileStats?: fs.Stats;
+    private fileStats?: Stats;
 
     public constructor(path: File | string, subpath?: string) {
         let fullPath: string = path instanceof File ? path.getAbsolutePath() : path as string;
@@ -72,14 +72,14 @@ import { Logger } from "../logger";
         return file.isDirectory();
     }
 
-    private getStats(): fs.Stats {
+    private getStats(): Stats {
         if (this.fileStats)
             return this.fileStats;
-        return this.exists() ? fs.statSync(this.fullPath) : null;
+        return this.exists() ? statSync(this.fullPath) : null;
     }
 
     public exists(): boolean {
-        return fs.existsSync(this.fullPath);
+        return existsSync(this.fullPath);
     }
 
     // Entry size in bytes
@@ -129,7 +129,7 @@ import { Logger } from "../logger";
      * Lists all file names in this directory.
      */
     public list(): string[] {
-        return this.exists() && this.getStats().isDirectory() ? fs.readdirSync(this.fullPath) : null;
+        return this.exists() && this.getStats().isDirectory() ? readdirSync(this.fullPath) : null;
     }
 
     /**
@@ -149,26 +149,26 @@ import { Logger } from "../logger";
 
     public writeText(content: string) {
         if (!this.exists() || this.getStats().isFile()) {
-            fs.writeFileSync(this.fullPath, content, { encoding: "utf-8" });
+            writeFileSync(this.fullPath, content, { encoding: "utf-8" });
         }
     }
 
     public readText(): string {
-        return this.exists() ? fs.readFileSync(this.fullPath, { encoding: "utf-8" }) : null;
+        return this.exists() ? readFileSync(this.fullPath, { encoding: "utf-8" }) : null;
         return null;
     }
 
     public rename(newName: string) {
         if (this.exists()) {
             let targetName = this.fullPath.includes(File.SEPARATOR) && !newName.includes(File.SEPARATOR) ? this.getParentDirectoryName + File.SEPARATOR + newName : newName;
-            fs.renameSync(this.fullPath, targetName);
+            renameSync(this.fullPath, targetName);
         }
     }
 
     public createFile(overwrite?: boolean) {
         let replace = overwrite ? overwrite : false;
         if (!this.exists() || replace) {
-            fs.writeFileSync(this.fullPath, "", { encoding: "utf-8" });
+            writeFileSync(this.fullPath, "", { encoding: "utf-8" });
             this.fileStats = undefined;
         }
     }
@@ -188,7 +188,7 @@ import { Logger } from "../logger";
      */
     private mkdirpath(dirPath: string)
     {
-        if(!fs.existsSync(dirPath)){
+        if(!existsSync(dirPath)){
             try {
                 let fromRoot = dirPath.startsWith(File.SEPARATOR);
                 let pathToParse = fromRoot ? dirPath.substring(1) : dirPath;
@@ -196,8 +196,8 @@ import { Logger } from "../logger";
                 let completion = fromRoot ? File.SEPARATOR : "";
                 for (let dir of dirs) {
                     completion = completion + dir + File.SEPARATOR;
-                    if(!fs.existsSync(completion)){
-                        fs.mkdirSync(completion);
+                    if(!existsSync(completion)){
+                        mkdirSync(completion);
                     }
                 }
             } catch(e) {
@@ -216,7 +216,7 @@ import { Logger } from "../logger";
             if (this.isDirectory())
                 this.deleteDirectory(this.fullPath);
             else
-                fs.unlinkSync(this.fullPath);
+                unlinkSync(this.fullPath);
             this.fileStats = undefined;
         }
     }
@@ -226,18 +226,18 @@ import { Logger } from "../logger";
      * browserfs localstorage driver doesn't.
      */
     private deleteDirectory(directoryPath: string) {
-        if (fs.existsSync(directoryPath)) {
-            fs.readdirSync(directoryPath).forEach((file, index) => {
+        if (existsSync(directoryPath)) {
+            readdirSync(directoryPath).forEach((file, index) => {
               const curPath = path.join(directoryPath, file);
-              if (fs.lstatSync(curPath).isDirectory()) {
+              if (lstatSync(curPath).isDirectory()) {
                 // recurse
                 this.deleteDirectory(curPath);
               } else {
                 // delete file
-                fs.unlinkSync(curPath);
+                unlinkSync(curPath);
               }
             });
-            fs.rmdirSync(directoryPath);
+            rmdirSync(directoryPath);
         }
     }
 
