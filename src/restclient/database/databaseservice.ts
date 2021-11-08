@@ -9,7 +9,6 @@ import { HttpMethod } from "../../http/httpmethod";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
-import { CreateCollectionResult } from "./createcollectionresult";
 import { HttpResponseParser } from '../../http/httpresponseparser';
 import { InsertOptions } from "./insertoptions";
 import { InsertResult } from "./insertresult";
@@ -17,6 +16,9 @@ import { FindOptions } from "./findoptions";
 import { JSONObject } from "@elastosfoundation/did-js-sdk/";
 import { CountOptions } from "./countoptions";
 import { QueryOptions } from "./queryoptions";
+import { UpdateOptions } from "./updateoptions";
+import { UpdateResult } from "./updateresult";
+import { DeleteOptions } from "./deleteoptions";
 
 export class DatabaseService extends RestService {
 	private static LOG = new Logger("DatabaseService");
@@ -37,13 +39,15 @@ export class DatabaseService extends RestService {
 	 */
 	public async createCollection(collectionName: string) : Promise<void>{
 		try {
-			let result: CreateCollectionResult = 
-			await this.httpClient.send<CreateCollectionResult>(`${DatabaseService.API_COLLECTIONS_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<CreateCollectionResult>> {
-				deserialize(content: any): CreateCollectionResult {
-					return JSON.parse(content) as CreateCollectionResult;
-				}}, HttpMethod.PUT);
+			let result = 
+			await this.httpClient.send<string>(`${DatabaseService.API_COLLECTIONS_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD,
+			<HttpResponseParser<string>> {
+				deserialize(content: any): string {
+					return JSON.parse(content)['name'];
+			}},
+			HttpMethod.PUT);
 
-			if (collectionName !== result.name)
+			if (collectionName !== result)
 				throw new ServerUnknownException("Different collection created, impossible to happen");
 		}
 		catch (e){
@@ -100,7 +104,12 @@ export class DatabaseService extends RestService {
 			},
 			<HttpResponseParser<InsertResult>> {
 				deserialize(content: any): InsertResult {
-					return JSON.parse(content) as InsertResult;
+					let jsonObj = JSON.parse(content);
+					let result = new InsertResult();
+					result.setAcknowledge(jsonObj['acknowledge']);
+					result.setInsertedIds(jsonObj['inserted_ids']);
+
+					return result;
 				}
 			},
 			HttpMethod.POST);
@@ -169,8 +178,8 @@ export class DatabaseService extends RestService {
 		try {
 			let filterStr = filter === null ? "" : encodeURIComponent(JSON.stringify(filter));
 			DatabaseService.LOG.debug("FILTER_STR: " + filterStr);
-			let skip = options !== null ? options.getSkip().toString() : "";
-			let limit = options !== null ? options.getLimit().toString() : "";
+			let skip = options !== null ? options.skip.toString() : "";
+			let limit = options !== null ? options.limit.toString() : "";
 			let ret = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}`, 
 				{
 					"skip": skip,
@@ -219,6 +228,103 @@ export class DatabaseService extends RestService {
 		}
 	}
 
+ 	/**
+ 	 * Update an existing document in a given collection.
+ 	 *
+ 	 * @param collection the collection name
+ 	 * @param filter A query that matches the document to update.
+ 	 * @param update The modifications to apply.
+ 	 * @param options optional, refer to {@link UpdateOptions}
+ 	 * @return Results returned by {@link UpdateResult} wrapper
+ 	 */
+	public async updateOne(collection: string, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+		return await this.updateInternal(collection, true, filter, update, options);
+	}
+
+
+ 	/**
+ 	 * Update many existing documents in a given collection.
+ 	 *
+ 	 * @param collection the collection name
+ 	 * @param filter A query that matches the document to update.
+ 	 * @param update The modifications to apply.
+ 	 * @param options optional, refer to {@link UpdateOptions}
+ 	 * @return Results returned by {@link UpdateResult} wrapper
+ 	 */
+ 	public async updateMany(collection: string, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+		 return await this.updateInternal(collection, false, filter, update, options);
+	}
+
+
+ 	/**
+ 	 * Delete an existing document in a given collection.
+ 	 *
+ 	 * @param collection the collection name
+ 	 * @param filter A query that matches the document to delete.
+ 	 * @return Delete result
+ 	 */
+	public async deleteOne(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
+		return await this.deleteInternal(collection, true, filter, options);
+	}
+
+
+ 	/**
+ 	 * Delete many existing documents in a given collection.
+ 	 *
+ 	 * @param collection the collection name
+ 	 * @param filter A query that matches the document to delete.
+ 	 * @return Delete result
+ 	 */
+	public async deleteMany(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
+		return await this.deleteInternal(collection, false, filter, options);
+	}
+
+	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+		try {
+			let result = await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
+			{
+				"filter": filter,
+				"update": update,
+				"options": options 
+			},
+			<HttpResponseParser<UpdateResult>> {
+				deserialize(content: any): UpdateResult {
+					let jsonObj = JSON.parse(content);
+					let result = new UpdateResult();
+
+					result.setAcknowledged(jsonObj['acknowledged']);
+					result.setMatchedCount(jsonObj['matched_count']);
+					result.setModifiedCount(jsonObj['modified_count']);
+					result.setUpsertedId(jsonObj['upserted_id']);
+					return result;
+				}
+			},
+			HttpMethod.PATCH);
+			
+			return result;
+		} catch (e){
+			this.handleError(e);
+		}
+	}
+
+	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
+		try {
+			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
+			{
+				"filter": filter,
+				"options": options 
+			},
+			<HttpResponseParser<number>> {
+				deserialize(content: any): number {
+					return JSON.parse(content)['deleted_count'];
+				}
+			},
+			HttpMethod.DELETE);
+		} catch (e){
+			this.handleError(e);
+		}
+	}
+
 	private handleError(e: Error): void {
 
 		if (e instanceof HttpException) {
@@ -240,47 +346,3 @@ export class DatabaseService extends RestService {
 		throw new NetworkException(e.message, e);
 	}
 }
-
-// 	/**
-// 	 * Update an existing document in a given collection.
-// 	 *
-// 	 * @param collection the collection name
-// 	 * @param filter A query that matches the document to update.
-// 	 * @param update The modifications to apply.
-// 	 * @param options optional, refer to {@link UpdateOptions}
-// 	 * @return Results returned by {@link UpdateResult} wrapper
-// 	 */
-// 	CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
-
-
-// 	/**
-// 	 * Update many existing documents in a given collection.
-// 	 *
-// 	 * @param collection the collection name
-// 	 * @param filter A query that matches the document to update.
-// 	 * @param update The modifications to apply.
-// 	 * @param options optional, refer to {@link UpdateOptions}
-// 	 * @return Results returned by {@link UpdateResult} wrapper
-// 	 */
-// 	CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
-
-
-// 	/**
-// 	 * Delete an existing document in a given collection.
-// 	 *
-// 	 * @param collection the collection name
-// 	 * @param filter A query that matches the document to delete.
-// 	 * @return Delete result
-// 	 */
-// 	CompletableFuture<Void> deleteOne(String collection, JsonNode filter);
-
-
-// 	/**
-// 	 * Delete many existing documents in a given collection.
-// 	 *
-// 	 * @param collection the collection name
-// 	 * @param filter A query that matches the document to delete.
-// 	 * @return Delete result
-// 	 */
-// 	CompletableFuture<Void> deleteMany(String collection, JsonNode filter);
-// }

@@ -50,13 +50,18 @@ import { AggregatedExecutable } from "./restclient/scripting/aggregatedexecutabl
 import { FileUploadExecutable } from "./restclient/scripting/fileuploadexecutable";
 import { FileDownloadExecutable } from "./restclient/scripting/filedownloadexecutable";
 import { FilePropertiesExecutable } from "./restclient/scripting/filepropertiesexecutable";
+import { HashInfo } from "./restclient/files/hashinfo";
+import { FileInfo } from "./restclient/files/fileinfo";
 import { UpdateExecutable, UpdateExecutableBody } from "./restclient/scripting/updateexecutable";
 import { InsertOptions } from "./restclient/database/insertoptions";
 import { FindOptions } from "./restclient/database/findoptions";
 import { UpdateOptions } from "./restclient/database/updateoptions";
 import { QueryOptions } from "./restclient/database/queryoptions";
 import { CountOptions } from "./restclient/database/countoptions";
-import { SortItem } from "./restclient/database/sortitem";
+import { DeleteOptions, DeleteIndex, DeleteOrder } from "./restclient/database/deleteoptions";
+import { UpdateResult } from "./restclient/database/updateresult";
+import { CaseFirst } from "./restclient/database/collation";
+import { SortItem, AscendingSortItem, DescendingSortItem } from "./restclient/database/sortitem";
 import { Order } from "./domain/payment/order";
 import { Receipt } from "./domain/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
@@ -95,6 +100,8 @@ export {
     BackupSubscriptionService,
     DatabaseService,
     FilesService,
+    HashInfo,
+    FileInfo,
     PaymentService,
     PromotionService,
     RestService,
@@ -131,9 +138,16 @@ export {
     UpdateOptions,
     QueryOptions,
     CountOptions,
+    DeleteOptions,
+    DeleteOrder,
+    DeleteIndex,
     SortItem,
+    AscendingSortItem,
+    DescendingSortItem,
     Order,
     Receipt,
+    UpdateResult,
+    CaseFirst,
     AlreadyExistsException,
     NotFoundException,
     // Utilities
