@@ -1,5 +1,3 @@
-import { HttpMethod } from "../../http/httpmethod";
-import { HttpResponseParser } from "../../http/httpresponseparser";
 import { NotFoundException, DeserializationError, InvalidParameterException, NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";

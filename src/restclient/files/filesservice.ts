@@ -7,8 +7,6 @@ import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
-import { HttpMethod } from "../../http/httpmethod";
-import { HttpResponseParser } from '../../http/httpresponseparser';
 import { HashInfo } from "./hashinfo";
 
 export class FilesService extends RestService {
