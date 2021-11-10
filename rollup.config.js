@@ -180,6 +180,7 @@ export default command => {
         input: 'src/index.ts',
         onwarn,
         external: [
+            '@elastosfoundation/did-js-sdk'
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */
