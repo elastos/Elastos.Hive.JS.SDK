@@ -2,9 +2,22 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from "@rollup/plugin-typescript";
+import fs from 'fs';
+
+//import emitModulePackageFile from './build-plugins/emit-module-package-file.js';
+import pkg from './package.json';
+
 import replace from '@rollup/plugin-replace';
 import size from 'rollup-plugin-size';
 import eslint from '@rollup/plugin-eslint';
+import replaceFiles from 'rollup-plugin-file-content-replace';
+import alias from "@rollup/plugin-alias";
+import globals from 'rollup-plugin-node-globals';
+import inject from "@rollup/plugin-inject";
+import { visualizer } from 'rollup-plugin-visualizer';
+
+//import { writeFileSync } from "fs";
+
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -17,56 +30,6 @@ export function emitModulePackageFile() {
 	};
 }
 
-// export default {
-// 	input: 'src/index.ts',
-// 	output: [
-//         {
-//             sourcemap: true,
-//             format: 'cjs',
-//             file: 'dist/index.js'
-//         },
-//         {
-//             sourcemap: true,
-//             format: 'esm',
-//             file: 'dist.esm/index.js'
-//         }
-//     ],
-// 	plugins: [
-// 		postcss({
-//             extract: 'bundle.css'
-//         }),
-// 		json(),
-
-// 		// If you have external dependencies installed from
-// 		// npm, you'll most likely need these plugins. In
-// 		// some cases you'll need additional configuration -
-// 		// consult the documentation for details:
-// 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
-// 		resolve({
-// 			browser: true,
-// 			dedupe: ['svelte'],
-// 			preferBuiltins: true
-// 		}),
-// 		commonjs(),
-//         typescript({
-//             sourceMap: true,
-//             inlineSources: !production
-//         }),
-
-// 		// If we're building for production (npm run build
-// 		// instead of npm run dev), minify
-// 		production && terser(),
-
-//         /*analyze({
-//             limit: 10
-//         })*/
-// 	],
-// 	watch: {
-// 		clearScreen: true
-// 	}
-// };
-
-
 // const commitHash = (function () {
 //     try {
 //         return fs.readFileSync('.commithash', 'utf-8');
@@ -76,15 +39,15 @@ export function emitModulePackageFile() {
 // })();
 
 const prodBuild = process.env.prodbuild || false;
-// console.log("Prod build: ", prodBuild);
+console.log("Prod build: ", prodBuild);
 
-// const now = new Date(
-//     process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
-// ).toUTCString();
+const now = new Date(
+    process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
+).toUTCString();
 
 // const banner = `/*
 //   @license
-//     DID.js v${pkg.version}
+//     hive.js v${pkg.version}
 //     ${now} - commit ${commitHash}
 
 //     Released under the MIT License.
@@ -213,7 +176,131 @@ export default command => {
         }
     };
 
+    const browserBuilds = {
+        input: 'src/index.ts',
+        onwarn,
+        external: [
+            '@elastosfoundation/did-js-sdk'
+            //'browserfs'
+            /* 'readable-stream',
+            'readable-stream/transform' */
+        ],
+        plugins: [
+            // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
+            // GOOD HEADACHES WITH RESOLVE ERROR, UNEXPORTED CLASSES AND SO ON...
+            json(),
+            //collectLicenses(),
+            //writeLicense(),
+            // Replace some node files with their browser-specific versions.
+            //Ex: fs.browser.ts -> fs.ts
+            replaceFiles({
+                fileReplacements: [
+                    { replace: "src/domain/fs.ts", with: "src/domain/fs.browser.ts" }                ]
+            }),
+            // Dirty circular dependency removal atttempt
+            replace({
+                delimiters: ['', ''],
+                preventAssignment: true,
+                include: [
+                    'node_modules/assert/build/internal/errors.js'
+                ],
+                values: {
+                    'require(\'../assert\')': 'null',
+                }
+            }),
+            // Dirty hack to remove circular deps between brorand and crypto-browserify as in browser,
+            // brorand doesn't use 'crypto' even if its source code includes it.
+            replace({
+                delimiters: ['', ''],
+                preventAssignment: true,
+                include: [
+                    'node_modules/brorand/**/*.js'
+                ],
+                values: {
+                    'require(\'crypto\')': 'null',
+                }
+            }),
+            // Circular dependencies tips: https://github.com/rollup/rollup/issues/3816
+            replace({
+                delimiters: ['', ''],
+                preventAssignment: true,
+                values: {
+                    // Replace readable-stream with stream (polyfilled) because it uses dynamic requires and this doesn't work well at runtime
+                    // even if trying to add "readable-stream" to "dynamicRequireTargets" in commonJs().
+                    // https://github.com/rollup/rollup/issues/1507#issuecomment-340550539
+                    'require(\'readable-stream\')': 'require(\'stream\')',
+                    'require("readable-stream")': 'require("stream")',
+                    'require(\'readable-stream/writable\')': 'require(\'stream\').Writable',
+                    'require("readable-stream/writable")': 'require("stream").Writable',
+                    'require(\'readable-stream/readable\')': 'require(\'stream\').Readable',
+                    'require("readable-stream/readable")': 'require("stream").Readable',
+                    'LegacyTransportStream = require(\'./legacy\')': 'LegacyTransportStream = null',
+                    'LegacyTransportStream = require(\'winston-transport/legacy\')': 'LegacyTransportStream = null'
+                }
+            }),
+            alias({
+                "entries": [
+                    { "find": "buffer", "replacement": "buffer-es6" },
+                    { "find": "process", "replacement": "process-es6" },
+                    //{ "find": "fs", "replacement": "browserfs/dist/shims/fs" },
+                    { "find": "path", "replacement": "path-browserify" },
+                    { "find": "crypto", "replacement": "crypto-browserify" },
+                    { "find": "util/", "replacement": "node_modules/util/util.js" },
+                    { "find": "util", "replacement": "node_modules/util/util.js" },
+                    { "find": "stream", "replacement": "./src/browser/stream.js" },
+                    { "find": "string_decoder/", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
+                    { "find": "string_decoder", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
+                    { "find": "events", "replacement": "node_modules/events/events.js" },
+                    { "find": "assert", "replacement": "node_modules/assert/build/assert.js" }
+                ]
+            }),
+            resolve({
+                mainFields: ['browser', 'module', 'jsnext:main', 'main'],
+                browser: true,
+                preferBuiltins: true,
+                dedupe: ['bn.js', 'browserfs', 'buffer-es6', 'process-es6', 'crypto-browserify', 'assert', 'events', 'browserify-sign']
+            }),
+            // Polyfills needed to replace readable-stream with stream (circular dep)
+            commonjs({
+                esmExternals: true,
+                //requireReturnsDefault: "true", // "true" will generate build error: TypeError: Cannot read property 'deoptimizePath' of undefined
+                //requireReturnsDefault: "auto", // namespace, true, false, auto, preferred
+                transformMixedEsModules: true, // TMP trying to solve commonjs "circular dependency" errors at runtime
+                dynamicRequireTargets: [],
+            }),
+            globals(), // Defines process, Buffer, etc
+            typescript({
+                exclude: "*.node.ts"
+            }),
+            /* nodePolyfills({
+                stream: true
+                // crypto:true // Broken, the polyfill just doesn't work. We have to use crypto-browserify directly in our TS code instead.
+            }), */ // To let some modules bundle NodeJS stream, util, fs ... in browser
+            inject({
+                "BrowserFS": "browserfs"
+            }),
+            size(),
+            visualizer({
+                filename: "./browser-bundle-stats.html"
+            }) // To visualize bundle dependencies sizes on a UI.
+            // LATER terser({ module: true, output: { comments: 'some' } })
+        ],
+        treeshake,
+        strictDeprecations: true,
+        output: [
+            //{ file: 'dist/did.browser.js', format: 'umd', name: 'did.js', banner, sourcemap: true },
+            {
+                file: 'dist/es/hive.browser.js',
+                format: 'es',
+                //banner,
+                sourcemap: !prodBuild,
+                //intro: 'var process: { env: {}};'
+                //intro: 'var global = typeof self !== undefined ? self : this;' // Fix "global is not defined"
+            },
+        ]
+    };
+
     
 
-    return [ commonJSBuild, esmBuild];
+    return [ commonJSBuild, esmBuild, browserBuilds];
 };

@@ -7,6 +7,7 @@ import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
+import { HashInfo } from "./hashinfo";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");

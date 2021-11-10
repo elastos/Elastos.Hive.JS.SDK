@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-// eslint-disable-next-line node/no-deprecated-api
 export {
     readdirSync,
     readFileSync,

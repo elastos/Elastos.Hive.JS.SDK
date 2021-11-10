@@ -1,11 +1,11 @@
-import { HttpMethod } from "../../http/httpmethod";
-import { HttpResponseParser } from "../../http/httpresponseparser";
 import { NotFoundException, DeserializationError, InvalidParameterException, NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { BackupResult } from "./backupresult";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from '../../http/httpresponseparser';
 
 export class BackupService extends RestService {
 	private static LOG = new Logger("BackupService");

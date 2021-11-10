@@ -1,10 +1,8 @@
-import { InvalidParameterException, IOException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from '../../exceptions';
+import { InvalidParameterException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpClient } from '../../http/httpclient';
-import { RegScriptParams } from './regscriptparams';
-import { RunScriptParams } from './runscriptparams';
 import { HttpResponseParser } from '../../http/httpresponseparser';
 import { Class } from '../../class';
 import { Context } from './context';
@@ -37,15 +35,16 @@ export class ScriptingService extends RestService {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
-		let params = new RegScriptParams()
-			.setExecutable(executable)
-			.setCondition(condition)
-			.setAllowAnonymousUser(allowAnonymousUser)
-			.setAllowAnonymousApp(allowAnonymousApp)
-			.toString();
-
         try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, params, HttpClient.NO_RESPONSE, HttpMethod.PUT);
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`,
+			{
+				"executable": executable,
+				"condition": condition,
+				"allowAnonymousUser": allowAnonymousUser,
+				"allowAnonymousApp": allowAnonymousApp
+			},
+			HttpClient.NO_RESPONSE,
+			HttpMethod.PUT);
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
@@ -62,9 +61,7 @@ export class ScriptingService extends RestService {
 						throw new ServerUnknownException(e.message, e);
 				}
 			}
-			if (e instanceof IOException){
-				throw new NetworkException(e.message, e);
-			}	
+			throw new NetworkException(e.message, e);
 		}
 	}
 	
@@ -91,9 +88,8 @@ export class ScriptingService extends RestService {
 					default:
 						throw new ServerUnknownException(e.message, e);
 				}
-			} else if (e instanceof IOException){
-				throw new NetworkException(e.message, e);
-			}	
+			}
+			throw new NetworkException(e.message, e);
 		}
 	}
 
@@ -105,13 +101,8 @@ export class ScriptingService extends RestService {
 		checkNotNull(resultType, "Missing result type");
 
 		try {
-			// TODO: not sure about the returning types
-			let runScriptParams = new RunScriptParams()
-				.setContext(new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid))
-				.setParams(params)
-				.toString();
-
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, runScriptParams, <HttpResponseParser<T>> {
+			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
+			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, { "context": context, "params": params }, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
 					return JSON.parse(content) as T;
 				}
@@ -133,9 +124,8 @@ export class ScriptingService extends RestService {
 					default:
 						throw new ServerUnknownException(e.message, e);
 				}
-			} else if (e instanceof IOException){
-				throw new NetworkException(e.message, e);
-			}	
+			}
+			throw new NetworkException(e.message, e);
 		}
 	}
 
@@ -169,9 +159,8 @@ export class ScriptingService extends RestService {
 					default:
 						throw new ServerUnknownException(e.message, e);
 				}
-			} else if (e instanceof IOException){
-				throw new NetworkException(e.message, e);
-			}	
+			}
+			throw new NetworkException(e.message, e);
 		}
 	}
 		
@@ -192,10 +181,8 @@ export class ScriptingService extends RestService {
 		} catch (e) {
 			if (e instanceof NodeRPCException) {
 				throw new ServerUnknownException(e.message, e);
-			} else if (e instanceof IOException) {
-				throw new NetworkException(e.message, e);
 			}
-
+			throw new NetworkException(e.message, e);
 		}
 		
 	}
@@ -226,6 +213,3 @@ export class ScriptingService extends RestService {
 		}
 	}
 }
-
-
-

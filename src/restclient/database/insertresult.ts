@@ -1,34 +1,20 @@
 export class InsertResult {
-    acknowledged: boolean;
-    inserted_ids: string[];
+    private acknowledged: boolean;
+    private inserted_ids: string[];
 
-    getAcknowledged() : boolean {
+    public isAcknowledge(): boolean {
         return this.acknowledged;
     }
 
+    public getIntertedIds(): string[] {
+        return this.inserted_ids;
+    }
 
-	getInsertedIds() : string[] {
-		return this.inserted_ids;
-	}
+    public setAcknowledge(isAcknowledge: boolean): void {
+        this.acknowledged = isAcknowledge;
+    }
+
+    public setInsertedIds(insertedIds: string[]): void {
+        this.inserted_ids = insertedIds;
+    }
 }
-
-// package org.elastos.hive.vault.database;
-
-// import com.google.gson.annotations.SerializedName;
-// import java.util.List;
-
-// public class InsertResult {
-// 	@SerializedName("acknowledged")
-// 	private Boolean acknowledged;
-
-// 	@SerializedName("inserted_ids")
-// 	private List<String> insertedIds;
-
-// 	public Boolean getAcknowledged() {
-// 		return acknowledged;
-// 	}
-
-// 	public List<String> getInsertedIds() {
-// 		return insertedIds;
-// 	}
-// }

@@ -24,7 +24,7 @@ export class HttpClient {
     public static WITH_AUTHORIZATION = true;
     public static NO_AUTHORIZATION = false;
     public static DEFAULT_TIMEOUT = 5000;
-    public static DEFAULT_PROTOCOL = "http";
+    public static DEFAULT_PROTOCOL = "http:";
     public static DEFAULT_PORT = 9001;
     public static DEFAULT_METHOD = HttpMethod.PUT;
     public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
@@ -149,6 +149,7 @@ export class HttpClient {
      * For GET requests, the payload is added to the endpoint url.
      */
     private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<http.RequestOptions> {
+        //Clone httpOptions
         let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
         if (method) {
           requestOptions.method = method;
@@ -205,14 +206,15 @@ export class HttpClient {
         httpOptions.timeout = httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT;
         httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
 
-        // If the providerAddress already contains the protocol, we extract it.
-        if (this.serviceContext.getProviderAddress().includes("//")) {
-          let urlPart = this.serviceContext.getProviderAddress().split("//");
-          httpOptions.protocol = urlPart[0];
-          httpOptions.host = urlPart[1];  
-        } else {
-          httpOptions.host = this.serviceContext.getProviderAddress();
-        }
+        // If the providerAddress already contains the protocol and/or the port, we override the provided configuration.
+        let protocol = this.serviceContext.getProviderAddress().includes("://") ? this.serviceContext.getProviderAddress().split("://")[0] + ':' : undefined;
+        let port = this.serviceContext.getProviderAddress().includes(":") ? (this.serviceContext.getProviderAddress().split(":").slice(-1)[0]).replace(/\D/g,'') : undefined;
+        let host = this.serviceContext.getProviderAddress();
+        host = protocol ? host.split("://")[1] : host;
+        host = port ? host.split(":")[0] : host;
+        httpOptions.protocol = protocol ? protocol : httpOptions.protocol;
+        httpOptions.port = port ? port : httpOptions.port;
+        httpOptions.host = host;
 
         return httpOptions;
     }

@@ -1,4 +1,4 @@
-import { HiveException, VaultServices, AppContext, Logger, Utils, File } from "@elastosfoundation/elastos-hive-js-sdk"
+import { HiveException, VaultServices, AppContext, Logger, Utils, File } from "@elastosfoundation/elastos-hive-js-sdk";
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
@@ -22,6 +22,10 @@ export class TestData {
 		this.userDir = userDir;
 		this.clientConfig = clientConfig;
     }
+
+	public static getUniqueName(prefix: string){
+		return `${prefix}_${Date.now().toString()}`;
+	}
 
     public static async getInstance(testName: string, clientConfig: any, userDir?: string): Promise<TestData> {
 		Utils.checkNotNull(clientConfig, "Test configuration cannot be empty");

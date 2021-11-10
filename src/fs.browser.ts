@@ -32,8 +32,7 @@ const {
     statSync,
     lstatSync,
     writeFileSync,
-    unlinkSync,
-    
+    unlinkSync
 } = fs;
 
 BrowserFS.configure({
@@ -58,5 +57,5 @@ export {
     statSync,
     lstatSync,
     writeFileSync,
-    unlinkSync,
+    unlinkSync
 };

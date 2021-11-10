@@ -1,57 +1,9 @@
 export class InsertOptions {
-    bypassDocumentValidation: boolean;
-    ordered: boolean;
+    public bypass_document_validation: boolean;
+    public ordered: boolean;
 
-    constructor(bypassDocumentValidation: boolean, ordered: boolean){
-        this.bypassDocumentValidation = bypassDocumentValidation;
-        this.ordered = ordered;
+    public constructor(bypassDocumentValidation?: boolean, ordered?: boolean){
+        this.bypass_document_validation = bypassDocumentValidation ?? false;
+        this.ordered = ordered ?? false;
     }
-
-	getBypassDocumentValidation(bypassDocumentValidation: boolean) : InsertOptions {
-		this.bypassDocumentValidation = bypassDocumentValidation;
-		return this;
-	}
-
-	getOrdered(value: boolean): InsertOptions {
-		this.ordered = value;
-		return this;
-	}
 }
-
-
-
-
-// package org.elastos.hive.vault.database;
-
-// import com.google.gson.annotations.SerializedName;
-
-// public class InsertOptions {
-// 	@SerializedName("bypass_document_validation")
-// 	Boolean bypassDocumentValidation;
-
-// 	@SerializedName("ordered")
-// 	boolean ordered;
-
-// 	public InsertOptions() {
-// 		this(false, false);
-// 	}
-
-// 	public InsertOptions(Boolean bypassDocumentValidation) {
-// 		this(bypassDocumentValidation, false);
-// 	}
-
-// 	public InsertOptions(Boolean bypassDocumentValidation, Boolean ordered) {
-// 		this.bypassDocumentValidation = bypassDocumentValidation;
-// 		this.ordered = ordered;
-// 	}
-
-// 	public InsertOptions bypassDocumentValidation(Boolean bypassDocumentValidation) {
-// 		this.bypassDocumentValidation = bypassDocumentValidation;
-// 		return this;
-// 	}
-
-// 	public InsertOptions ordered(Boolean value) {
-// 		ordered = value;
-// 		return this;
-// 	}
-// }

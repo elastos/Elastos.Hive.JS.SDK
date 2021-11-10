@@ -47,7 +47,7 @@ export class BackupSubscriptionService extends ServiceContext {
 	}
 
 	public async getOrder(orderId: string): Promise<Order> {
-		return await this.paymentService.getOrder(orderId);
+		return await this.paymentService.getOrder("backup", orderId);
 	}
 
 	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {

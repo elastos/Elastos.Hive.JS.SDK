@@ -47,7 +47,7 @@ export class VaultSubscriptionService extends ServiceContext {
 	}
 
 	public async getOrder(orderId: string): Promise<Order> {
-		return await this.paymentService.getOrder(orderId);
+		return await this.paymentService.getOrder("vault", orderId);
 	}
 
 	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {

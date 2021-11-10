@@ -10,12 +10,11 @@ export class PromotionService extends RestService {
 
 	private static API_PROMOTION_ENDPOINT = "/api/v2/backup/promotion";
 
-
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 
-	async promote() : Promise<void> {
+	public async promote() : Promise<void> {
 		throw new NotImplementedException();
 		try {
 			await this.httpClient.send<void>(PromotionService.API_PROMOTION_ENDPOINT, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.POST);

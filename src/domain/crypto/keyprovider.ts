@@ -22,9 +22,11 @@
 
 // TODO: **** SHOULD BE EXPORTED FROM DID JS ****
 
-import { KeyLike } from 'jose/types'
+// import { KeyLike } from 'jose';
 
-export interface KeyProvider {
-    getPublicKey(keyid : string) : Promise<KeyLike>;
-    getPrivateKey(keyid : string, password : string) : Promise<KeyLike>;
-}
+// export interface KeyProvider {
+//     getPublicKey(keyid : string) : Promise<KeyLike>;
+//     getPrivateKey(keyid : string, password : string) : Promise<KeyLike>;
+// }
+
+export {}
