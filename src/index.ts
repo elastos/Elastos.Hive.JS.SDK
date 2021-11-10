@@ -2,7 +2,7 @@
 'use strict';
 
 import { VaultServices } from "./api/vaultservices";
-import { KeyProvider } from "./domain/crypto/keyprovider";
+//import { KeyProvider } from "./domain/crypto/keyprovider";
 import { Class } from "./domain/class";
 import { DataStorage } from "./domain/datastorage";
 import { File } from "./domain/file";
@@ -70,7 +70,7 @@ import { AppContextParameters, DefaultAppContextProvider } from "./http/security
 Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
-    KeyProvider,
+    //KeyProvider,
     Class,
     
     DataStorage,

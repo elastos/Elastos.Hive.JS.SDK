@@ -23,7 +23,7 @@
 import path from "path";
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs.browser";
-//import * as fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { Logger } from "../logger";
 
 
@@ -40,7 +40,7 @@ import { Logger } from "../logger";
 
     private static LOG = new Logger("File");
     private fullPath: string;
-    private fileStats?: Stats;
+    private fileStats?: fs.Stats;
 
     public constructor(path: File | string, subpath?: string) {
         let fullPath: string = path instanceof File ? path.getAbsolutePath() : path as string;
@@ -72,10 +72,10 @@ import { Logger } from "../logger";
         return file.isDirectory();
     }
 
-    private getStats(): Stats {
+    private getStats(): fs.Stats {
         if (this.fileStats)
             return this.fileStats;
-        return this.exists() ? statSync(this.fullPath) : null;
+        return this.exists() ? null : null; //statSync(this.fullPath) : null;    // TODO: handle fs.Stats better
     }
 
     public exists(): boolean {
