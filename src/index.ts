@@ -60,7 +60,7 @@ import { QueryOptions } from "./restclient/database/queryoptions";
 import { CountOptions } from "./restclient/database/countoptions";
 import { DeleteOptions, DeleteIndex, DeleteOrder } from "./restclient/database/deleteoptions";
 import { UpdateResult } from "./restclient/database/updateresult";
-import { CaseFirst } from "./restclient/database/collation";
+import { CaseFirst, Strength, Alternate, Collation } from "./restclient/database/collation";
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./restclient/database/sortitem";
 import { Order } from "./domain/payment/order";
 import { Receipt } from "./domain/payment/receipt";
@@ -148,6 +148,9 @@ export {
     Receipt,
     UpdateResult,
     CaseFirst,
+    Strength,
+    Alternate,
+    Collation,
     AlreadyExistsException,
     NotFoundException,
     // Utilities

@@ -5,6 +5,7 @@ import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 import { HttpMethod } from "../../http/httpmethod";
 import { HttpResponseParser } from '../../http/httpresponseparser';
+import { HashInfo } from "./hashinfo";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -49,7 +50,18 @@ export class FilesService extends RestService {
 	  *		 if success; null otherwise
 	  */
 	 public async stat(path: string): Promise<FileInfo> {
-		return await Promise.resolve(new FileInfo());
+		return await this.httpClient.send(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
+			deserialize(content: any): FileInfo {
+				let rawFileInfo = JSON.parse(content);
+				let fileInfo = new FileInfo();
+				fileInfo.setCreated(rawFileInfo["created"]);
+				fileInfo.setUpdated(rawFileInfo["updated"]);
+				fileInfo.setName(rawFileInfo["name"]);
+				fileInfo.setAsFile(rawFileInfo["is_file"]);
+
+				return fileInfo;
+			}
+		}, HttpMethod.GET);
 	 }
  
 	 /**
@@ -59,10 +71,19 @@ export class FilesService extends RestService {
 	  * @return the new CompletionStage, the result is the base64 hash string
 	  *		 if the hash successfully calculated; null otherwise
 	  */
-	 public async hash(path: string): Promise<string> {
-		return await Promise.resolve("");
+	 public async hash(path: string): Promise<HashInfo> {
+		return await this.httpClient.send(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`, HttpClient.NO_PAYLOAD, <HttpResponseParser<HashInfo>> {
+			deserialize(content: any): HashInfo {
+				let rawHashInfo = JSON.parse(content);
+				let hashInfo = new HashInfo();
+				hashInfo.algorithm = rawHashInfo["algorithm"];
+				hashInfo.name = rawHashInfo["name"];
+				hashInfo.hash = rawHashInfo["hash"];
 
-	 }
+				return hashInfo;
+			}
+		}, HttpMethod.GET);
+	}
  
 	 /**
 	  * Moves (or renames) a file or folder.
@@ -74,7 +95,12 @@ export class FilesService extends RestService {
 	  *  	   been moved to target path in success. Otherwise, it will return
 	  *  	   result with false.
 	  */
-	 public async move(source: string, target: string) {
+	 public async move(source: string, target: string): Promise<void> {
+		await this.httpClient.send(`${FilesService.API_FILES_ENDPOINT}/${source}?to=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+			deserialize(content: any): string {
+				return JSON.parse(content)['name'];
+			}
+		}, HttpMethod.PATCH);
 	 }
  
 	 /**
@@ -86,7 +112,11 @@ export class FilesService extends RestService {
 	  *		 successfully copied; false otherwise
 	  */
 	 public async copy(source: string, target: string) {
-
+		await this.httpClient.send(`${FilesService.API_FILES_ENDPOINT}/${source}?dest=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+			deserialize(content: any): string {
+				return JSON.parse(content)['name'];
+			}
+		}, HttpMethod.PUT);
 	 }
  
 	 /**
@@ -98,6 +128,6 @@ export class FilesService extends RestService {
 	  *		 successfully deleted; false otherwise
 	  */
 	 public async delete(path: string): Promise<void> {
-
+		await this.httpClient.send(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 	 }
 }
