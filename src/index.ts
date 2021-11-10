@@ -14,6 +14,7 @@ import * as exceptions from "./exceptions";
 import { HttpClient }  from "./http/httpclient";
 import { HttpMethod }  from "./http/httpmethod";
 import { HttpResponseParser }  from "./http/httpresponseparser";
+import { StreamResponseParser }  from "./http/streamresponseparser";
 import { ServiceContext }  from "./http/servicecontext";
 import { AccessToken }  from "./http/security/accesstoken";
 import { AppContext }  from "./http/security/appcontext";
@@ -75,6 +76,7 @@ export type {
     
     DataStorage,
     HttpResponseParser,
+    StreamResponseParser,
     AppContextProvider,
     BridgeHandler,
 }

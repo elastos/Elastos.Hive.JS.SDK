@@ -1,4 +1,6 @@
-import { DeserializationError, NotFoundException, InvalidParameterException, NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from "../../http/httpresponseparser";
+import { NotFoundException, DeserializationError, InvalidParameterException, NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
@@ -16,7 +18,7 @@ export class BackupService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
-	async startBackup(credential: string) : Promise<void>{
+	public async startBackup(credential: string) : Promise<void>{
 		try {	
 			await this.httpClient.send<void>(`${BackupService.API_BACKUP_ENDPOINT}/?to=hive_node`, { "credential": credential }, HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e){
@@ -24,13 +26,13 @@ export class BackupService extends RestService {
 		}
 	}
 
-	async stopBackup(): Promise<void> {
+	public async stopBackup(): Promise<void> {
 		return await new Promise<void>((resolve, reject) => {
 			reject(new NotImplementedException());
 		});
 	}
 
-	async restoreFrom(credential: string) : Promise<void>{
+	public async restoreFrom(credential: string) : Promise<void>{
 		try {	
 			await this.httpClient.send<void>(`${BackupService.API_BACKUP_ENDPOINT}/?from=hive_node`, { "credential": credential }, HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e){
@@ -38,13 +40,13 @@ export class BackupService extends RestService {
 		}
 	}
 
-	async stopRestore(): Promise<void> {
+	public async stopRestore(): Promise<void> {
 		return await new Promise<void>((resolve, reject) => {
 			reject(new NotImplementedException());
 		});
 	}
 
-	async checkResult() : Promise<BackupResult> {
+	public async checkResult() : Promise<BackupResult> {
 		try {
 			let state = await this.httpClient.send<BackupResult>(BackupService.API_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupResult>> {
 				deserialize(content: any): BackupResult {
@@ -62,7 +64,7 @@ export class BackupService extends RestService {
 		}
 	}
 
-	private handleError(e: Error): void {
+	private handleError(e: Error): unknown {
 		if (e instanceof NodeRPCException) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

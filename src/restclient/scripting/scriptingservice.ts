@@ -91,7 +91,6 @@ export class ScriptingService extends RestService {
 			}
 			throw new NetworkException(e.message, e);
 		}
-	
 	}
 
 	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string, resultType:  Class<T>) : Promise<T> {
@@ -193,11 +192,11 @@ export class ScriptingService extends RestService {
 		checkNotNull(resultType, "Missing result type");
 
 		try {
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, {}, <HttpResponseParser<T>>{
+			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>>{
 				deserialize(content: any): T {
 					return JSON.parse(content) as T;
 				}
-			},HttpMethod.GET);
+			}, HttpMethod.GET);
 		} catch (e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

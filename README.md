@@ -40,6 +40,8 @@ Before running tests, the local user directory must be defined with the followin
 export HIVE_USER_DIR=/path/to/user/dir
 ```
 
+Then, modify the "provider" field tests/src/res/custom.json to point to your own local hive node.
+
 ## Run NodeJS tests
 
 From the source folder, build the project, then run the following commands:
@@ -79,29 +81,35 @@ testData = await TestData.getInstance("My service tests", ClientConfig.LOCAL);
 ### Test example
 
 ```javascript
-import { VaultSubscriptionService, PricingPlan } from "@elastosfoundation/elastos-hive-js-sdk";
+import {
+  VaultSubscriptionService,
+  PricingPlan,
+} from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("pricing plans", () => {
+  let testData: TestData;
+  let vaultSubscriptionService: VaultSubscriptionService;
 
-    let testData: TestData;
-    let vaultSubscriptionService: VaultSubscriptionService;
+  beforeEach(async () => {
+    testData = await TestData.getInstance(
+      "pricingplans.test",
+      ClientConfig.DEV
+    );
+    vaultsubscriptionService = new VaultSubscriptionService(
+      testData.getAppContext(),
+      testData.getProviderAddress()
+    );
+  });
 
-    beforeEach(async () => {
-        testData = await TestData.getInstance("pricingplans.test", ClientConfig.DEV);
-        vaultsubscriptionService = new VaultSubscriptionService(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-    });
-
-    test("get vault pricing plans", async() => {
-        let plans: PricingPlan[] = await vaultsubscriptionService.getPricingPlanList();
-        expect(plans).not.toBeNull();
-        expect(plans.length).toBeGreaterThan(0);
-    });
+  test("get vault pricing plans", async () => {
+    let plans: PricingPlan[] =
+      await vaultsubscriptionService.getPricingPlanList();
+    expect(plans).not.toBeNull();
+    expect(plans.length).toBeGreaterThan(0);
+  });
 });
-
 ```
 
 ## Usage
