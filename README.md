@@ -28,8 +28,8 @@ Preparing with the developer tool **git**, and then run the following commands t
 git clone https://github.com/elastos/Elastos.NET.Hive.JS.SDK
 cd Elastos.NET.Hive.JS.SDK
 npm install
+npm run types
 npm run build
-
 ```
 
 ## Test configuration
