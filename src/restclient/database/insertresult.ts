@@ -6,7 +6,7 @@ export class InsertResult {
         return this.acknowledged;
     }
 
-    public getIntertedIds(): string[] {
+    public getInsertedIds(): string[] {
         return this.inserted_ids;
     }
 

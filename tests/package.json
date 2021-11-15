@@ -15,7 +15,6 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "@elastosfoundation/did-js-sdk": "^2.1.5",
     "@elastosfoundation/elastos-hive-js-sdk": "file:../../Elastos.NET.Hive.JS.SDK",
     "buffer": "^5.6.0",
     "cd": "^0.3.3",

@@ -22,8 +22,8 @@
 
 import path from "path";
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs.browser";
-import * as fs from 'fs-extra';
+//import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs";
+import * as fs from "./fs";
 import { Logger } from "../logger";
 
 
@@ -75,11 +75,11 @@ import { Logger } from "../logger";
     private getStats(): fs.Stats {
         if (this.fileStats)
             return this.fileStats;
-        return this.exists() ? null : null; //statSync(this.fullPath) : null;    // TODO: handle fs.Stats better
+        return this.exists() ? fs.statSync(this.fullPath) : null;    // TODO: handle fs.Stats better
     }
 
     public exists(): boolean {
-        return existsSync(this.fullPath);
+        return fs.existsSync(this.fullPath);
     }
 
     // Entry size in bytes
@@ -129,7 +129,7 @@ import { Logger } from "../logger";
      * Lists all file names in this directory.
      */
     public list(): string[] {
-        return this.exists() && this.getStats().isDirectory() ? readdirSync(this.fullPath) : null;
+        return this.exists() && this.getStats().isDirectory() ? fs.readdirSync(this.fullPath) : null;
     }
 
     /**
@@ -149,26 +149,26 @@ import { Logger } from "../logger";
 
     public writeText(content: string) {
         if (!this.exists() || this.getStats().isFile()) {
-            writeFileSync(this.fullPath, content, { encoding: "utf-8" });
+            fs.writeFileSync(this.fullPath, content, { encoding: "utf-8" });
         }
     }
 
     public readText(): string {
-        return this.exists() ? readFileSync(this.fullPath, { encoding: "utf-8" }) : null;
+        return this.exists() ? fs.readFileSync(this.fullPath, { encoding: "utf-8" }) : null;
         return null;
     }
 
     public rename(newName: string) {
         if (this.exists()) {
             let targetName = this.fullPath.includes(File.SEPARATOR) && !newName.includes(File.SEPARATOR) ? this.getParentDirectoryName + File.SEPARATOR + newName : newName;
-            renameSync(this.fullPath, targetName);
+            fs.renameSync(this.fullPath, targetName);
         }
     }
 
     public createFile(overwrite?: boolean) {
         let replace = overwrite ? overwrite : false;
         if (!this.exists() || replace) {
-            writeFileSync(this.fullPath, "", { encoding: "utf-8" });
+            fs.writeFileSync(this.fullPath, "", { encoding: "utf-8" });
             this.fileStats = undefined;
         }
     }
@@ -188,7 +188,7 @@ import { Logger } from "../logger";
      */
     private mkdirpath(dirPath: string)
     {
-        if(!existsSync(dirPath)){
+        if(!fs.existsSync(dirPath)){
             try {
                 let fromRoot = dirPath.startsWith(File.SEPARATOR);
                 let pathToParse = fromRoot ? dirPath.substring(1) : dirPath;
@@ -196,8 +196,8 @@ import { Logger } from "../logger";
                 let completion = fromRoot ? File.SEPARATOR : "";
                 for (let dir of dirs) {
                     completion = completion + dir + File.SEPARATOR;
-                    if(!existsSync(completion)){
-                        mkdirSync(completion);
+                    if(!fs.existsSync(completion)){
+                        fs.mkdirSync(completion);
                     }
                 }
             } catch(e) {
@@ -216,7 +216,7 @@ import { Logger } from "../logger";
             if (this.isDirectory())
                 this.deleteDirectory(this.fullPath);
             else
-                unlinkSync(this.fullPath);
+            fs.unlinkSync(this.fullPath);
             this.fileStats = undefined;
         }
     }
@@ -226,18 +226,18 @@ import { Logger } from "../logger";
      * browserfs localstorage driver doesn't.
      */
     private deleteDirectory(directoryPath: string) {
-        if (existsSync(directoryPath)) {
-            readdirSync(directoryPath).forEach((file, index) => {
+        if (fs.existsSync(directoryPath)) {
+            fs.readdirSync(directoryPath).forEach((file, index) => {
               const curPath = path.join(directoryPath, file);
-              if (lstatSync(curPath).isDirectory()) {
+              if (fs.lstatSync(curPath).isDirectory()) {
                 // recurse
                 this.deleteDirectory(curPath);
               } else {
                 // delete file
-                unlinkSync(curPath);
+                fs.unlinkSync(curPath);
               }
             });
-            rmdirSync(directoryPath);
+            fs.rmdirSync(directoryPath);
         }
     }
 
