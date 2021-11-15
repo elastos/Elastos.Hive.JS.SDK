@@ -1,4 +1,4 @@
-import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -106,6 +106,45 @@ describe("test database services", () => {
         await expect(databaseService.deleteCollection(COLLECTION_NAME)).resolves.not.toThrow();
     }
    
+    test("testFindMany", async () => {
+        let query = {"author": "john doe1"};
+        await expect(databaseService.findMany(COLLECTION_NAME, query, new FindOptions())).resolves.not.toThrow();
+
+    });
+
+    test("testFindMany4NotFoundException", async () => {
+        let query = {"author": "john doe1"};
+        await expect(databaseService.findMany(COLLECTION_NAME_NOT_EXIST, query, new FindOptions())).rejects.toThrow(NotFoundException); 
+
+    });
+
+    test("testQuery", async () => {
+
+        let query = {"author": "john doe1"};
+        await expect(databaseService.query(COLLECTION_NAME, query, null)).resolves.not.toBeNull();
+
+    });
+
+
+    test("testQuery4NotFoundException", async () => {
+
+        let query = {"author": "john doe1"};
+        await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query, null)).rejects.toThrow(NotFoundException);
+
+    });
+
+
+    test("testQueryWithOptions", async () => {
+
+        let query = {"author": "john doe1"};
+        let options: QueryOptions = new QueryOptions();
+        options.sort = [new AscendingSortItem("_id")];
+        await expect(databaseService.query(COLLECTION_NAME, query, options)).resolves.not.toBeNull();
+
+    });
+    
+
+
 });
 
 
