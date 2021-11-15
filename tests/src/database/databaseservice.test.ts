@@ -52,7 +52,7 @@ describe("test database services", () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
         let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false));
         expect(result).not.toBeNull();
-        expect(result.inserted_ids.length).toEqual(1);
+        expect(result.getInsertedIds().length).toEqual(1);
 
     });
 
@@ -69,7 +69,7 @@ describe("test database services", () => {
 
         let result = await databaseService.insertMany(COLLECTION_NAME, nodes, new InsertOptions(false, true)); 
         expect(result).not.toBeNull();
-        expect(result.inserted_ids.length).toEqual(2);
+        expect(result.getInsertedIds().length).toEqual(2);
 
     });
 
@@ -91,7 +91,7 @@ describe("test database services", () => {
 
 
         let query = {"author": "john doe1"};
-        let result = await databaseService.findOne(collectionName, query, (new FindOptions()).setSkip(0).setLimit(0));
+        let result = await databaseService.findOne(collectionName, query, new FindOptions());
         expect(result).not.toBeNull();
     });
 
