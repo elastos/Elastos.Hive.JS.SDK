@@ -158,8 +158,7 @@ export {
     // Utilities
     SHA256,
     Utils,
-    exceptions,
-    Logger
+    exceptions
 }
 
 

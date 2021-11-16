@@ -9,7 +9,6 @@ describe("test database services", () => {
     let vaultServices: VaultServices;
     let databaseService: DatabaseService;
 
-    // 	private static final Logger log = LoggerFactory.getLogger(DatabaseServiceTest.class);
     let COLLECTION_NAME = "works";
     let COLLECTION_NAME_NOT_EXIST = "works_not_exists";
 
