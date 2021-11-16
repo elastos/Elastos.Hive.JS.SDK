@@ -93,12 +93,11 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string, resultType:  Class<T>) : Promise<T> {
+	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
 		checkNotNull(targetAppDid, "Missing target application DID");
-		checkNotNull(resultType, "Missing result type");
 
 		try {
 			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
@@ -129,15 +128,14 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	public async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string, resultType: Class<T>) {
+	public async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
 		checkNotNull(targetAppDid, "Missing target application DID");
-		checkNotNull(resultType, "Missing result type");
 		
 		try{
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
+			let returnValue: T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
 					return JSON.parse(content) as T;
 				}
@@ -163,33 +161,25 @@ export class ScriptingService extends RestService {
 			throw new NetworkException(e.message, e);
 		}
 	}
-		
 	
-	public async uploadFile<T>(transactionId: string, resultType: Class<T>) {
+	public async uploadFile(transactionId: string, fileContent: any): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
-		checkNotNull(resultType, "Missing result type");
 
 		try {
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
-				deserialize(content: any): T {
-					return JSON.parse(content) as T;
-				}
-			},HttpMethod.GET);
-			
-			return returnValue;
+			let returnValue = await this.httpClient.send<string>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, fileContent, <HttpResponseParser<string>> {
+				deserialize(content: any): string { return content; }
+			}, HttpMethod.POST);
 
 		} catch (e) {
 			if (e instanceof NodeRPCException) {
 				throw new ServerUnknownException(e.message, e);
 			}
 			throw new NetworkException(e.message, e);
-		}
-		
+		}		
 	}
 
-	public async downloadFile<T>(transactionId: string, resultType: Class<T>) {
+	public async downloadFile<T>(transactionId: string) {
 		checkNotNull(transactionId, "Missing transactionId.");
-		checkNotNull(resultType, "Missing result type");
 
 		try {
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>>{
