@@ -15,7 +15,7 @@ export class ScriptingService extends RestService {
 	private static LOG = new Logger("ScriptingService");
 
 	private static API_SCRIPT_ENDPOINT = "/api/v2/vault/scripting";
-	private static API_SCRIPT_UPLOAD_ENDPOINT = "/api/v2/vault/scripting/stream"; 
+	private static API_SCRIPT_STREAM_ENDPOINT = "/api/v2/vault/scripting/stream"; 
 
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
@@ -164,12 +164,10 @@ export class ScriptingService extends RestService {
 	
 	public async uploadFile(transactionId: string, fileContent: any): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
+		checkNotNull(fileContent, "Missing file content.");
 
 		try {
-			let returnValue = await this.httpClient.send<string>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, fileContent, <HttpResponseParser<string>> {
-				deserialize(content: any): string { return content; }
-			}, HttpMethod.POST);
-
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, fileContent, HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e) {
 			if (e instanceof NodeRPCException) {
 				throw new ServerUnknownException(e.message, e);
@@ -178,15 +176,16 @@ export class ScriptingService extends RestService {
 		}		
 	}
 
-	public async downloadFile<T>(transactionId: string) {
+	public async downloadFile<T>(transactionId: string): Promise<T> {
 		checkNotNull(transactionId, "Missing transactionId.");
 
 		try {
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_UPLOAD_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>>{
+			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>>{
 				deserialize(content: any): T {
-					return JSON.parse(content) as T;
+					return content as T;
 				}
 			}, HttpMethod.GET);
+			return returnValue;
 		} catch (e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

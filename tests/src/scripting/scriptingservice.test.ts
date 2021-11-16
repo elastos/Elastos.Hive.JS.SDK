@@ -35,9 +35,106 @@ describe("test scripting function", () => {
     let localDstFilePath: string;
     let fileName: string;
 
+    beforeAll(async () => {
+        testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+
+        vaultSubscriptionService = new VaultSubscriptionService(
+            testData.getAppContext(),
+            testData.getProviderAddress());
+        
+        try {
+            await vaultSubscriptionService.subscribe();    
+        } catch (e){
+            console.log("vault is already subscribed");
+        }
+
+        vaultServices = new VaultServices(
+            testData.getAppContext(),
+            testData.getProviderAddress());
+        
+        scriptingService = vaultServices.getScriptingService();
+        filesService = testData.newVault().getFilesService();
+        databaseService = testData.newVault().getDatabaseService();
+        targetDid = testData.getUserDid();
+        appDid = testData.getAppDid();
+
+        await remove_test_database();
+        await create_test_database();
+    });
+
+    afterAll(async () => {
+        try {
+            await remove_test_database();
+            await vaultSubscriptionService.unsubscribe();
+        } catch (e){
+            console.log("vault is already unsubscribed");
+        }
+    });
     
+    test("testInsert", async () => {
+        await registerScriptInsert(INSERT_NAME);
+        await callScriptInsert(INSERT_NAME);
+    });
+
+    test("testFindWithoutCondition", async () => {
+        await registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+        await callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+    });
+
+    test("testFind", async () => {
+        await registerScriptFind(FIND_NAME);
+        await callScriptFind(FIND_NAME);
+    });
+
+
+    test("testUpdate", async () => {
+        await registerScriptUpdate(UPDATE_NAME);
+        await callScriptUpdate(UPDATE_NAME);
+    });
+
+
+    test("testDelete", async () => {
+
+        let collectionName = "collectionToDelete";
+        await create_test_database(collectionName);
+        await registerScriptDelete(DELETE_NAME, collectionName);
+        await callScriptDelete(DELETE_NAME);
+    });
+
+
+    test.skip("testUploadFile", async () => {
+        // registerScriptFileUpload(UPLOAD_FILE_NAME);
+        // let transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
+        // uploadFileByTransActionId(transactionId);
+        // FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
+    });
+
+
+    test.skip("testFileDownload", async () => {
+        // FilesServiceTest.removeLocalFile(localDstFilePath);
+        // registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        // String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+        // downloadFileByTransActionId(transactionId);
+        // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+    });
+
+    test("testFileProperties", async () => {
+        await registerScriptFileProperties(FILE_PROPERTIES_NAME);
+        await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+    });
+
+    test("testFileHash", async () => {
+        await registerScriptFileHash(FILE_HASH_NAME);
+        await callScriptFileHash(FILE_HASH_NAME, fileName);
+        await scriptingService.unregisterScript(FILE_HASH_NAME);
+    });
+
     async function create_test_database(collectionName: string = COLLECTION_NAME) {
-        await expect(databaseService.createCollection(collectionName)).resolves.not.toThrow();
+        try {
+            await databaseService.createCollection(collectionName);
+        } catch (e) {
+            console.log("Failed to create collection: {}", e.getMessage());
+        }
     }
 
     /**
@@ -62,39 +159,7 @@ describe("test scripting function", () => {
         }
         expect(error).toBeUndefined();
     }
-    
 
-    beforeAll(async () => {
-        testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
-
-        vaultSubscriptionService = new VaultSubscriptionService(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-        
-        try {
-            await vaultSubscriptionService.subscribe();    
-        } catch (e){
-            console.log("vault is already subscribed");
-        }
-
-        vaultServices = new VaultServices(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-        
-        scriptingService = vaultServices.getScriptingService();
-        filesService = testData.newVault().getFilesService();
-        databaseService = testData.newVault().getDatabaseService();
-        targetDid = testData.getUserDid();
-        appDid = testData.getAppDid();
-    });
-
-    afterAll(async () => {
-        try {
-            await vaultSubscriptionService.unsubscribe();    
-        } catch (e){
-            console.log("vault is already unsubscribed");
-        }
-    });
 
     async function registerScriptInsert(scriptName: string) {
         let doc = { "author": "$params.author", "content": "$params.content" };
@@ -185,13 +250,12 @@ describe("test scripting function", () => {
         return result[scriptName].transaction_id;
     }
 
-
-    async function uploadFileByTransActionId( transactionId: string) {
-        await scriptingService.uploadFile(transactionId, LOCAL_FILE_CONTENT);
+    async function uploadFileByTransActionId( transactionId: string, content: any): Promise<void> {
+        await scriptingService.uploadFile(transactionId, content);
     }
     
-    function registerScriptFileProperties( scriptName: string) {
-        scriptingService.registerScript(scriptName, 
+    async function registerScriptFileProperties( scriptName: string) {
+        await scriptingService.registerScript(scriptName, 
             new FilePropertiesExecutable(scriptName).setOutput(true),
             false, false);
     }
@@ -226,80 +290,20 @@ describe("test scripting function", () => {
             new FileDownloadExecutable(scriptName).setOutput(true),
             false, false).get()).not.toThrow();
     }
-    
-    test("testInsert", async () => {
-        await remove_test_database();
-        await create_test_database();
-        await registerScriptInsert(INSERT_NAME);
-        await callScriptInsert(INSERT_NAME);
-    });
 
-    test("testFindWithoutCondition", async () => {
-        await registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-        await callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-    });
+	async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {
+        let result = await scriptingService.callScript(scriptName, 
+            Executable.createRunFileParams(fileName),
+            targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].transaction_id).not.toBeNull();
+        return result[scriptName].transaction_id;
+    }
 
-    test("testFind", async () => {
-        await registerScriptFind(FIND_NAME);
-        await callScriptFind(FIND_NAME);
-    });
-
-
-    test("testUpdate", async () => {
-        await registerScriptUpdate(UPDATE_NAME);
-        await callScriptUpdate(UPDATE_NAME);
-    });
-
-
-    test("testDelete", async () => {
-
-        let collectionName = "collectionToDelete";
-        await create_test_database(collectionName);
-        await registerScriptDelete(DELETE_NAME, collectionName);
-        await callScriptDelete(DELETE_NAME);
-    });
-
-
-    test.skip("testUploadFile", async () => {
-        // registerScriptFileUpload(UPLOAD_FILE_NAME);
-        // let transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-        // uploadFileByTransActionId(transactionId);
-        // FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
-    });
-
-
-    test.skip("testFileDownload", async () => {
-        // FilesServiceTest.removeLocalFile(localDstFilePath);
-        // registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        // String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-        // downloadFileByTransActionId(transactionId);
-        // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
-    });
-
-    test("testFileProperties", async () => {
-        await registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
-    });
-
-    test.skip("testFileHash", async () => {
-        await registerScriptFileHash(FILE_HASH_NAME);
-        await callScriptFileHash(FILE_HASH_NAME, fileName);
-    });
-
-
-    test("testUnregister", async () => {
-        let error;
-        try {
-            await scriptingService.unregisterScript(FILE_HASH_NAME);
-        } catch (e) {
-            error = e;
-            console.log(e);
-        }
-
-        //console.error("error: " + error);
-        expect(error).toBeUndefined();
-        await remove_test_database();
-    });
+	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
+        return await scriptingService.downloadFile<string>(transactionId);
+	}
 
 });
 // describe.skip("test scripting service", () => {
