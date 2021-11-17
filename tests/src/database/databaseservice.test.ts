@@ -1,8 +1,8 @@
-import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem, CountOptions } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe("test database services", () => {
+describe.skip("test database services", () => {
    
     let testData: TestData;
     let vaultSubscriptionService: VaultSubscriptionService;
@@ -105,11 +105,15 @@ describe("test database services", () => {
     async function deleteCollectionAnyway() {
         await expect(databaseService.deleteCollection(COLLECTION_NAME)).resolves.not.toThrow();
     }
+
+
+    async function createCollectionAnyway() {
+        await expect(databaseService.createCollection(COLLECTION_NAME)).resolves.not.toThrow();
+    }
    
     test("testFindMany", async () => {
         let query = {"author": "john doe1"};
         await expect(databaseService.findMany(COLLECTION_NAME, query, new FindOptions())).resolves.not.toThrow();
-
     });
 
     test("testFindMany4NotFoundException", async () => {
@@ -118,10 +122,15 @@ describe("test database services", () => {
 
     });
 
-    test("testQuery", async () => {
+    test.skip("testQuery", async () => {
+        let collectionName = TestData.getUniqueName("testQuery");
+        await databaseService.createCollection(collectionName);
+
+        let nodes = {"author": "john doe1", "title": "Eve for Dummies1"};
+        await expect(databaseService.insertOne(collectionName, nodes, new InsertOptions(false, false))).resolves.not.toThrow(); 
 
         let query = {"author": "john doe1"};
-        await expect(databaseService.query(COLLECTION_NAME, query, null)).resolves.not.toBeNull();
+         await expect(databaseService.query(collectionName, query, null)).resolves.not.toBeNull();
 
     });
 
@@ -136,6 +145,9 @@ describe("test database services", () => {
 
     test("testQueryWithOptions", async () => {
 
+        await deleteCollectionAnyway();
+        await createCollectionAnyway();
+
         let query = {"author": "john doe1"};
         let options: QueryOptions = new QueryOptions();
         options.sort = [new AscendingSortItem("_id")];
@@ -143,6 +155,18 @@ describe("test database services", () => {
 
     });
     
+
+    test("testCountDoc", async () => {
+
+        let filter = {"author": "john doe1"};
+        let options = new CountOptions();
+        options.limit = 1;
+        options.skip = 0;
+        options.maxTimeMS = 1000000000;
+        await expect(databaseService.countDocuments(COLLECTION_NAME, filter, options)).resolves.not.toBeNull();
+
+    });
+
 
 
 });
