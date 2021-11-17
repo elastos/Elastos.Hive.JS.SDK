@@ -2,37 +2,32 @@ import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService } from
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe("test subscribe function", () => {
+describe("test vault subscribe function", () => {
 
     let testData: TestData;
     let vaultsubscriptionService: VaultSubscriptionService;
-    let backupsubscriptionService: BackupSubscriptionService;
-    let PRICING_PLAN_NAME: string = "Rookie";
+    let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
-        testData = await TestData.getInstance("subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("vault subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
         vaultsubscriptionService = new VaultSubscriptionService(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-        backupsubscriptionService = new BackupSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());
     });
 
-    test("get vault pricing plans", async() => {
+    test("testGetPricingPlanList", async() => {
         let plans: PricingPlan[] = await vaultsubscriptionService.getPricingPlanList();
         expect(plans).not.toBeNull();
         expect(plans.length).toBeGreaterThan(0);
     });
 
-
-    test("get vault pricing plan", async() => {
+    test("testGetPricingPlan", async() => {
         let plan: PricingPlan = await vaultsubscriptionService.getPricingPlan(PRICING_PLAN_NAME);
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
-    test("should subscribe and unsubscribe to vault", async () => {
+    test("testSubscribeCheckUnsubscribe", async () => {
         let vaultInfo;
         try {
             vaultInfo = await vaultsubscriptionService.subscribe();
@@ -50,21 +45,35 @@ describe("test subscribe function", () => {
         }
         expect(error).toBeNull();
     });
+});
 
-    test("get backup pricing plans", async() => {
+
+describe("test backup subscribe function", () => {
+
+    let testData: TestData;
+    let backupsubscriptionService: BackupSubscriptionService;
+    let PRICING_PLAN_NAME = "Rookie";
+
+    beforeEach(async () => {
+        testData = await TestData.getInstance("backup subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        backupsubscriptionService = new BackupSubscriptionService(
+            testData.getAppContext(),
+            testData.getProviderAddress());
+    });
+
+    test("testGetPricingPlanList", async() => {
         let plans: PricingPlan[] = await backupsubscriptionService.getPricingPlanList();
         expect(plans).not.toBeNull();
         expect(plans.length).toBeGreaterThan(0);
     });
 
-    test("get backup pricing plan", async() => {
+    test("testGetPricingPlan", async() => {
         let plan: PricingPlan = await backupsubscriptionService.getPricingPlan(PRICING_PLAN_NAME);
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
-
-    test("should subscribe and unsubscribe to backup", async () => {
+    test("testSubscribeCheckUnsubscribe", async () => {
         let backupInfo;
         try {
             backupInfo = await backupsubscriptionService.subscribe();

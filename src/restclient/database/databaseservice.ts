@@ -263,8 +263,8 @@ export class DatabaseService extends RestService {
  	 * @param filter A query that matches the document to delete.
  	 * @return Delete result
  	 */
-	public async deleteOne(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
-		return await this.deleteInternal(collection, true, filter, options);
+	public async deleteOne(collection: string, filter: JSONObject): Promise<number> {
+		return await this.deleteInternal(collection, true, filter);
 	}
 
 
@@ -275,8 +275,8 @@ export class DatabaseService extends RestService {
  	 * @param filter A query that matches the document to delete.
  	 * @return Delete result
  	 */
-	public async deleteMany(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
-		return await this.deleteInternal(collection, false, filter, options);
+	public async deleteMany(collection: string, filter: JSONObject): Promise<number> {
+		return await this.deleteInternal(collection, false, filter);
 	}
 
 	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
@@ -307,7 +307,7 @@ export class DatabaseService extends RestService {
 		}
 	}
 
-	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options: DeleteOptions): Promise<number> {
+	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<number> {
 		try {
 			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
 			{

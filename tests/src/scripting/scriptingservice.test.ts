@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -8,9 +8,8 @@ describe("test scripting function", () => {
     let testData: TestData;
     let vaultSubscriptionService: VaultSubscriptionService;
     let vaultServices: VaultServices;
-    let PRICING_PLAN_NAME: string = "Rookie";
+    let PRICING_PLAN_NAME = "Rookie";
 
-    //private static log = LoggerFactory.getLogger(ScriptingServiceTest.class);
     const FIND_NAME = "get_group_messages";
     const FIND_NO_CONDITION_NAME = "script_no_condition";
     const INSERT_NAME = "database_insert";
@@ -22,7 +21,8 @@ describe("test scripting function", () => {
     const FILE_HASH_NAME = "file_hash";
     
     const COLLECTION_NAME = "script_database";
-    
+    const LOCAL_FILE_CONTENT = "this is test file abcdefghijklmnopqrstuvwxyz";
+
     let targetDid: string;
     let appDid: string;
     
@@ -34,35 +34,6 @@ describe("test scripting function", () => {
     let localDstFileRoot: string;
     let localDstFilePath: string;
     let fileName: string;
-
-    
-    async function create_test_database(collectionName: string = COLLECTION_NAME) {
-        await expect(databaseService.createCollection(collectionName)).resolves.not.toThrow();
-    }
-
-    	/**
-	 * If not exists, also return OK(_status).
-	 */
-	async function remove_test_database() {
-		try {
-			await databaseService.deleteCollection(COLLECTION_NAME);
-		} catch (e) {
-			console.error("Failed to remove collection: {}", e.getMessage());
-		}
-    }
-    
-    async function registerScriptDelete( scriptName: string, collectionName: string = COLLECTION_NAME) {
-        let filter = { "author": "$params.author" };
-        let error;
-        try {
-            await scriptingService.registerScript(scriptName, 
-                new DeleteExecutable(scriptName, collectionName, filter));
-        } catch (e) {
-            error = e;
-        }
-        expect(error).toBeUndefined();
-    }
-    
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
@@ -77,203 +48,30 @@ describe("test scripting function", () => {
             console.log("vault is already subscribed");
         }
 
-
         vaultServices = new VaultServices(
             testData.getAppContext(),
             testData.getProviderAddress());
-
         
         scriptingService = vaultServices.getScriptingService();
         filesService = testData.newVault().getFilesService();
         databaseService = testData.newVault().getDatabaseService();
         targetDid = testData.getUserDid();
         appDid = testData.getAppDid();
-    });
 
-
-    async function registerScriptInsert(scriptName: string) {
-        let doc = {"author": "$params.author", "content": "$params.content"};
-        let options = { "bypass_document_validation": false, "ordered": true};
-        await scriptingService.registerScript(scriptName,
-                new InsertExecutable(scriptName, COLLECTION_NAME, doc, options));
-    }
-        
-    async function callScriptInsert( scriptName: string) {
-        
-        let params = {"author":"John", "content": "message"}
-        let result : DatabaseInsertResponse = await scriptingService.callScript<DatabaseInsertResponse>(scriptName, params, targetDid, appDid, undefined);
-
-        //console.log("result :" + JSON.stringify(result));
-
-        expect(result).not.toBeNull();
-        expect(result.database_insert).not.toBeNull();
-        expect(result.database_insert.inserted_id).not.toBeNull();
-    }
-
-    async function registerScriptFindWithoutCondition(scriptName: string) {
-        
-        let filter = {"author":"John"};
-        await scriptingService.registerScript(scriptName,
-                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null));
-    
-    }
-
-    async function callScriptFindWithoutCondition( scriptName: string) {
-        //Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-        await scriptingService.callScriptUrl<any>(scriptName, "{}", targetDid, appDid, undefined);
-        
-    }
-    
-    async function registerScriptFind( scriptName: string) {
-        //Assertions.assertDoesNotThrow(()->{
-        let filter = { "author":"John" };
-
-        try {
-
-            await scriptingService.registerScript(scriptName,
-                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null),
-                    new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
-        } catch(e)
-        {
-            console.error("error: " + e);
-            
-        }
-        
-    }
-
-    async function callScriptFind(scriptName: string) {
-        // Assertions.assertDoesNotThrow(()->{
-        // 	Assertions.assertNotNull(
-        let returnScriptFind : any = await scriptingService.callScript<any>(scriptName, {}, targetDid, appDid, undefined);    
-        console.info("returnScriptFind " + returnScriptFind);
-        expect(returnScriptFind).not.toBeNull();
-    }
-
-    async function registerScriptUpdate( scriptName: string) {
-        let filter = {"author": "$params.author"};
-        let set = {"author": "$params.author", "content": "$params.content" };
-        let update = {"$set": set};
-        let options = { "bypass_document_validation": false, "upsert": true};
-        await scriptingService.registerScript(scriptName,
-            new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options));
-
-        console.log("registerScriptUpdate done");
-        
-    }
-
-    async function callScriptUpdate( scriptName: string) {
-        let params = {"author": "John", "content": "message" };
-        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
-
-        console.log(JSON.stringify(result));
-        expect(result).not.toBeNull();
-        //expect(result.database_delete).not.toBeNull();
-        //expect(result.database_delete.upserted_id).not.toBeNull();
-    }
-
-    interface DatabaseDeleteResponse {
-        database_delete: { acknowledged: boolean, deleted_count: number};
-    }
-
-    interface DatabaseInsertResponse {
-        database_insert: { acknowledged: boolean, inserted_id: string};
-    }
-
-    async function callScriptDelete( scriptName: string) {
-        let params =  {"author": "John"};
-        let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid, undefined);
-
-        expect(result).not.toBeNull();
-        expect(result.database_delete).not.toBeNull();
-        expect(result.database_delete.deleted_count).not.toBeNull();
-    }
-    
-    function registerScriptFileUpload(scriptName: string) {
-        //Assertions.assertDoesNotThrow(() ->
-        // scriptingService.registerScript(scriptName,
-        //         new FileUploadExecutable(scriptName).setOutput(true),
-        //         false, false).get());
-    }
-            
-    //    function callScriptFileUpload(scriptName: string, fileName: string) {
-    // 		try {
-    // 			JsonNode result = scriptRunner.callScript(scriptName,
-    // 					Executable.createRunFileParams(fileName),
-    // 					targetDid, appDid, JsonNode.class).get();
-    // 			Assertions.assertNotNull(result);
-    // 			Assertions.assertTrue(result.has(scriptName));
-    // 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
-    // 			return result.get(scriptName).get("transaction_id").textValue();
-    // 		} catch (Exception e) {
-    // 			Assertions.fail(Throwables.getStackTraceAsString(e));
-    // 			return null;
-    // 		}
-
-
-    function uploadFileByTransActionId( transactionId: string) {
-        // try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
-        // 	 FileReader fileReader = new FileReader(localSrcFilePath)) {
-        // 	Assertions.assertNotNull(writer);
-        // 	char[] buffer = new char[1];
-        // 	while (fileReader.read(buffer) != -1) {
-        // 		writer.write(buffer);
-        // 	}
-        // } catch (Exception e) {
-        // 	Assertions.fail(Throwables.getStackTraceAsString(e));
-        // }
-    }
-    
-    function registerScriptFileProperties( scriptName: string) {
-        //Assertions.assertDoesNotThrow(() ->
-        // scriptingService.registerScript(scriptName,
-        //         new FilePropertiesExecutable(scriptName).setOutput(true),
-        //         false, false).get());
-    }
-        
-    function callScriptFileProperties(scriptName: string, fileName: string) {
-    // 		Assertions.assertDoesNotThrow(()->{
-    // 			JsonNode result = scriptRunner.callScript(scriptName,
-    // 					Executable.createRunFileParams(fileName),
-    // 					targetDid, appDid, JsonNode.class).get();
-    // 			Assertions.assertNotNull(result);
-    // 			Assertions.assertTrue(result.has(scriptName));
-    // 			Assertions.assertTrue(result.get(scriptName).has("size"));
-    // 			Assertions.assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
-    // 		});
-    }
-        
-    async function registerScriptFileHash(scriptName: string) {
-        let error;
-        try {
-            await this.scriptingService.registerScript(scriptName,
-                new FileHashExecutable(scriptName).setOutput(true));
-        } catch (e) {
-            error = e;
-        }
-        expect(error).toBeNull();
-    }
-
-    async function callScriptFileHash(scriptName: string, fileName: string) {
-        //Assertions.assertDoesNotThrow(()->{
-        let result = await scriptingService.callScript(scriptName,
-                Executable.createRunFileParams(fileName),
-                targetDid, appDid, undefined);
-        //Assertions.assertNotNull(result);
-        //Assertions.assertTrue(result.has(scriptName));
-        //Assertions.assertTrue(result.get(scriptName).has("SHA256"));
-        //Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
-        //});
-    }
-        
-    function registerScriptFileDownload( scriptName: string) {
-        // expect(scriptingService.registerScript(scriptName,
-        // 				new FileDownloadExecutable(scriptName).setOutput(true),
-        // 				false, false).get()).not.toThrow();
-    }
-    
-    test("testInsert", async () => {
         await remove_test_database();
         await create_test_database();
+    });
+
+    afterAll(async () => {
+        try {
+            await remove_test_database();
+            await vaultSubscriptionService.unsubscribe();
+        } catch (e){
+            console.log("vault is already unsubscribed");
+        }
+    });
+    
+    test("testInsert", async () => {
         await registerScriptInsert(INSERT_NAME);
         await callScriptInsert(INSERT_NAME);
     });
@@ -325,25 +123,187 @@ describe("test scripting function", () => {
         await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
     });
 
-    test.skip("testFileHash", async () => {
+    test("testFileHash", async () => {
         await registerScriptFileHash(FILE_HASH_NAME);
         await callScriptFileHash(FILE_HASH_NAME, fileName);
+        await scriptingService.unregisterScript(FILE_HASH_NAME);
     });
 
+    async function create_test_database(collectionName: string = COLLECTION_NAME) {
+        try {
+            await databaseService.createCollection(collectionName);
+        } catch (e) {
+            console.log("Failed to create collection: {}", e.getMessage());
+        }
+    }
 
-    test("testUnregister", async () => {
+    /**
+	 * If not exists, also return OK(_status).
+	 */
+	async function remove_test_database() {
+		try {
+			await databaseService.deleteCollection(COLLECTION_NAME);
+		} catch (e) {
+			console.error("Failed to remove collection: {}", e.getMessage());
+		}
+    }
+    
+    async function registerScriptDelete( scriptName: string, collectionName: string = COLLECTION_NAME) {
+        let filter = { "author": "$params.author" };
         let error;
         try {
-            await scriptingService.unregisterScript(FILE_HASH_NAME);
+            await scriptingService.registerScript(scriptName, 
+                new DeleteExecutable(scriptName, collectionName, filter));
         } catch (e) {
             error = e;
-            console.log(e);
         }
-
-        //console.error("error: " + error);
         expect(error).toBeUndefined();
-        await remove_test_database();
-    });
+    }
+
+
+    async function registerScriptInsert(scriptName: string) {
+        let doc = { "author": "$params.author", "content": "$params.content" };
+        let options = { "bypass_document_validation": false, "ordered": true };
+        await scriptingService.registerScript(scriptName,
+                new InsertExecutable(scriptName, COLLECTION_NAME, doc, options));
+    }
+        
+    async function callScriptInsert( scriptName: string) {
+        
+        let params = { "author": "John", "content": "message" }
+        let result : DatabaseInsertResponse = await scriptingService.callScript<DatabaseInsertResponse>(scriptName, params, targetDid, appDid, undefined);
+
+        expect(result).not.toBeNull();
+        expect(result.database_insert).not.toBeNull();
+        expect(result.database_insert.inserted_id).not.toBeNull();
+    }
+
+    async function registerScriptFindWithoutCondition(scriptName: string) {
+        let filter = {"author":"John"};
+        await scriptingService.registerScript(scriptName,
+                    new FindExecutable(scriptName, COLLECTION_NAME, filter, null));
+    }
+
+    async function callScriptFindWithoutCondition( scriptName: string) {
+        await expect(scriptingService.callScriptUrl<any>(scriptName, "{}", targetDid, appDid, undefined)).resolves.not.toBeNull();
+    }
+    
+    async function registerScriptFind( scriptName: string) {
+        let filter = { "author":"John" };
+        await scriptingService.registerScript(scriptName,
+                new FindExecutable(scriptName, COLLECTION_NAME, filter, null),
+                new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+    }
+
+    async function callScriptFind(scriptName: string) {
+        await expect(scriptingService.callScript<any>(scriptName, {}, targetDid, appDid, undefined)).resolves.not.toBeNull();
+    }
+
+    async function registerScriptUpdate( scriptName: string) {
+        let filter = {"author": "$params.author"};
+        let set = {"author": "$params.author", "content": "$params.content" };
+        let update = {"$set": set};
+        let options = { "bypass_document_validation": false, "upsert": true};
+        await scriptingService.registerScript(scriptName,
+            new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options));
+    }
+
+    async function callScriptUpdate( scriptName: string) {
+        let params = {"author": "John", "content": "message" };
+        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
+
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].upserted_id).not.toBeNull();
+    }
+
+    interface DatabaseDeleteResponse {
+        database_delete: { acknowledged: boolean, deleted_count: number};
+    }
+
+    interface DatabaseInsertResponse {
+        database_insert: { acknowledged: boolean, inserted_id: string};
+    }
+
+    async function callScriptDelete( scriptName: string) {
+        let params =  {"author": "John"};
+        let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid, undefined);
+
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].deleted_count).not.toBeNull();
+    }
+    
+    async function registerScriptFileUpload(scriptName: string) {
+        await scriptingService.registerScript(scriptName,
+                 new FileUploadExecutable(scriptName).setOutput(true),
+                 false, false);
+    }
+
+    async function callScriptFileUpload(scriptName: string, fileName: string): Promise<string> {
+        let result = await scriptingService.callScript<any>(scriptName,
+                Executable.createRunFileParams(fileName),
+                targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].transaction_id).not.toBeNull();
+        return result[scriptName].transaction_id;
+    }
+
+    async function uploadFileByTransActionId( transactionId: string, content: any): Promise<void> {
+        await scriptingService.uploadFile(transactionId, content);
+    }
+    
+    async function registerScriptFileProperties( scriptName: string) {
+        await scriptingService.registerScript(scriptName, 
+            new FilePropertiesExecutable(scriptName).setOutput(true),
+            false, false);
+    }
+        
+    async function callScriptFileProperties(scriptName: string, fileName: string): Promise<void> {
+        let result = await scriptingService.callScript<any>(scriptName,
+            Executable.createRunFileParams(fileName),
+            targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].size).not.toBeNull();
+        expect(Number(result[scriptName].size) > 0);
+    }
+        
+    async function registerScriptFileHash(scriptName: string) {
+        await this.scriptingService.registerScript(scriptName,
+            new FileHashExecutable(scriptName).setOutput(true));
+    }
+
+    async function callScriptFileHash(scriptName: string, fileName: string) {
+        let result = await scriptingService.callScript(scriptName,
+                Executable.createRunFileParams(fileName),
+                targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].SHA256).not.toBeNull();
+        expect(result[scriptName].SHA256.length).toBeGreaterThan(0);
+    }
+        
+    async function registerScriptFileDownload( scriptName: string) {
+        await expect(scriptingService.registerScript(scriptName, 
+            new FileDownloadExecutable(scriptName).setOutput(true),
+            false, false).get()).not.toThrow();
+    }
+
+	async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {
+        let result = await scriptingService.callScript(scriptName, 
+            Executable.createRunFileParams(fileName),
+            targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result[scriptName]).not.toBeNull();
+        expect(result[scriptName].transaction_id).not.toBeNull();
+        return result[scriptName].transaction_id;
+    }
+
+	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
+        return await scriptingService.downloadFile<string>(transactionId);
+	}
 
 });
 // describe.skip("test scripting service", () => {
