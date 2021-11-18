@@ -2,7 +2,7 @@ import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExists
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe.skip("test database services", () => {
+describe("test database services", () => {
    
     let testData: TestData;
     let vaultSubscriptionService: VaultSubscriptionService;
