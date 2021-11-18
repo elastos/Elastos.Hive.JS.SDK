@@ -2,7 +2,7 @@ import { FilesService, VaultSubscriptionService } from "@elastosfoundation/elast
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
-describe.skip("test file service", () => {
+describe("test file service", () => {
 
 	const FILE_NAME_TXT = "test.txt";
 	const FILE_NAME_IMG = "big.png";
