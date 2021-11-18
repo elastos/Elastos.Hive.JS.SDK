@@ -171,7 +171,7 @@ describe("test scripting function", () => {
     async function callScriptInsert( scriptName: string) {
         
         let params = { "author": "John", "content": "message" }
-        let result : DatabaseInsertResponse = await scriptingService.callScript<DatabaseInsertResponse>(scriptName, params, targetDid, appDid, undefined);
+        let result : DatabaseInsertResponse = await scriptingService.callScript<DatabaseInsertResponse>(scriptName, params, targetDid, appDid);
 
         expect(result).not.toBeNull();
         expect(result.database_insert).not.toBeNull();
@@ -185,7 +185,7 @@ describe("test scripting function", () => {
     }
 
     async function callScriptFindWithoutCondition( scriptName: string) {
-        await expect(scriptingService.callScriptUrl<any>(scriptName, "{}", targetDid, appDid, undefined)).resolves.not.toBeNull();
+        await expect(scriptingService.callScriptUrl<any>(scriptName, "{}", targetDid, appDid)).resolves.not.toBeNull();
     }
     
     async function registerScriptFind( scriptName: string) {
@@ -196,7 +196,7 @@ describe("test scripting function", () => {
     }
 
     async function callScriptFind(scriptName: string) {
-        await expect(scriptingService.callScript<any>(scriptName, {}, targetDid, appDid, undefined)).resolves.not.toBeNull();
+        await expect(scriptingService.callScript<any>(scriptName, {}, targetDid, appDid)).resolves.not.toBeNull();
     }
 
     async function registerScriptUpdate( scriptName: string) {
@@ -210,7 +210,7 @@ describe("test scripting function", () => {
 
     async function callScriptUpdate( scriptName: string) {
         let params = {"author": "John", "content": "message" };
-        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid, undefined);
+        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid);
 
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
@@ -227,7 +227,7 @@ describe("test scripting function", () => {
 
     async function callScriptDelete( scriptName: string) {
         let params =  {"author": "John"};
-        let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid, undefined);
+        let result: DatabaseDeleteResponse = await scriptingService.callScript<DatabaseDeleteResponse>(scriptName, params, targetDid, appDid);
 
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
@@ -237,6 +237,7 @@ describe("test scripting function", () => {
     async function registerScriptFileUpload(scriptName: string) {
         await scriptingService.registerScript(scriptName,
                  new FileUploadExecutable(scriptName).setOutput(true),
+                 undefined,
                  false, false);
     }
 
@@ -257,6 +258,7 @@ describe("test scripting function", () => {
     async function registerScriptFileProperties( scriptName: string) {
         await scriptingService.registerScript(scriptName, 
             new FilePropertiesExecutable(scriptName).setOutput(true),
+            undefined,
             false, false);
     }
         
@@ -288,7 +290,8 @@ describe("test scripting function", () => {
     async function registerScriptFileDownload( scriptName: string) {
         await expect(scriptingService.registerScript(scriptName, 
             new FileDownloadExecutable(scriptName).setOutput(true),
-            false, false).get()).not.toThrow();
+            undefined,
+            false, false)).not.toThrow();
     }
 
 	async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {

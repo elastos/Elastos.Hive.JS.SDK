@@ -82,6 +82,7 @@ export type {
 }
 
 export {
+    Logger,
     //initialize,
     DefaultAppContextProvider,
     AppContextParameters,
