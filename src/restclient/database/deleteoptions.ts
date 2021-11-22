@@ -1,8 +1,8 @@
 import { Collation } from "./collation";
 
-export enum DeleteOrder {
-	ASCENDING = 1,
-	DESCENDING = -1
+export class DeleteOrder {
+	public static readonly ASCENDING = 1;
+	public static readonly DESCENDING = -1;
 }
 
 export class DeleteIndex {
