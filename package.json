@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "clean": "rm -rf dist/ dist.esm/ typings/",
+    "clean": "rm -rf dist/ dist.esm/ typings/ node_modules/",
     "tsc:build": "rollup -c",
     "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:w": "tsc -w",
@@ -49,7 +49,7 @@
     "@babel/plugin-proposal-decorators": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-typescript": "^7.13.0",
-    "@elastosfoundation/did-js-sdk": "^2.1.5",
+    "@elastosfoundation/did-js-sdk": "^2.1.7",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.5",

@@ -210,7 +210,7 @@ export class DatabaseService extends RestService {
  	 */
 	public async query(collection: string, filter: JSONObject, options: QueryOptions): Promise<JSONObject[]> {
 		try {
-			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_COLLECTION_ENDPOINT}/query`,
+			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
 			{
 				"collection": collection,
 				"filter": filter,
