@@ -26,7 +26,7 @@ describe("test file service", () => {
 		verifyRemoteFileExists(filesService, path);
 	}
 
-	function verifyRemoteFileExists(filesService: FilesService,  path: String) {
+	function verifyRemoteFileExists(filesService: FilesService,  path: string) {
 		//expect(filesService.stat(path).get()).not.toBeNull();
 	}
 
@@ -36,7 +36,7 @@ describe("test file service", () => {
 		expect(filesService = testData.newVault().getFilesService()).not.toThrow();
 	});
 
-	test("testUploadText", async () => {
+	test("testUploadText", () => {
 		//expect(uploadTextReally()).not.toThrow();
 		verifyRemoteFileExistsFromPath(remoteTxtFilePath);
     });
