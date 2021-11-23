@@ -195,7 +195,7 @@ export class HttpClient {
           return query;
         }
         return !payload || typeof payload === "string" ? payload : JSON.stringify(payload, (key, value) => {
-          if (value && value !== null) return value
+          if (value !== null) return value
         });
     }
 
