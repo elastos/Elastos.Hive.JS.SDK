@@ -212,10 +212,69 @@ export class DatabaseService extends RestService {
 		try {
 			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
 			{
-				"collection": collection,
-				"filter": filter,
-				"options": options
+					"collection": collection,
+					"filter": filter,
+					"options": options
 			},
+			<HttpResponseParser<JSONObject[]>> {
+				deserialize(content: any): JSONObject[] {
+					return JSON.parse(content)["items"];
+				}
+			},
+			HttpMethod.POST);
+			
+			return result;
+		} catch (e){
+			this.handleError(e);
+		}
+	}
+
+	/*
+	public async query(collection: string, filter: JSONObject, options: QueryOptions): Promise<JSONObject[]> {
+		try {
+			let textPayload = "{\"collection\":\"" + collection + "\",\"filter\":" + JSON.stringify(filter);
+			if (options) {
+				if (options.sort) {
+					let textOptions = "";
+					textOptions += (options.skip !== null ? "\"skip\":" + options.skip : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.limit !== null ? "\"limit\":" + options.limit : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.batch_size !== null ? "\"batch_size\":" + options.batch_size : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.allow_partial_results !== null ? "\"allow_partial_results\":" + options.allow_partial_results : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.return_key !== null ? "\"return_key\":" + options.return_key : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.show_record_id !== null ? "\"show_record_id\":" + options.show_record_id : "");
+
+					textOptions += (textOptions ? ",":"");
+					textOptions += (options.projection !== null ? "\"projection\":" + JSON.stringify(options.projection) : "");
+
+					let sortOptions = "";
+					for (let field of options.sort) {
+						sortOptions += (sortOptions ? ",":"");
+						//sortOptions += "(\"" + field.key + "\"," + field.order + ")"
+						sortOptions += "{\"" + field.key + "\":" + field.order + "}"
+					}
+					if (sortOptions) {
+						textOptions += (textOptions ? ",":"");
+						textOptions += ("\"sort\":[" + sortOptions + "]");
+					}
+					if (textOptions) {
+						textPayload += (",\"options\":{" + textOptions + "}");
+					}
+				} else {
+					textPayload += (",\"options\":" + JSON.stringify(options));
+				}
+			}
+			textPayload += "}";
+			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`, textPayload,
 			<HttpResponseParser<JSONObject[]>> {
 				deserialize(content: any): JSONObject[] {
 					return JSON.parse(content)["items"];
@@ -227,8 +286,9 @@ export class DatabaseService extends RestService {
 			this.handleError(e);
 		}
 	}
+	*/
 
- 	/**
+	/**
  	 * Update an existing document in a given collection.
  	 *
  	 * @param collection the collection name
@@ -307,18 +367,14 @@ export class DatabaseService extends RestService {
 		}
 	}
 
-	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<number> {
+	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<void> {
 		try {
-			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
+			await this.httpClient.send<void>(`${DatabaseService.API_DB_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
 			{
 				"filter": filter,
 				"options": options 
 			},
-			<HttpResponseParser<number>> {
-				deserialize(content: any): number {
-					return JSON.parse(content)['deleted_count'];
-				}
-			},
+			HttpClient.NO_RESPONSE,
 			HttpMethod.DELETE);
 		} catch (e){
 			this.handleError(e);
