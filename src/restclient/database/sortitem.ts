@@ -13,13 +13,13 @@ export class SortItem {
 }
 
 export class AscendingSortItem extends SortItem {
-    public constructor(key?: string) {
+    public constructor(key: string) {
         super(key, SortItem.ASCENDING);
     }
 }
 
 export class DescendingSortItem extends SortItem {
-    public constructor(key?: string) {
+    public constructor(key: string) {
         super(key, SortItem.DESCENDING);
     }
 }
