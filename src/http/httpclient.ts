@@ -202,6 +202,9 @@ export class HttpClient {
     private validateOptions(httpOptions: http.RequestOptions): http.RequestOptions {
         checkNotNull(httpOptions, "No HTTP configuration provided");
 
+        const PROTOCOL_DELIMITER = "://";
+        const PORT_DELIMITER = ":";
+
         httpOptions.protocol = httpOptions.protocol ?? HttpClient.DEFAULT_PROTOCOL;
         httpOptions.port = httpOptions.port ?? HttpClient.DEFAULT_PORT;
         httpOptions.method = httpOptions.method ?? HttpClient.DEFAULT_METHOD;
@@ -209,17 +212,16 @@ export class HttpClient {
         httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
 
         // If the providerAddress already contains the protocol and/or the port, we override the provided configuration.
-        let protocol = this.serviceContext.getProviderAddress().includes("://") ? this.serviceContext.getProviderAddress().split("://")[0] + ':' : undefined;
-        let port = this.serviceContext.getProviderAddress().includes(":") ? (this.serviceContext.getProviderAddress().split(":").slice(-1)[0]).replace(/\D/g,'') : undefined;
-        let host = this.serviceContext.getProviderAddress();
-        host = protocol ? host.split("://")[1] : host;
-        host = port ? host.split(":")[0] : host;
-        httpOptions.protocol = protocol ? protocol : httpOptions.protocol;
+        let providerAddress = this.serviceContext.getProviderAddress();
+        let protocol = providerAddress.includes(PROTOCOL_DELIMITER) ? providerAddress.split(PROTOCOL_DELIMITER)[0] : undefined;
+        providerAddress = protocol ? providerAddress.replace(protocol + PROTOCOL_DELIMITER, "") : providerAddress;
+        providerAddress = providerAddress.includes("/") ? providerAddress.split("/")[0] : providerAddress;
+        let port = providerAddress.includes(PORT_DELIMITER) ? (providerAddress.split(PORT_DELIMITER).slice(-1)[0]).replace(/\D/g,'') : undefined;
+        let host = port ? providerAddress.replace(PORT_DELIMITER + port, "") : providerAddress;
+        httpOptions.protocol = protocol ? protocol + ":" : httpOptions.protocol;
         httpOptions.port = port ? port : httpOptions.port;
         httpOptions.host = host;
 
         return httpOptions;
     }
-
-    
 }
