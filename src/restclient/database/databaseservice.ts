@@ -367,14 +367,18 @@ export class DatabaseService extends RestService {
 		}
 	}
 
-	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<void> {
+	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<number> {
 		try {
-			await this.httpClient.send<void>(`${DatabaseService.API_DB_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
+			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
 			{
 				"filter": filter,
 				"options": options 
 			},
-			HttpClient.NO_RESPONSE,
+			<HttpResponseParser<number>> {
+				deserialize(content: any): number {
+					return JSON.parse(content)['deleted_count'];
+				}
+			},
 			HttpMethod.DELETE);
 		} catch (e){
 			this.handleError(e);
