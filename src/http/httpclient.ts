@@ -90,7 +90,7 @@ export class HttpClient {
         let isStream = ('onData' in responseParser);
         let streamParser: StreamResponseParser;
         if (isStream) {
-          streamParser = isStream ? (responseParser as unknown) as StreamResponseParser : undefined;
+          streamParser = (responseParser as unknown) as StreamResponseParser;
           streamParser.deserialize = HttpClient.NO_RESPONSE.deserialize;
         }
 
