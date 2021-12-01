@@ -8,7 +8,7 @@ export class ParentException extends Error{
         this.causedBy = causedBy;
         Object.setPrototypeOf(this, new.target.prototype);
         let logger = new Logger(this.constructor.name);
-        let stack = causedBy ? " Caused by " + causedBy.constructor.name + ": " + causedBy.stack  : "";
+        let stack = (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : "");
         logger.error(message + stack);
     }
 
