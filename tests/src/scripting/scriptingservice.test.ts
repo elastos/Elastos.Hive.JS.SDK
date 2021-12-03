@@ -273,7 +273,7 @@ describe("test scripting function", () => {
     }
         
     async function registerScriptFileHash(scriptName: string) {
-        await this.scriptingService.registerScript(scriptName,
+        await scriptingService.registerScript(scriptName,
             new FileHashExecutable(scriptName).setOutput(true));
     }
 

@@ -20,7 +20,7 @@ export class HttpClient {
 				return;
 			}
 		};
-    public static NO_PAYLOAD = {};
+    public static NO_PAYLOAD = "";
     public static WITH_AUTHORIZATION = true;
     public static NO_AUTHORIZATION = false;
     public static DEFAULT_TIMEOUT = 5000;
@@ -86,7 +86,9 @@ export class HttpClient {
         if (options.method === HttpMethod.GET) {
           payload = "";
         }
-
+        if (payload && payload.includes("\\\"")) {
+          HttpClient.LOG.warn("Possible double payload escaping detected.");
+        }
         let isStream = ('onData' in responseParser);
         let streamParser: StreamResponseParser;
         if (isStream) {
@@ -95,7 +97,7 @@ export class HttpClient {
         }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && payload != HttpClient.NO_PAYLOAD && options.method != HttpMethod.GET ? " payload: " + payload : ""));
+        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? " payload: " + payload : ""));
         if (options.headers['Authorization']) {
           HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
         }
@@ -103,7 +105,7 @@ export class HttpClient {
         return new Promise<T>((resolve, reject) => {
             let request = http.request(
               options,
-              function(response: http.IncomingMessage) {
+              function(response: any) {
                 const chunks = [];
                 response.on('data', (chunk) => {
                   if (isStream) {
@@ -136,7 +138,7 @@ export class HttpClient {
               }
             );
             
-            if (payload && payload != HttpClient.NO_PAYLOAD) {
+            if (payload) {
               request.write(payload);
             }
 
@@ -181,20 +183,25 @@ export class HttpClient {
      * parameters for GET requests.
      */
     private parsePayload(payload: any, method: HttpMethod): string {
-        if (payload && method === HttpMethod.GET) {
-          if (typeof payload === 'string') {
-            return payload;
-          }
+        // No transformation needed when the payload is empty or already a string
+        if (!payload || typeof payload === 'string') {
+          return payload;
+        }
+        // Convert payload object properties to URL parameters
+        if (method === HttpMethod.GET) {
           let query = "";
           for (let prop of Object.keys(payload)) {
-            if (query) {
-              query += "&";
+            let value = payload[prop];
+            if (value) {
+              if (query) {
+                query += "&";
+              }
+              query += (prop + "=" + value);
             }
-            query += (prop + "=" + payload[prop]);
           }
           return query;
         }
-        return !payload || typeof payload === "string" ? payload : JSON.stringify(payload, (key, value) => {
+        return JSON.stringify(payload, (key, value) => {
           if (value !== null) return value
         });
     }
