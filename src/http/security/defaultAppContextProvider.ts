@@ -3,7 +3,7 @@ import { HiveException } from "../../exceptions";
 import { AppContextProvider } from "./appcontextprovider";
 import dayjs from "dayjs";
 import { Logger } from "../../logger";
-import { ShorthandPropertyAssignment } from "typescript";
+//import { ShorthandPropertyAssignment } from "typescript";
 
 
 export class AppContextParameters {

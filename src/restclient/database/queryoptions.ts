@@ -1,4 +1,4 @@
-import { JSONObject } from "@elastosfoundation/did-js-sdk/typings";
+import { JSONObject } from "@elastosfoundation/did-js-sdk";
 import { SortItem } from "./sortitem";
 
 export class QueryOptions {

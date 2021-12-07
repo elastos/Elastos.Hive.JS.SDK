@@ -6,6 +6,9 @@ import { HttpException, NodeRPCException, UnauthorizedException } from '../excep
 import { StreamResponseParser } from './streamresponseparser';
 import { HttpMethod } from './httpmethod';
 import { Logger } from '../logger';
+import axios, { Method } from "axios";
+import { runningInBrowser } from "./../domain/utils";
+
 
 export class HttpClient {
     private static LOG = new Logger("HttpClient");
@@ -75,6 +78,15 @@ export class HttpClient {
       }
     }
 
+    private getMethod(method: string): Method{
+        if (method.toUpperCase() === "POST") return "POST";
+        if (method.toUpperCase() === "GET") return "GET";
+        if (method.toUpperCase() === "DELETE") return "DELETE";
+        if (method.toUpperCase() === "PUT") return "PUT";
+        if (method.toUpperCase() === "PATCH") return "PATCH";
+        return "POST";
+    }
+
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         let self = this;
         checkNotNull(serviceEndpoint, "No service endpoint specified");
@@ -103,6 +115,33 @@ export class HttpClient {
         }
 
         return new Promise<T>((resolve, reject) => {
+          if (runningInBrowser()) {
+            void axios({
+                method: this.getMethod(options.method),
+                url: options.protocol + "//" + options.host + ":" + options.port + options.path,
+                headers: {
+                    // Don't set user-agent in browser environment, this is forbidden by modern browsers.
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `${options.headers['Authorization']}`
+                },
+                data: payload
+              }).then((response) => {
+                
+                  HttpClient.LOG.debug("Axios status text: " + response.statusText);
+                  HttpClient.LOG.debug("Axios data: " + JSON.stringify(response.data));
+
+                  if (response.status >= 200 && response.status < 400) {
+                      //self.handleResponse(response, rawContent);
+                      let deserialized = responseParser.deserialize(JSON.stringify(response.data));
+                      resolve(deserialized);
+                  }
+                  else {
+                      reject( new HttpException(response.status, response.statusText, undefined));
+                  }
+              });
+        }
+        else {
             let request = http.request(
               options,
               function(response: any) {
@@ -143,6 +182,7 @@ export class HttpClient {
             }
 
             request.end();
+          }
         });
     }
 
