@@ -23,7 +23,7 @@
 import path from "path";
 
 //import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs";
-import * as fs from "./fs";
+import * as fs from "./fs.browser";
 import { Logger } from "../logger";
 
 
