@@ -32,6 +32,8 @@ export class HttpClient {
     public static DEFAULT_METHOD = HttpMethod.PUT;
     public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     public static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
         "Transfer-Encoding": "chunked",
         "Connection": "Keep-Alive",
         "User-Agent": HttpClient.DEFAULT_AGENT
@@ -55,26 +57,26 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    private handleResponse(response: http.IncomingMessage, content: string): void {
+    private handleResponse(statusCode: number, content: string): void {
 
-      if (response.statusCode >= 300) {
+      if (statusCode >= 300) {
 
-        if (this.withAuthorization && response.statusCode == 401) {
+        if (this.withAuthorization && statusCode == 401) {
           this.serviceContext.getAccessToken().invalidate();
         }
         if (!content) {
-          throw new NodeRPCException(response.statusCode, -1, "Empty body.");
+          throw new NodeRPCException(statusCode, -1, "Empty body.");
         }
         let jsonObj = JSON.parse(content);
         if (!jsonObj["error"]) {
 
-          throw new NodeRPCException(response.statusCode, -1, content);
+          throw new NodeRPCException(statusCode, -1, content);
         }
         let httpError = jsonObj["error"];
         let errorCode = httpError['internal_code'];
         let errorMessage = httpError['message'];
 
-        throw new NodeRPCException(response.statusCode, errorCode ? errorCode : -1, errorMessage);
+        throw new NodeRPCException(statusCode, errorCode ? errorCode : -1, errorMessage);
       }
     }
 
@@ -127,21 +129,24 @@ export class HttpClient {
                 },
                 data: payload
               }).then((response) => {
-                
-                  HttpClient.LOG.debug("Axios status text: " + response.statusText);
-                  HttpClient.LOG.debug("Axios data: " + JSON.stringify(response.data));
+                  const rawContent = JSON.stringify(response.data);
+                  if (isStream) {
+                    HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
+                    streamParser.onData(rawContent);
+                    self.handleResponse(response.status, "{}");
+                    streamParser.onEnd();
+                  } else {
+                    HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
+                    HttpClient.LOG.debug("Axios status text: " + response.statusText);
+                    HttpClient.LOG.debug("Axios data: " + JSON.stringify(rawContent));
 
-                  if (response.status >= 200 && response.status < 400) {
-                      //self.handleResponse(response, rawContent);
-                      let deserialized = responseParser.deserialize(JSON.stringify(response.data));
-                      resolve(deserialized);
-                  }
-                  else {
-                      reject( new HttpException(response.status, response.statusText, undefined));
+                    self.handleResponse(response.status, rawContent);
+                    let deserialized = responseParser.deserialize(rawContent);
+                    resolve(deserialized);
                   }
               });
-        }
-        else {
+          }
+          else {
             let request = http.request(
               options,
               function(response: any) {
@@ -158,13 +163,13 @@ export class HttpClient {
                   try {
                     if (isStream) {
                       HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + " (\"STREAM\")");
-                      self.handleResponse(response, "{}");
+                      self.handleResponse(response.statusCode, "{}");
                       streamParser.onEnd();
                       resolve(null as T);
                     } else {
                       const rawContent = Buffer.concat(chunks).toString();
                       HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
-                      self.handleResponse(response, rawContent);
+                      self.handleResponse(response.statusCode, rawContent);
                       let deserialized = responseParser.deserialize(rawContent);
                       resolve(deserialized);
                     }
