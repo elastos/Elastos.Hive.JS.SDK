@@ -138,7 +138,6 @@ export class HttpClient {
                   } else {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
                     HttpClient.LOG.debug("Axios status text: " + response.statusText);
-                    HttpClient.LOG.debug("Axios data: " + JSON.stringify(rawContent));
 
                     self.handleResponse(response.status, rawContent);
                     let deserialized = responseParser.deserialize(rawContent);
