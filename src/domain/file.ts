@@ -21,8 +21,12 @@
  */
 
 import path from "path";
+
+//import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs";
 import * as fs from "./fs";
 import { Logger } from "../logger";
+
+
 
 /**
  * Internal class mimicing Java File class in order to reduce the divergence with Java implementation
@@ -151,6 +155,7 @@ import { Logger } from "../logger";
 
     public readText(): string {
         return this.exists() ? fs.readFileSync(this.fullPath, { encoding: "utf-8" }) : null;
+        return null;
     }
 
     public rename(newName: string) {
@@ -224,7 +229,7 @@ import { Logger } from "../logger";
         if (fs.existsSync(directoryPath)) {
             fs.readdirSync(directoryPath).forEach((file, index) => {
               const curPath = path.join(directoryPath, file);
-              if (fs.statSync(curPath).isDirectory()) {
+              if (fs.lstatSync(curPath).isDirectory()) {
                 // recurse
                 this.deleteDirectory(curPath);
               } else {
