@@ -21,6 +21,7 @@
  */
 
 import BrowserFS, { BFSRequire } from "browserfs";
+
 const fs = BFSRequire("fs");
 const {
     existsSync,
@@ -30,10 +31,8 @@ const {
     renameSync,
     rmdirSync,
     statSync,
-    lstatSync,
     writeFileSync,
-    unlinkSync,
-    
+    unlinkSync
 } = fs;
 
 BrowserFS.configure({
@@ -56,8 +55,6 @@ export {
     renameSync,
     rmdirSync,
     statSync,
-    lstatSync,
     writeFileSync,
     unlinkSync,
-    
 };
