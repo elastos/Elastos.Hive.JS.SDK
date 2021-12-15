@@ -40,7 +40,7 @@ export class ExecutableDatabaseBody {
 export class ExecutableFileBody {
     private path: string;
 
-    public FileBody() {
+    constructor() {
         this.path = "$params.path";
     }
 }
