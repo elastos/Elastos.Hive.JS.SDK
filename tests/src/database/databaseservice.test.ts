@@ -111,7 +111,7 @@ describe("test database services", () => {
 
     test("testQuery", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.query(COLLECTION_NAME, query)).resolves.not.toBeNull();
+        await expect(databaseService.query(COLLECTION_NAME, query, new QueryOptions())).resolves.not.toBeNull();
     });
 
     test("testQuery4NotFoundException", async () => {
