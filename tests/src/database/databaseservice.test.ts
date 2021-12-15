@@ -87,7 +87,7 @@ describe("test database services", () => {
         let collectionName = TestData.getUniqueName("testFindOne");
         await databaseService.createCollection(collectionName);
         let nodes = {"author": "john doe1", "title": "Eve for Dummies1"};
-        await expect(databaseService.insertOne(collectionName, nodes, new InsertOptions(false, false))).resolves.not.toThrow(); 
+        await expect(databaseService.insertOne(collectionName, nodes)).resolves.not.toThrow(); 
 
         let query = {"author": "john doe1"};
         let result = await databaseService.findOne(collectionName, query, new FindOptions());
@@ -96,27 +96,27 @@ describe("test database services", () => {
 
     test("testFindOne4NotFoundException", async () => {
 		let query = {"author": "john doe1"};
-        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query, new FindOptions())).rejects.toThrow(NotFoundException); 
+        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query)).rejects.toThrow(NotFoundException); 
 	});
    
     test("testFindMany", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.findMany(COLLECTION_NAME, query, new FindOptions())).resolves.not.toThrow();
+        await expect(databaseService.findMany(COLLECTION_NAME, query)).resolves.not.toThrow();
     });
 
     test("testFindMany4NotFoundException", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.findMany(COLLECTION_NAME_NOT_EXIST, query, new FindOptions())).rejects.toThrow(NotFoundException); 
+        await expect(databaseService.findMany(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException); 
     });
 
     test("testQuery", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.query(COLLECTION_NAME, query, new QueryOptions())).resolves.not.toBeNull();
+        await expect(databaseService.query(COLLECTION_NAME, query)).resolves.not.toBeNull();
     });
 
     test("testQuery4NotFoundException", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query, null)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
     });
 
     test.skip("testQueryWithOptions", async () => {
@@ -169,6 +169,13 @@ describe("test database services", () => {
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
         let updateNode = { "$set": docNode };
         await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
+    });
+
+    test("testUpdateOneNoOptions", async () => {
+        let filter = { "author": "john doe1" };
+        let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
+        let updateNode = { "$set": docNode };
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode)).resolves.not.toBeNull();
     });
 
     test("testUpdateOne4NotFoundException", async () => {

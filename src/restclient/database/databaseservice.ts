@@ -79,7 +79,7 @@ export class DatabaseService extends RestService {
 	*				the write to opt-out of document level validation. Default is False.
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
-	public async insertOne( collection: string, doc: any, options: InsertOptions) : Promise<InsertResult>{
+	public async insertOne( collection: string, doc: any, options?: InsertOptions) : Promise<InsertResult>{
 		return await this.insertMany(collection, [doc], options);
 	}
 
@@ -95,7 +95,7 @@ export class DatabaseService extends RestService {
 	*				bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
-	public async insertMany(collection: string, docs: any[], options: InsertOptions) : Promise<InsertResult>{
+	public async insertMany(collection: string, docs: any[], options?: InsertOptions) : Promise<InsertResult>{
 		try {
 			let result = await this.httpClient.send<InsertResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}`,
 			{
@@ -131,7 +131,7 @@ export class DatabaseService extends RestService {
  	 *			  maxTimeMS (number): The maximum amount of time to allow this operation to run, in milliseconds.
  	 * @return count size
  	 */
- 	public async countDocuments(collection: string, filter: JSONObject, options: CountOptions): Promise<number> {
+ 	public async countDocuments(collection: string, filter: JSONObject, options?: CountOptions): Promise<number> {
 		try {
 			let result = await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?op=count`,
 			{
@@ -158,7 +158,7 @@ export class DatabaseService extends RestService {
 	 * @param options optional,refer to {@link FindOptions}
 	 * @return a JSON object document result
 	 */
-	public async findOne(collection: string, filter: JSONObject, options: FindOptions): Promise<JSONObject> {
+	public async findOne(collection: string, filter: JSONObject, options?: FindOptions): Promise<JSONObject> {
 		let docs = await this.findMany(collection, filter, options);
 
 		DatabaseService.LOG.debug(JSON.stringify(docs));
@@ -174,12 +174,12 @@ export class DatabaseService extends RestService {
 	 * @return a JsonNode array result of document
 	 */
 
-	public async findMany(collectionName: string, filter: JSONObject, options: FindOptions) : Promise<JSONObject[]> {
+	public async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
 		try {
 			let filterStr = filter === null ? "" : encodeURIComponent(JSON.stringify(filter));
 			DatabaseService.LOG.debug("FILTER_STR: " + filterStr);
-			let skip = options !== null ? options.skip.toString() : "";
-			let limit = options !== null ? options.limit.toString() : "";
+			let skip = options !== undefined ? options.skip.toString() : 0;
+			let limit = options !== undefined ? options.limit.toString() : 0;
 			let ret = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}`, 
 				{
 					"skip": skip,
@@ -208,7 +208,7 @@ export class DatabaseService extends RestService {
  	 * @param options optional,refer to {@link QueryOptions}
  	 * @return a JsonNode array result of document
  	 */
-	public async query(collection: string, filter: JSONObject, options: QueryOptions): Promise<JSONObject[]> {
+	public async query(collection: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
 		try {
 			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
 			{
@@ -297,7 +297,7 @@ export class DatabaseService extends RestService {
  	 * @param options optional, refer to {@link UpdateOptions}
  	 * @return Results returned by {@link UpdateResult} wrapper
  	 */
-	public async updateOne(collection: string, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+	public async updateOne(collection: string, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		return await this.updateInternal(collection, true, filter, update, options);
 	}
 
@@ -311,7 +311,7 @@ export class DatabaseService extends RestService {
  	 * @param options optional, refer to {@link UpdateOptions}
  	 * @return Results returned by {@link UpdateResult} wrapper
  	 */
- 	public async updateMany(collection: string, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+ 	public async updateMany(collection: string, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		 return await this.updateInternal(collection, false, filter, update, options);
 	}
 
@@ -339,7 +339,7 @@ export class DatabaseService extends RestService {
 		return await this.deleteInternal(collection, false, filter);
 	}
 
-	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options: UpdateOptions): Promise<UpdateResult> {
+	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		try {
 			let result = await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
 			{
