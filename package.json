@@ -1,6 +1,6 @@
 {
-  "name": "@dchagastelles/elastos-hive-js-sdk",
-  "version": "2.3.45",
+  "name": "@elastosfoundation/elastos-hive-js-sdk",
+  "version": "2.3.4",
   "description": "Elastos Hive JS SDK",
   "main": "./dist/hive.js",
   "module": "./dist/es/hive.js",
