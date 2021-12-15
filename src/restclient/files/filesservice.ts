@@ -7,7 +7,8 @@ import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
-import { HashInfo } from "./hashinfo";
+import { File } from "../../domain/file";
+import { checkArgument } from "../../domain/utils";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -17,7 +18,6 @@ export class FilesService extends RestService {
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
-
 
 	/**
 	 * Start an async file download
@@ -43,6 +43,17 @@ export class FilesService extends RestService {
 	public async download(path: string, dataParser: StreamResponseParser): Promise<void> {
 		try {
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
+		} catch (e) {
+			this.handleError(e);
+		}
+	}
+
+	public async upload(path: string, file: File): Promise<void> {
+		checkArgument(file.exists(), "Can't find " + file.getAbsolutePath());
+		try {
+			let data = file.readText();
+			checkArgument(data && data.length > 0, "Provided file is empty: " + file.getAbsolutePath());
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, file.readText(), HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e) {
 			this.handleError(e);
 		}

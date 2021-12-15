@@ -29,9 +29,7 @@ export {
     unlinkSync,
     existsSync,
     statSync,
-    accessSync,
     renameSync,
-    lstatSync,
 
     Stats
 } from "fs";
