@@ -2,8 +2,8 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "target": "es2015",
-    "module": "es2015",
+    "target": "esnext",
+    "module": "esnext",
     "lib": ["es2017", "es7", "es6", "dom"],
     "moduleResolution": "node",
     //"outDir": "dist",
