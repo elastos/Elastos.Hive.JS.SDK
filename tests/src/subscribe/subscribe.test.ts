@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService, Order } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -26,6 +26,26 @@ describe("test vault subscribe function", () => {
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
+
+    
+
+    test("testGetVersion", async() => {
+        let version: string = await vaultsubscriptionService.getVersion();
+        expect(version).not.toBeNull();
+    });
+
+    test("testPlaceOrder", async() => {
+        let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
+        expect(order).not.toBeNull();
+    });
+
+    // void () {
+	// 	Assertions.assertDoesNotThrow(()->{
+	// 		Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
+	// 		Assertions.assertNotNull(order);
+	// 		Assertions.assertNotNull(order.getOrderId());
+	// 	});
+	// }
 
     test("testSubscribeCheckUnsubscribe", async () => {
         let vaultInfo;
