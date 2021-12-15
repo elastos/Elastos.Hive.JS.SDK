@@ -195,7 +195,7 @@ export default command => {
             //Ex: fs.browser.ts -> fs.ts
             replaceFiles({
                 fileReplacements: [
-                    { replace: "src/domain/fs.ts", with: "src/domain/fs.browser.ts" }                ]
+                    { replace: "fs.ts", with: "fs.browser.ts" }                ]
             }),
             // Dirty circular dependency removal atttempt
             replace({
