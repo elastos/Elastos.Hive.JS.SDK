@@ -51,9 +51,9 @@ export class FilesService extends RestService {
 	public async upload(path: string, file: File): Promise<void> {
 		checkArgument(file.exists(), "Can't find " + file.getAbsolutePath());
 		try {
-			let data = file.readText();
+			let data = file.read();
 			checkArgument(data && data.length > 0, "Provided file is empty: " + file.getAbsolutePath());
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, file.readText(), HttpClient.NO_RESPONSE, HttpMethod.POST);
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e) {
 			this.handleError(e);
 		}

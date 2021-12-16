@@ -21,6 +21,8 @@
  */
 
 export {
+    read,
+    readSync,
     readdirSync,
     readFileSync,
     writeFileSync,
