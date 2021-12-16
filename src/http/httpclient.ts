@@ -129,13 +129,13 @@ export class HttpClient {
                 },
                 data: payload
               }).then((response) => {
-                  const rawContent = JSON.stringify(response.data);
                   if (isStream) {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                    streamParser.onData(rawContent);
+                    streamParser.onData(response.data);
                     self.handleResponse(response.status, "{}");
                     streamParser.onEnd();
                   } else {
+                    const rawContent = JSON.stringify(response.data);
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
                     HttpClient.LOG.debug("Axios status text: " + response.statusText);
 

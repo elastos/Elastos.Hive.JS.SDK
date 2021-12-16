@@ -1,12 +1,15 @@
-import { FilesService, VaultSubscriptionService } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, FilesService, VaultSubscriptionService, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test file service", () => {
 
 	const FILE_NAME_TXT = "test.txt";
-	const FILE_NAME_IMG = "big.png";
+	const FILE_CONTENT_TXT = "This is a test file";
+	const FILE_NAME_BIN = "test.dat";
+	const FILE_CONTENT_BIN = "This is a binary test file";
 	const FILE_NAME_NOT_EXISTS = "not_exists";
+	const REMOTE_DIR = "hive/";
 
 	let localTxtFilePath: string;
 	let localImgFilePath: string;
@@ -20,29 +23,86 @@ describe("test file service", () => {
 	let remoteBackupTxtFilePath: string;
 
 	let filesService: FilesService;
-
-
-	function verifyRemoteFileExistsFromPath(path: string) {
-		verifyRemoteFileExists(filesService, path);
-	}
-
-	function verifyRemoteFileExists(filesService: FilesService,  path: string) {
-		//expect(filesService.stat(path).get()).not.toBeNull();
-	}
+	let vaultsubscriptionService: VaultSubscriptionService;
+	let testData: TestData;
 
 	beforeAll(async () => {
-		let testData = await TestData.getInstance("filesservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
-		expect(new VaultSubscriptionService(testData.getAppContext(),testData.getProviderAddress())).not.toThrow();
-		expect(filesService = testData.newVault().getFilesService()).not.toThrow();
+		testData = await TestData.getInstance("filesservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+		vaultsubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
+		filesService = testData.newVault().getFilesService();
+		prepareTestFile();
 	});
 
+	afterAll(() => {
+		cleanTestFile();
+	});
+
+	function prepareTestFile() {
+		let testFile = new File(FILE_NAME_TXT);
+		testFile.createFile(true);
+		testFile.write(FILE_CONTENT_TXT);
+
+		let binTestFile = new File(FILE_NAME_BIN);
+		binTestFile.createFile(true);
+		binTestFile.write(FILE_CONTENT_BIN);
+	}
+
+	function cleanTestFile() {
+		let testFile = new File("testfile.txt");
+		testFile.delete();
+		let binTestFile = new File("testfile.txt");
+		binTestFile.delete();
+	}
+
+	async function verifyRemoteFileExists(path: string) {
+		expect(await filesService.stat(path).get()).not.toBeNull();
+	}
+
+	async function uploadTextReally() {
+		let testFile = new File(FILE_NAME_TXT);
+		await filesService.upload(REMOTE_DIR + FILE_NAME_TXT, testFile);
+	}
+
+	async function uploadBinReally() {
+		let binTestFile = new File(FILE_NAME_BIN);
+		await filesService.upload(REMOTE_DIR + FILE_NAME_BIN, binTestFile);
+	}
+
 	test("testUploadText", () => {
-		//expect(uploadTextReally()).not.toThrow();
-		verifyRemoteFileExistsFromPath(remoteTxtFilePath);
+		uploadTextReally();
+		verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
     });
 
-	
+	test("testUploadBin", () => {
+		uploadBinReally();
+		verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_BIN);
+    });
 
+	test("testDownloadText", async () => {
+		let dataBuffer = Buffer.from("");
+		await filesService.download(REMOTE_DIR + FILE_NAME_TXT, {
+			onData(chunk: any): void {
+				dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+			},
+			onEnd(): void {
+			// Process end.
+			}
+		} as StreamResponseParser);
+		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_TXT);
+    });
+
+	test("testDownloadBin", async () => {
+		let dataBuffer = Buffer.from("");
+		await filesService.download(REMOTE_DIR + FILE_NAME_BIN, {
+			onData(chunk: any): void {
+				dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+			},
+			onEnd(): void {
+			// Process end.
+			}
+		} as StreamResponseParser);
+		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_BIN);
+    });
 });
 
 // package org.elastos.hive;

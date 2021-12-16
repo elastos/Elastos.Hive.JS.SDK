@@ -24,6 +24,8 @@ import BrowserFS, { BFSRequire } from "browserfs";
 
 const fs = BFSRequire("fs");
 const {
+    read,
+    readSync,
     existsSync,
     mkdirSync,
     readdirSync,
@@ -48,6 +50,8 @@ BrowserFS.configure({
 });
 
 export {
+    read,
+    readSync,
     existsSync,
     mkdirSync,
     readdirSync,
