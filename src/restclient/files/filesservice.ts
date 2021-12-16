@@ -13,7 +13,7 @@ import { checkArgument } from "../../domain/utils";
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
 
-	private static API_FILES_ENDPOINT = "/api/v2/vault/files/";
+	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
     constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
