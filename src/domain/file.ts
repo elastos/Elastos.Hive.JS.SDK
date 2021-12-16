@@ -143,10 +143,20 @@ import { Logger } from "../logger";
         return files;
     }
 
+    public write(content: Buffer) {
+        if (!this.exists() || this.getStats().isFile()) {
+            fs.writeFileSync(this.fullPath, content);
+        }
+    }
+    
     public writeText(content: string) {
         if (!this.exists() || this.getStats().isFile()) {
             fs.writeFileSync(this.fullPath, content, { encoding: "utf-8" });
         }
+    }
+
+    public read(): Buffer {
+        return this.exists() ? fs.readFileSync(this.fullPath) : null;
     }
 
     public readText(): string {
