@@ -53,7 +53,7 @@ export class FilesService extends RestService {
 		try {
 			let data = file.read();
 			checkArgument(data && data.length > 0, "Provided file is empty: " + file.getAbsolutePath());
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.POST);
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -100,7 +100,7 @@ export class FilesService extends RestService {
 		try {
 			let fileInfo: FileInfo = await this.httpClient.send<FileInfo>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
 				deserialize(content: any): FileInfo {
-					let file = JSON.parse(content)['value'];
+					let file = JSON.parse(content);
 					let newFileInfo = new FileInfo();
 					newFileInfo.setCreated(file["created"]);
 					newFileInfo.setUpdated(file["updated"]);

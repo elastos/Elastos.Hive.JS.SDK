@@ -2,9 +2,9 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "lib": ["es2017", "es2015", "es7", "es6", "dom"],
+    "target": "es2015",
+    "module": "es2015",
+    "lib": ["es2017", "es7", "es6", "dom"],
     "moduleResolution": "node",
     //"outDir": "dist",
     "allowSyntheticDefaultImports": true,
