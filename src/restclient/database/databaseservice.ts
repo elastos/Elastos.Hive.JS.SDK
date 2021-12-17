@@ -48,7 +48,7 @@ export class DatabaseService extends RestService {
 			HttpMethod.PUT);
 
 			if (collectionName !== result)
-				throw new ServerUnknownException("Different collection created, impossible to happen");
+				throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Different collection created, impossible to happen");
 		}
 		catch (e){
 			this.handleError(e);
@@ -400,7 +400,7 @@ export class DatabaseService extends RestService {
 				case NodeRPCException.ALREADY_EXISTS:
 					throw new AlreadyExistsException(e.message, e);
 				default:
-					throw new ServerUnknownException(e.message, e);
+					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
 			}
 		}
 		throw new NetworkException(e.message, e);

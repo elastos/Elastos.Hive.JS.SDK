@@ -8,7 +8,7 @@ import { checkNotNull } from "../../domain/utils";
 import { HttpMethod } from "../../http/httpmethod";
 import { IllegalArgumentException, NotFoundException } from "../../exceptions";
 import { HttpResponseParser } from "../../http/httpresponseparser";
-import { InvalidParameterException, NetworkException, NodeRPCException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import { NetworkException, NodeRPCException } from "../../exceptions";
 
 export class PaymentService extends RestService {
 	private static LOG = new Logger("PaymentService");
@@ -211,18 +211,7 @@ export class PaymentService extends RestService {
 
 	private handleError(e: Error): void {
 		if (e instanceof NodeRPCException) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.message, e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.message, e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.message, e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.message, e);
-				default:
-					throw new ServerUnknownException(e.message, e);
-			}
+			throw e;
 		}
 		throw new NetworkException(e.message, e);
 	}

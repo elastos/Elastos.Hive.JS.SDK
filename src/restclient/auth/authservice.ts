@@ -36,7 +36,7 @@ export class AuthService extends RestService {
 			AuthService.LOG.debug("challenge response " + challengeResponse);
 			return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
 		} catch (e) {
-			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.", e);
+			throw NodeRPCException.forHttpCode(NodeRPCException.UNAUTHORIZED,"Failed to get token by auth requests.", -1, e);
 		}
 	}
 
@@ -54,7 +54,7 @@ export class AuthService extends RestService {
 		AuthService.LOG.trace("challenge={} appInstanceDidDoc.getSubject().toString()={}", challenge, appInstanceDidDoc.getSubject().toString());
 		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
-			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
+			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid challenge code, possibly being hacked.");
 		}
 		return challenge;
     }
@@ -73,7 +73,7 @@ export class AuthService extends RestService {
 
 		if (! await this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
 			AuthService.LOG.error("Failed to check the valid of access token when auth.");
-			throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
+			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid challenge code, possibly being hacked.");
 		}
 		return token;
 
