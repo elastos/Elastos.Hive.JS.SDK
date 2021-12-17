@@ -67,15 +67,19 @@ export class HttpClient {
         if (!content) {
           throw new NodeRPCException(statusCode, -1, "Empty body.");
         }
-        let jsonObj = JSON.parse(content);
-        if (!jsonObj["error"]) {
-
-          throw new NodeRPCException(statusCode, -1, content);
+        let errorCode = -1;
+        let errorMessage = "";
+        try {
+          let jsonObj = JSON.parse(content);
+          if (!jsonObj["error"]) {
+            throw new NodeRPCException(statusCode, -1, content);
+          }
+          let httpError = jsonObj["error"];
+          errorCode = httpError['internal_code'];
+          errorMessage = httpError['message'];
+        } catch(e) {
+          errorMessage = "Unparseable content: " + content;
         }
-        let httpError = jsonObj["error"];
-        let errorCode = httpError['internal_code'];
-        let errorMessage = httpError['message'];
-
         throw new NodeRPCException(statusCode, errorCode ? errorCode : -1, errorMessage);
       }
     }
@@ -111,7 +115,7 @@ export class HttpClient {
         }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? " payload: " + payload : ""));
+        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? " payload: " + payload.toString() : ""));
         if (options.headers['Authorization']) {
           HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
         }
@@ -228,8 +232,8 @@ export class HttpClient {
      */
     private parsePayload(payload: any, method: HttpMethod): string {
         // No transformation needed when the payload is empty or already a string
-        if (!payload || typeof payload === 'string') {
-          return payload;
+        if (!payload || typeof payload === 'string' || Buffer.isBuffer(payload)) {
+          return payload.toString();
         }
         // Convert payload object properties to URL parameters
         if (method === HttpMethod.GET) {

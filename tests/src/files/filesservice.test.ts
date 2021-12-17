@@ -55,7 +55,7 @@ describe("test file service", () => {
 	}
 
 	async function verifyRemoteFileExists(path: string) {
-		expect(await filesService.stat(path).get()).not.toBeNull();
+		expect(await filesService.stat(path)).not.toBeNull();
 	}
 
 	async function uploadTextReally() {
@@ -68,14 +68,14 @@ describe("test file service", () => {
 		await filesService.upload(REMOTE_DIR + FILE_NAME_BIN, binTestFile);
 	}
 
-	test("testUploadText", () => {
-		uploadTextReally();
-		verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
+	test("testUploadText", async () => {
+		await uploadTextReally();
+		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
     });
 
-	test("testUploadBin", () => {
-		uploadBinReally();
-		verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_BIN);
+	test("testUploadBin", async () => {
+		await uploadBinReally();
+		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_BIN);
     });
 
 	test("testDownloadText", async () => {
