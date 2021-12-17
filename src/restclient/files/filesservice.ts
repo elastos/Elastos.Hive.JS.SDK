@@ -211,7 +211,7 @@ export class FilesService extends RestService {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.message, e);
 				default:
-					throw new ServerUnknownException(e.message, e);
+					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
 			}
 		}
 		throw new NetworkException(e.message, e);

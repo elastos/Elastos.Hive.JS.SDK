@@ -1,10 +1,9 @@
-import { InvalidParameterException, NetworkException, NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from '../../exceptions';
+import { NetworkException, NodeRPCException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpClient } from '../../http/httpclient';
 import { HttpResponseParser } from '../../http/httpresponseparser';
-import { Class } from '../../class';
 import { Context } from './context';
 import { HttpMethod } from '../../http/httpmethod';
 import { checkNotNull } from '../../domain/utils';
@@ -48,18 +47,7 @@ export class ScriptingService extends RestService {
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
-
-				// TODO: waiting for the codes
-				switch (e.getCode()) {
-					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message, e);
-					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message, e);
-					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message, e);
-					default:
-						throw new ServerUnknownException(e.message, e);
-				}
+				this.handleError(e);
 			}
 			throw new NetworkException(e.message, e);
 		}
@@ -76,18 +64,7 @@ export class ScriptingService extends RestService {
 		} 
 		catch (e){
 			if (e instanceof NodeRPCException) {
-				switch (e.getCode()) {
-					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message, e);
-					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message, e);
-					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message, e);
-					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message, e);
-					default:
-						throw new ServerUnknownException(e.message, e);
-				}
+				this.handleError(e);
 			}
 			throw new NetworkException(e.message, e);
 		}
@@ -111,18 +88,7 @@ export class ScriptingService extends RestService {
 		} 
 		catch (e) {
 			if (e instanceof NodeRPCException) {
-				switch (e.getCode()) {
-					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message, e);
-					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message, e);
-					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message, e);
-					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message, e);
-					default:
-						throw new ServerUnknownException(e.message, e);
-				}
+				this.handleError(e);
 			}
 			throw new NetworkException(e.message, e);
 		}
@@ -145,18 +111,7 @@ export class ScriptingService extends RestService {
 		} 
 		catch (e) {
 			if (e instanceof NodeRPCException) {
-				switch (e.getCode()) {
-					case NodeRPCException.UNAUTHORIZED:
-						throw new UnauthorizedException(e.message, e);
-					case NodeRPCException.FORBIDDEN:
-						throw new VaultForbiddenException(e.message, e);
-					case NodeRPCException.BAD_REQUEST:
-						throw new InvalidParameterException(e.message, e);
-					case NodeRPCException.NOT_FOUND:
-						throw new NotFoundException(e.message, e);
-					default:
-						throw new ServerUnknownException(e.message, e);
-				}
+				this.handleError(e);
 			}
 			throw new NetworkException(e.message, e);
 		}
@@ -170,7 +125,7 @@ export class ScriptingService extends RestService {
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, fileContent, HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e) {
 			if (e instanceof NodeRPCException) {
-				throw new ServerUnknownException(e.message, e);
+				this.handleError(e);
 			}
 			throw new NetworkException(e.message, e);
 		}		
@@ -187,18 +142,17 @@ export class ScriptingService extends RestService {
 			}, HttpMethod.GET);
 			return returnValue;
 		} catch (e) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.getMessage(), e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.getMessage(), e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.getMessage(), e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.getMessage(), e);
-				default:
-					throw new ServerUnknownException(e.getMessage(), e);
+			if (e instanceof NodeRPCException) {
+				this.handleError(e);
 			}
+			throw new NetworkException(e.message, e);
 		}
+	}
+
+	private handleError(e: Error): unknown {
+		if (e instanceof NodeRPCException) {
+			throw e;
+		}
+		throw new NetworkException(e.message, e);
 	}
 }

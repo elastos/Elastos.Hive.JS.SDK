@@ -1,4 +1,4 @@
-import { File, FilesService, VaultSubscriptionService, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, FilesService, VaultSubscriptionService, StreamResponseParser, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -40,11 +40,11 @@ describe("test file service", () => {
 	function prepareTestFile() {
 		let testFile = new File(FILE_NAME_TXT);
 		testFile.createFile(true);
-		testFile.write(FILE_CONTENT_TXT);
+		testFile.write(Buffer.from(FILE_CONTENT_TXT));
 
 		let binTestFile = new File(FILE_NAME_BIN);
 		binTestFile.createFile(true);
-		binTestFile.write(FILE_CONTENT_BIN);
+		binTestFile.write(Buffer.from(FILE_CONTENT_BIN));
 	}
 
 	function cleanTestFile() {
@@ -103,6 +103,22 @@ describe("test file service", () => {
 		} as StreamResponseParser);
 		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_BIN);
     });
+
+	test("testDownloadBin4NotFoundException", async () => {
+		try {
+			let dataBuffer = Buffer.from("");
+			await filesService.download(FILE_NAME_NOT_EXISTS, {
+				onData(chunk: any): void {
+					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+				},
+				onEnd(): void {
+				// Process end.
+				}
+			} as StreamResponseParser);
+		} catch(e) {
+			expect(e instanceof NotFoundException).toBeTruthy();
+		}
+ 	});
 });
 
 // package org.elastos.hive;

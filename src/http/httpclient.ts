@@ -57,7 +57,7 @@ export class HttpClient {
         this.httpOptions = this.validateOptions(httpOptions);
     }
 
-    private handleResponse(statusCode: number, content: string): void {
+    private handleResponse(statusCode: number, content?: string): void {
 
       if (statusCode >= 300) {
 
@@ -65,14 +65,14 @@ export class HttpClient {
           this.serviceContext.getAccessToken().invalidate();
         }
         if (!content) {
-          throw new NodeRPCException(statusCode, -1, "Empty body.");
+          throw NodeRPCException.forHttpCode(statusCode);
         }
         let errorCode = -1;
         let errorMessage = "";
         try {
           let jsonObj = JSON.parse(content);
           if (!jsonObj["error"]) {
-            throw new NodeRPCException(statusCode, -1, content);
+            throw NodeRPCException.forHttpCode(statusCode, content);
           }
           let httpError = jsonObj["error"];
           errorCode = httpError['internal_code'];
@@ -80,7 +80,7 @@ export class HttpClient {
         } catch(e) {
           errorMessage = "Unparseable content: " + content;
         }
-        throw new NodeRPCException(statusCode, errorCode ? errorCode : -1, errorMessage);
+        throw NodeRPCException.forHttpCode(statusCode, errorMessage, errorCode ? errorCode : -1);
       }
     }
 
@@ -136,7 +136,7 @@ export class HttpClient {
                   if (isStream) {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
                     streamParser.onData(response.data);
-                    self.handleResponse(response.status, "{}");
+                    self.handleResponse(response.status);
                     streamParser.onEnd();
                   } else {
                     const rawContent = JSON.stringify(response.data);
@@ -166,7 +166,7 @@ export class HttpClient {
                   try {
                     if (isStream) {
                       HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + " (\"STREAM\")");
-                      self.handleResponse(response.statusCode, "{}");
+                      self.handleResponse(response.statusCode);
                       streamParser.onEnd();
                       resolve(null as T);
                     } else {
@@ -177,9 +177,7 @@ export class HttpClient {
                       resolve(deserialized);
                     }
                   } catch(e) {
-                    reject(
-                      new HttpException(response.statusCode, e.message, e)
-                    );
+                    reject(e);
                   }
                 });
               }
