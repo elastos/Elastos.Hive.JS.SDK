@@ -1,4 +1,4 @@
-import { NotFoundException, DeserializationError, InvalidParameterException, NetworkException, NodeRPCException, NotImplementedException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import { DeserializationError, NetworkException, NodeRPCException, NotImplementedException } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
@@ -64,18 +64,7 @@ export class BackupService extends RestService {
 
 	private handleError(e: Error): unknown {
 		if (e instanceof NodeRPCException) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.message, e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.message, e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.message, e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.message, e);
-				default:
-					throw new ServerUnknownException(e.message, e);
-			}
+			throw e;
 		}
 		throw new NetworkException(e.message, e);
 	}
