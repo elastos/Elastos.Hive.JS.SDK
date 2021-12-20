@@ -200,6 +200,8 @@ export class FilesService extends RestService {
 	}
 
 	private handleError(e: Error): unknown {
+
+		
 		if (e instanceof NodeRPCException) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

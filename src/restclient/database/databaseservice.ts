@@ -387,6 +387,9 @@ export class DatabaseService extends RestService {
 
 	private handleError(e: Error): void {
 
+		if (e instanceof NotFoundException || e instanceof AlreadyExistsException){
+			throw e;
+		}
 		if (e instanceof HttpException) {
 			switch (e.getHttpCode()) {
 				case NodeRPCException.UNAUTHORIZED:
@@ -395,10 +398,7 @@ export class DatabaseService extends RestService {
 					throw new VaultForbiddenException(e.message, e);
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.message, e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.message, e);
-				case NodeRPCException.ALREADY_EXISTS:
-					throw new AlreadyExistsException(e.message, e);
+			
 				default:
 					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
 			}

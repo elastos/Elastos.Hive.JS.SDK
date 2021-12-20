@@ -118,7 +118,25 @@ describe("test file service", () => {
 		} catch(e) {
 			expect(e instanceof NotFoundException).toBeTruthy();
 		}
- 	});
+	 });
+	 
+	
+	 test("testList", async () => {
+		let files = await filesService.list(REMOTE_DIR);
+		expect(files).not.toBeNull();
+	 });
+
+
+	 // 	@Test @Order(5) void testList() {
+// 		Assertions.assertDoesNotThrow(() -> {
+// 			List<FileInfo> files = filesService.list(remoteRootDir).get();
+// 			Assertions.assertNotNull(files);
+// 			Assertions.assertTrue(files.size() >= 2);
+// 			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
+// 			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
+// 			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
+// 		});
+// 	}
 });
 
 // package org.elastos.hive;
