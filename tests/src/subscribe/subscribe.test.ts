@@ -8,6 +8,7 @@ describe("test vault subscribe function", () => {
     let vaultsubscriptionService: VaultSubscriptionService;
     let PRICING_PLAN_NAME = "Rookie";
 
+
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
         vaultsubscriptionService = new VaultSubscriptionService(
@@ -37,6 +38,15 @@ describe("test vault subscribe function", () => {
     test("testPlaceOrder", async() => {
         let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
+    });
+
+
+    test.skip("testGetOrder", async() => {
+        let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
+        expect(order).not.toBeNull();
+
+        let order2: Order = await vaultsubscriptionService.getOrder(order.getOrderId());
+        expect(order2).toEqual(order);
     });
 
     // void () {
