@@ -1,6 +1,7 @@
 import { TestData } from "./config/testdata";
 import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem, CountOptions, PromotionService } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "./config/clientconfig";
+import { NotImplementedException } from "../../typings/exceptions";
 
 
 describe("test database services", () => {
@@ -25,7 +26,7 @@ describe("test database services", () => {
 
 
     test("testPromote", async () => {
-        await expect(promotionService.promote()).resolves.not.toThrow();
+        await expect(promotionService.promote()).rejects.toThrow(NotImplementedException);
         
     });
 
