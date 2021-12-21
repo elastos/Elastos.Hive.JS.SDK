@@ -1,9 +1,4 @@
-import {  
-	AlreadyExistsException, 
-	HttpException, 
-	InvalidParameterException,
-	NetworkException,
-	NodeRPCException, NotFoundException, ServerUnknownException, UnauthorizedException, VaultForbiddenException } from "../../exceptions";
+import {  NetworkException,	NodeRPCException, ServerUnknownException, } from "../../exceptions";
 import { HttpClient } from "../../http/httpclient";
 import { HttpMethod } from "../../http/httpmethod";
 import { ServiceContext } from "../../http/servicecontext";
@@ -385,23 +380,9 @@ export class DatabaseService extends RestService {
 		}
 	}
 
-	private handleError(e: Error): void {
-
-		if (e instanceof NotFoundException || e instanceof AlreadyExistsException){
+	private handleError(e: Error): unknown {
+		if (e instanceof NodeRPCException) {
 			throw e;
-		}
-		if (e instanceof HttpException) {
-			switch (e.getHttpCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.message, e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.message, e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.message, e);
-			
-				default:
-					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
-			}
 		}
 		throw new NetworkException(e.message, e);
 	}
