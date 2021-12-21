@@ -11,17 +11,6 @@ describe("test file service", () => {
 	const FILE_NAME_NOT_EXISTS = "not_exists";
 	const REMOTE_DIR = "hive/";
 
-	let localTxtFilePath: string;
-	let localImgFilePath: string;
-	let localCacheRootDir: string;
-
-	let remoteRootDir: string;
-	let remoteTxtFilePath: string;
-	let remoteImgFilePath: string;
-	let remoteNotExistsFilePath: string;
-	let remoteNotExistsDirPath: string;
-	let remoteBackupTxtFilePath: string;
-
 	let filesService: FilesService;
 	let vaultsubscriptionService: VaultSubscriptionService;
 	let testData: TestData;
@@ -119,25 +108,76 @@ describe("test file service", () => {
 			expect(e instanceof NotFoundException).toBeTruthy();
 		}
 	 });
-	 
 	
-	 test("testList", async () => {
+	test("testList", async () => {
 		let files = await filesService.list(REMOTE_DIR);
 		expect(files).not.toBeNull();
-	 });
+		expect(files.length).toBeGreaterThanOrEqual(2);
+		let hasOurTextFile = false;
+		let hasOurBinFile = false;
+		files.forEach((element) => {
+			console.log(element.getName());
+			if (element.getName() === FILE_NAME_TXT) {
+				hasOurTextFile = true;
+			} else if (element.getName() === FILE_NAME_BIN) {
+				hasOurBinFile = true;
+			}
+		});
+		expect(hasOurTextFile).toBeTruthy();
+		expect(hasOurBinFile).toBeTruthy();
+ 	});
 
-
-	 // 	@Test @Order(5) void testList() {
-// 		Assertions.assertDoesNotThrow(() -> {
-// 			List<FileInfo> files = filesService.list(remoteRootDir).get();
-// 			Assertions.assertNotNull(files);
-// 			Assertions.assertTrue(files.size() >= 2);
-// 			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
-// 			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
-// 			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
-// 		});
-// 	}
 });
+
+// 	@Test @Order(5) void testList4NotFoundException() {
+// 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+// 				() -> filesService.list(remoteNotExistsDirPath).get());
+// 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+// 	}
+
+// 	@Test @Order(6) void testHash() {
+// 		Assertions.assertDoesNotThrow(() -> Assertions.assertNotNull(
+// 				filesService.hash(remoteTxtFilePath).get()));
+// 	}
+
+// 	@Test @Order(6) void testHash4NotFoundException() {
+// 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+// 				() -> filesService.hash(remoteNotExistsFilePath).get());
+// 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+// 	}
+
+// 	@Test @Order(7) void testMove() {
+// 		Assertions.assertDoesNotThrow(() ->
+// 				filesService.delete(remoteBackupTxtFilePath)
+// 						.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
+// 						.get());
+// 		verifyRemoteFileExists(remoteBackupTxtFilePath);
+// 	}
+
+// 	@Test @Order(7) void testMove4NotFoundException() {
+// 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+// 				() -> filesService.move(remoteNotExistsFilePath, remoteNotExistsFilePath + "_bak").get());
+// 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+// 	}
+
+// 	@Test @Order(8) void testCopy() {
+// 		Assertions.assertDoesNotThrow(() ->
+// 				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get());
+// 		verifyRemoteFileExists(remoteTxtFilePath);
+// 	}
+
+// 	@Test @Order(8) void testCopy4NotFoundException() {
+// 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+// 				() -> filesService.copy(remoteNotExistsFilePath, remoteNotExistsFilePath + "_bak").get());
+// 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+// 	}
+
+// 	@Test @Order(9) void testDeleteFile() {
+// 		Assertions.assertDoesNotThrow(() ->
+// 				filesService.delete(remoteTxtFilePath)
+// 						.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
+// 						.get());
+// 	}
 
 // package org.elastos.hive;
 

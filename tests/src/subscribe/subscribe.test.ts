@@ -28,8 +28,6 @@ describe("test vault subscribe function", () => {
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
-    
-
     test("testGetVersion", async() => {
         let version: string = await vaultsubscriptionService.getVersion();
         expect(version).not.toBeNull();
@@ -38,6 +36,7 @@ describe("test vault subscribe function", () => {
     test("testPlaceOrder", async() => {
         let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
+        expect(order.getOrderId()).not.toBeNull();
     });
 
 
