@@ -7,7 +7,6 @@ import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
-import { File } from "../../domain/file";
 import { checkArgument } from "../../domain/utils";
 
 export class FilesService extends RestService {
@@ -48,11 +47,9 @@ export class FilesService extends RestService {
 		}
 	}
 
-	public async upload(path: string, file: File): Promise<void> {
-		checkArgument(file.exists(), "Can't find " + file.getAbsolutePath());
+	public async upload(path: string, data: Buffer): Promise<void> {
+		checkArgument(data && data.length > 0, "No data to upload.");
 		try {
-			let data = file.read();
-			checkArgument(data && data.length > 0, "Provided file is empty: " + file.getAbsolutePath());
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
@@ -69,14 +66,15 @@ export class FilesService extends RestService {
 		try {
 			let fileInfos: FileInfo[] = await this.httpClient.send<FileInfo[]>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=children`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo[]>> {
 				deserialize(content: any): FileInfo[] {
-					let rawFiles = JSON.parse(content)['value'];
+					let rawFiles = JSON.parse(content)["value"];
 					let files = [];
-					for (let file in rawFiles) {
+					for (let file of rawFiles) {
 						let fileInfo = new FileInfo();
 						fileInfo.setCreated(file["created"]);
 						fileInfo.setUpdated(file["updated"]);
 						fileInfo.setName(file["name"]);
 						fileInfo.setAsFile(file["is_file"]);
+						fileInfo.setSize(file["size"]);
 						files.push(fileInfo);
 					}
 					return files;

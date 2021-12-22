@@ -49,12 +49,12 @@ describe("test file service", () => {
 
 	async function uploadTextReally() {
 		let testFile = new File(FILE_NAME_TXT);
-		await filesService.upload(REMOTE_DIR + FILE_NAME_TXT, testFile);
+		await filesService.upload(REMOTE_DIR + FILE_NAME_TXT, testFile.read());
 	}
 
 	async function uploadBinReally() {
 		let binTestFile = new File(FILE_NAME_BIN);
-		await filesService.upload(REMOTE_DIR + FILE_NAME_BIN, binTestFile);
+		await filesService.upload(REMOTE_DIR + FILE_NAME_BIN, binTestFile.read());
 	}
 
 	test("testUploadText", async () => {
@@ -116,7 +116,6 @@ describe("test file service", () => {
 		let hasOurTextFile = false;
 		let hasOurBinFile = false;
 		files.forEach((element) => {
-			console.log(element.getName());
 			if (element.getName() === FILE_NAME_TXT) {
 				hasOurTextFile = true;
 			} else if (element.getName() === FILE_NAME_BIN) {
