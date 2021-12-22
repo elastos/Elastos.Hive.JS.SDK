@@ -318,7 +318,7 @@ export class DatabaseService extends RestService {
  	 * @param filter A query that matches the document to delete.
  	 * @return Delete result
  	 */
-	public async deleteOne(collection: string, filter: JSONObject): Promise<number> {
+	public async deleteOne(collection: string, filter: JSONObject): Promise<void> {
 		return await this.deleteInternal(collection, true, filter);
 	}
 
@@ -330,7 +330,7 @@ export class DatabaseService extends RestService {
  	 * @param filter A query that matches the document to delete.
  	 * @return Delete result
  	 */
-	public async deleteMany(collection: string, filter: JSONObject): Promise<number> {
+	public async deleteMany(collection: string, filter: JSONObject): Promise<void> {
 		return await this.deleteInternal(collection, false, filter);
 	}
 
@@ -362,18 +362,14 @@ export class DatabaseService extends RestService {
 		}
 	}
 
-	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<number> {
+	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<void> {
 		try {
-			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
+			return await this.httpClient.send<void>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
 			{
 				"filter": filter,
 				"options": options 
 			},
-			<HttpResponseParser<number>> {
-				deserialize(content: any): number {
-					return JSON.parse(content)['deleted_count'];
-				}
-			},
+			HttpClient.NO_RESPONSE,
 			HttpMethod.DELETE);
 		} catch (e){
 			this.handleError(e);
