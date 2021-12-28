@@ -4,9 +4,10 @@ import { Executable } from './executable';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpClient } from '../../http/httpclient';
 import { HttpResponseParser } from '../../http/httpresponseparser';
+import { StreamResponseParser } from '../../http/streamresponseparser';
 import { Context } from './context';
 import { HttpMethod } from '../../http/httpmethod';
-import { checkNotNull } from '../../domain/utils';
+import { checkNotNull, checkArgument } from '../../domain/utils';
 import { Logger } from '../../logger';
 import { RestService } from '../restservice';
 
@@ -46,10 +47,7 @@ export class ScriptingService extends RestService {
 			HttpMethod.PUT);
 		} 
 		catch (e){
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}
 	}
 	
@@ -63,10 +61,7 @@ export class ScriptingService extends RestService {
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} 
 		catch (e){
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}
 	}
 
@@ -87,10 +82,7 @@ export class ScriptingService extends RestService {
 			return returnValue;
 		} 
 		catch (e) {
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}
 	}
 
@@ -110,42 +102,38 @@ export class ScriptingService extends RestService {
 			return returnValue;
 		} 
 		catch (e) {
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}
 	}
 	
-	public async uploadFile(transactionId: string, fileContent: any): Promise<void> {
+	public async uploadFile(transactionId: string, data: any): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
-		checkNotNull(fileContent, "Missing file content.");
+		checkArgument(data && data.length > 0, "No data to upload.");
 
 		try {
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, fileContent, HttpClient.NO_RESPONSE, HttpMethod.POST);
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}		
 	}
 
-	public async downloadFile<T>(transactionId: string): Promise<T> {
+	public async downloadFile(transactionId: string): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
 
 		try {
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>>{
-				deserialize(content: any): T {
-					return content as T;
+			let dataBuffer = Buffer.from("");
+			let dataParser = {
+				onData(chunk: any): void {
+					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+				},
+				onEnd(): void {
+				// Process end.
 				}
-			}, HttpMethod.GET);
-			return returnValue;
+			} as StreamResponseParser;
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
+			return dataBuffer;
 		} catch (e) {
-			if (e instanceof NodeRPCException) {
-				this.handleError(e);
-			}
-			throw new NetworkException(e.message, e);
+			this.handleError(e);
 		}
 	}
 
