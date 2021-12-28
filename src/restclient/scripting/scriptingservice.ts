@@ -122,15 +122,17 @@ export class ScriptingService extends RestService {
 
 		try {
 			let dataBuffer = Buffer.from("");
-			let dataParser = {
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD,
+			{
 				onData(chunk: any): void {
 					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
 				},
 				onEnd(): void {
 				// Process end.
 				}
-			} as StreamResponseParser;
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
+			} as StreamResponseParser,
+			HttpMethod.GET);
+
 			return dataBuffer;
 		} catch (e) {
 			this.handleError(e);
