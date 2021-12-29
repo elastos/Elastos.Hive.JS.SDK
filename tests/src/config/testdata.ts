@@ -1,4 +1,4 @@
-import { HiveException, VaultServices, AppContext, Logger, Utils, File } from "@elastosfoundation/elastos-hive-js-sdk";
+import { HiveException, VaultServices, AppContext, Logger, Utils, File, HiveBackupContext } from "@elastosfoundation/elastos-hive-js-sdk";
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
@@ -52,6 +52,46 @@ export class TestData {
 
 	public getProviderAddress(): string {
 		return this.clientConfig.node.provider;
+	}
+
+	public getBackupContext(): HiveBackupContext {
+		return {
+
+			getParameter(parameter:string): string {
+				switch (parameter) {
+					case "targetAddress":
+						return this.getTargetProviderAddress();
+		
+					case "targetServiceDid":
+						return this.getTargetServiceDid();
+		
+					default:
+						break;
+				}
+				return null;
+			},
+
+			getType(): string {
+				return null;
+			},
+
+			getTargetProviderAddress(): string {
+				return this.clientConfig.node.targetHost;
+			},
+
+			getTargetServiceDid(): string {
+				return this.clientConfig.node.targetDid;
+			},
+
+			async getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
+				try {
+					return this.userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
+				} catch (e) {
+					throw new HiveException(e.getMessage());
+				}
+				
+			}
+		}
 	}
 
 	public newVault(): VaultServices {
@@ -166,6 +206,11 @@ export class TestData {
 	public getUserDid(): string {
 		return this.userDid.toString();
 	}
+
+	public getUser(): UserDID {
+		return this.userDid;
+	}
+
 
 	public getCallerDid(): string {
 		return this.callerDid.toString();
