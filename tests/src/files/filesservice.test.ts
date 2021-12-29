@@ -1,4 +1,4 @@
-import { File, FilesService, VaultSubscriptionService, StreamResponseParser, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, FilesService, HttpClient, VaultSubscriptionService, StreamResponseParser, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -73,27 +73,13 @@ describe("test file service", () => {
 
 	test("testDownloadText", async () => {
 		let dataBuffer = Buffer.from("");
-		await filesService.download(REMOTE_DIR + FILE_NAME_TXT, {
-			onData(chunk: any): void {
-				dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
-			},
-			onEnd(): void {
-			// Process end.
-			}
-		} as StreamResponseParser);
+		await filesService.download(REMOTE_DIR + FILE_NAME_TXT, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
 		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_TXT);
     });
 
 	test("testDownloadBin", async () => {
 		let dataBuffer = Buffer.from("");
-		await filesService.download(REMOTE_DIR + FILE_NAME_BIN, {
-			onData(chunk: any): void {
-				dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
-			},
-			onEnd(): void {
-			// Process end.
-			}
-		} as StreamResponseParser);
+		await filesService.download(REMOTE_DIR + FILE_NAME_BIN, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
 		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_BIN);
     });
 
@@ -101,20 +87,13 @@ describe("test file service", () => {
 		let expectedException;
 		try {
 			let dataBuffer = Buffer.from("");
-			await filesService.download(FILE_NAME_NOT_EXISTS, {
-				onData(chunk: any): void {
-					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
-				},
-				onEnd(): void {
-				// Process end.
-				}
-			} as StreamResponseParser);
+			await filesService.download(FILE_NAME_NOT_EXISTS, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
 		} catch(e) {
 			expectedException = e;
 		}
 		expect(expectedException).toBeInstanceOf(NotFoundException);
 	 });
-	
+
 	test("testList", async () => {
 		let files = await filesService.list(REMOTE_DIR);
 		expect(files).not.toBeNull();
@@ -122,9 +101,9 @@ describe("test file service", () => {
 		let hasOurTextFile = false;
 		let hasOurBinFile = false;
 		files.forEach((element) => {
-			if (element.getName() === FILE_NAME_TXT) {
+			if (element.getName() === `hive/${FILE_NAME_TXT}`) {
 				hasOurTextFile = true;
-			} else if (element.getName() === FILE_NAME_BIN) {
+			} else if (element.getName() === `hive/${FILE_NAME_BIN}`) {
 				hasOurBinFile = true;
 			}
 		});

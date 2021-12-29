@@ -117,23 +117,11 @@ export class ScriptingService extends RestService {
 		}		
 	}
 
-	public async downloadFile(transactionId: string): Promise<Buffer> {
+	public async downloadFile(transactionId: string, dataParser: StreamResponseParser): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
-
+		checkNotNull(dataParser, "Download data handler is mandatory");
 		try {
-			let dataBuffer = Buffer.from("");
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD,
-			{
-				onData(chunk: any): void {
-					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
-				},
-				onEnd(): void {
-				// Process end.
-				}
-			} as StreamResponseParser,
-			HttpMethod.GET);
-
-			return dataBuffer;
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
 		} catch (e) {
 			this.handleError(e);
 		}
