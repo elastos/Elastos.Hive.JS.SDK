@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
+import { HttpClient, VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -307,7 +307,9 @@ describe("test scripting function", () => {
     }
 
 	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
-        return await scriptingService.downloadFile<string>(transactionId);
+        let dataBuffer = Buffer.from("");
+        await scriptingService.downloadFile(transactionId, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
+        return dataBuffer.toString();
 	}
 
 });
