@@ -103,18 +103,19 @@ describe("test scripting function", () => {
 
 
     test("testUploadFile", async () => {
-        registerScriptFileUpload(UPLOAD_FILE_NAME);
+        await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let transactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
         await uploadFileByTransActionId(transactionId, "test");
         //FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
     });
 
 
-    test.skip("testFileDownload", async () => {
-        // FilesServiceTest.removeLocalFile(localDstFilePath);
-        // registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        // String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-        // downloadFileByTransActionId(transactionId);
+    test("testFileDownload", async () => {
+        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        let transactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+        await downloadFileByTransActionId(transactionId).then(res => {
+            console.log(`get the downloaded file content: ${res}`);
+        });
         // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
     });
 
@@ -133,7 +134,7 @@ describe("test scripting function", () => {
         try {
             await databaseService.createCollection(collectionName);
         } catch (e) {
-            console.log("Failed to create collection: {}", e.getMessage());
+            console.log(`Failed to create collection: ${e}`);
         }
     }
 
@@ -144,7 +145,7 @@ describe("test scripting function", () => {
 		try {
 			await databaseService.deleteCollection(COLLECTION_NAME);
 		} catch (e) {
-			console.error("Failed to remove collection: {}", e.getMessage());
+			console.error(`Failed to remove collection: ${e}`);
 		}
     }
     
@@ -290,10 +291,10 @@ describe("test scripting function", () => {
     }
         
     async function registerScriptFileDownload( scriptName: string) {
-        await expect(scriptingService.registerScript(scriptName, 
+        await scriptingService.registerScript(scriptName,
             new FileDownloadExecutable(scriptName).setOutput(true),
             undefined,
-            false, false)).not.toThrow();
+            false, false);
     }
 
 	async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {
@@ -306,10 +307,8 @@ describe("test scripting function", () => {
         return result[scriptName].transaction_id;
     }
 
-	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
-        let dataBuffer = Buffer.from("");
-        await scriptingService.downloadFile(transactionId, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
-        return dataBuffer.toString();
+    async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
+        return await scriptingService.downloadFile(transactionId);
 	}
 
 });
