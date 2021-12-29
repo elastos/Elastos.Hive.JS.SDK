@@ -66,6 +66,12 @@ import { SortItem, AscendingSortItem, DescendingSortItem } from "./restclient/da
 import { Order } from "./domain/payment/order";
 import { Receipt } from "./domain/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
+import { BackupContext } from "./restclient/backup/backupcontext";
+import { CodeFetcher } from "./restclient/backup/codefetcher";
+import { CredentialCode } from "./restclient/backup/credentialcode";
+import { RemoteResolver } from "./restclient/backup/remoteresolver";
+import { LocalResolver } from "./restclient/backup/localresolver";
+import { HiveBackupContext } from "./restclient/backup/hivebackupcontext";
 
 
 Logger.setDefaultLevel(Logger.DEBUG);
@@ -79,11 +85,17 @@ export type {
     StreamResponseParser,
     AppContextProvider,
     BridgeHandler,
+    CodeFetcher,
+    BackupContext,
 }
 
 export {
     Logger,
     //initialize,
+    HiveBackupContext,
+    LocalResolver,
+    CredentialCode,
+    RemoteResolver,
     DefaultAppContextProvider,
     AppContextParameters,
     VaultServices,
