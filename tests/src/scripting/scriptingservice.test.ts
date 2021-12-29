@@ -1,4 +1,4 @@
-import { VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable } from "@elastosfoundation/elastos-hive-js-sdk";
+import { HttpClient, VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -103,19 +103,18 @@ describe("test scripting function", () => {
 
 
     test("testUploadFile", async () => {
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
+        registerScriptFileUpload(UPLOAD_FILE_NAME);
         let transactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
         await uploadFileByTransActionId(transactionId, "test");
         //FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
     });
 
 
-    test("testFileDownload", async () => {
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        let transactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-        await downloadFileByTransActionId(transactionId).then(res => {
-            console.log(`get the downloaded file content: ${res}`);
-        });
+    test.skip("testFileDownload", async () => {
+        // FilesServiceTest.removeLocalFile(localDstFilePath);
+        // registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        // String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+        // downloadFileByTransActionId(transactionId);
         // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
     });
 
@@ -134,7 +133,7 @@ describe("test scripting function", () => {
         try {
             await databaseService.createCollection(collectionName);
         } catch (e) {
-            console.log(`Failed to create collection: ${e}`);
+            console.log("Failed to create collection: {}", e.getMessage());
         }
     }
 
@@ -145,7 +144,7 @@ describe("test scripting function", () => {
 		try {
 			await databaseService.deleteCollection(COLLECTION_NAME);
 		} catch (e) {
-			console.error(`Failed to remove collection: ${e}`);
+			console.error("Failed to remove collection: {}", e.getMessage());
 		}
     }
     
@@ -291,10 +290,10 @@ describe("test scripting function", () => {
     }
         
     async function registerScriptFileDownload( scriptName: string) {
-        await scriptingService.registerScript(scriptName,
+        await expect(scriptingService.registerScript(scriptName, 
             new FileDownloadExecutable(scriptName).setOutput(true),
             undefined,
-            false, false);
+            false, false)).not.toThrow();
     }
 
 	async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {
@@ -307,9 +306,11 @@ describe("test scripting function", () => {
         return result[scriptName].transaction_id;
     }
 
-    async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
-        return await scriptingService.downloadFile(transactionId);
-    }
+	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
+        let dataBuffer = Buffer.from("");
+        await scriptingService.downloadFile(transactionId, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
+        return dataBuffer.toString();
+	}
 
 });
 // describe.skip("test scripting service", () => {
