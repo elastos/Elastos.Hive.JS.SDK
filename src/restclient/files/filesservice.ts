@@ -7,7 +7,7 @@ import { ServiceContext } from "../../http/servicecontext";
 import { Logger } from '../../logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
-import { checkArgument } from "../../domain/utils";
+import { checkArgument, checkNotNull } from "../../domain/utils";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -40,6 +40,8 @@ export class FilesService extends RestService {
 	 */
 
 	public async download(path: string, dataParser: StreamResponseParser): Promise<void> {
+		checkNotNull(path, "Remote file path is mandatory.");
+		checkNotNull(dataParser, "Download data handler is mandatory.");
 		try {
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
 		} catch (e) {
@@ -48,6 +50,7 @@ export class FilesService extends RestService {
 	}
 
 	public async upload(path: string, data: Buffer): Promise<void> {
+		checkNotNull(path, "Remote destination path is mandatory.");
 		checkArgument(data && data.length > 0, "No data to upload.");
 		try {
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
