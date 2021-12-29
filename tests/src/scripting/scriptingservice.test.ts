@@ -33,7 +33,7 @@ describe("test scripting function", () => {
     let localSrcFilePath: string;
     let localDstFileRoot: string;
     let localDstFilePath: string;
-    let fileName: string;
+    let fileName: string = "test.txt";
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
@@ -102,11 +102,11 @@ describe("test scripting function", () => {
     });
 
 
-    test.skip("testUploadFile", async () => {
-        // registerScriptFileUpload(UPLOAD_FILE_NAME);
-        // let transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-        // uploadFileByTransActionId(transactionId);
-        // FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
+    test("testUploadFile", async () => {
+        registerScriptFileUpload(UPLOAD_FILE_NAME);
+        let transactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
+        await uploadFileByTransActionId(transactionId, "test");
+        //FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
     });
 
 
@@ -247,6 +247,8 @@ describe("test scripting function", () => {
                 targetDid, appDid);
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
+
+        console.log(JSON.stringify(result[scriptName]));
         expect(result[scriptName].transaction_id).not.toBeNull();
         return result[scriptName].transaction_id;
     }
