@@ -47,17 +47,6 @@ export class HttpClient {
         headers: HttpClient.DEFAULT_HEADERS
     };
 
-    public static DEFAULT_STREAM_PARSER(data: Buffer): StreamResponseParser {
-      return {
-        onData(chunk: any): void {
-                data = Buffer.concat([data, Buffer.from(chunk)]);
-        },
-        onEnd(): void {
-        // Process end.
-        }
-      } as StreamResponseParser;
-    }
-
     private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: http.RequestOptions;

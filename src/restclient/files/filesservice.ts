@@ -39,11 +39,22 @@ export class FilesService extends RestService {
 	 * }
 	 */
 
-	public async download(path: string, dataParser: StreamResponseParser): Promise<void> {
+	public async download(path: string): Promise<Buffer> {
 		checkNotNull(path, "Remote file path is mandatory.");
-		checkNotNull(dataParser, "Download data handler is mandatory.");
 		try {
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, dataParser, HttpMethod.GET);
+			let dataBuffer = Buffer.from("");
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
+			{
+				onData(chunk: any): void {
+					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+				},
+				onEnd(): void {
+					// Process end.
+				}
+      		} as StreamResponseParser,
+			HttpMethod.GET);
+
+			return dataBuffer;
 		} catch (e) {
 			this.handleError(e);
 		}

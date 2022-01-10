@@ -72,22 +72,19 @@ describe("test file service", () => {
     });
 
 	test("testDownloadText", async () => {
-		let dataBuffer = Buffer.from("");
-		await filesService.download(REMOTE_DIR + FILE_NAME_TXT, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
+		let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_TXT);
 		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_TXT);
     });
 
 	test("testDownloadBin", async () => {
-		let dataBuffer = Buffer.from("");
-		await filesService.download(REMOTE_DIR + FILE_NAME_BIN, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
+		let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_BIN);
 		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_BIN);
     });
 
 	test("testDownloadBin4NotFoundException", async () => {
 		let expectedException;
 		try {
-			let dataBuffer = Buffer.from("");
-			await filesService.download(FILE_NAME_NOT_EXISTS, HttpClient.DEFAULT_STREAM_PARSER(dataBuffer));
+			await filesService.download(FILE_NAME_NOT_EXISTS);
 		} catch(e) {
 			expectedException = e;
 		}
