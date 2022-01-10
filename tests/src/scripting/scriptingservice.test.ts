@@ -113,10 +113,23 @@ describe("test scripting function", () => {
     test("testFileDownload", async () => {
         await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
         let transactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-        await downloadFileByTransActionId(transactionId).then(res => {
-            console.log(`get the downloaded file content: ${res}`);
-        });
+        let buffer = await downloadFileByTransActionId(transactionId);
+        console.log(`get the downloaded file content: ${buffer.toString()}`);
         // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+    });
+
+    test("testDownloadAndUpload", async () => {
+
+        await registerScriptFileUpload(UPLOAD_FILE_NAME);
+        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
+        await uploadFileByTransActionId(uploadTransactionId, "test Download and Upload content");
+
+        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
+        let buffer = await downloadFileByTransActionId(downloadTransactionId);
+        console.log(`get the upload/download file content: ${buffer}`);
+        expect(buffer.toString()).not.toBeNull(); //Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+        expect(buffer.toString()).not.toBeUndefined();
     });
 
     test("testFileProperties", async () => {
