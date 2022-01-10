@@ -98,9 +98,9 @@ describe("test file service", () => {
 		let hasOurTextFile = false;
 		let hasOurBinFile = false;
 		files.forEach((element) => {
-			if (element.getName() === `hive/${FILE_NAME_TXT}`) {
+			if (element.getName() === FILE_NAME_TXT) {
 				hasOurTextFile = true;
-			} else if (element.getName() === `hive/${FILE_NAME_BIN}`) {
+			} else if (element.getName() === FILE_NAME_BIN) {
 				hasOurBinFile = true;
 			}
 		});
