@@ -306,11 +306,10 @@ describe("test scripting function", () => {
         expect(result[scriptName].transaction_id).not.toBeNull();
         return result[scriptName].transaction_id;
     }
-
-    async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
-        return await scriptingService.downloadFile(transactionId);
+	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
+        let dataBuffer = await scriptingService.downloadFile(transactionId);
+        return dataBuffer.toString();
 	}
-
 });
 // describe.skip("test scripting service", () => {
     
