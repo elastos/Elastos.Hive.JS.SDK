@@ -119,7 +119,7 @@ export class HttpClient {
         if (options.headers['Authorization']) {
           HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
         }
-
+        
         return new Promise<T>((resolve, reject) => {
           if (runningInBrowser()) {
             void axios({
@@ -131,15 +131,17 @@ export class HttpClient {
                     "Accept": "application/json",
                     "Authorization": `${options.headers['Authorization']}`
                 },
+                responseType: isStream ? 'arraybuffer' : 'text',
                 data: payload
               }).then((response) => {
                   if (isStream) {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                    streamParser.onData(response.data);
+                    streamParser.onData(this.toBuffer(response.data));
                     self.handleResponse(response.status);
                     streamParser.onEnd();
+                    resolve(null as T);
                   } else {
-                    const rawContent = JSON.stringify(response.data);
+                    const rawContent = response.data;
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
                     HttpClient.LOG.debug("Axios status text: " + response.statusText);
 
@@ -277,4 +279,13 @@ export class HttpClient {
 
         return httpOptions;
     }
+
+  private toBuffer(ab: ArrayBuffer): Buffer {
+      const buf = Buffer.alloc(ab.byteLength);
+      const view = new Uint8Array(ab);
+      for (let i = 0; i < buf.length; ++i) {
+          buf[i] = view[i];
+      }
+      return buf;
+  }
 }
