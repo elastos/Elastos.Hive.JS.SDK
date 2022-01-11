@@ -136,7 +136,7 @@ export class HttpClient {
               }).then((response) => {
                   if (isStream) {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                    streamParser.onData(this.toBuffer(response.data));
+                    streamParser.onData(Buffer.from(response.data));
                     self.handleResponse(response.status);
                     streamParser.onEnd();
                     resolve(null as T);
@@ -279,13 +279,4 @@ export class HttpClient {
 
         return httpOptions;
     }
-
-  private toBuffer(ab: ArrayBuffer): Buffer {
-      const buf = Buffer.alloc(ab.byteLength);
-      const view = new Uint8Array(ab);
-      for (let i = 0; i < buf.length; ++i) {
-          buf[i] = view[i];
-      }
-      return buf;
-  }
 }
