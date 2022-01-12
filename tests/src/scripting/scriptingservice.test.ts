@@ -21,7 +21,7 @@ describe("test scripting function", () => {
     const FILE_HASH_NAME = "file_hash";
     
     const COLLECTION_NAME = "script_database";
-    const LOCAL_FILE_CONTENT = "this is test file abcdefghijklmnopqrstuvwxyz";
+    const FILE_CONTENT = "this is test file abcdefghijklmnopqrstuvwxyz";
 
     let targetDid: string;
     let appDid: string;
@@ -71,6 +71,19 @@ describe("test scripting function", () => {
         }
     });
     
+	function expectBuffersToBeEqual(expected: Buffer, actual: Buffer): void {
+        expect(actual).not.toBeNull();
+        expect(actual).not.toBeUndefined();
+		expect(actual.byteLength).toEqual(expected.byteLength);
+		for (var i = 0 ; i != actual.byteLength ; i++)
+		{
+			if (actual[i] != expected[i]) {
+				console.log(i + ": Actual: " + actual[i] + " Expected: " + expected[i]);
+			}
+			expect(actual[i]).toEqual(expected[i]);
+		}
+	}
+
     test("testInsert", async () => {
         await registerScriptInsert(INSERT_NAME);
         await callScriptInsert(INSERT_NAME);
@@ -101,35 +114,14 @@ describe("test scripting function", () => {
         await callScriptDelete(DELETE_NAME);
     });
 
-
-    test("testUploadFile", async () => {
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
-        let transactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-        await uploadFileByTransActionId(transactionId, "test");
-        //FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
-    });
-
-
-    test("testFileDownload", async () => {
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        let transactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-        let buffer = await downloadFileByTransActionId(transactionId);
-        console.log(`get the downloaded file content: ${buffer.toString()}`);
-        // Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
-    });
-
     test("testDownloadAndUpload", async () => {
-
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
-        await uploadFileByTransActionId(uploadTransactionId, "test Download and Upload content");
-
+        await uploadFileByTransActionId(uploadTransactionId, FILE_CONTENT);
         await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
         let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
         let buffer = await downloadFileByTransActionId(downloadTransactionId);
-        console.log(`get the upload/download file content: ${buffer}`);
-        expect(buffer.toString()).not.toBeNull(); //Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
-        expect(buffer.toString()).not.toBeUndefined();
+        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
 
     test("testFileProperties", async () => {
@@ -319,9 +311,8 @@ describe("test scripting function", () => {
         expect(result[scriptName].transaction_id).not.toBeNull();
         return result[scriptName].transaction_id;
     }
-	async function downloadFileByTransActionId(transactionId: string): Promise<string> {
-        let dataBuffer = await scriptingService.downloadFile(transactionId);
-        return dataBuffer.toString();
+	async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
+        return await scriptingService.downloadFile(transactionId);
 	}
 });
 // describe.skip("test scripting service", () => {

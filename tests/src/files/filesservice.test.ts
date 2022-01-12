@@ -28,7 +28,7 @@ describe("test file service", () => {
 		cleanTestFile();
 	});
 
-	function prepareTestFile() {
+	function prepareTestFile(): void {
 		let testFile = new File(FILE_NAME_TXT);
 		testFile.createFile(true);
 		testFile.write(Buffer.from(FILE_CONTENT_TXT));
@@ -38,11 +38,24 @@ describe("test file service", () => {
 		binTestFile.write(Buffer.from(FILE_CONTENT_BIN));
 	}
 
-	function cleanTestFile() {
+	function cleanTestFile(): void {
 		let testFile = new File("testfile.txt");
 		testFile.delete();
 		let binTestFile = new File("testfile.txt");
 		binTestFile.delete();
+	}
+
+	function expectBuffersToBeEqual(expected: Buffer, actual: Buffer): void {
+		expect(actual).not.toBeNull();
+        expect(actual).not.toBeUndefined();
+		expect(actual.byteLength).toEqual(expected.byteLength);
+		for (var i = 0 ; i != actual.byteLength ; i++)
+		{
+			if (actual[i] != expected[i]) {
+				console.log(i + ": Actual: " + actual[i] + " Expected: " + expected[i]);
+			}
+			expect(actual[i]).toEqual(expected[i]);
+		}
 	}
 
 	async function verifyRemoteFileExists(path: string) {
@@ -73,12 +86,12 @@ describe("test file service", () => {
 
 	test("testDownloadText", async () => {
 		let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_TXT);
-		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_TXT);
+		expectBuffersToBeEqual(Buffer.from(FILE_CONTENT_TXT), dataBuffer);
     });
 
 	test("testDownloadBin", async () => {
 		let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_BIN);
-		expect(dataBuffer.toString()).toEqual(FILE_CONTENT_BIN);
+		expectBuffersToBeEqual(Buffer.from(FILE_CONTENT_BIN), dataBuffer);
     });
 
 	test("testDownloadBin4NotFoundException", async () => {

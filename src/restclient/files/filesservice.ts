@@ -18,42 +18,21 @@ export class FilesService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
-	/**
-	 * Start an async file download
-	 * 
-	 * @param path Path to the remote file to get
-	 * @param dataParser Instance of StreamResponseParser
-	 * 
-	 * 
-	 * Sample usage
-	 * 
-	 * public async testIt() {
-	 * 		await this.download("someFile", <StreamResponseParser> {
-	 * 			onData(chunk: any): void {
-	 * 				// Process chunk of data.
-	 * 			},
-	 * 			onEnd(): void {
-	 * 				// Process end.
-	 * 			}
-	 * 		});
-	 * }
-	 */
-
 	public async download(path: string): Promise<Buffer> {
 		checkNotNull(path, "Remote file path is mandatory.");
 		try {
-			let dataBuffer = Buffer.from("");
+			let dataBuffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
 			{
-				onData(chunk: any): void {
-					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+				onData(chunk: Buffer): void {
+					dataBuffer = Buffer.concat([dataBuffer, chunk]);
 				},
 				onEnd(): void {
 					// Process end.
 				}
       		} as StreamResponseParser,
 			HttpMethod.GET);
-
+			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 			return dataBuffer;
 		} catch (e) {
 			this.handleError(e);
@@ -63,6 +42,7 @@ export class FilesService extends RestService {
 	public async upload(path: string, data: Buffer): Promise<void> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkArgument(data && data.length > 0, "No data to upload.");
+		FilesService.LOG.debug("Uploading " + Buffer.byteLength(data) + " byte(s).");
 		try {
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
