@@ -111,6 +111,7 @@ export class ScriptingService extends RestService {
 		checkArgument(data && data.length > 0, "No data to upload.");
 
 		try {
+			ScriptingService.LOG.debug("Uploading " + Buffer.byteLength(data) + " byte(s)");
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
@@ -120,11 +121,11 @@ export class ScriptingService extends RestService {
 	public async downloadFile(transactionId: string): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		try {
-			let dataBuffer = Buffer.from("");
+			let dataBuffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, 
 			{
-				onData(chunk: any): void {
-					dataBuffer = Buffer.concat([dataBuffer, Buffer.from(chunk)]);
+				onData(chunk: Buffer): void {
+					dataBuffer = Buffer.concat([dataBuffer, chunk]);
 				},
 				onEnd(): void {
 					// Process end.
@@ -132,6 +133,7 @@ export class ScriptingService extends RestService {
       		} as StreamResponseParser,
 			HttpMethod.GET);
 
+			ScriptingService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 			return dataBuffer;
 		} catch (e) {
 			this.handleError(e);

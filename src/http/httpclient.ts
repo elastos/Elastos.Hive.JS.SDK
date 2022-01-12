@@ -104,7 +104,7 @@ export class HttpClient {
         if (options.method === HttpMethod.GET) {
           payload = "";
         }
-        if (payload && payload.includes("\\\"")) {
+        if (payload && typeof payload === 'string' && payload.includes("\\\"")) {
           HttpClient.LOG.warn("Possible double payload escaping detected.");
         }
         let isStream = ('onData' in responseParser);
@@ -127,21 +127,27 @@ export class HttpClient {
                 url: options.protocol + "//" + options.host + ":" + options.port + options.path,
                 headers: {
                     // Don't set user-agent in browser environment, this is forbidden by modern browsers.
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
+                    "Content-Type": isStream ? "application/octet-stream" : "application/json",
+                    "Accept": isStream ? "application/octet-stream" : "application/json",
+                    "Transfer-Encoding": "chunked",
                     "Authorization": `${options.headers['Authorization']}`
                 },
-                responseType: isStream ? 'arraybuffer' : 'text',
-                data: payload
+                responseType: isStream ? "arraybuffer" : "text",
+                data: payload,
+                validateStatus: (status) => { return true; },
+                transitional: {
+                  forcedJSONParsing: false
+                }
               }).then((response) => {
                   if (isStream) {
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                    streamParser.onData(Buffer.from(response.data));
+                    HttpClient.LOG.debug("HTTP Response: Size: " + response.data.byteLength);
+                    streamParser.onData(response.data);
                     self.handleResponse(response.status);
                     streamParser.onEnd();
                     resolve(null as T);
                   } else {
-                    const rawContent = JSON.stringify(response.data);
+                    const rawContent = response.data;
                     HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
                     HttpClient.LOG.debug("Axios status text: " + response.statusText);
 
@@ -149,6 +155,8 @@ export class HttpClient {
                     let deserialized = responseParser.deserialize(rawContent);
                     resolve(deserialized);
                   }
+              }).catch((error) => {
+                reject(error);
               });
           }
           else {
@@ -230,10 +238,10 @@ export class HttpClient {
      * Return provided payload as a serialized JSON object or as url
      * parameters for GET requests.
      */
-    private parsePayload(payload: any, method: HttpMethod): string {
+    private parsePayload(payload: any, method: HttpMethod): any {
         // No transformation needed when the payload is empty or already a string
         if (!payload || typeof payload === 'string' || Buffer.isBuffer(payload)) {
-          return payload.toString();
+          return payload;
         }
         // Convert payload object properties to URL parameters
         if (method === HttpMethod.GET) {

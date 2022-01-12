@@ -54,7 +54,7 @@ export class HttpException extends ParentException {
 export class MalformedDIDException extends IllegalArgumentException {}
 export class NetworkException extends ParentException {
     constructor(message: string, causedBy?: Error) {
-        super("Unkown network exception with message: " + message, causedBy);
+        super("Unknown network exception with message: " + message, causedBy);
     }
 
 }
