@@ -15,7 +15,8 @@
     "tsc:build": "rollup -c",
     "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:w": "tsc -w",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "typings": "typings/",
   "dependencies": {

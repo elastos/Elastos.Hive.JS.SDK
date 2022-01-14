@@ -8,6 +8,7 @@ import { PricingPlan } from "../../../domain/subscription/pricingplan";
 import { VaultInfo } from "../../../domain/subscription/vaultinfo";
 import { Receipt } from "../../../domain/payment/receipt";
 import { Order } from "../../../domain/payment/order";
+import {AppInfo} from "../../../domain/subscription/appinfo";
 
 export class VaultSubscriptionService extends ServiceContext {
 	private static LOG = new Logger("VaultSubscriptionService");
@@ -40,6 +41,10 @@ export class VaultSubscriptionService extends ServiceContext {
 
 	public async checkSubscription(): Promise<VaultInfo> {
 		return await this.subscriptionService.getVaultInfo();
+	}
+
+	public async getAppStats(): Promise<AppInfo[]> {
+		return await this.subscriptionService.getAppStats();
 	}
 
 	public async placeOrder(planName: string): Promise<Order> {
