@@ -7,6 +7,7 @@ import { VaultInfo } from "../../domain/subscription/vaultinfo";
 import { BackupInfo } from "../../domain/subscription/backupinfo";
 import { HttpResponseParser } from '../../http/httpresponseparser';
 import { HttpMethod } from "../../http/httpmethod";
+import {AppInfo} from "../../domain/subscription/appinfo";
 
 export class SubscriptionService extends RestService {
 	private static LOG = new Logger("SubscriptionService");
@@ -17,6 +18,7 @@ export class SubscriptionService extends RestService {
 	private static DEACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=deactivation";
 	private static UNSUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
 	private static VAULT_INFO_ENDPOINT = "/api/v2/subscription/vault";
+	private static APP_INFO_ENDPOINT = "/api/v2/subscription/vault/app_stats";
 	private static SUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
 	private static ACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=activation";
 	private static DEACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=deactivation";
@@ -78,6 +80,20 @@ export class SubscriptionService extends RestService {
 			deserialize(content: any): VaultInfo {
 				let jsonObj = JSON.parse(content);
 				return (new VaultInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["price_plan"]);
+			}
+		}, HttpMethod.GET);
+	}
+
+	/**
+	 * Get the details of the vault applications.
+	 *
+	 * @return The details of the vault applications.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public async getAppStats(): Promise<AppInfo[]> {
+		return await this.httpClient.send(SubscriptionService.APP_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<AppInfo[]>> {
+			deserialize(content: any): AppInfo[] {
+				return JSON.parse(content)["apps"].map(v => Object.assign(new AppInfo(), v));
 			}
 		}, HttpMethod.GET);
 	}
