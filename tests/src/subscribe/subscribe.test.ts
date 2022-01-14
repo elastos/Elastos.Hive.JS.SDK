@@ -8,7 +8,6 @@ describe("test vault subscribe function", () => {
     let vaultsubscriptionService: VaultSubscriptionService;
     let PRICING_PLAN_NAME = "Rookie";
 
-
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
         vaultsubscriptionService = new VaultSubscriptionService(
@@ -55,6 +54,12 @@ describe("test vault subscribe function", () => {
 	// 		Assertions.assertNotNull(order.getOrderId());
 	// 	});
 	// }
+
+    test("test get app stats", async () => {
+        let appStats = await vaultsubscriptionService.getAppStats();
+        expect(appStats).not.toBeNull();
+        expect(appStats).not.toEqual([]);
+    });
 
     test("testSubscribeCheckUnsubscribe", async () => {
         let vaultInfo;

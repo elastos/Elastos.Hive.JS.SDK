@@ -2,6 +2,7 @@ import { HiveException, VaultServices, AppContext, Logger, Utils, File, HiveBack
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
+import {ProviderService} from "../../../src/restclient/provider/providerservice";
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
@@ -96,6 +97,10 @@ export class TestData {
 
 	public newVault(): VaultServices {
 		return new VaultServices(this.context, this.getProviderAddress());
+	}
+
+	public createProviderService() {
+		return new ProviderService(this.context, this.getProviderAddress());
 	}
 
     public async init(): Promise<TestData> {
