@@ -20,7 +20,7 @@
 
   "node": {
     "provider": "http://localhost",
-    "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
+    "targetDid": "did:elastos:ihFqmW7UVwsSoSGoQbHYbBsdFAJHohMRJR",
     "targetHost": "http://localhost:9001",
     "storePath": "develop"
   },

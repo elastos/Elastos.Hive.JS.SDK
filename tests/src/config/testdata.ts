@@ -1,8 +1,19 @@
-import { HiveException, VaultServices, AppContext, Logger, Utils, File, HiveBackupContext } from "@elastosfoundation/elastos-hive-js-sdk";
+import {
+	HiveException,
+	VaultServices,
+	AppContext,
+	Logger,
+	Utils,
+	File,
+	HiveBackupContext,
+	BackupContext
+} from "../../../src";
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
+import path from 'path';
 import {ProviderService} from "../../../src/restclient/provider/providerservice";
+import {Backup} from "../../../src/api/backup";
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
@@ -55,48 +66,12 @@ export class TestData {
 		return this.clientConfig.node.provider;
 	}
 
-	public getBackupContext(): HiveBackupContext {
-		return {
-
-			getParameter(parameter:string): string {
-				switch (parameter) {
-					case "targetAddress":
-						return this.getTargetProviderAddress();
-		
-					case "targetServiceDid":
-						return this.getTargetServiceDid();
-		
-					default:
-						break;
-				}
-				return null;
-			},
-
-			getType(): string {
-				return null;
-			},
-
-			getTargetProviderAddress(): string {
-				return this.clientConfig.node.targetHost;
-			},
-
-			getTargetServiceDid(): string {
-				return this.clientConfig.node.targetDid;
-			},
-
-			async getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
-				try {
-					return this.userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
-				} catch (e) {
-					throw new HiveException(e.getMessage());
-				}
-				
-			}
-		}
-	}
-
 	public newVault(): VaultServices {
 		return new VaultServices(this.context, this.getProviderAddress());
+	}
+
+	public newBackup(): Backup {
+		return new Backup(this.context, this.getProviderAddress());
 	}
 
 	public createProviderService() {
@@ -141,7 +116,6 @@ export class TestData {
 				return self.getLocalStorePath();
 			},
 
-			
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
 				try {
 					return await self.appInstanceDid.getDocument();
@@ -196,7 +170,7 @@ export class TestData {
 							await self.userDid.issueDiplomaFor(self.appInstanceDid),
 							claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
 				} catch (e) {
-					throw new HiveException(e.getMessage(), e);
+					throw new HiveException(e.toString(), e);
 				}
 			}
 		}, this.callerDid.getDid().toString());
@@ -216,8 +190,49 @@ export class TestData {
 		return this.userDid;
 	}
 
+	private getTargetProviderAddress(): string {
+		return this.clientConfig.node.targetHost;
+	}
+
+	private getTargetServiceDid(): string {
+		return this.clientConfig.node.targetDid;
+	}
 
 	public getCallerDid(): string {
 		return this.callerDid.toString();
+	}
+
+	public getBackupService() {
+		const backupService = this.newVault().getBackupService();
+		const self = this;
+		backupService.setBackupContext({
+			getParameter(parameter:string): string {
+				switch (parameter) {
+					case "targetAddress":
+						return self.getTargetProviderAddress();
+
+					case "targetServiceDid":
+						return self.getTargetServiceDid();
+
+					default:
+						break;
+				}
+				return null;
+			},
+
+			getType(): string {
+				return null;
+			},
+
+			async getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
+				try {
+					return (await self.userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid)).toString();
+				} catch (e) {
+					throw new HiveException(e.toString());
+				}
+
+			}
+		});
+		return backupService;
 	}
 }

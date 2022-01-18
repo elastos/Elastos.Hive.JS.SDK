@@ -1,33 +1,25 @@
 import { TestData } from "./config/testdata";
-import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem, CountOptions, PromotionService } from "@elastosfoundation/elastos-hive-js-sdk";
+import {PromotionService, VaultSubscriptionService} from "../../src";
 import { ClientConfig } from "./config/clientconfig";
-import { NotImplementedException } from "../../typings/exceptions";
 
 
-describe("test database services", () => {
-   
-    let testData: TestData;
-    let vaultSubscriptionService: VaultSubscriptionService;
-    let vaultServices: VaultServices;
+describe.skip("test database services", () => {
     let promotionService: PromotionService;
-   
 
     beforeAll(async () => {
-
-        let testData = await TestData.getInstance("databaseservice.tests", ClientConfig.CUSTOM, TestData.USER_DIR);
-
-        vaultServices = new VaultServices(
+        const testData = await TestData.getInstance("promotionservice.tests", ClientConfig.CUSTOM, TestData.USER_DIR);
+        promotionService = testData.newBackup().getPromotionService();
+        const vaultSubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());
-
-        
-        promotionService = vaultServices.getPromotionService();
+        try {
+            await vaultSubscriptionService.unsubscribe();
+        } catch (e) {
+            // do nothing.
+        }
     });
-
 
     test("testPromote", async () => {
-        await expect(promotionService.promote()).rejects.toThrow(NotImplementedException);
-        
+        await promotionService.promote();
     });
-
 });
