@@ -8,7 +8,7 @@ import { HttpResponseParser } from '../../http/httpresponseparser';
 import { InsertOptions } from "./insertoptions";
 import { InsertResult } from "./insertresult";
 import { FindOptions } from "./findoptions";
-import { JSONObject } from "@elastosfoundation/did-js-sdk/";
+import { JSONObject } from "@elastosfoundation/did-js-sdk";
 import { CountOptions } from "./countoptions";
 import { QueryOptions } from "./queryoptions";
 import { UpdateOptions } from "./updateoptions";

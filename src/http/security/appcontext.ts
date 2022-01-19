@@ -1,4 +1,4 @@
-import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk/';
+import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 import {
      IllegalArgumentException,
      DIDResoverAlreadySetupException,
