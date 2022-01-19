@@ -117,7 +117,7 @@ describe("test scripting function", () => {
     test("testDownloadAndUpload", async () => {
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
-        await uploadFileByTransActionId(uploadTransactionId, FILE_CONTENT);
+        await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
         await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
         let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
         let buffer = await downloadFileByTransActionId(downloadTransactionId);
