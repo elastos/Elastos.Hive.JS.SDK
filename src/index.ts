@@ -12,6 +12,7 @@ import { SHA256 } from "./domain/sha256";
 import * as Utils from "./domain/utils";
 import * as exceptions from "./exceptions";
 import { HttpClient }  from "./http/httpclient";
+import { HttpOptions, HttpHeaders }  from "./http/httpoptions";
 import { HttpMethod }  from "./http/httpmethod";
 import { HttpResponseParser }  from "./http/httpresponseparser";
 import { StreamResponseParser }  from "./http/streamresponseparser";
@@ -105,6 +106,8 @@ export {
     FileStorage,
     HttpClient,
     HttpMethod,
+    HttpOptions,
+    HttpHeaders,
     ServiceContext,
     AccessToken,
     NodeVersion,

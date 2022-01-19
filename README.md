@@ -6,8 +6,8 @@ Elastos Hive is an essential service infrastructure as a decentralized network o
 
 - Subscribe/unsubscribe to vault or backup vault
 - Scripting execution
-- Structured data object access and store onto MongoDB (Not supported yet);
-- Upload/download files (Not supported yet);
+- Upload/Download files
+- Structured data object access and store onto MongoDB (Not supported yet)
 - Key/Values (Not supported yet);
 
 Elastos Hive will keep the promise that **users remain in full control of their own data** and committing the practice on it.

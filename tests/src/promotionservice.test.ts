@@ -1,8 +1,6 @@
 import { TestData } from "./config/testdata";
-import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem, CountOptions, PromotionService } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, VaultSubscriptionService, NotImplementedException, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException, QueryOptions, AscendingSortItem, CountOptions, PromotionService } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "./config/clientconfig";
-import { NotImplementedException } from "../../typings/exceptions";
-
 
 describe("test database services", () => {
    
