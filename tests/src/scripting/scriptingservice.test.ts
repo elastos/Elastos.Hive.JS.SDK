@@ -126,12 +126,12 @@ describe("test scripting function", () => {
 
     test("testFileProperties", async () => {
         await registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+        await callScriptFileProperties(FILE_PROPERTIES_NAME, "testDownloadUpload.txt");
     });
 
     test("testFileHash", async () => {
         await registerScriptFileHash(FILE_HASH_NAME);
-        await callScriptFileHash(FILE_HASH_NAME, fileName);
+        await callScriptFileHash(FILE_HASH_NAME, "testDownloadUpload.txt");
         await scriptingService.unregisterScript(FILE_HASH_NAME);
     });
 
