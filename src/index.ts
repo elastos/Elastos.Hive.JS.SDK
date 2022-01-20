@@ -88,6 +88,8 @@ export type {
     BridgeHandler,
     CodeFetcher,
     BackupContext,
+    HttpHeaders,
+    HttpOptions
 }
 
 export {
@@ -106,8 +108,6 @@ export {
     FileStorage,
     HttpClient,
     HttpMethod,
-    HttpOptions,
-    HttpHeaders,
     ServiceContext,
     AccessToken,
     NodeVersion,
