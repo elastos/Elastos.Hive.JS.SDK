@@ -90,6 +90,8 @@ export class NodeRPCException extends ParentException {
                 return new NotFoundException(message ? message : "", causedBy, internalCode);
             case NodeRPCException.ALREADY_EXISTS:
                 return new AlreadyExistsException(message ? message : "", causedBy, internalCode);
+            case NodeRPCException.INSUFFICIENT_STORAGE:
+                return new InsufficientStorageException(message ? message : "", causedBy, internalCode);
             default:
                 return new ServerUnknownException(httpCode, message ? message : "", causedBy, internalCode);
         }
