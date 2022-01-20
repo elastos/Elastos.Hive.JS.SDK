@@ -190,23 +190,10 @@ export class FilesService extends RestService {
 			this.handleError(e);
 		}
 	}
-
+	
 	private handleError(e: Error): unknown {
-
-		
 		if (e instanceof NodeRPCException) {
-			switch (e.getCode()) {
-				case NodeRPCException.UNAUTHORIZED:
-					throw new UnauthorizedException(e.message, e);
-				case NodeRPCException.FORBIDDEN:
-					throw new VaultForbiddenException(e.message, e);
-				case NodeRPCException.BAD_REQUEST:
-					throw new InvalidParameterException(e.message, e);
-				case NodeRPCException.NOT_FOUND:
-					throw new NotFoundException(e.message, e);
-				default:
-					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
-			}
+			throw e;
 		}
 		throw new NetworkException(e.message, e);
 	}

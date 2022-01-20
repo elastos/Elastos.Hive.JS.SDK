@@ -62,19 +62,10 @@ export class ProviderService extends ServiceContext {
         }
     }
 
-    private static handleError(e: Error): unknown {
-        if (e instanceof NodeRPCException) {
-            switch (e.getCode()) {
-                case NodeRPCException.UNAUTHORIZED:
-                    throw new UnauthorizedException(e.message, e);
-                case NodeRPCException.BAD_REQUEST:
-                    throw new InvalidParameterException(e.message, e);
-                case NodeRPCException.NOT_FOUND:
-                    throw new NotFoundException(e.message, e);
-                default:
-                    throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
-            }
-        }
-        throw new NetworkException(e.message, e);
-    }
+	private static handleError(e: Error): unknown {
+		if (e instanceof NodeRPCException) {
+			throw e;
+		}
+		throw new NetworkException(e.message, e);
+	}
 }

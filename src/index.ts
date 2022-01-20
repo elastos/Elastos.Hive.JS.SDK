@@ -10,7 +10,6 @@ import { FileStorage } from "./domain/filestorage";
 import { NodeVersion } from "./domain/nodeversion";
 import { SHA256 } from "./domain/sha256";
 import * as Utils from "./domain/utils";
-import * as exceptions from "./exceptions";
 import { HttpClient }  from "./http/httpclient";
 import { HttpOptions, HttpHeaders }  from "./http/httpoptions";
 import { HttpMethod }  from "./http/httpmethod";
@@ -42,7 +41,37 @@ import { SubscriptionService }  from "./restclient/subscription/subscriptionserv
 import { VaultSubscriptionService }  from "./restclient/subscription/vaultsubscription/vaultsubscriptionservice";
 import { PricingPlan } from "./domain/subscription/pricingplan";
 import { VaultInfo } from "./domain/subscription/vaultinfo";
-import { AlreadyExistsException, HiveException, NotFoundException } from "./exceptions";
+import { IllegalArgumentException,
+    BackupIsInProcessingException,
+    BackupNotFoundException,
+    BadContextProviderException,
+    DIDNotPublishedException,
+    DIDResolverNotSetupException,
+    DIDResolverSetupException,
+    DIDResoverAlreadySetupException,
+    HiveException,
+    IllegalDidFormatException,
+    NotImplementedException,
+    PathNotExistException,
+    PricingPlanNotFoundException,
+    ProviderNotSetException,
+    ScriptNotFoundException,
+    DIDResolveException,
+    JWTException,
+    IOException,
+    DeserializationError,
+    HttpException,
+    MalformedDIDException,
+    NetworkException,
+    NodeRPCException,
+    UnauthorizedException,
+    VaultForbiddenException,
+    NotFoundException,
+    AlreadyExistsException,
+    ServerUnknownException,
+    InvalidParameterException,
+    VaultNotFoundException,
+    InsufficientStorageException } from "./exceptions";
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./restclient/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./restclient/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./restclient/scripting/findexecutable";
@@ -134,7 +163,6 @@ export {
     Context,
     SubscriptionService,
     VaultSubscriptionService,
-    HiveException,
     QueryHasResultCondition,
     QueryHasResultConditionOptions,
     QueryHasResultConditionBody,
@@ -169,26 +197,40 @@ export {
     Strength,
     Alternate,
     Collation,
-    AlreadyExistsException,
+
+    IllegalArgumentException,
+    BackupIsInProcessingException,
+    BackupNotFoundException,
+    BadContextProviderException,
+    DIDNotPublishedException,
+    DIDResolverNotSetupException,
+    DIDResolverSetupException,
+    DIDResoverAlreadySetupException,
+    HiveException,
+    IllegalDidFormatException,
+    NotImplementedException,
+    PathNotExistException,
+    PricingPlanNotFoundException,
+    ProviderNotSetException,
+    ScriptNotFoundException,
+    DIDResolveException,
+    JWTException,
+    IOException,
+    DeserializationError,
+    HttpException,
+    MalformedDIDException,
+    NetworkException,
+    NodeRPCException,
+    UnauthorizedException,
+    VaultForbiddenException,
     NotFoundException,
+    AlreadyExistsException,
+    ServerUnknownException,
+    InvalidParameterException,
+    VaultNotFoundException,
+    InsufficientStorageException,
+
     // Utilities
     SHA256,
     Utils,
-    exceptions
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
