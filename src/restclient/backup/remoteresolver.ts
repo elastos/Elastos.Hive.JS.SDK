@@ -26,7 +26,7 @@ export class RemoteResolver implements CodeFetcher {
 			return await this.backupContext.getAuthorization(this.serviceContext.getServiceInstanceDid(), this.targetDid, this.targetHost);
 		} catch (e) {  //InterruptedException | ExecutionException 
 			throw new NodeRPCException(NodeRPCException.UNAUTHORIZED, -1,
-					"Failed to create backup credential." + e.getCause().getMessage());
+					"Failed to create backup credential." + e.toString());
 		}
 	}
 

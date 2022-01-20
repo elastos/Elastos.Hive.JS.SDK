@@ -67,7 +67,10 @@ export class UserDID extends DIDEntity {
 		subject["targetDID"] = targetDID;
 
         let cal = dayjs();
-        cal.add(5, 'year');
+        cal = cal.add(5, 'year');
+
+        // TODO: remove this line.
+		this.setIssuer(new Issuer(await this.getDocument()));
 
 		let cb = this.issuer.issueFor(sourceDID);
 		let vc = await cb.id("backupId")
