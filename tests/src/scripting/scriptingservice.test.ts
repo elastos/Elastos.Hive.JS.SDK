@@ -1,4 +1,4 @@
-import { HttpClient, VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
+import { InvalidParameterException, VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -124,6 +124,18 @@ describe("test scripting function", () => {
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
 
+    test("testDownloadWithInvalidTransactionId", async () => {
+        let expectedException;
+        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        let invalidTransactionId = "0000000";
+        try {
+            await downloadFileByTransActionId(invalidTransactionId);
+        } catch (e) {
+			expectedException = e;
+		}
+		expect(expectedException).toBeInstanceOf(InvalidParameterException);
+    });
+    
     test("testFileProperties", async () => {
         await registerScriptFileProperties(FILE_PROPERTIES_NAME);
         await callScriptFileProperties(FILE_PROPERTIES_NAME, "testDownloadUpload.txt");
