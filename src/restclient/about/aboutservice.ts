@@ -41,7 +41,7 @@ export class AboutService extends RestService {
 		try {
 			return await this.httpClient.send<string>(AboutService.API_COMMIT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>>{
 				deserialize(content: any): string {
-					return JSON.parse(content)['commit_hash'];
+					return JSON.parse(content)['commit_id'];
 				}
 			},HttpMethod.GET);
 		} catch (e) {

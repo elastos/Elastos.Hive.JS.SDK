@@ -1,14 +1,12 @@
-import * as http from 'http';
 import { checkNotNull } from '../domain/utils';
 import { ServiceContext } from './servicecontext';
 import { HttpResponseParser } from './httpresponseparser';
-import { HttpException, NodeRPCException, UnauthorizedException } from '../exceptions';
+import { NodeRPCException, UnauthorizedException } from '../exceptions';
 import { StreamResponseParser } from './streamresponseparser';
 import { HttpMethod } from './httpmethod';
+import { HttpOptions, HttpHeaders } from './httpoptions';
 import { Logger } from '../logger';
 import axios, { Method } from "axios";
-import { runningInBrowser } from "./../domain/utils";
-
 
 export class HttpClient {
     private static LOG = new Logger("HttpClient");
@@ -31,7 +29,7 @@ export class HttpClient {
     public static DEFAULT_PORT = 9001;
     public static DEFAULT_METHOD = HttpMethod.PUT;
     public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
-    public static DEFAULT_HEADERS: http.OutgoingHttpHeaders = {
+    public static DEFAULT_HEADERS: HttpHeaders = {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Transfer-Encoding": "chunked",
@@ -39,7 +37,7 @@ export class HttpClient {
         "User-Agent": HttpClient.DEFAULT_AGENT
     };
 
-    public static DEFAULT_OPTIONS: http.RequestOptions = {
+    public static DEFAULT_OPTIONS: HttpOptions = {
         method: HttpClient.DEFAULT_METHOD,
         protocol: HttpClient.DEFAULT_PROTOCOL,
         port: HttpClient.DEFAULT_PORT,
@@ -49,9 +47,9 @@ export class HttpClient {
 
     private withAuthorization = false;
     private serviceContext: ServiceContext;
-    private httpOptions: http.RequestOptions;
+    private httpOptions: HttpOptions;
 
-    constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: http.RequestOptions) {
+    constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = this.validateOptions(httpOptions);
@@ -119,86 +117,46 @@ export class HttpClient {
         if (options.headers['Authorization']) {
           HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
         }
-        
+        if (isStream) {
+          options.headers['Content-Type'] = "application/octet-stream";
+          options.headers['Accept'] = "application/octet-stream";
+        } else {
+          options.headers['Content-Type'] = "application/json";
+          options.headers['Accept'] = "application/json";
+        }
+
         return new Promise<T>((resolve, reject) => {
-          if (runningInBrowser()) {
-            void axios({
-                method: this.getMethod(options.method),
-                url: options.protocol + "//" + options.host + ":" + options.port + options.path,
-                headers: {
-                    // Don't set user-agent in browser environment, this is forbidden by modern browsers.
-                    "Content-Type": isStream ? "application/octet-stream" : "application/json",
-                    "Accept": isStream ? "application/octet-stream" : "application/json",
-                    "Transfer-Encoding": "chunked",
-                    "Authorization": `${options.headers['Authorization']}`
-                },
-                responseType: isStream ? "arraybuffer" : "text",
-                data: payload,
-                validateStatus: (status) => { return true; },
-                transitional: {
-                  forcedJSONParsing: false
-                }
-              }).then((response) => {
-                  if (isStream) {
-                    HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                    HttpClient.LOG.debug("HTTP Response: Size: " + response.data.byteLength);
-                    streamParser.onData(response.data);
-                    self.handleResponse(response.status);
-                    streamParser.onEnd();
-                    resolve(null as T);
-                  } else {
-                    const rawContent = response.data;
-                    HttpClient.LOG.info("HTTP Response: Status: " + response.status + (rawContent ? " response: " + rawContent : ""));
-                    HttpClient.LOG.debug("Axios status text: " + response.statusText);
-
-                    self.handleResponse(response.status, rawContent);
-                    let deserialized = responseParser.deserialize(rawContent);
-                    resolve(deserialized);
-                  }
-              }).catch((error) => {
-                reject(error);
-              });
-          }
-          else {
-            let request = http.request(
-              options,
-              function(response: any) {
-                const chunks = [];
-                response.on('data', (chunk) => {
-                  if (isStream) {
-                    streamParser.onData(chunk);
-                  } else {
-                    chunks.push(chunk);
-                  }
-                });
-
-                response.on('end', () => {
-                  try {
-                    if (isStream) {
-                      HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + " (\"STREAM\")");
-                      self.handleResponse(response.statusCode);
-                      streamParser.onEnd();
-                      resolve(null as T);
-                    } else {
-                      const rawContent = Buffer.concat(chunks).toString();
-                      HttpClient.LOG.info("HTTP Response: Status: " + response.statusCode + (rawContent ? " response: " + rawContent : ""));
-                      self.handleResponse(response.statusCode, rawContent);
-                      let deserialized = responseParser.deserialize(rawContent);
-                      resolve(deserialized);
-                    }
-                  } catch(e) {
-                    reject(e);
-                  }
-                });
+          void axios({
+              method: this.getMethod(options.method),
+              url: options.protocol + "//" + options.host + ":" + options.port + options.path,
+              headers: options.headers,
+              responseType: isStream ? "arraybuffer" : "text",
+              data: payload,
+              validateStatus: (status) => { return true; },
+              transitional: {
+                forcedJSONParsing: false
               }
-            );
-            
-            if (payload) {
-              request.write(payload);
-            }
-
-            request.end();
-          }
+            }).then((response) => {
+                if (isStream) {
+                  HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
+                  HttpClient.LOG.debug("HTTP Response: Size: " + response.data.byteLength);
+                  streamParser.onData(Buffer.from(response.data, 'binary'));
+                  self.handleResponse(response.status);
+                  streamParser.onEnd();
+                  resolve(null as T);
+                } else {
+                  const rawContent = response.data;
+                  HttpClient.LOG.info("HTTP Response: Status: " + response.status);
+                  if (rawContent) {
+                    HttpClient.LOG.debug("HTTP response: " + rawContent);
+                  }
+                  self.handleResponse(response.status, rawContent);
+                  let deserialized = responseParser.deserialize(rawContent);
+                  resolve(deserialized);
+                }
+            }).catch((error) => {
+              reject(error);
+            });
         });
     }
 
@@ -206,9 +164,9 @@ export class HttpClient {
      * Build Http RequestOptions from endpoint, method and payload.
      * For GET requests, the payload is added to the endpoint url.
      */
-    private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<http.RequestOptions> {
+    private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<HttpOptions> {
         //Clone httpOptions
-        let requestOptions: http.RequestOptions = JSON.parse(JSON.stringify(this.httpOptions));
+        let requestOptions: HttpOptions = JSON.parse(JSON.stringify(this.httpOptions));
         if (method) {
           requestOptions.method = method;
         }
@@ -262,7 +220,7 @@ export class HttpClient {
         });
     }
 
-    private validateOptions(httpOptions: http.RequestOptions): http.RequestOptions {
+    private validateOptions(httpOptions: HttpOptions): HttpOptions {
         checkNotNull(httpOptions, "No HTTP configuration provided");
 
         const PROTOCOL_DELIMITER = "://";
@@ -278,12 +236,14 @@ export class HttpClient {
         let providerAddress = this.serviceContext.getProviderAddress();
         let protocol = providerAddress.includes(PROTOCOL_DELIMITER) ? providerAddress.split(PROTOCOL_DELIMITER)[0] : undefined;
         providerAddress = protocol ? providerAddress.replace(protocol + PROTOCOL_DELIMITER, "") : providerAddress;
+        let path = providerAddress.includes("/") ? providerAddress.substring(providerAddress.indexOf("/")) : "";
         providerAddress = providerAddress.includes("/") ? providerAddress.split("/")[0] : providerAddress;
         let port = providerAddress.includes(PORT_DELIMITER) ? (providerAddress.split(PORT_DELIMITER).slice(-1)[0]).replace(/\D/g,'') : undefined;
         let host = port ? providerAddress.replace(PORT_DELIMITER + port, "") : providerAddress;
         httpOptions.protocol = protocol ? protocol + ":" : httpOptions.protocol;
         httpOptions.port = port ? port : httpOptions.port;
         httpOptions.host = host;
+        httpOptions.path = path;
 
         return httpOptions;
     }

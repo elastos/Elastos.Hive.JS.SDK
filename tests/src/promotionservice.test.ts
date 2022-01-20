@@ -1,7 +1,7 @@
 import { TestData } from "./config/testdata";
+
 import {PromotionService, VaultSubscriptionService} from "../../src";
 import { ClientConfig } from "./config/clientconfig";
-
 
 describe.skip("test database services", () => {
     let promotionService: PromotionService;

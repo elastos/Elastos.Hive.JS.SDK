@@ -117,7 +117,7 @@ describe("test scripting function", () => {
     test("testDownloadAndUpload", async () => {
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
-        await uploadFileByTransActionId(uploadTransactionId, FILE_CONTENT);
+        await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
         await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
         let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
         let buffer = await downloadFileByTransActionId(downloadTransactionId);
@@ -126,12 +126,12 @@ describe("test scripting function", () => {
 
     test("testFileProperties", async () => {
         await registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        await callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+        await callScriptFileProperties(FILE_PROPERTIES_NAME, "testDownloadUpload.txt");
     });
 
     test("testFileHash", async () => {
         await registerScriptFileHash(FILE_HASH_NAME);
-        await callScriptFileHash(FILE_HASH_NAME, fileName);
+        await callScriptFileHash(FILE_HASH_NAME, "testDownloadUpload.txt");
         await scriptingService.unregisterScript(FILE_HASH_NAME);
     });
 
