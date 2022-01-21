@@ -1,9 +1,9 @@
-import { HiveException, NodeRPCException } from "../../exceptions";
+import { HiveException } from "../../exceptions";
 import { BackupContext } from "./backupcontext";
-import { CodeFetcher } from "./codefetcher";
+import { CodeFetcher } from "../../http/auth/codefetcher";
 import { LocalResolver } from "./localresolver";
 import { RemoteResolver } from "./remoteresolver";
-import {DataStorage, Logger, ServiceContext} from "../..";
+import {DataStorage, ServiceContext} from "../..";
 
 export class CredentialCode {
 	private targetServiceDid: string;

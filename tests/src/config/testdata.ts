@@ -1,6 +1,7 @@
 import {
 	HiveException,
 	VaultServices,
+	BackupService,
 	AppContext,
 	Logger,
 	Utils,
@@ -120,7 +121,7 @@ export class TestData {
 					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
 					TestData.LOG.error(e.stack);
 				}
-				return null;
+				return Promise.resolve(null);
 			},
 			
 			async getAuthorization(jwtToken : string) : Promise<string> {
@@ -154,7 +155,7 @@ export class TestData {
 				} catch (e) {
 					TestData.LOG.error(e.stack);
 				}
-				return null;
+				return Promise.resolve(null);
 			},
 
 			async getAuthorization(jwtToken : string) : Promise<string>  {
@@ -199,7 +200,7 @@ export class TestData {
 		return this.callerDid.toString();
 	}
 
-	public getBackupService() {
+	public getBackupService(): BackupService {
 		const backupService = this.newVault().getBackupService();
 		const self = this;
 		backupService.setBackupContext({

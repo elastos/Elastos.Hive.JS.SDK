@@ -1,7 +1,7 @@
 import { NodeRPCException } from "../../exceptions";
 import { ServiceContext } from "../../http/servicecontext";
 import { BackupContext } from "./backupcontext";
-import { CodeFetcher } from "./codefetcher";
+import { CodeFetcher } from "../../http/auth/codefetcher";
 
 
 export class RemoteResolver implements CodeFetcher {

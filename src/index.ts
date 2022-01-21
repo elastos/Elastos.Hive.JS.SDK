@@ -3,7 +3,6 @@
 
 import { VaultServices } from "./api/vaultservices";
 //import { KeyProvider } from "./domain/crypto/keyprovider";
-import { Class } from "./domain/class";
 import { DataStorage } from "./domain/datastorage";
 import { File } from "./domain/file";
 import { FileStorage } from "./domain/filestorage";
@@ -16,10 +15,10 @@ import { HttpMethod }  from "./http/httpmethod";
 import { HttpResponseParser }  from "./http/httpresponseparser";
 import { StreamResponseParser }  from "./http/streamresponseparser";
 import { ServiceContext }  from "./http/servicecontext";
-import { AccessToken }  from "./http/security/accesstoken";
-import { AppContext }  from "./http/security/appcontext";
-import { AppContextProvider }  from "./http/security/appcontextprovider";
-import { BridgeHandler }  from "./http/security/bridgehandler";
+import { AccessToken }  from "./http/auth/accesstoken";
+import { AppContext }  from "./http/auth/appcontext";
+import { AppContextProvider }  from "./http/auth/appcontextprovider";
+import { BridgeHandler }  from "./http/auth/bridgehandler";
 import { Logger }  from "./logger";
 import { AboutService }  from "./restclient/about/aboutservice";
 import { AuthService }  from "./restclient/auth/authservice";
@@ -95,9 +94,9 @@ import { CaseFirst, Strength, Alternate, Collation } from "./restclient/database
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./restclient/database/sortitem";
 import { Order } from "./domain/payment/order";
 import { Receipt } from "./domain/payment/receipt";
-import { AppContextParameters, DefaultAppContextProvider } from "./http/security/defaultAppContextProvider";
+import { AppContextParameters, DefaultAppContextProvider } from "./http/auth/defaultAppContextProvider";
 import { BackupContext } from "./restclient/backup/backupcontext";
-import { CodeFetcher } from "./restclient/backup/codefetcher";
+import { CodeFetcher } from "./http/auth/codefetcher";
 import { CredentialCode } from "./restclient/backup/credentialcode";
 import { RemoteResolver } from "./restclient/backup/remoteresolver";
 import { LocalResolver } from "./restclient/backup/localresolver";
@@ -108,7 +107,6 @@ Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
     //KeyProvider,
-    Class,
     
     DataStorage,
     HttpResponseParser,

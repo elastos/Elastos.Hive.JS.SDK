@@ -108,6 +108,7 @@ export class AccessToken {
 	}
 
 	private isExpired(jwtCode: string) : boolean {
+		// This validation is also disabled in the Java implementation.
 		// return System.currentTimeMillis() >= (getExpiresTime() * 1000);
 		return false;
 	}
