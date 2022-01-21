@@ -1,4 +1,4 @@
-import { AppContext } from "../../../http/security/appcontext";
+import { AppContext } from "../../../http/auth/appcontext";
 import { HttpClient } from "../../../http/httpclient";
 import { ServiceContext } from "../../../http/servicecontext";
 import { Logger } from '../../../logger';

@@ -1,3 +1,6 @@
+/**
+ * CodeFetcher is for accessing the code by the network and can be invalidate.
+ */
 export interface CodeFetcher {
 	/**
 	 * Fetch the code.

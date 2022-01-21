@@ -28,13 +28,21 @@ export class HttpClient {
     public static DEFAULT_PROTOCOL = "http:";
     public static DEFAULT_PORT = 9001;
     public static DEFAULT_METHOD = HttpMethod.PUT;
-    public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
+    // Disabled. Axios should set it automatically when running from browser and requests from Node shouldn't require this attribute.
+    // The correct solution for Node requests would be to get the user-agent from the configuration to identify the calling application.
+    // (Carl Duranleau - January 21st, 2022)
+    //public static DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     public static DEFAULT_HEADERS: HttpHeaders = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Transfer-Encoding": "chunked",
         "Connection": "Keep-Alive",
-        "User-Agent": HttpClient.DEFAULT_AGENT
+
+        // We don't handle chunked payloads for now since Axios doesn't support it when running in a browser.
+        // We would need to add specific code to handle chunked payloads in the Node environment only. It means that, for now, download services
+        // will take more memory since all the data will be pushed to memory in a single big binary buffer. (Carl Duranleau - January 21st, 2022)
+        //"Transfer-Encoding": "chunked",
+
+        //"User-Agent": HttpClient.DEFAULT_AGENT
     };
 
     public static DEFAULT_OPTIONS: HttpOptions = {
@@ -88,7 +96,7 @@ export class HttpClient {
         if (method.toUpperCase() === "DELETE") return "DELETE";
         if (method.toUpperCase() === "PUT") return "PUT";
         if (method.toUpperCase() === "PATCH") return "PATCH";
-        return "POST";
+        return HttpClient.DEFAULT_METHOD;
     }
 
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
@@ -110,19 +118,13 @@ export class HttpClient {
         if (isStream) {
           streamParser = (responseParser as unknown) as StreamResponseParser;
           streamParser.deserialize = HttpClient.NO_RESPONSE.deserialize;
+          options.headers['Accept'] = "application/octet-stream";
         }
 
         HttpClient.LOG.initializeCID();
         HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? " payload: " + payload.toString() : ""));
         if (options.headers['Authorization']) {
           HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
-        }
-        if (isStream) {
-          options.headers['Content-Type'] = "application/octet-stream";
-          options.headers['Accept'] = "application/octet-stream";
-        } else {
-          options.headers['Content-Type'] = "application/json";
-          options.headers['Accept'] = "application/json";
         }
 
         return new Promise<T>((resolve, reject) => {
