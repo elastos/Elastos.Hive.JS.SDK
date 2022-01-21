@@ -4,14 +4,11 @@ import {
 	AppContext,
 	Logger,
 	Utils,
-	File,
-	HiveBackupContext,
-	BackupContext
-} from "../../../src";
+	File
+} from '@elastosfoundation/elastos-hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import path from 'path';
 import {ProviderService} from "../../../src/restclient/provider/providerservice";
 import {Backup} from "../../../src/api/backup";
 
