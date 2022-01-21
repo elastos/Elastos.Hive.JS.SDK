@@ -1,5 +1,5 @@
 import { ServiceContext } from "../../http/servicecontext";
-import { CodeFetcher } from "./codefetcher";
+import { CodeFetcher } from "../../http/auth/codefetcher";
 
 
 export class LocalResolver implements CodeFetcher {

@@ -1,5 +1,5 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
-import { AppContextProvider } from '../../http/security/appcontextprovider';
+import { AppContextProvider } from '../../http/auth/appcontextprovider';
 import { HttpClient } from '../../http/httpclient';
 import { ServiceContext } from '../../http/servicecontext';
 import { HttpResponseParser } from '../../http/httpresponseparser';
