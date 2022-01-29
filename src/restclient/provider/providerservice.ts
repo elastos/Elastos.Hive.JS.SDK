@@ -1,16 +1,16 @@
-import {Logger} from "../../logger";
-import {AppContext, HttpClient, HttpMethod, HttpResponseParser, NotFoundException, ServiceContext} from "../..";
+import { Logger } from "../../logger";
+import { AppContext } from "../../http/auth/appcontext";
+import { HttpClient } from "../../http/httpclient";
+import { HttpMethod } from "../../http/httpmethod";
+import { HttpResponseParser } from "../../http/httpresponseparser";
+import { ServiceContext } from "../../http/servicecontext";
 import {
-    InvalidParameterException,
     NetworkException,
     NodeRPCException,
-    ServerUnknownException,
-    UnauthorizedException
 } from "../../exceptions";
 import {VaultDetail} from "./vaultdetail";
 import {BackupDetail} from "./backupdetail";
 import {FilledOrderDetail} from "./filledorderdetail";
-
 
 export class ProviderService extends ServiceContext {
     private static LOG = new Logger("ProviderService");
