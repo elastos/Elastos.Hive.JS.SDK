@@ -3,7 +3,8 @@ import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../http/auth/codefetcher";
 import { LocalResolver } from "./localresolver";
 import { RemoteResolver } from "./remoteresolver";
-import {DataStorage, ServiceContext} from "../..";
+import { ServiceContext } from "../../http/servicecontext";
+import { DataStorage } from "../../domain/datastorage";
 
 export class CredentialCode {
 	private targetServiceDid: string;

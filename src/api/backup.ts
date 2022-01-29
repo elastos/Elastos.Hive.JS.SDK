@@ -1,10 +1,7 @@
-import {
-    AppContext,
-    HttpClient,
-    PromotionService,
-    ServiceContext
-} from "..";
-
+import { AppContext } from "../http/auth/appcontext";
+import { HttpClient } from "../http/httpclient";
+import { PromotionService } from "../restclient/promotion/promotionservice";
+import { ServiceContext } from "../http/servicecontext";
 
 export class Backup extends ServiceContext {
     private readonly promotionService: PromotionService;
