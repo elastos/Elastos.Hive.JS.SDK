@@ -1,4 +1,19 @@
-import { InvalidParameterException, VaultSubscriptionService, DatabaseService, DeleteExecutable, InsertExecutable, FindExecutable, FileUploadExecutable, FileDownloadExecutable, FilePropertiesExecutable, FileHashExecutable, UpdateExecutable, ScriptingService, VaultServices, QueryHasResultCondition, FilesService, Executable, StreamResponseParser } from "@elastosfoundation/elastos-hive-js-sdk";
+import {
+    InvalidParameterException,
+    VaultSubscriptionService, 
+    DatabaseService, 
+    DeleteExecutable, InsertExecutable, 
+    FindExecutable, 
+    FileUploadExecutable, 
+    FileDownloadExecutable, 
+    FilePropertiesExecutable, 
+    FileHashExecutable, 
+    UpdateExecutable, 
+    ScriptingService, 
+    VaultServices, 
+    QueryHasResultCondition, 
+    FilesService, 
+    Executable } from "@elastosfoundation/elastos-hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
@@ -53,8 +68,8 @@ describe("test scripting function", () => {
             testData.getProviderAddress());
         
         scriptingService = vaultServices.getScriptingService();
-        filesService = testData.newVault().getFilesService();
-        databaseService = testData.newVault().getDatabaseService();
+        filesService = vaultServices.getFilesService();
+        databaseService = vaultServices.getDatabaseService();
         targetDid = testData.getUserDid();
         appDid = testData.getAppDid();
 
