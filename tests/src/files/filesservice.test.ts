@@ -1,4 +1,4 @@
-import { File, FilesService, HttpClient, VaultSubscriptionService, StreamResponseParser, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, FilesService, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
@@ -14,12 +14,10 @@ describe("test file service", () => {
 	const INVALID_REMOTE_DIR = "badremotedir/";
 
 	let filesService: FilesService;
-	let vaultsubscriptionService: VaultSubscriptionService;
 	let testData: TestData;
 
 	beforeAll(async () => {
 		testData = await TestData.getInstance("filesservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
-		vaultsubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
 		filesService = testData.newVault().getFilesService();
 		prepareTestFile();
 	});
