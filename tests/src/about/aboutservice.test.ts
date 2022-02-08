@@ -9,7 +9,7 @@ describe("test about service", () => {
 
     beforeAll(async () => {
 		testData = await TestData.getInstance("aboutservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
-        serviceContext= new ServiceContext(testData.getAppContext(), testData.getProviderAddress());
+        serviceContext = new ServiceContext(testData.getAppContext(), testData.getProviderAddress());
 	});
 
     test("testGetNodeVersion", async () => {
