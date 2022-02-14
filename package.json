@@ -2,6 +2,12 @@
   "name": "@elastosfoundation/elastos-hive-js-sdk",
   "version": "2.3.4",
   "description": "Elastos Hive JS SDK",
+  "exports": {
+    "node" : "./dist/hive.js",
+    "browser": {
+      "import": "./dist/es/hive.browser.js"
+    }
+  },
   "main": "./dist/hive.js",
   "module": "./dist/es/hive.js",
   "browser": {
