@@ -1,0 +1,46 @@
+{
+  "resolverUrl": "mainnet",
+
+  "application": {
+    "name": "developApp",
+    "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
+    "passPhrase": "",
+    "mnemonics2": "curious push water point border mutual install govern message ordinary fish small",
+    "did": "did:elastos:iag8qwq1xPBpLsGv4zR4CmzLpLUkBNfPHX",
+    "storepass": "password"
+  },
+
+  "user": {
+    "name": "developUser",
+    "mnemonic": "aisle invest solar duck push romance laundry can chimney parade goose gaze",
+    "passPhrase": "",
+    "storepass": "password",
+    "did": "did:elastos:ifJkpmsjykgzT7XDyFo9cqwWYJiaWeTSxL"
+  },
+
+  "node": {
+    "provider": "http://localhost:5004",
+    "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
+    "targetHost": "http://localhost:5004",
+    "storePath": "develop"
+  },
+
+  "cross": {
+    "application": {
+      "name": "crossApp",
+      "mnemonic": "hammer knock again pet curious promote guard mixed give can margin kiwi",
+      "passPhrase": "",
+      "storepass": "password"
+    },
+
+    "user": {
+      "did": "did:elastos:iTGfs68mWLJuEcZ6Fibm7yoeBFaNfFQugi",
+      "name": "crossUser",
+      "mnemonic": "earth surface exotic absent key divert sun ten engage sadness nasty lyrics",
+      "passPhrase": "",
+      "storepass": "password"
+    },
+
+    "crossDid": "did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n"
+  }
+}
