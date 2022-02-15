@@ -4,8 +4,8 @@ import { TestData } from "../config/testdata";
 
 describe("test payment service", () => {
 	const PRICING_PLAN_NAME = "Rookie";
-    const ORDER_ID = "61f8bce772f0d0456cf3289e";
-    const TRANS_ID = "6fZEM5A6dVWoUR2pScT6TkWNiseYahcnFzgOyqqgOA1NHdgz6jVZekbVCW5zA";
+    const ORDER_ID = "60ee8c056fdd17b16bb5b4c2";
+    const TRANS_ID = "280a24034bfb241c31b5a73c792c9d05df2b1f79bb98733c5358aeb909c27010";
 
 	let testData: TestData;
     let testOrderId: string;
@@ -13,7 +13,7 @@ describe("test payment service", () => {
 	let vaultSubscriptionService: VaultSubscriptionService;
 
     beforeAll(async () => {
-		testData = await TestData.getInstance("paymentservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+		testData = await TestData.getInstance("paymentservice.test", ClientConfig.TEST, TestData.USER_DIR);
         vaultSubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
         try {
             await vaultSubscriptionService.subscribe();    
