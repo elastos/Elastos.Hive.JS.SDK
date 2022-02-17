@@ -1,0 +1,45 @@
+{
+  "resolverUrl": "https://api-testnet.elastos.io/newid",
+
+  "application": {
+    "name": "developApp",
+    "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
+    "passPhrase": "password",
+    "mnemonics2":"curious push water point border mutual install govern message ordinary fish small",
+    "did":"did:elastos:iag8qwq1xPBpLsGv4zR4CmzLpLUkBNfPHX",
+    "storepass": "password"
+  },
+
+  "user": {
+    "name": "developUser",
+    "mnemonic": "firm dash language credit twist puzzle crouch order slim now issue trap",
+    "passPhrase": "",
+    "storepass": "password"
+  },
+
+  "node": {
+    "provider": "https://hive-testnet1.trinity-tech.io",
+    "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
+    "targetHost": "https://hive-testnet2.trinity-tech.io",
+    "storePath": "develop"
+  },
+
+  "cross": {
+    "application": {
+      "name": "crossApp",
+      "mnemonic": "hammer knock again pet curious promote guard mixed give can margin kiwi",
+      "passPhrase": "password",
+      "storepass": "password"
+    },
+
+    "user": {
+      "did": "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7",
+      "name": "crossUser",
+      "mnemonic": "stage west lava group genre ten farm pony small family february drink",
+      "passPhrase": "password",
+      "storepass": "password"
+    },
+
+    "crossDid":"did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n"
+  }
+}

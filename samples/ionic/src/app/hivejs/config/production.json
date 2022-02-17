@@ -1,0 +1,43 @@
+{
+  "resolverUrl": "https://api.elastos.io/eid",
+
+  "application": {
+    "name": "productionApp",
+    "mnemonic": "venture link adapt field priority extend depart endless right lamp sudden fringe",
+    "passPhrase": "password",
+    "storepass": "password"
+  },
+
+  "user": {
+    "name": "productionUser",
+    "mnemonic": "venture link adapt field priority extend depart endless right lamp sudden fringe",
+    "passPhrase": "password",
+    "storepass": "password"
+  },
+
+  "node": {
+    "provider": "https://hive1.trinity-tech.io",
+    "targetDid": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
+    "targetHost": "https://hive1.trinity-tech.io",
+    "storePath": "production"
+  },
+
+  "cross": {
+    "application": {
+      "name": "crossApp",
+      "mnemonic": "trend music thumb what erupt near apology exotic surge item field awake",
+      "passPhrase": "password",
+      "storepass": "password"
+    },
+
+    "user": {
+      "did": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
+      "name": "crossUser",
+      "mnemonic": "gallery input work twice helmet mesh decline cushion same garbage art bullet",
+      "passPhrase": "password",
+      "storepass": "password"
+    },
+
+    "crossDid":"did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL"
+  }
+}
