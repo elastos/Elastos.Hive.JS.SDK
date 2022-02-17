@@ -46,7 +46,7 @@ export class AccessToken {
 			this.jwtCode = await this.fetch();
 		} catch (e) {
 			AccessToken.LOG.error("error on getCanonicalizedAccessToken: " + e);
-			return null;
+			throw e;
 		}
 		return "token " + this.jwtCode;
 	}
@@ -150,7 +150,7 @@ class BridgeHandlerImpl implements BridgeHandler {
 			this.ref.flushDids(claims.getAudience(), claims.getIssuer());
         } catch (e) {
             BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
-            return;
+            throw e;
         }
     }
 
