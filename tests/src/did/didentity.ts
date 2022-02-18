@@ -1,5 +1,6 @@
-import { RootIdentity, DIDStore, DID, DIDDocument, HDKey, DIDURL } from "@elastosfoundation/did-js-sdk";
+import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@elastosfoundation/elastos-hive-js-sdk";
+import { UnauthorizedException } from "@elastosfoundation/elastos-hive-js-sdk";
 
 
 export class DIDEntity {
@@ -22,8 +23,6 @@ export class DIDEntity {
 		this.didString = did;
 		this.mnemonic = mnemonic;
 		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
-
-		
 	}
 
 	public async initPrivateIdentity(mnemonic: string): Promise<void> {
@@ -69,10 +68,11 @@ export class DIDEntity {
 		}
 		
 		this.did = await this.identity.getDefaultDid();
+		if (!this.did) throw new UnauthorizedException("Invalid DID.");
 		DIDEntity.LOG.info("************************************* default DID: {}", this.did.toString());
 		let resolvedDoc = await this.did.resolve();
+		if (!resolvedDoc) throw new UnauthorizedException("Invalid DID Document.");
 		DIDEntity.LOG.info("************************************* My new DIDDOC resolved: {}", resolvedDoc.toString(true));
-
 
 		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
 	}
