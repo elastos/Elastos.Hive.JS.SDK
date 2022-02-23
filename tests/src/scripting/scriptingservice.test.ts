@@ -13,7 +13,7 @@ import {
     VaultServices, 
     QueryHasResultCondition, 
     FilesService, 
-    Executable } from "@elastosfoundation/elastos-hive-js-sdk";
+    Executable } from "@elastosfoundation/hive-js-sdk";
 
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
