@@ -17,7 +17,7 @@ Elastos Hive will keep the promise that **users remain in full control of their 
 To add the Hive JS SDK dependency to your project, run the following command from your source folder:
 
 ```shell
-npm i --save @elastosfoundation/elastos-hive-js-sdk
+npm i --save @elastosfoundation/hive-js-sdk
 ```
 
 ## Build from source
@@ -84,7 +84,7 @@ testData = await TestData.getInstance("My service tests", ClientConfig.LOCAL);
 import {
   VaultSubscriptionService,
   PricingPlan,
-} from "@elastosfoundation/elastos-hive-js-sdk";
+} from "@elastosfoundation/hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 

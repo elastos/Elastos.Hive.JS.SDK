@@ -1,4 +1,4 @@
-import { NodeVersion, ServiceContext } from "@elastosfoundation/elastos-hive-js-sdk";
+import { NodeVersion, ServiceContext } from "@elastosfoundation/hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 

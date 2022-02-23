@@ -7,7 +7,7 @@ import {
   VaultInfo,
   VaultServices,
   VaultSubscriptionService
-} from '@dchagastelles/elastos-hive-js-sdk';
+} from '@elastosfoundation/hive-js-sdk';
 // import {showContents} from "./bfs";
 // import {readdirSync} from "./bfs";
 // import {readdirSync} from "@elastosfoundation/did-js-sdk/typings/fs.browser";
