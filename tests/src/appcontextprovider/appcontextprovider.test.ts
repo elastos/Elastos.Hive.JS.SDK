@@ -1,5 +1,5 @@
 import { DefaultDIDAdapter, DIDBackend } from "@elastosfoundation/did-js-sdk";
-import { VaultServices, AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { VaultServices, AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 

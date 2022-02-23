@@ -5,7 +5,7 @@ import {
     VerifiableCredential,
     VerifiablePresentation
 } from "@elastosfoundation/did-js-sdk";
-import {AppContext, HiveException} from '@dchagastelles/elastos-hive-js-sdk';
+import {AppContext, HiveException} from '@elastosfoundation/hive-js-sdk';
 import {AppDID} from './did/appdid';
 import {UserDID} from './did/userdid';
 // import * as path from 'path';

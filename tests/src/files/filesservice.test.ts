@@ -1,4 +1,4 @@
-import { File, FilesService, NotFoundException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, FilesService, NotFoundException } from "@elastosfoundation/hive-js-sdk";
 import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 

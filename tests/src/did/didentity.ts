@@ -1,6 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
-import { File, Logger } from "@elastosfoundation/elastos-hive-js-sdk";
-import { UnauthorizedException } from "@elastosfoundation/elastos-hive-js-sdk";
+import { File, Logger } from "@elastosfoundation/hive-js-sdk";
+import { UnauthorizedException } from "@elastosfoundation/hive-js-sdk";
 
 
 export class DIDEntity {

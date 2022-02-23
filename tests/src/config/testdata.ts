@@ -6,7 +6,7 @@ import {
 	Logger,
 	Utils,
 	File
-} from '@elastosfoundation/elastos-hive-js-sdk';
+} from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
