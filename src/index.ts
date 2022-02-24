@@ -101,6 +101,7 @@ import { CredentialCode } from "./restclient/backup/credentialcode";
 import { RemoteResolver } from "./restclient/backup/remoteresolver";
 import { LocalResolver } from "./restclient/backup/localresolver";
 import { HiveBackupContext } from "./restclient/backup/hivebackupcontext";
+import { Backup } from "./api/backup";
 
 
 Logger.setDefaultLevel(Logger.DEBUG);
@@ -129,6 +130,7 @@ export {
     DefaultAppContextProvider,
     AppContextParameters,
     VaultServices,
+    Backup,
     PricingPlan,
     VaultInfo,
     File,
