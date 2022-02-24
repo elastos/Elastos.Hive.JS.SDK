@@ -66,7 +66,12 @@ export class BackupService extends RestService {
 			return await this.httpClient.send<BackupResult>(BackupService.API_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD,
 					<HttpResponseParser<BackupResult>> {
 				deserialize(content: any): BackupResult {
-					return JSON.parse(content)['state'] as BackupResult;
+					const obj = JSON.parse(content);
+					let result = new BackupResult();
+					result.state = obj['state'];
+					result.result = obj['result'];
+					result.message = obj['message'];
+					return result;
 				}
 			}, HttpMethod.GET);
 		} catch (e) {
@@ -76,7 +81,16 @@ export class BackupService extends RestService {
 
 	private handleError(e: Error): unknown {
 		if (e instanceof NodeRPCException) {
-			throw e;
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e.message, e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.message, e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.message, e);
+				default:
+					throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, e.message, e);
+			}
 		}
 		throw new NetworkException(e.message, e);
 	}
