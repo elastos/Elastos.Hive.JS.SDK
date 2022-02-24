@@ -21,7 +21,10 @@ describe("test backup services", () => {
     });
 
     test("testCheckResult", async () => {
-        await backupService.checkResult();
+        let result = await backupService.checkResult();
+        console.log(`state: ${result.state}`);
+        console.log(`result: ${result.result}`);
+        console.log(`message: ${result.message}`);
     });
 
 });
