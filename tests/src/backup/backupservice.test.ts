@@ -21,7 +21,9 @@ describe("test backup services", () => {
     });
 
     test("testCheckResult", async () => {
-        await backupService.checkResult();
+        let result = await backupService.checkResult();
+        expect(result.state).not.toBeNull();
+        expect(result.result).not.toBeNull();
     });
 
 });

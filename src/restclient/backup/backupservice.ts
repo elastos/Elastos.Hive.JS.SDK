@@ -66,7 +66,7 @@ export class BackupService extends RestService {
 			return await this.httpClient.send<BackupResult>(BackupService.API_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD,
 					<HttpResponseParser<BackupResult>> {
 				deserialize(content: any): BackupResult {
-					return JSON.parse(content)['state'] as BackupResult;
+					return JSON.parse(content) as BackupResult;
 				}
 			}, HttpMethod.GET);
 		} catch (e) {
