@@ -22,9 +22,8 @@ describe("test backup services", () => {
 
     test("testCheckResult", async () => {
         let result = await backupService.checkResult();
-        console.log(`state: ${result.state}`);
-        console.log(`result: ${result.result}`);
-        console.log(`message: ${result.message}`);
+        expect(result.state).not.toBeNull();
+        expect(result.result).not.toBeNull();
     });
 
 });
