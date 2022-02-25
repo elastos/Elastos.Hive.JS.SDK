@@ -11,40 +11,40 @@ export enum BackupResultResult {
 }
 
 export class BackupResult {
-    private _state: string;
-    private _result: string;
+    private _state: BackupResultState;
+    private _result: BackupResultResult;
     private _message: string;
 
     get state(): BackupResultState {
-        if (this._state === 'stop') {
-            return BackupResultState.STATE_STOP;
+        return this._state;
+    }
+
+    set state(value: string) {
+        if (value === 'stop') {
+            this._state = BackupResultState.STATE_STOP;
         } else if (this._state === 'backup') {
-            return BackupResultState.STATE_BACKUP;
+            this._state = BackupResultState.STATE_BACKUP;
         } else if (this._state === 'restore') {
-            return BackupResultState.STATE_RESTORE;
+            this._state = BackupResultState.STATE_RESTORE;
         } else {
             throw Error('Unknown state.');
         }
     }
 
-    set state(value: string) {
-        this._state = value;
-    }
-
     get result(): BackupResultResult {
-        if (this._result === 'success') {
-            return BackupResultResult.RESULT_SUCCESS;
-        } else if (this._state === 'failed') {
-            return BackupResultResult.RESULT_FAILED;
-        } else if (this._state === 'process') {
-            return BackupResultResult.RESULT_PROCESS;
-        } else {
-            throw Error('Unknown result.');
-        }
+        return this._result;
     }
 
     set result(value: string) {
-        this._result = value;
+        if (value === 'success') {
+            this._result = BackupResultResult.RESULT_SUCCESS;
+        } else if (value === 'failed') {
+            this._result = BackupResultResult.RESULT_FAILED;
+        } else if (value === 'process') {
+            this._result = BackupResultResult.RESULT_PROCESS;
+        } else {
+            throw Error('Unknown result.');
+        }
     }
 
     get message(): string {
