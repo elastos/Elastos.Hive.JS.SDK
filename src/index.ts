@@ -102,6 +102,7 @@ import { RemoteResolver } from "./restclient/backup/remoteresolver";
 import { LocalResolver } from "./restclient/backup/localresolver";
 import { HiveBackupContext } from "./restclient/backup/hivebackupcontext";
 import { Backup } from "./api/backup";
+import { ProviderService } from "./restclient/provider/providerservice";
 
 
 Logger.setDefaultLevel(Logger.DEBUG);
@@ -131,6 +132,7 @@ export {
     AppContextParameters,
     VaultServices,
     Backup,
+    ProviderService,
     PricingPlan,
     VaultInfo,
     File,
