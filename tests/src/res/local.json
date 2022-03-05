@@ -18,7 +18,6 @@
 
   "node": {
     "ownerDid": "did:elastos:iqk3KLebgiiP46uyoKevYQJB7PZcs2iTLz",
-    "provider": "http://127.0.0.1:5000",
     "targetDid": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
     "targetHost": "http://127.0.0.1:5001",
     "storePath": "local"
