@@ -61,7 +61,7 @@ export class TestData {
 	}
 
 	public getProviderAddress(): string {
-		return this.clientConfig.node.provider;
+		return this.clientConfig.node.targetHost;
 	}
 
 	public newVault(): VaultServices {

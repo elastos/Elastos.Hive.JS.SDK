@@ -30,7 +30,7 @@ describe("test default appcontext provider", () => {
         try{
             let appProvider = await DefaultAppContextProvider.create(appContextParameters);
             let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string);
-            vaultSubscriptionService = new VaultSubscriptionService(appContext, clientConfig.node.provider);
+            vaultSubscriptionService = new VaultSubscriptionService(appContext, clientConfig.node.targetHost);
         } catch(e){
             console.debug(e);
             fail("failed");
