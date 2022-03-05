@@ -16,7 +16,6 @@
   },
 
   "node": {
-    "provider": "https://hive1.trinity-tech.io",
     "targetDid": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
     "targetHost": "https://hive1.trinity-tech.io",
     "storePath": "production"
