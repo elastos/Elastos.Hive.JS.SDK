@@ -142,7 +142,7 @@ export class TestData {
 				}
 			}
 		}, self.userDid.getDid().toString());
-
+/*
 		this.callerContext = await AppContext.build({
 			//@Override
 			getLocalDataDir(): string {
@@ -172,7 +172,7 @@ export class TestData {
 				}
 			}
 		}, this.callerDid.getDid().toString());
-
+*/
 		return this;
 	}
 

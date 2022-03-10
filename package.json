@@ -3,7 +3,7 @@
   "version": "2.3.4",
   "description": "Elastos Hive JS SDK",
   "exports": {
-    "node" : "./dist/hive.js",
+    "node": "./dist/hive.js",
     "browser": {
       "import": "./dist/es/hive.browser.js"
     }
@@ -48,7 +48,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elastos/Elastos.NET.Hive.JS.SDK.git"
+    "url": "git+https://github.com/elastos/Elastos.Hive.JS.SDK.git"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
@@ -90,9 +90,9 @@
   "author": "Elastos",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK/issues"
+    "url": "https://github.com/elastos/Elastos.Hive.JS.SDK/issues"
   },
-  "homepage": "https://github.com/elastos/Elastos.NET.Hive.JS.SDK#readme",
+  "homepage": "https://github.com/elastos/Elastos.Hive.JS.SDK#readme",
   "directories": {
     "test": "tests"
   }
