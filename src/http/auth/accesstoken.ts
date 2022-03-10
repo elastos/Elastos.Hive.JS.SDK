@@ -17,6 +17,7 @@ export class AccessToken {
 	private authService: AuthService;
 	private storage: DataStorage;
 	private bridge: BridgeHandler;
+	private providedToken: string;
 
 	/**
 	 * Create the access token by service end point, data storage, and bridge handler.
@@ -29,6 +30,16 @@ export class AccessToken {
 		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
 		this.bridge = new BridgeHandlerImpl(serviceContext);
+		this.providedToken = serviceContext.getAppContext().getUserToken();
+	}
+
+	public async withUserToken(userToken: string): Promise<AccessToken> {
+		this.jwtCode = userToken;
+		if (this.jwtCode) {
+			await this.bridge.flush(this.jwtCode);
+			this.saveToken(this.jwtCode);
+		}
+		return this;
 	}
 
 	// TEMPORARY DEBUG METHOD
@@ -54,6 +65,13 @@ export class AccessToken {
 	public async fetch(): Promise<string> {
 		if (this.jwtCode != null) {
 			return this.jwtCode;
+		}
+
+		if (this.providedToken) {
+			this.jwtCode = this.providedToken;
+			this.providedToken = null;
+			await this.bridge.flush(this.jwtCode);
+			this.saveToken(this.jwtCode);
 		}
 
 		this.jwtCode = this.restoreToken();

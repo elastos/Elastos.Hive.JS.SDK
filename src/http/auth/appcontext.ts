@@ -30,11 +30,17 @@ export class AppContext {
 
     private contextProvider: AppContextProvider;
     private userDid: string;
+	private userToken: string;
 
-    private constructor(provider: AppContextProvider, userDid: string) {
+    private constructor(provider: AppContextProvider, userDid: string, userToken?: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
+		this.userToken = userToken;
     }
+
+	public getUserToken() {
+		return this.userToken;
+	}
 
 	/**
 	 * Get the provider of the application context.
@@ -71,6 +77,10 @@ export class AppContext {
 		this.LOG.trace("Initializing DIDBackend with " + resolver);
 		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
 		AppContext.resolverHasSetup = true;
+	}
+
+	public static createFromAuthenticatedContext(userDid: string, userToken: string): AppContext {
+		return new AppContext(null, userDid, userToken);
 	}
 
 	/**
