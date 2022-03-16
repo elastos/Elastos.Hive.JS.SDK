@@ -1,5 +1,4 @@
 import { VaultServices, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, CountOptions, UpdateOptions, NotFoundException, QueryOptions, AscendingSortItem } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {
@@ -14,7 +13,7 @@ describe("test database services", () => {
 
     beforeAll(async () => {
 
-        let testData = await TestData.getInstance("databaseservice.tests", ClientConfig.CUSTOM, TestData.USER_DIR);
+        let testData = await TestData.getInstance("databaseservice.tests");
 
         vaultSubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),

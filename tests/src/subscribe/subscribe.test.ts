@@ -1,5 +1,10 @@
-import { VaultSubscriptionService, PricingPlan, BackupSubscriptionService, Order } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
+import {
+    VaultSubscriptionService,
+    PricingPlan,
+    BackupSubscriptionService,
+    Order,
+    AlreadyExistsException
+} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test vault subscribe function", () => {
@@ -9,7 +14,7 @@ describe("test vault subscribe function", () => {
     let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
-        testData = await TestData.getInstance("vault subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("vault subscribe.test");
         vaultsubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());
@@ -32,7 +37,7 @@ describe("test vault subscribe function", () => {
         expect(version).not.toBeNull();
     });
 
-    test("testPlaceOrder", async() => {
+    test.skip("testPlaceOrder", async() => {
         let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
         expect(order.getOrderId()).not.toBeNull();
@@ -56,6 +61,13 @@ describe("test vault subscribe function", () => {
 	// }
 
     test("test get app stats", async () => {
+        try {
+            await vaultsubscriptionService.subscribe();
+        } catch (e) {
+            if (!(e instanceof AlreadyExistsException)) {
+                throw e;
+            }
+        }
         let appStats = await vaultsubscriptionService.getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
@@ -89,7 +101,7 @@ describe("test backup subscribe function", () => {
     let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
-        testData = await TestData.getInstance("backup subscribe.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("backup subscribe.test");
         backupsubscriptionService = new BackupSubscriptionService(
             testData.getAppContext(),
             testData.getProviderAddress());

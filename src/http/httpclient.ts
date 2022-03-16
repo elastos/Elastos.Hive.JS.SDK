@@ -60,7 +60,8 @@ export class HttpClient {
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
-        this.httpOptions = this.validateOptions(httpOptions);
+        // this.httpOptions = this.validateOptions(httpOptions);
+        this.httpOptions = this.getHttpOptionsByProviderAddress(httpOptions);
     }
 
     private handleResponse(statusCode: number, content?: string): void {
@@ -248,5 +249,20 @@ export class HttpClient {
         httpOptions.path = path;
 
         return httpOptions;
+    }
+
+    private getHttpOptionsByProviderAddress(httpOptions: HttpOptions): HttpOptions {
+        checkNotNull(httpOptions, "No HTTP configuration provided");
+        const providerAddress = this.serviceContext.getProviderAddress();
+        const url = new URL(providerAddress);
+        return {
+            protocol: url.protocol,
+            host: url.host,
+            port: url.port ? url.port : (url.protocol == 'https:' ? '443' : '80'),
+            method: httpOptions.method ?? HttpClient.DEFAULT_METHOD,
+            path: url.pathname,
+            headers: httpOptions.headers ?? HttpClient.DEFAULT_HEADERS,
+            timeout: httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT
+        };
     }
 }
