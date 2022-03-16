@@ -1,7 +1,5 @@
-import { DefaultDIDAdapter, DIDBackend } from "@elastosfoundation/did-js-sdk";
-import { VaultServices, AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscriptionService, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, NotFoundException } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
-import { TestData } from "../config/testdata";
+import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
+import {TestData} from "../config/testdata";
 
 
 
@@ -10,10 +8,8 @@ describe("test default appcontext provider", () => {
     let vaultSubscriptionService: VaultSubscriptionService;
     
     beforeAll(async() => {
-        DIDBackend.initialize(new DefaultDIDAdapter("mainnet"));
-        AppContext.setupResolver("mainnet", "data/didcache");
-
-        let clientConfig = ClientConfig.CUSTOM;
+        const testData = await TestData.getInstance("appcontextprovider.test");
+        const clientConfig = testData.getClientConfig();
 
         let appContextParameters = {
             storePath: `${process.env["HIVE_USER_DIR"]}/data/store/app`,

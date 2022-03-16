@@ -12,6 +12,7 @@ import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import {ProviderService} from "../../../src/restclient/provider/providerservice";
 import {Backup} from "../../../src/api/backup";
+import {ClientConfig} from "./clientconfig";
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
@@ -37,20 +38,19 @@ export class TestData {
 		return `${prefix}_${Date.now().toString()}`;
 	}
 
-    public static async getInstance(testName: string, clientConfig: any, userDir?: string): Promise<TestData> {
-		Utils.checkNotNull(clientConfig, "Test configuration cannot be empty");
-		Utils.checkNotNull(clientConfig.node, "A valid test configuration is mandatory");
-		if (!userDir) {
-			userDir = TestData.USER_DIR;
-		}
+    public static async getInstance(testName: string): Promise<TestData> {
+		console.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
-			TestData.LOG.info("***** Running {} using '{}' configuration *****", testName, clientConfig.node.storePath);
-			TestData.LOG.info("***** Data directory: '{}' *****", userDir);
-            TestData.INSTANCE = new TestData(clientConfig, userDir);
+			// TODO: Update ClientConfig here.
+            TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
 			await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
     }
+
+    public getClientConfig() {
+    	return this.clientConfig;
+	}
 
 	public getLocalStorePath(): string {
 		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
@@ -61,7 +61,7 @@ export class TestData {
 	}
 
 	public getProviderAddress(): string {
-		return this.clientConfig.node.targetHost;
+		return this.clientConfig.node.provider;
 	}
 
 	public newVault(): VaultServices {
@@ -88,6 +88,7 @@ export class TestData {
 				applicationConfig.mnemonics2,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass,
+				this.clientConfig.resolverUrl,
 				applicationConfig.did);
 
 		

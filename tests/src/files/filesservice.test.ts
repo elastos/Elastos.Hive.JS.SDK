@@ -1,5 +1,10 @@
-import { File, FilesService, NotFoundException } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
+import {
+	AlreadyExistsException,
+	File,
+	FilesService,
+	NotFoundException,
+	VaultSubscriptionService
+} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test file service", () => {
@@ -17,9 +22,19 @@ describe("test file service", () => {
 	let testData: TestData;
 
 	beforeAll(async () => {
-		testData = await TestData.getInstance("filesservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+		testData = await TestData.getInstance("filesservice.test");
 		filesService = testData.newVault().getFilesService();
 		prepareTestFile();
+		try {
+			const vaultSubscriptionService = new VaultSubscriptionService(
+				testData.getAppContext(),
+				testData.getProviderAddress());
+			await vaultSubscriptionService.subscribe();
+		} catch (e) {
+			if (!(e instanceof AlreadyExistsException)) {
+				throw e;
+			}
+		}
 	});
 
 	afterAll(() => {
@@ -109,9 +124,9 @@ describe("test file service", () => {
 		let hasOurTextFile = false;
 		let hasOurBinFile = false;
 		files.forEach((element) => {
-			if (element.getName() === `${FILE_NAME_TXT}`) {
+			if (element.getName() === `${REMOTE_DIR}${FILE_NAME_TXT}`) {
 				hasOurTextFile = true;
-			} else if (element.getName() === `${FILE_NAME_BIN}`) {
+			} else if (element.getName() === `${REMOTE_DIR}${FILE_NAME_BIN}`) {
 				hasOurBinFile = true;
 			}
 		});
