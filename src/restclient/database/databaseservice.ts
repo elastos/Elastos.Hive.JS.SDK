@@ -209,7 +209,7 @@ export class DatabaseService extends RestService {
 			{
 					"collection": collection,
 					"filter": filter,
-					"options": options
+					"options": this.normalizeSortQueryOptions(options)
 			},
 			<HttpResponseParser<JSONObject[]>> {
 				deserialize(content: any): JSONObject[] {
@@ -332,6 +332,18 @@ export class DatabaseService extends RestService {
  	 */
 	public async deleteMany(collection: string, filter: JSONObject): Promise<void> {
 		return await this.deleteInternal(collection, false, filter);
+	}
+
+	private normalizeSortQueryOptions (options: QueryOptions): QueryOptions {
+		if (options && options.sort) {
+			let sortQuery = [];
+			for (var s of options.sort) {
+				sortQuery.push([s.key, s.order])
+			}
+			options.sort = sortQuery;
+		}
+
+		return options;
 	}
 
 	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {

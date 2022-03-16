@@ -119,32 +119,12 @@ describe("test database services", () => {
         await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
     });
 
-    test.skip("testQueryWithOptions", async () => {
-        let query = {"author": "john doe1"};
-        let options: QueryOptions = new QueryOptions();
-        options.sort = [new AscendingSortItem("_id")];
-        await expect(databaseService.query(COLLECTION_NAME, query, options)).resolves.not.toBeNull();
-    });
-
-    /*
     test("testQueryWithOptions", async () => {
-        await deleteCollectionAnyway();
-        await databaseService.createCollection(COLLECTION_NAME);
-        await databaseService.insertOne(COLLECTION_NAME, {"author": "john doe1", "title": "Eve for Dummies1"}, new InsertOptions(false, false));
-        await databaseService.insertMany(COLLECTION_NAME, [{"author": "john doe2", "title": "Eve for Dummies2"},{"author": "john doe3", "title": "Eve for Dummies3"}], new InsertOptions(false, true));
         let query = {"author": "john doe1"};
         let options: QueryOptions = new QueryOptions();
-        options.skip = 0;
-        options.limit = 3;
-        options.projection = { "_id": false };
-        options.allow_partial_results = false;
-        options.return_key = false;
-        options.show_record_id = false;
-        options.batch_size = 0;
         options.sort = [new AscendingSortItem("_id")];
         await expect(databaseService.query(COLLECTION_NAME, query, options)).resolves.not.toBeNull();
     });
-    */
 
     test("testCountDoc", async () => {
         let filter = { "author": "john doe1" };
@@ -203,7 +183,7 @@ describe("test database services", () => {
         await expect(databaseService.deleteOne(COLLECTION_NAME, { "author": "john doe2" })).resolves.not.toThrow();
     });
 
-    test.skip("testDeleteOne4NotFoundException", async () => {
+    test("testDeleteOne4NotFoundException", async () => {
         await expect(databaseService.deleteOne(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(NotFoundException);
     });
 
@@ -211,7 +191,7 @@ describe("test database services", () => {
         await expect(databaseService.deleteMany(COLLECTION_NAME, { "author": "john doe2" })).resolves.not.toThrow();
     });
 
-    test.skip("testDeleteMany4NotFoundException", async () => {
+    test("testDeleteMany4NotFoundException", async () => {
         await expect(databaseService.deleteMany(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(NotFoundException);
     });
 
