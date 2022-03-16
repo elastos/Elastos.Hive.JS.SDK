@@ -1,6 +1,5 @@
-import {BackupSubscriptionService, NotFoundException, VaultSubscriptionService} from "../../../src";
+import {BackupSubscriptionService, NotFoundException, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
 import {TestData} from "../config/testdata";
-import {ClientConfig} from "../config/clientconfig";
 import {ProviderService} from "../../../src/restclient/provider/providerservice";
 import {VaultDetail} from "../../../src/restclient/provider/vaultdetail";
 import {BackupDetail} from "../../../src/restclient/provider/backupdetail";
@@ -13,7 +12,7 @@ describe("test provider service", () => {
     let providerService: ProviderService;
 
     beforeAll(async () => {
-        testData = await TestData.getInstance("providerservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("providerservice.test");
         vaultSubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
         backupSubscriptionService = new BackupSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
         providerService = testData.createProviderService();
@@ -36,9 +35,13 @@ describe("test provider service", () => {
     });
 
     test("test get backups", async () => {
-        let backups: BackupDetail[] = await providerService.getBackups();
-        expect(backups).not.toBeNull();
-        expect(backups).not.toEqual([]);
+        try {
+            let backups: BackupDetail[] = await providerService.getBackups();
+            expect(backups).not.toBeNull();
+            expect(backups).not.toEqual([]);
+        } catch (e) {
+            expect(e).toBeInstanceOf(NotFoundException);
+        }
     });
 
     test("test get filled orders", async () => {

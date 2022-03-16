@@ -1,5 +1,4 @@
 import { Order, Receipt, VaultSubscriptionService } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test payment service", () => {
@@ -13,7 +12,7 @@ describe("test payment service", () => {
 	let vaultSubscriptionService: VaultSubscriptionService;
 
     beforeAll(async () => {
-		testData = await TestData.getInstance("paymentservice.test", ClientConfig.TEST, TestData.USER_DIR);
+		testData = await TestData.getInstance("paymentservice.test");
         vaultSubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
         try {
             await vaultSubscriptionService.subscribe();    
@@ -28,14 +27,14 @@ describe("test payment service", () => {
         console.log("Payment Service version: " + paymentVersion);
     });
 
-    test("testPlaceOrder", async () => {
+    test.skip("testPlaceOrder", async () => {
         let order: Order = await vaultSubscriptionService.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
         testOrderId = order.getOrderId();
         expect(testOrderId).not.toBeNull();
     });
 
-    test("testPayOrder", async () => {
+    test.skip("testPayOrder", async () => {
         let receipt: Receipt = await vaultSubscriptionService.payOrder(ORDER_ID, TRANS_ID);
         expect(receipt).not.toBeNull();
         testTransactionId = receipt.getReceiptId();
@@ -43,7 +42,7 @@ describe("test payment service", () => {
         expect(receipt.getOrderId()).not.toBeNull();
     });
 
-    test("testGetReceipt", async () => {
+    test.skip("testGetReceipt", async () => {
         let receipt: Receipt = await vaultSubscriptionService.getReceipt(ORDER_ID);
         expect(receipt).not.toBeNull();
         expect(receipt.getReceiptId()).not.toBeNull();
@@ -51,13 +50,13 @@ describe("test payment service", () => {
         testTransactionId = receipt.getTransactionId();
     });
 
-    test("testGetOrder", async () => {
+    test.skip("testGetOrder", async () => {
         let order: Order = await vaultSubscriptionService.getOrder(ORDER_ID);
         expect(order).not.toBeNull();
         expect(order.getOrderId()).not.toBeNull();
     });
 
-    test("testGetOrders", async () => {
+    test.skip("testGetOrders", async () => {
         let orders: Order[] = await vaultSubscriptionService.getOrderList();
         expect(orders).not.toBeNull();
         expect(orders.length).toBeGreaterThan(0);

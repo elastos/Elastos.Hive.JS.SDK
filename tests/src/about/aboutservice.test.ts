@@ -1,5 +1,4 @@
 import { NodeVersion, ServiceContext } from "@elastosfoundation/hive-js-sdk";
-import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test about service", () => {
@@ -8,7 +7,7 @@ describe("test about service", () => {
     let serviceContext: ServiceContext;
 
     beforeAll(async () => {
-		testData = await TestData.getInstance("aboutservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+		testData = await TestData.getInstance("aboutservice.test");
         serviceContext = new ServiceContext(testData.getAppContext(), testData.getProviderAddress());
 	});
 
