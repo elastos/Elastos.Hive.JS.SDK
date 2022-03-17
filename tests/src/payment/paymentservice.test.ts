@@ -1,7 +1,9 @@
-import { Order, Receipt, VaultSubscriptionService } from "@elastosfoundation/hive-js-sdk";
+import { Order, Receipt, VaultSubscriptionService, Logger } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test payment service", () => {
+    const LOG = new Logger("paymentservice.test");
+
 	const PRICING_PLAN_NAME = "Rookie";
     const ORDER_ID = "60ee8c056fdd17b16bb5b4c2";
     const TRANS_ID = "280a24034bfb241c31b5a73c792c9d05df2b1f79bb98733c5358aeb909c27010";
@@ -17,14 +19,14 @@ describe("test payment service", () => {
         try {
             await vaultSubscriptionService.subscribe();    
         } catch (e){
-            console.log("vault is already subscribed");
+            LOG.log("vault is already subscribed");
         }
 	});
 
     test("testgetversion", async () => {
 		let paymentVersion = await vaultSubscriptionService.getVersion();
 		expect(paymentVersion).not.toBeNull();
-        console.log("Payment Service version: " + paymentVersion);
+        LOG.log("Payment Service version: " + paymentVersion);
     });
 
     test.skip("testPlaceOrder", async () => {

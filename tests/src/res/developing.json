@@ -4,7 +4,6 @@
   "application": {
     "name": "developApp",
     "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
-    "mnemonics2":"wash busy tell relief street maximum dumb fat legend end panic warrior",
     "passPhrase": "password",
     "storepass": "password",
     "did":"did:elastos:imMY7uHc5WCDUhWCVaH5MtFFCBMegCaEYH"
