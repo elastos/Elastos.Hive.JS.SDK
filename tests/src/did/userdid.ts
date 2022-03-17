@@ -12,7 +12,7 @@ export class UserDID extends DIDEntity {
 
     public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?:string): Promise<UserDID> {
         let newInstance = new UserDID(name, mnemonic, phrasepass, storepass, did);
-        await newInstance.initDid2(mnemonic, true);
+        await newInstance.initDid(mnemonic, true);
         let doc = await newInstance.getDocument();
         newInstance.setIssuer(new Issuer(doc));
         return newInstance;

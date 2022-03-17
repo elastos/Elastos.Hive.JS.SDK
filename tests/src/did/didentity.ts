@@ -1,5 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@elastosfoundation/hive-js-sdk";
+import {TestData} from "../config/testdata";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
@@ -21,8 +22,8 @@ export class DIDEntity {
 		this.mnemonic = mnemonic;
 	}
 
-	public async initDid2(mnemonic: string, needResolve: boolean) {
-		const path = "data/didCache" + File.SEPARATOR + this.name;
+	public async initDid(mnemonic: string, needResolve: boolean) {
+		const path = TestData.RESOLVE_CACHE + File.SEPARATOR + this.name;
 		this.didStore = await DIDStore.open(path);
 		const rootIdentity = await this.getRootIdentity(mnemonic);
 		await this.initDidByRootIdentity(rootIdentity, needResolve);
@@ -41,16 +42,16 @@ export class DIDEntity {
 		} else {
 			if (needResolve) {
 				const synced = await rootIdentity.synchronizeIndex(0);
-				console.info(`${this.name}: identity synchronized result: ${synced}`);
+				DIDEntity.LOG.info(`${this.name}: identity synchronized result: ${synced}`);
 				this.did = rootIdentity.getDid(0);
 			} else {
 				const doc: DIDDocument = await rootIdentity.newDid(this.storepass);
 				this.did = doc.getSubject();
-				console.info(`[${this.name}] My new DID created: ${this.did.toString()}`);
+				DIDEntity.LOG.info(`[${this.name}] My new DID created: ${this.did.toString()}`);
 			}
 		}
 		if (!this.did) {
-			console.error("Can not get the did from the local store.");
+			DIDEntity.LOG.error("Can not get the did from the local store.");
 		}
 	}
 
