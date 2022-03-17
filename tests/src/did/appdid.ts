@@ -9,13 +9,12 @@ export class AppDID extends DIDEntity {
 		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
-	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
-		DIDBackend.initialize(new DefaultDIDAdapter("mainnet")); 
-		//DIDBackend.initialize(new DefaultDIDAdapter("https://api-testnet.elastos.io/newid")); 
+	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
+							   resolver: string, did?: string): Promise<AppDID> {
+		// TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
+		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
         let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
-		await newInstance.initPrivateIdentity(mnemonic);	
-		await newInstance.initDid();
-
+		await newInstance.initDid(mnemonic, false);
         return newInstance;
     }
 
@@ -24,17 +23,12 @@ export class AppDID extends DIDEntity {
 	}
 
 	public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
-
-		
 		let vpb = await VerifiablePresentation.createFor(this.getDid(), null, this.getDIDStore());
 		let vp = await vpb.credentials(vc)
 				.realm(realm)
 				.nonce(nonce)
 				.seal(this.getStorePassword());
 
-		
-			
-				
 		AppDID.LOG.info("VerifiablePresentation:{}", vp.toString());
 
 		let listener = VerificationEventListener.getDefaultWithIdent("isValid");

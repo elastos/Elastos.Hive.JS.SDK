@@ -14,8 +14,6 @@ import {
     QueryHasResultCondition, 
     FilesService, 
     Executable } from "@elastosfoundation/hive-js-sdk";
-
-import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test scripting function", () => {
@@ -51,7 +49,7 @@ describe("test scripting function", () => {
     let fileName: string = "test.txt";
 
     beforeAll(async () => {
-        testData = await TestData.getInstance("scriptingservice.test", ClientConfig.CUSTOM, TestData.USER_DIR);
+        testData = await TestData.getInstance("scriptingservice.test");
 
         vaultSubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),

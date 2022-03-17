@@ -4,20 +4,18 @@ import {
 	BackupService,
 	AppContext,
 	Logger,
-	Utils,
-	File
+	File, ProviderService, Backup
 } from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import {ProviderService} from "../../../src/restclient/provider/providerservice";
-import {Backup} from "../../../src/api/backup";
+import {ClientConfig} from "./clientconfig";
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
 
 	private static LOG = new Logger("TestData");
-    private static readonly RESOLVE_CACHE = "data/didCache";
+    public static readonly RESOLVE_CACHE = "data/didCache";
     private static INSTANCE: TestData;
 
     private userDid: UserDID;
@@ -37,20 +35,19 @@ export class TestData {
 		return `${prefix}_${Date.now().toString()}`;
 	}
 
-    public static async getInstance(testName: string, clientConfig: any, userDir?: string): Promise<TestData> {
-		Utils.checkNotNull(clientConfig, "Test configuration cannot be empty");
-		Utils.checkNotNull(clientConfig.node, "A valid test configuration is mandatory");
-		if (!userDir) {
-			userDir = TestData.USER_DIR;
-		}
+    public static async getInstance(testName: string): Promise<TestData> {
+		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
-			TestData.LOG.info("***** Running {} using '{}' configuration *****", testName, clientConfig.node.storePath);
-			TestData.LOG.info("***** Data directory: '{}' *****", userDir);
-            TestData.INSTANCE = new TestData(clientConfig, userDir);
+			// TODO: Update ClientConfig here.
+            TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
 			await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
     }
+
+    public getClientConfig() {
+    	return this.clientConfig;
+	}
 
 	public getLocalStorePath(): string {
 		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
@@ -61,7 +58,7 @@ export class TestData {
 	}
 
 	public getProviderAddress(): string {
-		return this.clientConfig.node.targetHost;
+		return this.clientConfig.node.provider;
 	}
 
 	public newVault(): VaultServices {
@@ -85,9 +82,10 @@ export class TestData {
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonics2,
+				applicationConfig.mnemonics,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass,
+				this.clientConfig.resolverUrl,
 				applicationConfig.did);
 
 		

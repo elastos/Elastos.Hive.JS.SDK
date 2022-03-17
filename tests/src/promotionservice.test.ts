@@ -1,13 +1,12 @@
 import { TestData } from "./config/testdata";
 
-import {PromotionService, VaultSubscriptionService} from "../../src";
-import { ClientConfig } from "./config/clientconfig";
+import {PromotionService, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
 
 describe.skip("test database services", () => {
     let promotionService: PromotionService;
 
     beforeAll(async () => {
-        const testData = await TestData.getInstance("promotionservice.tests", ClientConfig.CUSTOM, TestData.USER_DIR);
+        const testData = await TestData.getInstance("promotionservice.tests");
         promotionService = testData.newBackup().getPromotionService();
         const vaultSubscriptionService = new VaultSubscriptionService(
             testData.getAppContext(),

@@ -60,7 +60,7 @@ export class HttpClient {
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
-        this.httpOptions = this.validateOptions(httpOptions);
+        this.httpOptions = this.getHttpOptionsByProviderAddress(httpOptions);
     }
 
     private handleResponse(statusCode: number, content?: string): void {
@@ -222,31 +222,18 @@ export class HttpClient {
         });
     }
 
-    private validateOptions(httpOptions: HttpOptions): HttpOptions {
+    private getHttpOptionsByProviderAddress(httpOptions: HttpOptions): HttpOptions {
         checkNotNull(httpOptions, "No HTTP configuration provided");
-
-        const PROTOCOL_DELIMITER = "://";
-        const PORT_DELIMITER = ":";
-
-        httpOptions.protocol = httpOptions.protocol ?? HttpClient.DEFAULT_PROTOCOL;
-        httpOptions.port = httpOptions.port ?? HttpClient.DEFAULT_PORT;
-        httpOptions.method = httpOptions.method ?? HttpClient.DEFAULT_METHOD;
-        httpOptions.timeout = httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT;
-        httpOptions.headers = httpOptions.headers ?? HttpClient.DEFAULT_HEADERS;
-
-        // If the providerAddress already contains the protocol and/or the port, we override the provided configuration.
-        let providerAddress = this.serviceContext.getProviderAddress();
-        let protocol = providerAddress.includes(PROTOCOL_DELIMITER) ? providerAddress.split(PROTOCOL_DELIMITER)[0] : undefined;
-        providerAddress = protocol ? providerAddress.replace(protocol + PROTOCOL_DELIMITER, "") : providerAddress;
-        let path = providerAddress.includes("/") ? providerAddress.substring(providerAddress.indexOf("/")) : "";
-        providerAddress = providerAddress.includes("/") ? providerAddress.split("/")[0] : providerAddress;
-        let port = providerAddress.includes(PORT_DELIMITER) ? (providerAddress.split(PORT_DELIMITER).slice(-1)[0]).replace(/\D/g,'') : undefined;
-        let host = port ? providerAddress.replace(PORT_DELIMITER + port, "") : providerAddress;
-        httpOptions.protocol = protocol ? protocol + ":" : httpOptions.protocol;
-        httpOptions.port = port ? port : httpOptions.port;
-        httpOptions.host = host;
-        httpOptions.path = path;
-
-        return httpOptions;
+        const providerAddress = this.serviceContext.getProviderAddress();
+        const url = new URL(providerAddress);
+        return {
+            protocol: url.protocol,
+            host: url.host,
+            port: url.port ? url.port : (url.protocol == 'https:' ? '443' : '80'),
+            method: httpOptions.method ?? HttpClient.DEFAULT_METHOD,
+            path: url.pathname,
+            headers: httpOptions.headers ?? HttpClient.DEFAULT_HEADERS,
+            timeout: httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT
+        };
     }
 }

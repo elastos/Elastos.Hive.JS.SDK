@@ -1,18 +1,16 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@elastosfoundation/hive-js-sdk";
-import { UnauthorizedException } from "@elastosfoundation/hive-js-sdk";
-
+import {TestData} from "../config/testdata";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
 
-	private name: string;
-	private phrasepass: string;
+	private readonly name: string;
+	private readonly phrasepass: string;
 	private mnemonic: string
 	protected storepass: string;
 
-	private identity: RootIdentity;
-	private store: DIDStore;
+	private didStore: DIDStore;
 	private did: DID;
 	private didString: string;
 
@@ -22,102 +20,43 @@ export class DIDEntity {
 		this.storepass = storepass;
 		this.didString = did;
 		this.mnemonic = mnemonic;
-		//void this.initPrivateIdentity(mnemonic).finally(() => { void this.initDid() });
 	}
 
-	public async initPrivateIdentity(mnemonic: string): Promise<void> {
-		let storePath = "data/didCache" + File.SEPARATOR + this.name;
-
-		this.store = await DIDStore.open(storePath);
-
-		let id = RootIdentity.getIdFromMnemonic(mnemonic, this.phrasepass);
-		if (this.store.containsRootIdentity(id)){
-			this.identity = await this.store.loadRootIdentity(id);
-			return; // Already exists
-		}
-
-
-		DIDEntity.LOG.info("Creating root identity for mnemonic {}", mnemonic);
-
-		try {
-			this.identity = RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.store, this.storepass);
-		} catch (e){
-			DIDEntity.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, e);
-			throw new Error("Error Creating root identity for mnemonic");
-		}
-		
-
-		
-		await this.identity.synchronize();
-
-		if (this.didString !== undefined){
-			this.identity.setDefaultDid(this.didString);
-			let defaultDid = this.identity.getDefaultDid();
-			DIDEntity.LOG.info("************************************* default DID: {}", defaultDid.toString());
-		}
-
-
-		return;
+	public async initDid(mnemonic: string, needResolve: boolean) {
+		const path = TestData.RESOLVE_CACHE + File.SEPARATOR + this.name;
+		this.didStore = await DIDStore.open(path);
+		const rootIdentity = await this.getRootIdentity(mnemonic);
+		await this.initDidByRootIdentity(rootIdentity, needResolve);
 	}
 
-	public async initDid(): Promise<void> {
-		let dids = await this.store.listDids();
+	protected async getRootIdentity(mnemonic: string): Promise<RootIdentity> {
+		const id = RootIdentity.getIdFromMnemonic(mnemonic, this.phrasepass);
+		return this.didStore.containsRootIdentity(id) ? await this.didStore.loadRootIdentity(id)
+			: RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.didStore, this.storepass);
+	}
+
+	protected async initDidByRootIdentity(rootIdentity: RootIdentity, needResolve: boolean): Promise<void> {
+		const dids = await this.didStore.listDids();
 		if (dids.length > 0) {
 			this.did = dids[0];
-			return;
+		} else {
+			if (needResolve) {
+				const synced = await rootIdentity.synchronizeIndex(0);
+				DIDEntity.LOG.info(`${this.name}: identity synchronized result: ${synced}`);
+				this.did = rootIdentity.getDid(0);
+			} else {
+				const doc: DIDDocument = await rootIdentity.newDid(this.storepass);
+				this.did = doc.getSubject();
+				DIDEntity.LOG.info(`[${this.name}] My new DID created: ${this.did.toString()}`);
+			}
 		}
-		
-		this.did = await this.identity.getDefaultDid();
-		if (!this.did) throw new UnauthorizedException("Invalid DID.");
-		DIDEntity.LOG.info("************************************* default DID: {}", this.did.toString());
-		let resolvedDoc = await this.did.resolve();
-		if (!resolvedDoc) throw new UnauthorizedException("Invalid DID Document.");
-		DIDEntity.LOG.info("************************************* My new DIDDOC resolved: {}", resolvedDoc.toString(true));
-
-		DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
+		if (!this.did) {
+			DIDEntity.LOG.error("Can not get the did from the local store.");
+		}
 	}
 
-
-	// public async initDid(): Promise<void> {
-
-	// 	let doc: DIDDocument = undefined;
-	// 	if (this.didString === undefined){
-	// 		let dids = await this.store.listDids();
-	// 		if (dids.length > 0) {
-	// 			this.did = dids[0];
-	// 			return;
-	// 		}
-	// 		doc = await this.identity.newDid(this.storepass);
-	// 	} 
-	// 	else {
-	// 		DIDEntity.LOG.info("trying to resolve did " + this.didString);
-			
-	// 		let localDoc = await this.store.loadDid(this.didString);
-
-	// 		if (localDoc === undefined || localDoc === null){
-	// 			doc = await DID.from(this.didString).resolve(true);
-	// 			let key = HDKey.newWithMnemonic(this.mnemonic, "").deriveWithPath(
-	// 				HDKey.DERIVE_PATH_PREFIX + 0
-	// 			  );
-			  
-	// 			  this.store.storePrivateKey(DIDURL.from('#primary', this.didString), key.serialize(), this.storepass);
-
-	// 			await this.store.storeDid(doc);
-	// 		} else
-	// 		{
-	// 			doc = localDoc;
-	// 		}
-	// 	}
-	// 	if (!doc.isValid()){
-	// 		DIDEntity.LOG.error("doc is not valid");
-	// 		throw new Error("doc is not valid");
-	// 	}
-	// 	this.did = doc.getSubject();
-	// 	DIDEntity.LOG.info("{} My new DID created: {}", this.name, this.did.toString());
-	// }
-
 	protected getDIDStore(): DIDStore {
-		return this.store;
+		return this.didStore;
 	}
 
 	public getDid(): DID {
@@ -125,7 +64,7 @@ export class DIDEntity {
 	}
 
 	public async getDocument(): Promise<DIDDocument> {
-		return await this.store.loadDid(this.did);
+		return await this.didStore.loadDid(this.did);
 	}
 
 	public getName(): string {

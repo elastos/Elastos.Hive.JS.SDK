@@ -1,5 +1,4 @@
-import { BackupService } from "../../../src";
-import { ClientConfig } from "../config/clientconfig";
+import { BackupService } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata"
 
 
@@ -8,7 +7,7 @@ describe("test backup services", () => {
     let backupService: BackupService;
 
     beforeAll(async () => {
-        const testData = await TestData.getInstance("backupservice.tests", ClientConfig.CUSTOM, TestData.USER_DIR);
+        const testData = await TestData.getInstance("backupservice.tests");
         backupService = testData.getBackupService();
     });
 
