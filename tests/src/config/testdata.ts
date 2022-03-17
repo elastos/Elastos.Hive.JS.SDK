@@ -4,21 +4,18 @@ import {
 	BackupService,
 	AppContext,
 	Logger,
-	Utils,
-	File
+	File, ProviderService, Backup
 } from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import {ProviderService} from "../../../src/restclient/provider/providerservice";
-import {Backup} from "../../../src/api/backup";
 import {ClientConfig} from "./clientconfig";
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
 
 	private static LOG = new Logger("TestData");
-    private static readonly RESOLVE_CACHE = "data/didCache";
+    public static readonly RESOLVE_CACHE = "data/didCache";
     private static INSTANCE: TestData;
 
     private userDid: UserDID;
@@ -39,7 +36,7 @@ export class TestData {
 	}
 
     public static async getInstance(testName: string): Promise<TestData> {
-		console.log(`Get TestData instance for test: ${testName}`);
+		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
 			// TODO: Update ClientConfig here.
             TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
@@ -85,7 +82,7 @@ export class TestData {
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonics2,
+				applicationConfig.mnemonics,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass,
 				this.clientConfig.resolverUrl,

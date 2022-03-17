@@ -14,7 +14,7 @@ export class AppDID extends DIDEntity {
 		// TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
 		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
         let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
-		await newInstance.initDid2(mnemonic, false);
+		await newInstance.initDid(mnemonic, false);
         return newInstance;
     }
 
