@@ -56,19 +56,28 @@ export class HttpClient {
     private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: HttpOptions;
+    private httpOptionsInitialized: boolean = false;
 
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
-        this.httpOptions = this.getHttpOptionsByProviderAddress(httpOptions);
+        this.httpOptions = httpOptions;
     }
 
-    private handleResponse(statusCode: number, content?: string): void {
+    private async getHttpOptions(): Promise<HttpOptions> {
+        if (!this.httpOptionsInitialized) {
+            this.httpOptions = await this.getHttpOptionsByProviderAddress(this.httpOptions);
+            this.httpOptionsInitialized = true;
+        }
+        return this.httpOptions;
+    }
+
+    private async handleResponse(statusCode: number, content?: string): Promise<void> {
 
       if (statusCode >= 300) {
 
         if (this.withAuthorization && statusCode == 401) {
-          this.serviceContext.getAccessToken().invalidate();
+          await this.serviceContext.getAccessToken().invalidate();
         }
         if (!content) {
           throw NodeRPCException.forHttpCode(statusCode);
@@ -138,12 +147,12 @@ export class HttpClient {
               transitional: {
                 forcedJSONParsing: false
               }
-            }).then((response) => {
+            }).then(async (response) => {
                 if (isStream) {
                   HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
                   HttpClient.LOG.debug("HTTP Response: Size: " + response.data.byteLength);
                   streamParser.onData(Buffer.from(response.data, 'binary'));
-                  self.handleResponse(response.status);
+                  await self.handleResponse(response.status);
                   streamParser.onEnd();
                   resolve(null as T);
                 } else {
@@ -152,7 +161,7 @@ export class HttpClient {
                   if (rawContent) {
                     HttpClient.LOG.debug("HTTP response: " + rawContent);
                   }
-                  self.handleResponse(response.status, rawContent);
+                    await self.handleResponse(response.status, rawContent);
                   let deserialized = responseParser.deserialize(rawContent);
                   resolve(deserialized);
                 }
@@ -168,7 +177,7 @@ export class HttpClient {
      */
     private async buildRequest(serviceEndpoint: string, method: HttpMethod, payload: string): Promise<HttpOptions> {
         //Clone httpOptions
-        let requestOptions: HttpOptions = JSON.parse(JSON.stringify(this.httpOptions));
+        let requestOptions: HttpOptions = JSON.parse(JSON.stringify(await this.getHttpOptions()));
         if (method) {
           requestOptions.method = method;
         }
@@ -222,18 +231,18 @@ export class HttpClient {
         });
     }
 
-    private getHttpOptionsByProviderAddress(httpOptions: HttpOptions): HttpOptions {
-        checkNotNull(httpOptions, "No HTTP configuration provided");
-        const providerAddress = this.serviceContext.getProviderAddress();
+    private async getHttpOptionsByProviderAddress(ho: HttpOptions): Promise<HttpOptions> {
+        checkNotNull(ho, "No HTTP configuration provided");
+        const providerAddress = await this.serviceContext.getProviderAddress();
         const url = new URL(providerAddress);
         return {
             protocol: url.protocol,
             host: url.host,
             port: url.port ? url.port : (url.protocol == 'https:' ? '443' : '80'),
-            method: httpOptions.method ?? HttpClient.DEFAULT_METHOD,
+            method: ho.method ?? HttpClient.DEFAULT_METHOD,
             path: url.pathname,
-            headers: httpOptions.headers ?? HttpClient.DEFAULT_HEADERS,
-            timeout: httpOptions.timeout ?? HttpClient.DEFAULT_TIMEOUT
+            headers: ho.headers ?? HttpClient.DEFAULT_HEADERS,
+            timeout: ho.timeout ?? HttpClient.DEFAULT_TIMEOUT
         };
     }
 }

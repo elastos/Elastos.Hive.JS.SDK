@@ -1,9 +1,6 @@
-import {BackupSubscriptionService, NotFoundException, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
+import {BackupSubscriptionService, NotFoundException, VaultSubscriptionService,
+    ProviderService, VaultDetail, BackupDetail, FilledOrderDetail} from "@elastosfoundation/hive-js-sdk";
 import {TestData} from "../config/testdata";
-import {ProviderService} from "../../../src/restclient/provider/providerservice";
-import {VaultDetail} from "../../../src/restclient/provider/vaultdetail";
-import {BackupDetail} from "../../../src/restclient/provider/backupdetail";
-import {FilledOrderDetail} from "../../../src/restclient/provider/filledorderdetail";
 
 describe("test provider service", () => {
     let testData: TestData;
@@ -44,7 +41,7 @@ describe("test provider service", () => {
         }
     });
 
-    test("test get filled orders", async () => {
+    test.skip("test get filled orders", async () => {
         try {
             let orders: FilledOrderDetail[] = await providerService.getFilledOrders();
             expect(orders).not.toBeNull();
