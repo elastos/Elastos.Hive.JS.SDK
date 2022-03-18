@@ -160,7 +160,6 @@ describe("test file service", () => {
 	});
 
 	test("testMove", async () => {
-		await filesService.delete(REMOTE_DIR + FILE_NAME_BACKUP);
 		await filesService.move(REMOTE_DIR + FILE_NAME_TXT, REMOTE_DIR + FILE_NAME_BACKUP);
 		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_BACKUP);
 		await verifyRemoteFileNotExists(REMOTE_DIR + FILE_NAME_TXT);

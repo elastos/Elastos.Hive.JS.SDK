@@ -18,7 +18,7 @@ export class ProviderService extends ServiceContext {
     private static API_ENDPOINT = "/api/v2/provider";
     private httpClient: HttpClient;
 
-    constructor(appContext: AppContext, providerAddress: string) {
+    constructor(appContext: AppContext, providerAddress?: string) {
         super(appContext, providerAddress);
         this.httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
     }

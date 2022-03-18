@@ -56,6 +56,15 @@ export class AppContext {
 	}
 
 	/**
+	 * Get the provider address from user DID document.
+	 *
+	 * @return The provider address.
+	 */
+	public async getProviderAddress(): Promise<string> {
+		return await AppContext.getProviderAddress(this.userDid, null);
+	}
+
+	/**
 	 * Setup the resolver for the DID verification.
 	 *
 	 * @param resolver The URL of the resolver.

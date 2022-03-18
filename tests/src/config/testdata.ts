@@ -12,7 +12,8 @@ import { UserDID } from '../did/userdid';
 import {ClientConfig} from "./clientconfig";
 
 export class TestData {
-	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ? process.env["HIVE_USER_DIR"] : "/home/diego/temp"
+	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ?
+		process.env["HIVE_USER_DIR"] : __dirname + '/../../data/userDir';
 
 	private static LOG = new Logger("TestData");
     public static readonly RESOLVE_CACHE = "data/didCache";
@@ -74,15 +75,11 @@ export class TestData {
 	}
 
     public async init(): Promise<TestData> {
-
-		let userDirFile = new File(this.userDir);
-		userDirFile.delete();
-
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
 
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonics,
+				applicationConfig.mnemonic,
 				applicationConfig.passPhrase,
 				applicationConfig.storepass,
 				this.clientConfig.resolverUrl,
