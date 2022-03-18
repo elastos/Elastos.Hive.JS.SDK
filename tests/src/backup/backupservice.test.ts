@@ -1,4 +1,4 @@
-import { BackupService } from "@elastosfoundation/hive-js-sdk";
+import { BackupService, AlreadyExistsException, VaultSubscriptionService } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata"
 
 
@@ -9,9 +9,19 @@ describe("test backup services", () => {
     beforeAll(async () => {
         const testData = await TestData.getInstance("backupservice.tests");
         backupService = testData.getBackupService();
+        try {
+            const vaultSubscriptionService = new VaultSubscriptionService(
+                testData.getAppContext(),
+                testData.getProviderAddress());
+            await vaultSubscriptionService.subscribe();
+        } catch (e) {
+            if (!(e instanceof AlreadyExistsException)) {
+                throw e;
+            }
+        }
     });
 
-    test("testStartBackup", async () => {
+    test.skip("testStartBackup", async () => {
         await backupService.startBackup();
     });
 

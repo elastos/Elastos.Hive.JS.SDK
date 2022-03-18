@@ -60,7 +60,7 @@ describe("test vault subscribe function", () => {
 	// 	});
 	// }
 
-    test("test get app stats", async () => {
+    test.skip("testGetAppStats", async () => {
         try {
             await vaultsubscriptionService.subscribe();
         } catch (e) {

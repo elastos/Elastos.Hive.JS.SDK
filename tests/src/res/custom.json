@@ -18,10 +18,10 @@
   },
 
   "node": {
-    "provider": "http://localhost:9001",
-    "targetDid": "did:elastos:ihFqmW7UVwsSoSGoQbHYbBsdFAJHohMRJR",
-    "targetHost": "http://localhost:9001",
-    "storePath": "develop"
+    "provider": "https://hive1.trinity-tech.io",
+    "targetDid": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
+    "targetHost": "https://hive2.trinity-tech.io",
+    "storePath": "custom"
   },
 
   "cross": {
