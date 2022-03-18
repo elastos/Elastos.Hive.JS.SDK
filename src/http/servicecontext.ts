@@ -22,7 +22,7 @@ export class ServiceContext {
 	private dataStorage: DataStorage;
 
     private static LOG_SERVICE_CONTEXT = new Logger("ServiceContext");
-    constructor(context: AppContext, providerAddress: string) {
+    constructor(context: AppContext, providerAddress?: string) {
         checkNotNull(context, "Empty context parameter");
         checkNotNull(providerAddress, "Empty provider address parameter");
 
@@ -48,7 +48,10 @@ export class ServiceContext {
         return this.accessToken;
     }
 
-    public getProviderAddress(): string {
+    public async getProviderAddress(): Promise<string> {
+        if (!this.providerAddress) {
+            this.providerAddress = await this.context.getProviderAddress();
+        }
         return this.providerAddress;
     }
 

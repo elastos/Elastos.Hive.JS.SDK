@@ -56,7 +56,7 @@ describe("test database services", () => {
 
     test("testInsertOne", async () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
-        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false));
+        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds().length).toEqual(1);
     });
@@ -118,7 +118,7 @@ describe("test database services", () => {
         await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
     });
 
-    test("testQueryWithOptions", async () => {
+    test.skip("testQueryWithOptions", async () => {
         let query = {"author": "john doe1"};
         let options: QueryOptions = new QueryOptions();
         options.sort = [new AscendingSortItem("_id")];

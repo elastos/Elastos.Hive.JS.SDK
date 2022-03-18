@@ -16,7 +16,7 @@ import { PromotionService } from "../restclient/promotion/promotionservice";
 	private scripting: ScriptingService;
 	private backupService: BackupService;
 
-	public constructor(context: AppContext, providerAddress: string) {
+	public constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
 		let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
 		this.filesService	= new FilesService(this, httpClient);

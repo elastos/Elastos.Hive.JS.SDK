@@ -56,13 +56,13 @@ export class AccessToken {
 			return this.jwtCode;
 		}
 
-		this.jwtCode = this.restoreToken();
+		this.jwtCode = await this.restoreToken();
 		if (this.jwtCode == null) {
 			this.jwtCode = await this.authService.fetch();
 
 			if (this.jwtCode != null) {
 				await this.bridge.flush(this.jwtCode);
-				this.saveToken(this.jwtCode);
+				await this.saveToken(this.jwtCode);
 			}
 		} else {
 			await this.bridge.flush(this.jwtCode);
@@ -70,11 +70,11 @@ export class AccessToken {
 		return Promise.resolve(this.jwtCode);
 	}
 
-	public invalidate(): void {
-		this.clearToken();
+	public async invalidate(): Promise<void> {
+		await this.clearToken();
 	}
 
-	private restoreToken() : string {
+	private async restoreToken() : Promise<string> {
 		let endpoint = this.bridge.target() as ServiceContext;
 
 		if (endpoint == null)
@@ -85,7 +85,7 @@ export class AccessToken {
 		let address;
 
 		serviceDid = endpoint.getServiceInstanceDid();
-		address	= endpoint.getProviderAddress();
+		address	= await endpoint.getProviderAddress();
 
 		if (serviceDid != null)
 			jwtCode = this.storage.loadAccessToken(serviceDid);
@@ -113,16 +113,16 @@ export class AccessToken {
 		return false;
 	}
 
-	private saveToken( jwtCode: string) : void {
+	private async saveToken( jwtCode: string) : Promise<void> {
 		let endpoint = this.bridge.target() as ServiceContext;
 		if (endpoint == null || !endpoint.getServiceInstanceDid())
 			return;
 
 		this.storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
-		this.storage.storeAccessTokenByAddress(endpoint.getProviderAddress(), jwtCode);
+		this.storage.storeAccessTokenByAddress(await endpoint.getProviderAddress(), jwtCode);
 	}
 
-	private clearToken(): void {
+	private async clearToken(): Promise<void> {
 		let endpoint = this.bridge.target() as ServiceContext;
 		if (endpoint == null)
 			return;
@@ -130,7 +130,7 @@ export class AccessToken {
 		if (endpoint.getServiceInstanceDid()) {
 			this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
 		}
-		this.storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
+		this.storage.clearAccessTokenByAddress(await endpoint.getProviderAddress());
 	}
 }
 
