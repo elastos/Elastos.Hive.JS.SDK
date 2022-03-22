@@ -32,8 +32,8 @@ plugins/android.json
 plugins/ios.json
 www/
 $RECYCLE.BIN/
-tests/data
-tests/generated
+tests/data/**
+tests/generated/
 tests/test-report.html
 typings/
 
@@ -44,3 +44,8 @@ package-lock.json
 
 .jscramblerrc
 appdid
+
+src/**/*.js
+src/**/*.map
+tests/src/**/*.js
+tests/src/**/*.map
