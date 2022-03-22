@@ -118,7 +118,7 @@ describe("test database services", () => {
         await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
     });
 
-    test.skip("testQueryWithOptions", async () => {
+    test("testQueryWithOptions", async () => {
         let query = {"author": "john doe1"};
         let options: QueryOptions = new QueryOptions();
         options.sort = [new AscendingSortItem("_id")];
