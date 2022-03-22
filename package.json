@@ -56,7 +56,7 @@
     "@babel/plugin-proposal-decorators": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.13.0",
-    "@elastosfoundation/did-js-sdk": "^2.2.2",
+    "@elastosfoundation/did-js-sdk": "^2.2.4",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.6",

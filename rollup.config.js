@@ -1,8 +1,9 @@
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
-import resolve from '@rollup/plugin-node-resolve';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import typescript from "@rollup/plugin-typescript";
 import fs from 'fs';
+import path from 'path';
 
 //import emitModulePackageFile from './build-plugins/emit-module-package-file.js';
 import pkg from './package.json';
@@ -10,7 +11,7 @@ import pkg from './package.json';
 import replace from '@rollup/plugin-replace';
 import size from 'rollup-plugin-size';
 import eslint from '@rollup/plugin-eslint';
-import replaceFiles from 'rollup-plugin-file-content-replace';
+import fileContentReplace from 'rollup-plugin-file-content-replace';
 import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
@@ -74,7 +75,7 @@ const treeshake = {
 };
 
 const nodePlugins = [
-    resolve({
+    nodeResolve({
         preferBuiltins: true
     }),
     json({}),
@@ -193,10 +194,12 @@ export default command => {
             //writeLicense(),
             // Replace some node files with their browser-specific versions.
             //Ex: fs.browser.ts -> fs.ts
-            replaceFiles({
-                fileReplacements: [
-                    { replace: "fs.ts", with: "fs.browser.ts" }                ]
-            }),
+            // fileContentReplace({
+            //     fileReplacements: [
+            //         { replace: "src/domain/fs.ts", with: "src/domain/fs.browser.ts" }
+            //     ],
+            //     root: path.resolve(__dirname, 'src/domain')
+            // }),
             // Dirty circular dependency removal atttempt
             replace({
                 delimiters: ['', ''],
@@ -254,7 +257,7 @@ export default command => {
                     { "find": "assert", "replacement": "node_modules/assert/build/assert.js" }
                 ]
             }),
-            resolve({
+            nodeResolve({
                 mainFields: ['browser', 'module', 'jsnext:main', 'main'],
                 browser: true,
                 preferBuiltins: true,
