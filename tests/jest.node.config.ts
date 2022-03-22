@@ -9,8 +9,11 @@ writeFileSync("./generated/browserdata.json", "{}");
 
 const config: InitialOptionsTsJest = {
   rootDir: "./src",
+  preset: 'ts-jest',
   transform: {
     ...tsjPreset.transform,
+    '^.+\\.(ts|tsx)?$': 'ts-jest',
+    "^.+\\.(js|jsx)$": "babel-jest",
   },
   reporters: [
     "default",
