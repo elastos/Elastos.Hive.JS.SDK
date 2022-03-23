@@ -193,13 +193,18 @@ export default command => {
             //collectLicenses(),
             //writeLicense(),
             // Replace some node files with their browser-specific versions.
+            /**
+             *  TODO: if getting the error: cannot find file fs.browser.ts.
+             *  Please remove the line #40 contains: await (0, _util.promisify)((0, _fs.access),
+             *  rollup-plugin-file-content-replace: index.js
+             */
             //Ex: fs.browser.ts -> fs.ts
-            // fileContentReplace({
-            //     fileReplacements: [
-            //         { replace: "src/domain/fs.ts", with: "src/domain/fs.browser.ts" }
-            //     ],
-            //     root: path.resolve(__dirname, 'src/domain')
-            // }),
+            fileContentReplace({
+                fileReplacements: [
+                    { replace: "fs.ts", with: "fs.browser.ts" }
+                ],
+                root: path.resolve(__dirname, 'src/domain')
+            }),
             // Dirty circular dependency removal atttempt
             replace({
                 delimiters: ['', ''],
