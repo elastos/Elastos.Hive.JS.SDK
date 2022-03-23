@@ -6,6 +6,7 @@ import {
 	VaultSubscriptionService
 } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
+import { Blob } from 'buffer';
 
 describe("test file service", () => {
 
@@ -96,6 +97,27 @@ describe("test file service", () => {
 		await filesService.upload(REMOTE_DIR + FILE_NAME_BIN, binTestFile.read());
 		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_BIN);
     });
+
+	test("testUploadBinBlob", async () => {
+		const fileName = REMOTE_DIR + FILE_NAME_BIN + 'Blob';
+		const obj = {hello: 'world'};
+		const blob = new Blob([JSON.stringify(obj, null, 2)], {type : 'application/json'});
+		const arrayBuffer2Buffer = (arrayBuffer: ArrayBuffer) => {
+			const buffer = new Buffer(arrayBuffer.byteLength);
+			const view = new Uint8Array(arrayBuffer);
+			for (let i = 0; i < buffer.length; ++i) {
+				buffer[i] = view[i];
+			}
+			return buffer;
+		};
+		const blob2Buffer = async (b: Blob) => {
+			return arrayBuffer2Buffer(await b.arrayBuffer());
+		};
+		await filesService.upload(fileName, await blob2Buffer(blob));
+		await verifyRemoteFileExists(fileName);
+		const dataBuffer = await filesService.download(fileName);
+		expectBuffersToBeEqual(await blob2Buffer(blob), dataBuffer);
+	});
 
 	test("testDownloadText", async () => {
 		let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_TXT);
