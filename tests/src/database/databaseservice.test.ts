@@ -150,6 +150,19 @@ describe("test database services", () => {
         await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
     });
 
+    test("testUpdateInsertIfNotExists", async () => {
+        /** The inserted document:
+        {
+            "_id": ObjectId("6241471ab042663cc9f179e7"),
+            "author": "john doe4",
+            "title": "title": "Eve for Dummies4"
+        }
+        */
+        let filter = { "author": "john doe4" };
+        let updateNode = { "$setOnInsert": { "title": "Eve for Dummies4" } };
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(true, true))).resolves.not.toBeNull();
+    });
+
     test("testUpdateOneNoOptions", async () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
