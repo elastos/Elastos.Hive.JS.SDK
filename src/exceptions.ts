@@ -26,7 +26,7 @@ export class BadContextProviderException extends ParentException {}
 export class DIDNotPublishedException extends ParentException {} 
 export class DIDResolverNotSetupException extends ParentException {} 
 export class DIDResolverSetupException extends ParentException {} 
-export class DIDResoverAlreadySetupException extends ParentException {} 
+export class DIDResolverAlreadySetupException extends ParentException {} 
 export class HiveException extends ParentException {} 
 export class IllegalDidFormatException extends ParentException {} 
 export class NotImplementedException extends ParentException {} 
