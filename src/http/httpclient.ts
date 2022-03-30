@@ -56,7 +56,7 @@ export class HttpClient {
     private withAuthorization = false;
     private serviceContext: ServiceContext;
     private httpOptions: HttpOptions;
-    private httpOptionsInitialized: boolean = false;
+    private httpOptionsInitialized = false;
 
     constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
@@ -237,7 +237,7 @@ export class HttpClient {
         const url = new URL(providerAddress);
         return {
             protocol: url.protocol,
-            host: url.host,
+            host: url.host.split(':')[0],
             port: url.port ? url.port : (url.protocol == 'https:' ? '443' : '80'),
             method: ho.method ?? HttpClient.DEFAULT_METHOD,
             path: url.pathname,
