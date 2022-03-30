@@ -2,7 +2,7 @@ import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from "@elastosfoundat
 import { checkNotNull } from '../../domain/utils';
 import {
      IllegalArgumentException,
-     DIDResoverAlreadySetupException,
+     DIDResolverAlreadySetupException,
      BadContextProviderException,
      DIDResolverNotSetupException,
      MalformedDIDException,
@@ -76,7 +76,7 @@ export class AppContext {
 			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
 
 		if (AppContext.resolverHasSetup)
-			throw new DIDResoverAlreadySetupException();
+			throw new DIDResolverAlreadySetupException();
 
 		this.LOG.trace("Initializing DIDBackend with " + resolver);
 		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
