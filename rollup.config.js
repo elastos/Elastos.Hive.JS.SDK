@@ -255,7 +255,7 @@ export default command => {
                     { "find": "crypto", "replacement": "crypto-browserify" },
                     { "find": "util/", "replacement": "node_modules/util/util.js" },
                     { "find": "util", "replacement": "node_modules/util/util.js" },
-                    { "find": "stream", "replacement": "./src/browser/stream.js" },
+                    { "find": "stream", "replacement": "./src/utils/browser/stream.js" },
                     { "find": "string_decoder/", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
                     { "find": "string_decoder", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
                     { "find": "events", "replacement": "node_modules/events/events.js" },
