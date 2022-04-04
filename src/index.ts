@@ -2,7 +2,6 @@
 'use strict';
 
 import { VaultServices } from "./vaultservices";
-//import { KeyProvider } from "./domain/crypto/keyprovider";
 import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
 import { FileStorage } from "./utils/storage/filestorage";
@@ -94,7 +93,7 @@ import { CaseFirst, Strength, Alternate, Collation } from "./service/database/co
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./service/database/sortitem";
 import { Order } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
-import { AppContextParameters, DefaultAppContextProvider } from "./connection/auth/defaultAppContextProvider";
+import { AppContextParameters, DefaultAppContextProvider } from "./connection/auth/defaultappcontextprovider";
 import { BackupContext } from "./service/backup/backupcontext";
 import { CodeFetcher } from "./connection/auth/codefetcher";
 import { CredentialCode } from "./service/backup/credentialcode";
@@ -108,8 +107,6 @@ import { ProviderService } from "./service/provider/providerservice";
 Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
-    //KeyProvider,
-    
     DataStorage,
     HttpResponseParser,
     StreamResponseParser,
