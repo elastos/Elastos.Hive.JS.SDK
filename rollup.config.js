@@ -203,7 +203,7 @@ export default command => {
                 fileReplacements: [
                     { replace: "fs.ts", with: "fs.browser.ts" }
                 ],
-                root: path.resolve(__dirname, 'src/domain')
+                root: path.resolve(__dirname, 'src/utils/storage')
             }),
             // Dirty circular dependency removal atttempt
             replace({
