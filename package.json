@@ -19,7 +19,7 @@
     "dev": "rollup -c -w",
     "clean": "rm -rf dist/ dist.esm/ typings/ node_modules/",
     "tsc:build": "rollup -c",
-    "types": "npm run clean && npm i && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
+    "types": "tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:w": "tsc -w",
     "test": "jest",
     "docs": "rm -Rf docs/ && npx typedoc",
