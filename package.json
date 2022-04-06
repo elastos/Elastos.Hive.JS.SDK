@@ -22,6 +22,7 @@
     "types": "npm run clean && npm i && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:w": "tsc -w",
     "test": "jest",
+    "docs": "rm -Rf docs/ && npx typedoc",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "typings": "typings/",
@@ -77,6 +78,7 @@
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-terser": "^7.0.2",
     "ts-node": "^9.1.1",
+    "typedoc": "^0.22.13",
     "typescript": "^4.5.2"
   },
   "files": [
