@@ -24,5 +24,9 @@
     "resolveJsonModule": true,
     "rootDirs": ["src/","src/tests/"],
     "typeRoots": ["node_modules/@types"]
+  },
+  "typedocOptions": {
+      "entryPoints": ["src/index.ts"],
+      "out": "docs"
   }
 }
