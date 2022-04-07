@@ -39,7 +39,7 @@ export class TestData {
     public static async getInstance(testName: string): Promise<TestData> {
 		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
-			// TODO: Update ClientConfig here.
+			// TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
             TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
 			await TestData.INSTANCE.init();
         }
