@@ -24,7 +24,6 @@ export class ServiceContext {
     private static LOG_SERVICE_CONTEXT = new Logger("ServiceContext");
     constructor(context: AppContext, providerAddress?: string) {
         checkNotNull(context, "Empty context parameter");
-        checkNotNull(providerAddress, "Empty provider address parameter");
 
         this.context = context;
         this.providerAddress = providerAddress;
