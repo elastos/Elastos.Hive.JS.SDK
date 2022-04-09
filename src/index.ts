@@ -102,6 +102,9 @@ import { LocalResolver } from "./service/backup/localresolver";
 import { HiveBackupContext } from "./service/backup/hivebackupcontext";
 import { Backup } from "./backup";
 import { ProviderService } from "./service/provider/providerservice";
+import { VaultDetail } from "./service/provider/vaultdetail";
+import { BackupDetail } from "./service/provider/backupdetail";
+import { FilledOrderDetail } from "./service/provider/filledorderdetail";
 
 
 Logger.setDefaultLevel(Logger.DEBUG);
@@ -130,6 +133,9 @@ export {
     VaultServices,
     Backup,
     ProviderService,
+    VaultDetail,
+    BackupDetail,
+    FilledOrderDetail,
     PricingPlan,
     VaultInfo,
     File,
