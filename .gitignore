@@ -6,7 +6,6 @@
 *.log
 *.tmp
 *.tmp.*
-*.html
 log.txt
 *.sublime-project
 *.sublime-workspace
@@ -45,7 +44,9 @@ package-lock.json
 .jscramblerrc
 appdid
 
+/*.html
 src/**/*.js
 src/**/*.map
 tests/src/**/*.js
 tests/src/**/*.map
+tests/src/**/*.html
