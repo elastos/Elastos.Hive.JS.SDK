@@ -126,6 +126,8 @@ export type {
 }
 
 export {
+    Logger,
+    
     //initialize,
     HiveBackupContext,
     LocalResolver,
