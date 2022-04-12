@@ -33,7 +33,7 @@ import { Condition }  from "./service/scripting/condition";
 import { OrCondition }  from "./service/scripting/orcondition";
 import { AndCondition }  from "./service/scripting/andcondition";
 import { AggregatedCondition }  from "./service/scripting/aggregatedcondition";
-import { Executable, ExecutableDatabaseBody, ExecutableFileBody }  from "./service/scripting/executable";
+import { Executable, ExecutableType, ExecutableDatabaseBody, ExecutableFileBody }  from "./service/scripting/executable";
 import { Context }  from "./service/scripting/context";
 import { SubscriptionService }  from "./service/subscription/subscriptionservice";
 import { VaultSubscriptionService }  from "./service/subscription/vaultsubscription/vaultsubscriptionservice";
@@ -89,7 +89,7 @@ import { QueryOptions } from "./service/database/queryoptions";
 import { CountOptions } from "./service/database/countoptions";
 import { DeleteOptions, DeleteIndex, DeleteOrder } from "./service/database/deleteoptions";
 import { UpdateResult } from "./service/database/updateresult";
-import { CaseFirst, Strength, Alternate, Collation } from "./service/database/collation";
+import { CaseFirst, Strength, Alternate, Collation, MaxVariable } from "./service/database/collation";
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./service/database/sortitem";
 import { Order } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
@@ -105,7 +105,11 @@ import { ProviderService } from "./service/provider/providerservice";
 import { VaultDetail } from "./service/provider/vaultdetail";
 import { BackupDetail } from "./service/provider/backupdetail";
 import { FilledOrderDetail } from "./service/provider/filledorderdetail";
-
+import { BackupInfo } from "./service/subscription/backupinfo"
+import { AppInfo } from "./service/subscription/appinfo"
+import { BackupResult, BackupResultResult, BackupResultState } from "./service/backup/backupresult"
+import { InsertResult } from "./service/database/insertresult"
+import { SubscriptionInfo } from "./service/subscription/subscriptioninfo"
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -122,7 +126,6 @@ export type {
 }
 
 export {
-    Logger,
     //initialize,
     HiveBackupContext,
     LocalResolver,
@@ -165,6 +168,14 @@ export {
     Executable,
     ExecutableFileBody,
     ExecutableDatabaseBody,
+    ExecutableType,
+    BackupInfo,
+    AppInfo,
+    BackupResult,
+    BackupResultResult,
+    BackupResultState,
+    InsertResult,
+    SubscriptionInfo,
     Context,
     SubscriptionService,
     VaultSubscriptionService,
@@ -202,7 +213,7 @@ export {
     Strength,
     Alternate,
     Collation,
-
+    MaxVariable,
     IllegalArgumentException,
     BackupIsInProcessingException,
     BackupNotFoundException,
