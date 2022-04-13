@@ -31,6 +31,7 @@ plugins/
 plugins/android.json
 plugins/ios.json
 www/
+docs/
 $RECYCLE.BIN/
 tests/data/**
 tests/generated/
