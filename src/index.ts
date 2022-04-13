@@ -29,6 +29,7 @@ import { PaymentService }  from "./service/payment/paymentservice";
 import { PromotionService }  from "./service/promotion/promotionservice";
 import { RestService }  from "./service/restservice";
 import { ScriptingService }  from "./service/scripting/scriptingservice";
+import { ScriptRunner }  from "./scriptrunner";
 import { Condition }  from "./service/scripting/condition";
 import { OrCondition }  from "./service/scripting/orcondition";
 import { AndCondition }  from "./service/scripting/andcondition";
@@ -163,6 +164,7 @@ export {
     PromotionService,
     RestService,
     ScriptingService,
+    ScriptRunner,
     Condition,
     AggregatedCondition,
     OrCondition,
