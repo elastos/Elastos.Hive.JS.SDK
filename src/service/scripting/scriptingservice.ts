@@ -1,15 +1,16 @@
-import { NetworkException, NodeRPCException } from '../../exceptions';
+import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
-import { ServiceContext } from '../../connection/servicecontext';
-import { HttpClient } from '../../connection/httpclient';
-import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { StreamResponseParser } from '../../connection/streamresponseparser';
-import { Context } from './context';
-import { HttpMethod } from '../../connection/httpmethod';
+import { ServiceContext, HttpClient, HttpResponseParser, StreamResponseParser, Context, HttpMethod, Logger } from '../..';
 import { checkNotNull, checkArgument } from '../../utils/utils';
-import { Logger } from '../../utils/logger';
 import { RestService } from '../restservice';
+
+interface HiveUrl {
+	targetUsrDid: string,
+	targetAppDid: string,
+	scriptName: string,
+	params: string
+}
 
 export class ScriptingService extends RestService {
 	private static LOG = new Logger("ScriptingService");
@@ -86,7 +87,7 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	public async callScriptUrl<T>( name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
+	public async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
@@ -138,6 +139,44 @@ export class ScriptingService extends RestService {
 		} catch (e) {
 			this.handleError(e);
 		}
+	}
+
+	private parseHiveUrl(hiveUrl: string): HiveUrl {
+		if (!hiveUrl || !hiveUrl.startsWith('hive://')) {
+			throw new InvalidParameterException('Invalid hive url: no hive prefix');
+		}
+		const parts = hiveUrl.substring('hive://'.length).split('/');
+		if (parts.length < 2) {
+			throw new InvalidParameterException('Invalid hive url: must contain at least one slash');
+		}
+		const dids = parts[0].split('@');
+		if (dids.length !== 2) {
+			throw new InvalidParameterException('Invalid hive url: must contain two DIDs');
+		}
+		const values = parts[1].split('\\?params=');
+		if (values.length) {
+			throw new InvalidParameterException('Invalid hive url: must contain script name and params');
+		}
+		return {
+			targetUsrDid: dids[0],
+			targetAppDid: dids[1],
+			scriptName: values[0],
+			params: values[1]
+		}
+	}
+
+	/**
+	 * This is the compatible implementation for downloading file by the hive url
+	 * which comes from v1 version SDK. The hive url definition is as this format:
+	 * <br>
+	 * hive://&lt;targetDid&gt;@&lt;targetAppDid&gt;/&lt;scriptName&gt;?params=&lt;paramJsonStr&gt;
+	 *
+	 * @param hiveUrl
+	 */
+	public async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+		const params = this.parseHiveUrl(hiveUrl);
+		const result = await this.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
+		return await this.downloadFile(result[params.scriptName].transaction_id);
 	}
 
 	private handleError(e: Error): unknown {
