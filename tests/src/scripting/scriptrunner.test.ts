@@ -30,6 +30,7 @@ describe("test scripting runner function", () => {
     const DELETE_NAME = "database_delete";
     const UPLOAD_FILE_NAME = "upload_file";
     const DOWNLOAD_FILE_NAME = "download_file";
+    const DOWNLOAD_BY_HIVE_URL = "download_by_hive_url";
     const FILE_PROPERTIES_NAME = "file_properties";
     const FILE_HASH_NAME = "file_hash";
 
@@ -138,7 +139,9 @@ describe("test scripting runner function", () => {
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
         await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
-        const hiveUrl = `hive://${targetDid}@${appDid}/${UPLOAD_FILE_NAME}?params={"path": "${fileName}"}`;
+
+        await registerScriptFileDownload(DOWNLOAD_BY_HIVE_URL);
+        const hiveUrl = `hive://${targetDid}@${appDid}/${DOWNLOAD_BY_HIVE_URL}?params={"path": "${fileName}"}`;
         const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
