@@ -153,8 +153,8 @@ export class ScriptingService extends RestService {
 		if (dids.length !== 2) {
 			throw new InvalidParameterException('Invalid hive url: must contain two DIDs');
 		}
-		const values = parts[1].split('\\?params=');
-		if (values.length) {
+		const values = parts[1].split('?params=');
+		if (values.length != 2) {
 			throw new InvalidParameterException('Invalid hive url: must contain script name and params');
 		}
 		return {
