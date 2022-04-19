@@ -6,6 +6,7 @@ import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
 import { FileStorage } from "./utils/storage/filestorage";
 import { NodeVersion } from "./service/about/nodeversion";
+import { NodeInfo } from "./service/about/nodeinfo";
 import { SHA256 } from "./utils/sha256";
 import * as Utils from "./utils/utils";
 import { HttpClient }  from "./connection/httpclient";
@@ -151,6 +152,7 @@ export {
     ServiceContext,
     AccessToken,
     NodeVersion,
+    NodeInfo,
     AppContext,
     AboutService,
     AuthService,
