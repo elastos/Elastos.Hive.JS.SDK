@@ -11,10 +11,10 @@
 
   "user": {
     "name": "developUser",
-    "mnemonic": "firm dash language credit twist puzzle crouch order slim now issue trap",
-    "passPhrase": "secret",
-    "storepass": "password",
-    "did": "did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm4"
+    "mnemonic": "decrease eagle devote evoke dragon dignity affair fame honey tourist shrug divorce",
+    "passPhrase": "123456",
+    "storepass": "123456",
+    "did": "did:elastos:ipBaBr6HQ6h92T1fh5fFQS14xhTcyt3Azq"
   },
 
   "node": {
