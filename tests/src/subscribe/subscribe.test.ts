@@ -60,7 +60,7 @@ describe("test vault subscribe function", () => {
 	// 	});
 	// }
 
-    test.skip("testGetAppStats", async () => {
+    test("testGetAppStats", async () => {
         try {
             await vaultsubscriptionService.subscribe();
         } catch (e) {
@@ -71,6 +71,12 @@ describe("test vault subscribe function", () => {
         let appStats = await vaultsubscriptionService.getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
+        expect(appStats[0].getName()).not.toEqual(null);
+        expect(appStats[0].getDeveloperDid()).not.toEqual(null);
+        expect(appStats[0].getIconUrl()).not.toEqual(null);
+        expect(appStats[0].getUserDid()).not.toEqual(null);
+        expect(appStats[0].getAppDid()).not.toEqual(null);
+        expect(appStats[0].getUsedStorageSize()).toBeGreaterThanOrEqual(0);
     });
 
     test("testSubscribeCheckUnsubscribe", async () => {
