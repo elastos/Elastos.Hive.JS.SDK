@@ -7,6 +7,7 @@ import { ServiceContext } from "../../connection/servicecontext";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import {NodeInfo} from "./nodeinfo";
+import {VerifiablePresentation} from "@elastosfoundation/did-js-sdk";
 
 export class AboutService extends RestService {
 	private static LOG = new Logger("AboutService");
@@ -66,7 +67,9 @@ export class AboutService extends RestService {
 		try {
 			return await this.httpClient.send<NodeInfo>(AboutService.API_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<NodeInfo>>{
 				deserialize(content: any): NodeInfo {
-					return Object.assign(new NodeInfo(), JSON.parse(content));
+					let json_dict = JSON.parse(content);
+					json_dict['ownership_presentation'] = VerifiablePresentation.parse(JSON.stringify(json_dict['ownership_presentation']));
+					return Object.assign(new NodeInfo(), json_dict);
 				}
 			},HttpMethod.GET);
 		} catch (e) {
