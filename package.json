@@ -10,6 +10,7 @@
   },
   "main": "./dist/hive.js",
   "module": "./dist/es/hive.js",
+  "typings": "typings/",
   "browser": {
     "./dist/hive.js": "./dist/hive.browser.js",
     "./dist/es/hive.js": "./dist/es/hive.browser.js"
@@ -27,7 +28,6 @@
     "docs": "npx typedoc src/index.ts --excludePrivate --excludeProtected --excludeInternal",
     "test": "jest"
   },
-  "typings": "typings/",
   "dependencies": {
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
@@ -37,7 +37,8 @@
     "jsrsasign-util": "^1.0.2",
     "postcss": "^8.4.4",
     "pretend": "^3.1.0",
-    "tslib": "^2.3.1"
+    "tslib": "^2.3.1",
+    "@elastosfoundation/did-js-sdk": "^2.2.4"
   },
   "repository": {
     "type": "git",
@@ -49,7 +50,6 @@
     "@babel/plugin-proposal-decorators": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.13.0",
-    "@elastosfoundation/did-js-sdk": "^2.2.4",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.6",
@@ -70,7 +70,6 @@
     "node-fetch": "^2.6.6",
     "path-browserify": "^1.0.1",
     "rollup": "^2.60.1",
-    "rollup-plugin-file-content-replace": "^1.0.0",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-size": "^0.2.2",
     "rollup-plugin-visualizer": "^5.5.2",

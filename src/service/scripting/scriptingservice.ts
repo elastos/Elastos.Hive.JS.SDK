@@ -1,7 +1,13 @@
 import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
-import { ServiceContext, HttpClient, HttpResponseParser, StreamResponseParser, Context, HttpMethod, Logger } from '../..';
+import { ServiceContext } from '../../connection/servicecontext';
+import { HttpClient } from '../../connection/httpclient';
+import { HttpResponseParser } from '../../connection/httpresponseparser';
+import { StreamResponseParser } from '../../connection/streamresponseparser';
+import { Context } from './context';
+import { HttpMethod } from '../../connection/httpmethod';
+import { Logger } from '../../utils/logger';
 import { checkNotNull, checkArgument } from '../../utils/utils';
 import { RestService } from '../restservice';
 
