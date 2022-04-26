@@ -239,7 +239,7 @@ import { Logger } from "../logger";
         if (fs.existsSync(directoryPath)) {
             fs.readdirSync(directoryPath).forEach((file, index) => {
               const curPath = path.join(directoryPath, file);
-              if (fs.lstatSync(curPath).isDirectory()) {
+              if (fs.statSync(curPath).isDirectory()) {
                 // recurse
                 this.deleteDirectory(curPath);
               } else {
