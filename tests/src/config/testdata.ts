@@ -121,7 +121,7 @@ export class TestData {
 			
 			async getAuthorization(jwtToken : string) : Promise<string> {
 				try {
-					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
+					let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtToken)).getBody();
 					if (claims == null)
 						throw new HiveException("Invalid jwt token as authorization.");
 
@@ -137,37 +137,6 @@ export class TestData {
 				}
 			}
 		}, self.userDid.getDid().toString());
-/*
-		this.callerContext = await AppContext.build({
-			//@Override
-			getLocalDataDir(): string {
-				return self.getLocalStorePath();
-			},
-
-			async getAppInstanceDocument() : Promise<DIDDocument>  {
-				try {
-					return await self.appInstanceDid.getDocument();
-				} catch (e) {
-					TestData.LOG.error(e.stack);
-				}
-				return Promise.resolve(null);
-			},
-
-			async getAuthorization(jwtToken : string) : Promise<string>  {
-				
-				try {
-					let claims : Claims = (await new JWTParserBuilder().build().parse(jwtToken)).getBody();
-					if (claims == null)
-						throw new HiveException("Invalid jwt token as authorization.");
-					return await self.appInstanceDid.createToken(await self.appInstanceDid.createPresentation(
-							await self.userDid.issueDiplomaFor(self.appInstanceDid),
-							claims.getIssuer(), claims.get("nonce") as string), claims.getIssuer());
-				} catch (e) {
-					throw new HiveException(e.toString(), e);
-				}
-			}
-		}, this.callerDid.getDid().toString());
-*/
 		return this;
 	}
 

@@ -146,7 +146,7 @@ class BridgeHandlerImpl implements BridgeHandler {
     public async flush(value: string): Promise<void> {
         try {
             let claims: Claims;
-            claims = (await new JWTParserBuilder().build().parse(value)).getBody();
+            claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(value)).getBody();
 			this.ref.flushDids(claims.getAudience(), claims.getIssuer());
         } catch (e) {
             BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
