@@ -117,7 +117,7 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 */
 	async getAuthorization(authenticationChallengeJWtCode: string): Promise<string> {
         try {
-            let claims : Claims = (await new JWTParserBuilder().build().parse(authenticationChallengeJWtCode)).getBody();
+            let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(authenticationChallengeJWtCode)).getBody();
             if (claims == null)
                 throw new HiveException("Invalid jwt token as authorization.");
 

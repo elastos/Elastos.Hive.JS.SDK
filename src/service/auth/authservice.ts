@@ -76,13 +76,11 @@ export class AuthService extends RestService {
 			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid challenge code, possibly being hacked.");
 		}
 		return token;
-
-
     }
 
 	private async checkValid(jwtCode: string, expectationDid: string): Promise<boolean> {
 		try {
-			let claims: Claims = (await new JWTParserBuilder().build().parse(jwtCode)).getBody();
+			let claims: Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
 
 			AuthService.LOG.trace("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
 			AuthService.LOG.trace("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
