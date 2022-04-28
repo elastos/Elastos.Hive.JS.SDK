@@ -13,7 +13,8 @@ import {
     VaultServices,
     QueryHasResultCondition,
     FilesService,
-    Executable } from "@elastosfoundation/hive-js-sdk";
+    Executable, NotFoundException
+} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test scripting runner function", () => {
@@ -140,7 +141,7 @@ describe("test scripting runner function", () => {
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
         await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
 
-        await registerScriptFileDownload(DOWNLOAD_BY_HIVE_URL);
+        await registerScriptFileDownload(DOWNLOAD_BY_HIVE_URL, false, 'fake_executable_name');
         const hiveUrl = `hive://${targetDid}@${appDid}/${DOWNLOAD_BY_HIVE_URL}?params={"path": "${fileName}"}`;
         const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
@@ -194,7 +195,11 @@ describe("test scripting runner function", () => {
         try {
             await databaseService.deleteCollection(COLLECTION_NAME);
         } catch (e) {
-            console.error(`Failed to remove collection: ${e}`);
+            if (e instanceof NotFoundException) {
+                // ok, skip this.
+            } else {
+                console.error(`Failed to remove collection: ${e}`);
+            }
         }
     }
 
@@ -339,9 +344,10 @@ describe("test scripting runner function", () => {
         expect(result[scriptName].SHA256.length).toBeGreaterThan(0);
     }
 
-    async function registerScriptFileDownload(scriptName: string, anonymous?: boolean) {
+    async function registerScriptFileDownload(scriptName: string, anonymous?: boolean, executableName?: string) {
+        const name = executableName ? executableName : scriptName;
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(scriptName).setOutput(true),
+            new FileDownloadExecutable(name).setOutput(true),
             undefined,
             anonymous ?? false, anonymous ?? false);
     }
