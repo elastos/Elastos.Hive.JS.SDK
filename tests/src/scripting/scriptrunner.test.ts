@@ -135,6 +135,17 @@ describe("test scripting runner function", () => {
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
 
+    test("testDownloadAndUploadWithString", async () => {
+        await registerScriptFileUpload(UPLOAD_FILE_NAME);
+        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
+        await uploadFileByTransActionId(uploadTransactionId, FILE_CONTENT);
+
+        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+        let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
+        let buffer = await downloadFileByTransActionId(downloadTransactionId);
+        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+    });
+
     test("testDownloadFileByHiveUrl", async () => {
         const fileName = "testDownloadUploadByHiveUrl.txt";
         await registerScriptFileUpload(UPLOAD_FILE_NAME);

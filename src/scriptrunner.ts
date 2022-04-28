@@ -22,7 +22,7 @@ export class ScriptRunner extends ServiceEndpoint{
         return await this.scriptService.callScriptUrl(name, params, targetDid, targetAppDid);
     }
 
-    public async uploadFile(transactionId: string, data: Buffer): Promise<void> {
+    public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
         return await this.scriptService.uploadFile(transactionId, data);
     }
 
