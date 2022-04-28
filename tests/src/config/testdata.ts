@@ -1,10 +1,10 @@
 import {
 	HiveException,
-	VaultServices,
+	Vault,
 	BackupService,
 	AppContext,
 	Logger,
-	File, ProviderService, Backup
+	File, Provider, Backup
 } from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
@@ -62,8 +62,8 @@ export class TestData {
 		return this.clientConfig.node.provider;
 	}
 
-	public newVault(): VaultServices {
-		return new VaultServices(this.context, this.getProviderAddress());
+	public newVault(): Vault {
+		return new Vault(this.context, this.getProviderAddress());
 	}
 
 	public newBackup(): Backup {
@@ -71,7 +71,7 @@ export class TestData {
 	}
 
 	public createProviderService() {
-		return new ProviderService(this.context, this.getProviderAddress());
+		return new Provider(this.context, this.getProviderAddress());
 	}
 
     public async init(): Promise<TestData> {

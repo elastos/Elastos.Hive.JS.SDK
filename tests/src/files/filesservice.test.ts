@@ -3,7 +3,7 @@ import {
 	File,
 	FilesService,
 	NotFoundException,
-	VaultSubscriptionService
+	VaultSubscription
 } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 import { Blob } from 'buffer';
@@ -27,10 +27,10 @@ describe("test file service", () => {
 		filesService = testData.newVault().getFilesService();
 		prepareTestFile();
 		try {
-			const vaultSubscriptionService = new VaultSubscriptionService(
+			const vaultSubscription = new VaultSubscription(
 				testData.getAppContext(),
 				testData.getProviderAddress());
-			await vaultSubscriptionService.subscribe();
+			await vaultSubscription.subscribe();
 		} catch (e) {
 			if (!(e instanceof AlreadyExistsException)) {
 				throw e;

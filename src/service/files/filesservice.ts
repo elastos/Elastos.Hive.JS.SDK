@@ -3,7 +3,7 @@ import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { StreamResponseParser } from "../../connection/streamresponseparser";
 import {  NetworkException, NodeRPCException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
@@ -14,7 +14,7 @@ export class FilesService extends RestService {
 
 	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 

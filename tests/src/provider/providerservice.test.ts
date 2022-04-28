@@ -1,39 +1,39 @@
-import {BackupSubscriptionService, NotFoundException, VaultSubscriptionService,
-    ProviderService, VaultDetail, BackupDetail, FilledOrderDetail} from "@elastosfoundation/hive-js-sdk";
+import {BackupSubscription, NotFoundException, VaultSubscription,
+    Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "@elastosfoundation/hive-js-sdk";
 import {TestData} from "../config/testdata";
 
 describe("test provider service", () => {
     let testData: TestData;
-    let vaultSubscriptionService: VaultSubscriptionService;
-    let backupSubscriptionService: BackupSubscriptionService;
-    let providerService: ProviderService;
+    let vaultSubscription: VaultSubscription;
+    let backupSubscription: BackupSubscription;
+    let provider: Provider;
 
     beforeAll(async () => {
         testData = await TestData.getInstance("providerservice.test");
-        vaultSubscriptionService = new VaultSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
-        backupSubscriptionService = new BackupSubscriptionService(testData.getAppContext(), testData.getProviderAddress());
-        providerService = testData.createProviderService();
+        vaultSubscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+        backupSubscription = new BackupSubscription(testData.getAppContext(), testData.getProviderAddress());
+        provider = testData.createProviderService();
         try {
-            await vaultSubscriptionService.subscribe();
+            await vaultSubscription.subscribe();
         } catch (e) {
             console.log('Init with subscribe error, maybe already exists.');
         }
         try {
-            await backupSubscriptionService.subscribe();
+            await backupSubscription.subscribe();
         } catch (e) {
             console.log('Init with subscribe error, maybe already exists.');
         }
     });
 
     test("test get vaults", async () => {
-        let vaults: VaultDetail[] = await providerService.getVaults();
+        let vaults: VaultDetail[] = await provider.getVaults();
         expect(vaults).not.toBeNull();
         expect(vaults).not.toEqual([]);
     });
 
     test("test get backups", async () => {
         try {
-            let backups: BackupDetail[] = await providerService.getBackups();
+            let backups: BackupDetail[] = await provider.getBackups();
             expect(backups).not.toBeNull();
             expect(backups).not.toEqual([]);
         } catch (e) {
@@ -43,7 +43,7 @@ describe("test provider service", () => {
 
     test.skip("test get filled orders", async () => {
         try {
-            let orders: FilledOrderDetail[] = await providerService.getFilledOrders();
+            let orders: FilledOrderDetail[] = await provider.getFilledOrders();
             expect(orders).not.toBeNull();
             expect(orders).not.toEqual([]);
         } catch (e) {

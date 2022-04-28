@@ -1,6 +1,6 @@
 import { AppContext } from "../../../connection/auth/appcontext";
 import { HttpClient } from "../../../connection/httpclient";
-import { ServiceContext } from "../../../connection/servicecontext";
+import { ServiceEndpoint } from "../../../connection/serviceEndpoint";
 import { Logger } from '../../../utils/logger';
 import { PaymentService } from "../../payment/paymentservice";
 import { SubscriptionService } from "../../subscription/subscriptionservice";
@@ -10,8 +10,8 @@ import { Receipt } from "../../payment/receipt";
 import { Order } from "../../payment/order";
 import {AppInfo} from "../appinfo";
 
-export class VaultSubscriptionService extends ServiceContext {
-	private static LOG = new Logger("VaultSubscriptionService");
+export class VaultSubscription extends ServiceEndpoint {
+	private static LOG = new Logger("VaultSubscription");
 
     private paymentService: PaymentService;
     private subscriptionService: SubscriptionService;

@@ -1,6 +1,6 @@
 import { HttpClient } from "./connection/httpclient";
 import { AppContext } from "./connection/auth/appcontext";
-import { ServiceContext } from "./connection/servicecontext";
+import { ServiceEndpoint } from "./connection/serviceEndpoint";
 import { FilesService } from "./service/files/filesservice";
 import { DatabaseService } from "./service/database/databaseservice";
 import { ScriptingService } from "./service/scripting/scriptingservice";
@@ -9,7 +9,7 @@ import { BackupService } from "./service/backup/backupservice";
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
- export class VaultServices extends ServiceContext {
+ export class Vault extends ServiceEndpoint {
 	private filesService: FilesService;
 	private database: DatabaseService;
 	private scripting: ScriptingService;

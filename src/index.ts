@@ -1,7 +1,7 @@
 
 'use strict';
 
-import { VaultServices } from "./vaultservices";
+import { Vault } from "./vault";
 import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
 import { FileStorage } from "./utils/storage/filestorage";
@@ -14,7 +14,7 @@ import { HttpOptions, HttpHeaders }  from "./connection/httpoptions";
 import { HttpMethod }  from "./connection/httpmethod";
 import { HttpResponseParser }  from "./connection/httpresponseparser";
 import { StreamResponseParser }  from "./connection/streamresponseparser";
-import { ServiceContext }  from "./connection/servicecontext";
+import { ServiceEndpoint }  from "./connection/serviceEndpoint";
 import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
 import { AppContextProvider }  from "./connection/auth/appcontextprovider";
@@ -23,7 +23,7 @@ import { Logger }  from "./utils/logger";
 import { AboutService }  from "./service/about/aboutservice";
 import { AuthService }  from "./service/auth/authservice";
 import { BackupService }  from "./service/backup/backupservice";
-import { BackupSubscriptionService }  from "./service/subscription/backupsubscription/backupsubscriptionservice";
+import { BackupSubscription }  from "./service/subscription/backupsubscription/backupsubscription";
 import { DatabaseService }  from "./service/database/databaseservice";
 import { FilesService }  from "./service/files/filesservice";
 import { PaymentService }  from "./service/payment/paymentservice";
@@ -38,7 +38,7 @@ import { AggregatedCondition }  from "./service/scripting/aggregatedcondition";
 import { Executable, ExecutableType, ExecutableDatabaseBody, ExecutableFileBody }  from "./service/scripting/executable";
 import { Context }  from "./service/scripting/context";
 import { SubscriptionService }  from "./service/subscription/subscriptionservice";
-import { VaultSubscriptionService }  from "./service/subscription/vaultsubscription/vaultsubscriptionservice";
+import { VaultSubscription }  from "./service/subscription/vaultsubscription/vaultsubscription";
 import { PricingPlan } from "./service/subscription/pricingplan";
 import { VaultInfo } from "./service/subscription/vaultinfo";
 import { IllegalArgumentException,
@@ -103,7 +103,7 @@ import { RemoteResolver } from "./service/backup/remoteresolver";
 import { LocalResolver } from "./service/backup/localresolver";
 import { HiveBackupContext } from "./service/backup/hivebackupcontext";
 import { Backup } from "./backup";
-import { ProviderService } from "./service/provider/providerservice";
+import { Provider } from "./service/provider/provider";
 import { VaultDetail } from "./service/provider/vaultdetail";
 import { BackupDetail } from "./service/provider/backupdetail";
 import { FilledOrderDetail } from "./service/provider/filledorderdetail";
@@ -137,9 +137,9 @@ export {
     RemoteResolver,
     DefaultAppContextProvider,
     AppContextParameters,
-    VaultServices,
+    Vault,
     Backup,
-    ProviderService,
+    Provider,
     VaultDetail,
     BackupDetail,
     FilledOrderDetail,
@@ -149,7 +149,7 @@ export {
     FileStorage,
     HttpClient,
     HttpMethod,
-    ServiceContext,
+    ServiceEndpoint,
     AccessToken,
     NodeVersion,
     NodeInfo,
@@ -157,7 +157,7 @@ export {
     AboutService,
     AuthService,
     BackupService,
-    BackupSubscriptionService,
+    BackupSubscription,
     DatabaseService,
     FilesService,
     HashInfo,
@@ -184,7 +184,7 @@ export {
     SubscriptionInfo,
     Context,
     SubscriptionService,
-    VaultSubscriptionService,
+    VaultSubscription,
     QueryHasResultCondition,
     QueryHasResultConditionOptions,
     QueryHasResultConditionBody,

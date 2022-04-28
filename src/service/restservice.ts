@@ -1,16 +1,16 @@
 import { HttpClient } from "../connection/httpclient";
-import { ServiceContext } from "../connection/servicecontext";
+import { ServiceEndpoint } from "../connection/serviceEndpoint";
 
 export class RestService {
-    protected serviceContext: ServiceContext;
+    protected serviceContext: ServiceEndpoint;
     protected httpClient: HttpClient;
 
-    protected constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    protected constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
         this.serviceContext = serviceContext;
         this.httpClient = httpClient;
     }
 
-    public getServiceContext(): ServiceContext {
+    public getServiceContext(): ServiceEndpoint {
         return this.serviceContext;
     }
 

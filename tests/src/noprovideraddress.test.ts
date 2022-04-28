@@ -1,5 +1,5 @@
 import {TestData} from "./config/testdata";
-import {AlreadyExistsException, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
+import {AlreadyExistsException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
 import {DefaultDIDAdapter, DIDBackend} from "@elastosfoundation/did-js-sdk";
 
 /**
@@ -14,9 +14,9 @@ describe.skip("test service without provider address", () => {
     test("testDatabaseServiceWithoutProviderAddress", async () => {
         DIDBackend.initialize(new DefaultDIDAdapter('mainnet'));
         const testData = await TestData.getInstance("databaseservice.tests");
-        const vaultSubscriptionService = new VaultSubscriptionService(testData.getAppContext());
+        const vaultSubscription = new VaultSubscription(testData.getAppContext());
         try {
-            await vaultSubscriptionService.subscribe();
+            await vaultSubscription.subscribe();
         } catch (e) {
             if (!(e instanceof AlreadyExistsException)) {
                 throw e;

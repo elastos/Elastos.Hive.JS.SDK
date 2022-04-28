@@ -1,12 +1,12 @@
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
 
 
 export class LocalResolver implements CodeFetcher {
-	private serviceContext: ServiceContext;
+	private serviceContext: ServiceEndpoint;
 	private nextResolver: CodeFetcher;
 
-	constructor(serviceContext: ServiceContext, next: CodeFetcher) {
+	constructor(serviceContext: ServiceEndpoint, next: CodeFetcher) {
 		this.serviceContext = serviceContext;
 		this.nextResolver = next;
 	}

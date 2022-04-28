@@ -1,17 +1,17 @@
 import { NodeRPCException } from "../../exceptions";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
 
 
 export class RemoteResolver implements CodeFetcher {
-	private serviceContext: ServiceContext;
+	private serviceContext: ServiceEndpoint;
 	private backupContext: BackupContext;
 	private targetDid: string;
 	private targetHost: string;
 
-	constructor( serviceEndpoint: ServiceContext, backupContext: BackupContext,
-						   targetServiceDid: string, targetAddress: string) {
+	constructor(serviceEndpoint: ServiceEndpoint, backupContext: BackupContext,
+				targetServiceDid: string, targetAddress: string) {
 		this.serviceContext = serviceEndpoint;
 		this.backupContext = backupContext;
 		this.targetDid = targetServiceDid;

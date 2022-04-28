@@ -1,6 +1,6 @@
 import { PricingPlan } from "./pricingplan";
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { VaultInfo } from "./vaultinfo";
@@ -25,7 +25,7 @@ export class SubscriptionService extends RestService {
 	private static UNSUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
 	private static BACKUP_INFO_ENDPOINT = "/api/v2/subscription/backup";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 
