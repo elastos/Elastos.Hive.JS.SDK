@@ -1,6 +1,6 @@
 import {
     InvalidParameterException,
-    VaultSubscriptionService, 
+    VaultSubscription,
     DatabaseService, 
     DeleteExecutable, InsertExecutable, 
     FindExecutable, 
@@ -10,7 +10,7 @@ import {
     FileHashExecutable, 
     UpdateExecutable, 
     ScriptingService, 
-    VaultServices, 
+    Vault,
     QueryHasResultCondition, 
     FilesService, 
     Executable } from "@elastosfoundation/hive-js-sdk";
@@ -19,8 +19,8 @@ import { TestData } from "../config/testdata";
 describe("test scripting function", () => {
 
     let testData: TestData;
-    let vaultSubscriptionService: VaultSubscriptionService;
-    let vaultServices: VaultServices;
+    let vaultSubscription: VaultSubscription;
+    let vault: Vault;
     let PRICING_PLAN_NAME = "Rookie";
 
     const FIND_NAME = "get_group_messages";
@@ -51,23 +51,23 @@ describe("test scripting function", () => {
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");
 
-        vaultSubscriptionService = new VaultSubscriptionService(
+        vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
         
         try {
-            await vaultSubscriptionService.subscribe();    
+            await vaultSubscription.subscribe();
         } catch (e){
             console.log("vault is already subscribed");
         }
 
-        vaultServices = new VaultServices(
+        vault = new Vault(
             testData.getAppContext(),
             testData.getProviderAddress());
         
-        scriptingService = vaultServices.getScriptingService();
-        filesService = vaultServices.getFilesService();
-        databaseService = vaultServices.getDatabaseService();
+        scriptingService = vault.getScriptingService();
+        filesService = vault.getFilesService();
+        databaseService = vault.getDatabaseService();
         targetDid = testData.getUserDid();
         appDid = testData.getAppDid();
 
@@ -78,7 +78,7 @@ describe("test scripting function", () => {
     afterAll(async () => {
         try {
             await remove_test_database();
-            await vaultSubscriptionService.unsubscribe();
+            await vaultSubscription.unsubscribe();
         } catch (e){
             console.log("vault is already unsubscribed");
         }

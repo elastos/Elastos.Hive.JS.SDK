@@ -1,5 +1,5 @@
 import { checkNotNull } from '../utils/utils';
-import { ServiceContext } from './servicecontext';
+import { ServiceEndpoint } from './serviceEndpoint';
 import { HttpResponseParser } from './httpresponseparser';
 import { NodeRPCException, UnauthorizedException } from '../exceptions';
 import { StreamResponseParser } from './streamresponseparser';
@@ -54,11 +54,11 @@ export class HttpClient {
     };
 
     private withAuthorization = false;
-    private serviceContext: ServiceContext;
+    private serviceContext: ServiceEndpoint;
     private httpOptions: HttpOptions;
     private httpOptionsInitialized = false;
 
-    constructor(serviceContext: ServiceContext, withAuthorization: boolean, httpOptions: HttpOptions) {
+    constructor(serviceContext: ServiceEndpoint, withAuthorization: boolean, httpOptions: HttpOptions) {
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = httpOptions;

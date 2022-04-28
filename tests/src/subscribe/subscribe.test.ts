@@ -1,7 +1,7 @@
 import {
-    VaultSubscriptionService,
+    VaultSubscription,
     PricingPlan,
-    BackupSubscriptionService,
+    BackupSubscription,
     Order,
     AlreadyExistsException
 } from "@elastosfoundation/hive-js-sdk";
@@ -10,45 +10,45 @@ import { TestData } from "../config/testdata";
 describe("test vault subscribe function", () => {
 
     let testData: TestData;
-    let vaultsubscriptionService: VaultSubscriptionService;
+    let vaultSubscription: VaultSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
-        vaultsubscriptionService = new VaultSubscriptionService(
+        vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
     });
 
     test("testGetPricingPlanList", async() => {
-        let plans: PricingPlan[] = await vaultsubscriptionService.getPricingPlanList();
+        let plans: PricingPlan[] = await vaultSubscription.getPricingPlanList();
         expect(plans).not.toBeNull();
         expect(plans.length).toBeGreaterThan(0);
     });
 
     test("testGetPricingPlan", async() => {
-        let plan: PricingPlan = await vaultsubscriptionService.getPricingPlan(PRICING_PLAN_NAME);
+        let plan: PricingPlan = await vaultSubscription.getPricingPlan(PRICING_PLAN_NAME);
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
 
     test("testGetVersion", async() => {
-        let version: string = await vaultsubscriptionService.getVersion();
+        let version: string = await vaultSubscription.getVersion();
         expect(version).not.toBeNull();
     });
 
     test.skip("testPlaceOrder", async() => {
-        let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
+        let order: Order = await vaultSubscription.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
         expect(order.getOrderId()).not.toBeNull();
     });
 
 
     test.skip("testGetOrder", async() => {
-        let order: Order = await vaultsubscriptionService.placeOrder(PRICING_PLAN_NAME);
+        let order: Order = await vaultSubscription.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
 
-        let order2: Order = await vaultsubscriptionService.getOrder(order.getOrderId());
+        let order2: Order = await vaultSubscription.getOrder(order.getOrderId());
         expect(order2).toEqual(order);
     });
 
@@ -62,13 +62,13 @@ describe("test vault subscribe function", () => {
 
     test("testGetAppStats", async () => {
         try {
-            await vaultsubscriptionService.subscribe();
+            await vaultSubscription.subscribe();
         } catch (e) {
             if (!(e instanceof AlreadyExistsException)) {
                 throw e;
             }
         }
-        let appStats = await vaultsubscriptionService.getAppStats();
+        let appStats = await vaultSubscription.getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
         expect(appStats[0].getName()).not.toEqual(null);
@@ -82,16 +82,16 @@ describe("test vault subscribe function", () => {
     test("testSubscribeCheckUnsubscribe", async () => {
         let vaultInfo;
         try {
-            vaultInfo = await vaultsubscriptionService.subscribe();
+            vaultInfo = await vaultSubscription.subscribe();
         } catch (e) {
-            await vaultsubscriptionService.unsubscribe();
-            vaultInfo = await vaultsubscriptionService.subscribe();
+            await vaultSubscription.unsubscribe();
+            vaultInfo = await vaultSubscription.subscribe();
         }
         expect(vaultInfo).not.toBeNull();
-        expect(await vaultsubscriptionService.checkSubscription()).not.toBeNull();
+        expect(await vaultSubscription.checkSubscription()).not.toBeNull();
         let error = null;
         try {
-            await vaultsubscriptionService.unsubscribe()
+            await vaultSubscription.unsubscribe()
         } catch (e) {
             error = e;
         }
@@ -103,12 +103,12 @@ describe("test vault subscribe function", () => {
 describe("test backup subscribe function", () => {
 
     let testData: TestData;
-    let backupsubscriptionService: BackupSubscriptionService;
+    let backupsubscriptionService: BackupSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
-        backupsubscriptionService = new BackupSubscriptionService(
+        backupsubscriptionService = new BackupSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
     });

@@ -1,5 +1,5 @@
 /**
- * The bridge handler is for the {@link AccessToken#AccessToken(ServiceContext, DataStorage, BridgeHandler)} ()}
+ * The bridge handler is for the {@link AccessToken#AccessToken(ServiceEndpoint, DataStorage, BridgeHandler)} ()}
  * to notify the caller some information.
  */
 export interface BridgeHandler {

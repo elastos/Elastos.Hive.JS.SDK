@@ -1,7 +1,7 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppContextProvider } from '../../connection/auth/appcontextprovider';
 import { HttpClient } from '../../connection/httpclient';
-import { ServiceContext } from '../../connection/servicecontext';
+import { ServiceEndpoint } from '../../connection/serviceEndpoint';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../../exceptions';
 import { Logger } from '../../utils/logger';
@@ -16,7 +16,7 @@ export class AuthService extends RestService {
 
 	private contextProvider: AppContextProvider;
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
     }

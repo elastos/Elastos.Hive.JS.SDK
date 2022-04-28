@@ -1,7 +1,7 @@
 import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
-import { ServiceContext } from '../../connection/servicecontext';
+import { ServiceEndpoint } from '../../connection/serviceEndpoint';
 import { HttpClient } from '../../connection/httpclient';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { StreamResponseParser } from '../../connection/streamresponseparser';
@@ -24,7 +24,7 @@ export class ScriptingService extends RestService {
 	private static API_SCRIPT_ENDPOINT = "/api/v2/vault/scripting";
 	private static API_SCRIPT_STREAM_ENDPOINT = "/api/v2/vault/scripting/stream"; 
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
     

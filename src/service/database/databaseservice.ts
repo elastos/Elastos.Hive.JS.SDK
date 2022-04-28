@@ -1,7 +1,7 @@
 import {  NetworkException,	NodeRPCException, ServerUnknownException, } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { HttpResponseParser } from '../../connection/httpresponseparser';
@@ -22,7 +22,7 @@ export class DatabaseService extends RestService {
 	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
 	private static API_DB_ENDPOINT = "/api/v2/vault/db";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 

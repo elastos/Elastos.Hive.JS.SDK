@@ -4,7 +4,7 @@ import {
 	NotImplementedException
 } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import {BackupResult, BackupResultResult, BackupResultState} from "./backupresult";
@@ -19,7 +19,7 @@ export class BackupService extends RestService {
 
 	private credentialCode: CredentialCode;
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 

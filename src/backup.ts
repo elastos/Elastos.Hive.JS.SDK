@@ -1,9 +1,9 @@
 import { AppContext } from "./connection/auth/appcontext";
 import { HttpClient } from "./connection/httpclient";
 import { PromotionService } from "./service/promotion/promotionservice";
-import { ServiceContext } from "./connection/servicecontext";
+import { ServiceEndpoint } from "./connection/serviceEndpoint";
 
-export class Backup extends ServiceContext {
+export class Backup extends ServiceEndpoint {
     private readonly promotionService: PromotionService;
 
     public constructor(context: AppContext, providerAddress?: string) {

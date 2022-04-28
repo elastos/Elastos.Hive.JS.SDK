@@ -1,6 +1,6 @@
 import { AppContext } from "../../../connection/auth/appcontext";
 import { HttpClient } from "../../../connection/httpclient";
-import { ServiceContext } from "../../../connection/servicecontext";
+import { ServiceEndpoint } from "../../../connection/serviceEndpoint";
 import { Logger } from '../../../utils/logger';
 import { PaymentService } from "../../payment/paymentservice";
 import { SubscriptionService } from "../../subscription/subscriptionservice";
@@ -9,7 +9,7 @@ import { BackupInfo } from "../backupinfo";
 import { Order } from "../../payment/order";
 import { Receipt } from "../../payment/receipt";
 
-export class BackupSubscriptionService extends ServiceContext {
+export class BackupSubscription extends ServiceEndpoint {
 	private static LOG = new Logger("BackupSubscriptionService");
 
     private paymentService: PaymentService;

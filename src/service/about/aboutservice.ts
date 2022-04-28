@@ -3,7 +3,7 @@ import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import {NodeInfo} from "./nodeinfo";
@@ -16,7 +16,7 @@ export class AboutService extends RestService {
 	private static API_COMMIT_ENDPOINT = "/api/v2/node/commit_id";
 	private static API_INFO_ENDPOINT = "/api/v2/node/info";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
     }
 

@@ -1,5 +1,5 @@
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { Order } from  "./order";
@@ -17,7 +17,7 @@ export class PaymentService extends RestService {
 	private static API_RECEIPT_ENDPOINT = "/api/v2/payment/receipt";
 	private static API_VERSION_ENDPOINT = "/api/v2/payment/version";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 

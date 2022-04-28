@@ -3,7 +3,7 @@ import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
 import { LocalResolver } from "./localresolver";
 import { RemoteResolver } from "./remoteresolver";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { DataStorage } from "../../utils/storage/datastorage";
 
 export class CredentialCode {
@@ -12,7 +12,7 @@ export class CredentialCode {
 	private remoteResolver: CodeFetcher;
 	private storage: DataStorage;
 
-    constructor(endpoint: ServiceContext,  context: BackupContext) {
+    constructor(endpoint: ServiceEndpoint, context: BackupContext) {
         this.targetServiceDid = context.getParameter("targetServiceDid");
         let remoteResolver = new RemoteResolver(
         		endpoint, context, this.targetServiceDid, context.getParameter("targetAddress"));

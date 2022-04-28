@@ -1,6 +1,6 @@
 import { DataStorage } from '../../utils/storage/datastorage';
 import { BridgeHandler } from './bridgehandler';
-import { ServiceContext } from '../servicecontext';
+import { ServiceEndpoint } from '../serviceEndpoint';
 import { AuthService } from '../../service/auth/authservice';
 import { HttpClient } from '../httpclient';
 import { Logger } from '../../utils/logger';
@@ -25,7 +25,7 @@ export class AccessToken {
 	 * @param storage The data storage which is used to save the access token.
 	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
-	public constructor(serviceContext: ServiceContext, storage: DataStorage) {
+	public constructor(serviceContext: ServiceEndpoint, storage: DataStorage) {
 		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.storage = storage;
 		this.bridge = new BridgeHandlerImpl(serviceContext);
@@ -75,7 +75,7 @@ export class AccessToken {
 	}
 
 	private async restoreToken() : Promise<string> {
-		let endpoint = this.bridge.target() as ServiceContext;
+		let endpoint = this.bridge.target() as ServiceEndpoint;
 
 		if (endpoint == null)
 			return null;
@@ -114,7 +114,7 @@ export class AccessToken {
 	}
 
 	private async saveToken( jwtCode: string) : Promise<void> {
-		let endpoint = this.bridge.target() as ServiceContext;
+		let endpoint = this.bridge.target() as ServiceEndpoint;
 		if (endpoint == null || !endpoint.getServiceInstanceDid())
 			return;
 
@@ -123,7 +123,7 @@ export class AccessToken {
 	}
 
 	private async clearToken(): Promise<void> {
-		let endpoint = this.bridge.target() as ServiceContext;
+		let endpoint = this.bridge.target() as ServiceEndpoint;
 		if (endpoint == null)
 			return;
 
@@ -137,9 +137,9 @@ export class AccessToken {
 class BridgeHandlerImpl implements BridgeHandler {
 	private static LOG = new Logger("BridgeHandler");
 
-    private ref: ServiceContext;
+    private ref: ServiceEndpoint;
 
-    constructor(endpoint: ServiceContext) {
+    constructor(endpoint: ServiceEndpoint) {
 		this.ref = endpoint;
     }
 

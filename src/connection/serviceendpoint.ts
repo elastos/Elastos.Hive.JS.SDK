@@ -11,7 +11,7 @@ import { AboutService } from '../service/about/aboutservice'
 import { Logger } from '../utils/logger'
 import {NodeInfo} from "../service/about/nodeinfo";
 
-export class ServiceContext {
+export class ServiceEndpoint {
     private readonly context: AppContext;
     private providerAddress: string;
     private aboutService: AboutService;
@@ -23,7 +23,7 @@ export class ServiceContext {
     private accessToken: AccessToken;
     private dataStorage: DataStorage;
 
-    private static LOG_SERVICE_CONTEXT = new Logger("ServiceContext");
+    private static LOG_SERVICE_CONTEXT = new Logger("ServiceEndpoint");
 
     constructor(context: AppContext, providerAddress?: string) {
         checkNotNull(context, "Empty context parameter");
@@ -40,7 +40,7 @@ export class ServiceContext {
         if (!dataDir.endsWith(File.SEPARATOR))
             dataDir += File.SEPARATOR;
 
-        //ServiceContext.LOG_SERVICE_CONTEXT.debug("Init Service Context");
+        //ServiceEndpoint.LOG_SERVICE_CONTEXT.debug("Init Service Context");
         this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
         this.accessToken = new AccessToken(this, this.dataStorage);
         this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
@@ -63,7 +63,7 @@ export class ServiceContext {
     }
 
     /**
-     * Get the user DID string of this ServiceContext.
+     * Get the user DID string of this ServiceEndpoint.
      *
      * @return user did
      */

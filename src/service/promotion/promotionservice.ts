@@ -4,7 +4,7 @@ import {
 	NodeRPCException
 } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceContext } from "../../connection/servicecontext";
+import { ServiceEndpoint } from "../../connection/serviceEndpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 
@@ -13,7 +13,7 @@ export class PromotionService extends RestService {
 
 	private static API_PROMOTION_ENDPOINT = "/api/v2/backup/promotion";
 
-    constructor(serviceContext: ServiceContext, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
 

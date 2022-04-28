@@ -1,10 +1,10 @@
-import {ServiceContext} from "./connection/servicecontext";
+import {ServiceEndpoint} from "./connection/serviceEndpoint";
 import {HttpClient} from "./connection/httpclient";
 import {AppContext} from "./connection/auth/appcontext";
 import {ScriptingService} from "./service/scripting/scriptingservice";
 
 
-export class ScriptRunner extends ServiceContext{
+export class ScriptRunner extends ServiceEndpoint{
 
     private scriptService: ScriptingService;
 

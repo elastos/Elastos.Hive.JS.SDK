@@ -131,14 +131,14 @@ export class ApiServiceContextProvider implements AppContextProvider {
     }
 }
 
-let vaultSubscriptionService : VaultSubscriptionService = new VaultSubscriptionService(appContext, "[hiveNode address]");
+let vaultSubscriptionService : VaultSubscription = new VaultSubscription(appContext, "[hiveNode address]");
 let vaultInfo = await vaultSubscriptionService.subscribe();
 ```
 
 The same mechanics is used by VaultService, which provides all services to interact with hive vault
 
 ```javascript
-let vaultServices = new VaultServices(appContext, "[hiveNode address]");
+let vaultServices = new Vault(appContext, "[hiveNode address]");
 let scriptingService = vaultServices.getScriptingService();
 let filesService = vaultServices.getFilesService();
 let databaseService = vaultServices.getDatabaseService();

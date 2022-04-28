@@ -1,20 +1,20 @@
-import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscriptionService, ServiceContext, AuthService } from "@elastosfoundation/hive-js-sdk";
+import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test auth service", () => {
 
 	let testData: TestData;
-    let serviceContext: ServiceContext;
+    let serviceEndpoint: ServiceEndpoint;
 
 	beforeAll(async () => {
 		testData = await TestData.getInstance("aboutservice.test");
-        serviceContext = new ServiceContext(testData.getAppContext(), testData.getProviderAddress());
+        serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
 	});
 
-	afterAll(() => { serviceContext.getAccessToken().invalidate(); });
+	afterAll(() => { serviceEndpoint.getAccessToken().invalidate(); });
 
     test("testAuth", async () => {
-		let token = await serviceContext.getAccessToken().fetch();
+		let token = await serviceEndpoint.getAccessToken().fetch();
 		expect(token).not.toBeNull();
     });
 });
@@ -22,7 +22,7 @@ describe("test auth service", () => {
 describe("authentication fail test", () => {
 
 	let testData: TestData;
-    let vaultsubscriptionService: VaultSubscriptionService;
+    let vaultSubscription: VaultSubscription;
 
     beforeAll(() => {
         let spy = jest.spyOn(AuthService.prototype, 'auth').mockImplementation(() => {throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Expected error");});
@@ -30,7 +30,7 @@ describe("authentication fail test", () => {
 
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
-        vaultsubscriptionService = new VaultSubscriptionService(
+        vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
     });
@@ -40,7 +40,7 @@ describe("authentication fail test", () => {
 	test("testAuthenticationFailed", async () => {
 		let actualError = null;
         try {
-            await vaultsubscriptionService.getPricingPlanList();
+            await vaultSubscription.getPricingPlanList();
         } catch (e) {
 			actualError = e;
         }
