@@ -182,7 +182,7 @@ export class ScriptingService extends RestService {
 	public async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
 		const params = this.parseHiveUrl(hiveUrl);
 		const result = await this.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
-		return await this.downloadFile(result[params.scriptName].transaction_id);
+		return await this.downloadFile(Object.values(result)[0]['transaction_id']);
 	}
 
 	private handleError(e: Error): unknown {
