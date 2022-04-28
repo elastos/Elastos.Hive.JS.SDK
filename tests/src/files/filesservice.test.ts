@@ -1,14 +1,8 @@
-import {
-	AlreadyExistsException,
-	File,
-	FilesService,
-	NotFoundException,
-	VaultSubscription
-} from "@elastosfoundation/hive-js-sdk";
-import { TestData } from "../config/testdata";
 import { Blob } from 'buffer';
+import { TestData } from "../config/testdata";
+import {AlreadyExistsException, File, FilesService, NotFoundException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
 
-describe("test file service", () => {
+describe("test files service", () => {
 
 	const FILE_NAME_TXT = "test.txt";
 	const FILE_CONTENT_TXT = "This is a test file";
@@ -18,6 +12,9 @@ describe("test file service", () => {
 	const FILE_NAME_NOT_EXISTS = "not_exists";
 	const REMOTE_DIR = "hive/";
 	const INVALID_REMOTE_DIR = "badremotedir/";
+
+	const FILE_STR_NAME = "string.dat";
+	const FILE_STR_CONTENT = "This is a string test file";
 
 	let filesService: FilesService;
 	let testData: TestData;
@@ -91,6 +88,14 @@ describe("test file service", () => {
 		await filesService.upload(REMOTE_DIR + FILE_NAME_TXT, testFile.read());
 		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
     });
+
+	test("testUploadWithString", async () => {
+		const filePath = REMOTE_DIR + FILE_STR_NAME
+		await filesService.upload(filePath, FILE_STR_CONTENT);
+		const data = await filesService.download(filePath);
+		expectBuffersToBeEqual(new Buffer(FILE_STR_CONTENT), data);
+		await filesService.delete(filePath);
+	});
 
 	test("testUploadBin", async () => {
 		let binTestFile = new File(FILE_NAME_BIN);

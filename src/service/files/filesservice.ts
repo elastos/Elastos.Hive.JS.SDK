@@ -39,12 +39,14 @@ export class FilesService extends RestService {
 		}
 	}
 
-	public async upload(path: string, data: Buffer): Promise<void> {
+	public async upload(path: string, data: Buffer | string): Promise<void> {
 		checkNotNull(path, "Remote destination path is mandatory.");
-		checkArgument(data && data.length > 0, "No data to upload.");
-		FilesService.LOG.debug("Uploading " + Buffer.byteLength(data) + " byte(s).");
+		checkNotNull(data, "data must be provided.");
+		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		checkArgument(content.length > 0, "No data to upload.");
+		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 		try {
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, content, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
 		}

@@ -113,13 +113,14 @@ export class ScriptingService extends RestService {
 		}
 	}
 	
-	public async uploadFile(transactionId: string, data: Buffer): Promise<void> {
+	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
-		checkArgument(data && data.byteLength > 0, "No data to upload.");
-
+		checkNotNull(data, "data must be provided.");
+		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		checkArgument(content.length > 0, "No data to upload.");
 		try {
-			ScriptingService.LOG.debug("Uploading " + data.byteLength + " byte(s)");
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, data, HttpClient.NO_RESPONSE, HttpMethod.PUT);
+			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, content, HttpClient.NO_RESPONSE, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
 		}		
