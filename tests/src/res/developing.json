@@ -1,5 +1,6 @@
 {
   "resolverUrl": "testnet",
+  "ipfsGateUrl": "https://ipfs-test.trinity-feeds.app",
 
   "application": {
     "name": "developApp",

@@ -1,6 +1,12 @@
-import { Blob } from 'buffer';
+import {
+	AlreadyExistsException,
+	File,
+	FilesService, IpfsRunner,
+	NotFoundException, ScriptRunner,
+	VaultSubscription
+} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
-import {AlreadyExistsException, File, FilesService, NotFoundException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import { Blob } from 'buffer';
 
 describe("test files service", () => {
 
@@ -16,8 +22,15 @@ describe("test files service", () => {
 	const FILE_STR_NAME = "string.dat";
 	const FILE_STR_CONTENT = "This is a string test file";
 
+	const FILE_PUBLIC_NAME = "test_public.txt";
+	const FILE_PUBLIC_CONTENT = "This is a public test file";
+
 	let filesService: FilesService;
 	let testData: TestData;
+
+	let anonymousScriptRunner: ScriptRunner;
+	let targetDid: string;
+	let appDid: string;
 
 	beforeAll(async () => {
 		testData = await TestData.getInstance("filesservice.test");
@@ -33,6 +46,10 @@ describe("test files service", () => {
 				throw e;
 			}
 		}
+
+		anonymousScriptRunner = testData.newAnonymousCallerScriptRunner();
+		targetDid = testData.getUserDid();
+		appDid = testData.getAppDid();
 	});
 
 	afterAll(() => {
@@ -88,6 +105,37 @@ describe("test files service", () => {
 		await filesService.upload(REMOTE_DIR + FILE_NAME_TXT, testFile.read());
 		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
     });
+
+	test("testUploadTextPublic", async () => {
+		const fileName = REMOTE_DIR + FILE_PUBLIC_NAME;
+		const scriptName = FILE_PUBLIC_NAME.split('.')[0]
+		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), true, scriptName);
+		expect(cid).not.toBeUndefined();
+		expect(cid).not.toBeNull();
+		expect(cid).not.toEqual('');
+		// check by directly downloading.
+		let data = await filesService.download(fileName);
+		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
+		// check by scripting downloading.
+		let downloadTransactionId = await callScriptFileDownload(FILE_PUBLIC_NAME.split('.')[0]);
+		data = await downloadFileByTransActionId(downloadTransactionId);
+		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
+		// check by cid
+		data = await new IpfsRunner(testData.getIpfsGatewayUrl()).getFile(cid);
+		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
+	});
+
+	async function callScriptFileDownload(scriptName: string): Promise<string> {
+		let result = await anonymousScriptRunner.callScript(scriptName, {}, targetDid, appDid);
+		expect(result).not.toBeNull();
+		expect(result[scriptName]).not.toBeNull();
+		expect(result[scriptName].transaction_id).not.toBeNull();
+		return result[scriptName].transaction_id;
+	}
+
+	async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
+		return await anonymousScriptRunner.downloadFile(transactionId);
+	}
 
 	test("testUploadWithString", async () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME

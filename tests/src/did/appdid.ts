@@ -3,7 +3,8 @@ import dayjs from "dayjs";
 import { DIDEntity } from "./didentity";
 
 export class AppDID extends DIDEntity {
-	private appId = "appId";
+	public static APP_DID = "appId";
+	public static APP_DID2 = "appDID2";
 
 	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
 		super(name, mnemonic, phrasepass, storepass, did);

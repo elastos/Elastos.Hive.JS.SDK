@@ -4,7 +4,7 @@ import {
 	BackupService,
 	AppContext,
 	Logger,
-	File, Provider, Backup
+	File, Provider, Backup, ScriptRunner
 } from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
@@ -23,6 +23,7 @@ export class TestData {
 	private callerDid: UserDID;
 	private appInstanceDid: AppDID;
 	private context: AppContext;
+	private anonymousContext: AppContext;
 	private callerContext: AppContext;
 	private clientConfig: any;
 	private userDir: string;
@@ -66,6 +67,10 @@ export class TestData {
 		return new Vault(this.context, this.getProviderAddress());
 	}
 
+	public newAnonymousCallerScriptRunner(): ScriptRunner {
+		return new ScriptRunner(this.anonymousContext, this.getProviderAddress());
+	}
+
 	public newBackup(): Backup {
 		return new Backup(this.context, this.getProviderAddress());
 	}
@@ -102,8 +107,14 @@ export class TestData {
 			userConfigCaller.did);
 					
 		//Application Context
-		let self = this;
-		this.context = await AppContext.build({
+		this.context = await this.createContext(this.userDid, AppDID.APP_DID);
+		this.anonymousContext = await this.createContext(this.callerDid, AppDID.APP_DID2);
+		return this;
+	}
+
+	private async createContext(userDid: UserDID, appDid: string): Promise<AppContext> {
+    	const self = this;
+		return await AppContext.build({
 
 			getLocalDataDir() : string {
 				return self.getLocalStorePath();
@@ -118,7 +129,7 @@ export class TestData {
 				}
 				return Promise.resolve(null);
 			},
-			
+
 			async getAuthorization(jwtToken : string) : Promise<string> {
 				try {
 					let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtToken)).getBody();
@@ -126,18 +137,17 @@ export class TestData {
 						throw new HiveException("Invalid jwt token as authorization.");
 
 					let presentation = await self.appInstanceDid.createPresentation(
-						await self.userDid.issueDiplomaFor(self.appInstanceDid),
+						await userDid.issueDiplomaFor(self.appInstanceDid, appDid),
 						claims.getIssuer(), claims.get("nonce") as string);
-						
-					TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
+
+					TestData.LOG.debug("TestData->presentation: " + presentation.toString(true));
 					return await self.appInstanceDid.createToken(presentation,  claims.getIssuer());
 				} catch (e) {
-					TestData.LOG.info("TestData->getAuthorization error: " + e); 	
+					TestData.LOG.info("TestData->getAuthorization error: " + e);
 					TestData.LOG.error(e.stack);
 				}
 			}
-		}, self.userDid.getDid().toString());
-		return this;
+		}, userDid.getDid().toString());
 	}
 
 	public getAppDid(): string {
@@ -162,6 +172,10 @@ export class TestData {
 
 	public getCallerDid(): string {
 		return this.callerDid.toString();
+	}
+
+	public getIpfsGatewayUrl(): string {
+		return this.clientConfig.ipfsGateUrl;
 	}
 
 	public getBackupService(): BackupService {

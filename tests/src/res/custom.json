@@ -1,5 +1,6 @@
 {
   "resolverUrl": "mainnet",
+  "ipfsGateUrl": "https://ipfs.trinity-tech.io",
 
   "application": {
     "name": "developApp",
