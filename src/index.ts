@@ -14,7 +14,7 @@ import { HttpOptions, HttpHeaders }  from "./connection/httpoptions";
 import { HttpMethod }  from "./connection/httpmethod";
 import { HttpResponseParser }  from "./connection/httpresponseparser";
 import { StreamResponseParser }  from "./connection/streamresponseparser";
-import { ServiceEndpoint }  from "./connection/serviceEndpoint";
+import { ServiceEndpoint }  from "./connection/serviceendpoint";
 import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
 import { AppContextProvider }  from "./connection/auth/appcontextprovider";

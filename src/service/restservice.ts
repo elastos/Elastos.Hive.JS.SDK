@@ -1,5 +1,5 @@
 import { HttpClient } from "../connection/httpclient";
-import { ServiceEndpoint } from "../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../connection/serviceendpoint";
 
 export class RestService {
     protected serviceContext: ServiceEndpoint;

@@ -1,7 +1,7 @@
 import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
-import { ServiceEndpoint } from '../../connection/serviceEndpoint';
+import { ServiceEndpoint } from '../../connection/serviceendpoint';
 import { HttpClient } from '../../connection/httpclient';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { StreamResponseParser } from '../../connection/streamresponseparser';

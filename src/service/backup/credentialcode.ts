@@ -3,7 +3,7 @@ import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
 import { LocalResolver } from "./localresolver";
 import { RemoteResolver } from "./remoteresolver";
-import { ServiceEndpoint } from "../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { DataStorage } from "../../utils/storage/datastorage";
 
 export class CredentialCode {

@@ -3,7 +3,7 @@ import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { StreamResponseParser } from "../../connection/streamresponseparser";
 import {  NetworkException, NodeRPCException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
-import { ServiceEndpoint } from "../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";

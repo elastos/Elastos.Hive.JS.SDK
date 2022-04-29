@@ -1,7 +1,7 @@
 import {  NetworkException,	NodeRPCException, ServerUnknownException, } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
-import { ServiceEndpoint } from "../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { HttpResponseParser } from '../../connection/httpresponseparser';

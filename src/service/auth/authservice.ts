@@ -1,7 +1,7 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppContextProvider } from '../../connection/auth/appcontextprovider';
 import { HttpClient } from '../../connection/httpclient';
-import { ServiceEndpoint } from '../../connection/serviceEndpoint';
+import { ServiceEndpoint } from '../../connection/serviceendpoint';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { NodeRPCException, ServerUnknownException } from '../../exceptions';
 import { Logger } from '../../utils/logger';

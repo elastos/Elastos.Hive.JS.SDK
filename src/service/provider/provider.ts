@@ -3,7 +3,7 @@ import { AppContext } from "../../connection/auth/appcontext";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { ServiceEndpoint } from "../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import {
     NetworkException,
     NodeRPCException,

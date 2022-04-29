@@ -1,6 +1,6 @@
 import { HttpClient } from "./connection/httpclient";
 import { AppContext } from "./connection/auth/appcontext";
-import { ServiceEndpoint } from "./connection/serviceEndpoint";
+import { ServiceEndpoint } from "./connection/serviceendpoint";
 import { FilesService } from "./service/files/filesservice";
 import { DatabaseService } from "./service/database/databaseservice";
 import { ScriptingService } from "./service/scripting/scriptingservice";
