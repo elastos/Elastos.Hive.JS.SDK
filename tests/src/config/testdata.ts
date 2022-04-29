@@ -151,7 +151,7 @@ export class TestData {
 	}
 
 	public getAppDid(): string {
-		return this.appInstanceDid.getAppDid();
+		return AppDID.APP_DID;
 	}
 
 	public getUserDid(): string {
