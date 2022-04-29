@@ -26,6 +26,7 @@ import { BackupService }  from "./service/backup/backupservice";
 import { BackupSubscription }  from "./service/subscription/backupsubscription/backupsubscription";
 import { DatabaseService }  from "./service/database/databaseservice";
 import { FilesService }  from "./service/files/filesservice";
+import { IpfsRunner }  from "./ipfsrunner";
 import { PaymentService }  from "./service/payment/paymentservice";
 import { PromotionService }  from "./service/promotion/promotionservice";
 import { RestService }  from "./service/restservice";
@@ -160,6 +161,7 @@ export {
     BackupSubscription,
     DatabaseService,
     FilesService,
+    IpfsRunner,
     HashInfo,
     FileInfo,
     PaymentService,

@@ -22,11 +22,11 @@ export class UserDID extends DIDEntity {
         this.issuer = issuer;
     }
 
-	public async issueDiplomaFor(appInstanceDid: AppDID): Promise<VerifiableCredential> {
+	public async issueDiplomaFor(appInstanceDid: AppDID, appDid?: string): Promise<VerifiableCredential> {
 		let subject = {};
 
-		subject["appDid"] = appInstanceDid.getDid();
-		subject["appInstanceDid"] = appInstanceDid.getDid();
+		subject["appDid"] = appDid ? appDid : AppDID.APP_DID;
+		// subject["appInstanceDid"] = appInstanceDid.getDid();
 
         let cal = dayjs();
         cal = cal.add(5, 'year');

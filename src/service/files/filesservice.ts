@@ -39,14 +39,34 @@ export class FilesService extends RestService {
 		}
 	}
 
-	public async upload(path: string, data: Buffer | string): Promise<void> {
+	/**
+	 * Upload a file to the files service.
+	 *
+	 * @param path the path in files service.
+	 * @param data file's content.
+	 * @param is_public 'true' will return the cid of the file which can be used to access from global ipfs gateway.
+	 * @param script_name used when is_public is true, this will create a new downloading script with name script_name.
+	 */
+	public async upload(path: string, data: Buffer | string, is_public = false, script_name?: string): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
 		checkArgument(content.length > 0, "No data to upload.");
 		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
+
+		let urlArgsStr = '';
+		if (is_public) {
+			checkArgument(!!script_name, "Script name must be provided when is_public is true.");
+			urlArgsStr = `?public=true&script_name=${script_name}`
+		}
+
 		try {
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, content, HttpClient.NO_RESPONSE, HttpMethod.PUT);
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, content,
+				<HttpResponseParser<string>> {
+					deserialize(content: any): string {
+						return JSON.parse(content)["cid"];
+					}
+				}, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
 		}
