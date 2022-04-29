@@ -1,4 +1,4 @@
-import { ServiceEndpoint } from "../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
 
 

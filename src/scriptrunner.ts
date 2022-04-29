@@ -1,4 +1,4 @@
-import {ServiceEndpoint} from "./connection/serviceEndpoint";
+import {ServiceEndpoint} from "./connection/serviceendpoint";
 import {HttpClient} from "./connection/httpclient";
 import {AppContext} from "./connection/auth/appcontext";
 import {ScriptingService} from "./service/scripting/scriptingservice";

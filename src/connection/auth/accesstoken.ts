@@ -1,6 +1,6 @@
 import { DataStorage } from '../../utils/storage/datastorage';
 import { BridgeHandler } from './bridgehandler';
-import { ServiceEndpoint } from '../serviceEndpoint';
+import { ServiceEndpoint } from '../serviceendpoint';
 import { AuthService } from '../../service/auth/authservice';
 import { HttpClient } from '../httpclient';
 import { Logger } from '../../utils/logger';

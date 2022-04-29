@@ -1,7 +1,7 @@
 import { AppContext } from "./connection/auth/appcontext";
 import { HttpClient } from "./connection/httpclient";
 import { PromotionService } from "./service/promotion/promotionservice";
-import { ServiceEndpoint } from "./connection/serviceEndpoint";
+import { ServiceEndpoint } from "./connection/serviceendpoint";
 
 export class Backup extends ServiceEndpoint {
     private readonly promotionService: PromotionService;

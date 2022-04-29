@@ -1,6 +1,6 @@
 import { AppContext } from "../../../connection/auth/appcontext";
 import { HttpClient } from "../../../connection/httpclient";
-import { ServiceEndpoint } from "../../../connection/serviceEndpoint";
+import { ServiceEndpoint } from "../../../connection/serviceendpoint";
 import { Logger } from '../../../utils/logger';
 import { PaymentService } from "../../payment/paymentservice";
 import { SubscriptionService } from "../../subscription/subscriptionservice";

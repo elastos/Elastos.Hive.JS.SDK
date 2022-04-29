@@ -1,5 +1,5 @@
 import { checkNotNull } from '../utils/utils';
-import { ServiceEndpoint } from './serviceEndpoint';
+import { ServiceEndpoint } from './serviceendpoint';
 import { HttpResponseParser } from './httpresponseparser';
 import { NodeRPCException, UnauthorizedException } from '../exceptions';
 import { StreamResponseParser } from './streamresponseparser';
