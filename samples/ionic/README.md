@@ -5,7 +5,7 @@ This demo comes from [the ionic tutorial](https://ionicframework.com/docs/angula
 To run the demo, please use the following commands:
 
 ```
-$ npm install
+$ npm install --legacy-peer-deps
 ## Try on browser
 $ ionic serve
 ## Try on ios

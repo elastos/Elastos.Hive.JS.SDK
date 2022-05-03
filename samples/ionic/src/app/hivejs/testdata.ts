@@ -17,7 +17,7 @@ import {DID} from '@elastosfoundation/elastos-connectivity-sdk-js';
 
 export default class SdkContext {
     public static INSTANCE: SdkContext;
-    public static readonly RESOLVE_CACHE = 'data/didCache';
+    public static readonly RESOLVE_CACHE = '/data/didCache';
     // public static readonly RESOLVE_CACHE = '/Users/fred/Fred/workspace/nodejs/react-material-ui/react-examples/photo-gallery/data/didCache';
     // public static readonly USER_DIR = path.join(__dirname, '../../data/userDir');
     // public static readonly USER_DIR = '/Users/fred/Fred/workspace/nodejs/react-material-ui/react-examples/photo-gallery/data/userDir';
@@ -32,7 +32,7 @@ export default class SdkContext {
     private callerDid: UserDID;
     private appInstanceDid: AppDID;
     private callerContext: AppContext;
-    private readonly isTest: boolean;
+    private readonly isTest: boolean; // True goes like hive js testing, else will work with EE.
 
     private appIdCredential: VerifiableCredential;
 
@@ -48,6 +48,7 @@ export default class SdkContext {
         this.clientConfig = clientConfig;
         this.userDir = userDir;
         this.isTest = true;
+        console.log(`this.isTest=${this.isTest}`);
     }
 
     async init(): Promise<void> {
@@ -55,12 +56,12 @@ export default class SdkContext {
         //let userDirFile = new File(this.userDir);
         //userDirFile.delete();
         console.log(`${this.clientConfig.resolverUrl}, ${SdkContext.RESOLVE_CACHE}`);
-        AppContext.setupResolver(this.clientConfig.resolverUrl, SdkContext.RESOLVE_CACHE);
+        AppContext.setupResolver(this.clientConfig.resolverUrl, SdkContext.USER_DIR);
 
         const applicationConfig = this.clientConfig.application;
       console.log('init SdkContest.init 1.');
         this.appInstanceDid = await AppDID.create(applicationConfig.name,
-            applicationConfig.mnemonics2,
+            applicationConfig.mnemonic,
             applicationConfig.passPhrase,
             applicationConfig.storepass,
             applicationConfig.did);
@@ -137,7 +138,7 @@ export default class SdkContext {
 
             async getAuthorization(jwtToken: string): Promise<string>  {
                 try {
-                    return owner.getAuthAuthorization(jwtToken);
+                    return await owner.getAuthAuthorization(jwtToken);
                 } catch (e) {
                     throw new HiveException(e.getMessage(), e);
                 }

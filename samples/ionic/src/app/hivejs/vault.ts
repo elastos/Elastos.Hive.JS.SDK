@@ -21,27 +21,28 @@ export default class Vault {
   private static readonly SCRIPT_NAME_UPLOAD: string = 'upload_file';
   private static readonly SCRIPT_NAME_DOWNLOAD: string = 'download_file';
 
-  private readonly hiveUrl: string;
+  private hiveUrl: string;
   private sdkContext: SdkContext;
   private vaultSubscriptionService: VaultSubscriptionService;
   private vaultService: VaultServices;
   private targetUserDid: string;
   private targetAppDid: string;
 
-  private constructor(hiveUrl: string) {
-    this.hiveUrl = hiveUrl
+  private constructor() {
+    // do nothing.
   }
 
-  public static async getInstance(hiveUrl: string): Promise<Vault> {
+  public static async getInstance(): Promise<Vault> {
       if (!Vault.instance) {
-          Vault.instance = new Vault(hiveUrl);
+          Vault.instance = new Vault();
           await Vault.instance.init();
       }
       return Vault.instance;
   }
 
   private async init(): Promise<void> {
-    this.sdkContext = await SdkContext.getInstance('hive js demo', ClientConfig.CUSTOM, SdkContext.USER_DIR);
+    this.sdkContext = await SdkContext.getInstance('hive js demo', ClientConfig.DEV, SdkContext.USER_DIR);
+    this.hiveUrl = this.sdkContext.getProviderAddress();
     this.targetUserDid = this.sdkContext.getUserDid();
     this.targetAppDid = this.sdkContext.getAppDid();
   }
