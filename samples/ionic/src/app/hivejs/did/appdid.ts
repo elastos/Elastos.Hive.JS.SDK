@@ -1,24 +1,23 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend,
-  VerificationEventListener } from '@elastosfoundation/did-js-sdk';
-import dayjs from 'dayjs';
-import { DIDEntity } from './didentity';
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend, VerificationEventListener } from "@elastosfoundation/did-js-sdk";
+import dayjs from "dayjs";
+import { DIDEntity } from "./didentity";
 import {DID} from '@elastosfoundation/elastos-connectivity-sdk-js';
 
 export class AppDID extends DIDEntity {
-	private appId = "appId";
+	public static APP_DID = "appId";
+	public static APP_DID2 = "appDID2";
 
 	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
 		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
-	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string): Promise<AppDID> {
-		DIDBackend.initialize(new DefaultDIDAdapter("mainnet"));
-		//DIDBackend.initialize(new DefaultDIDAdapter("https://api-testnet.elastos.io/newid"));
-        let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
-		await newInstance.initPrivateIdentity(mnemonic);
-		await newInstance.initDid();
-
-        return newInstance;
+	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
+							   resolver: string, did?: string): Promise<AppDID> {
+		  // TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
+		  DIDBackend.initialize(new DefaultDIDAdapter(resolver));
+		  let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
+		  await newInstance.initDid(mnemonic, false);
+		  return newInstance;
     }
 
 	public getAppDid(): string {
@@ -42,16 +41,14 @@ export class AppDID extends DIDEntity {
 	}
 
 	public async createToken(vp: VerifiablePresentation, hiveDid: string): Promise<string> {
-    console.log(`createToken 0， ${vp.toString(true)}, ${hiveDid}`);
         let cal = dayjs();
         let iat = cal.unix();
         let nbf = cal.unix();
         let exp = cal.add(3, 'month').unix();
-    console.log(`createToken 1, ${iat}, ${nbf}, ${exp}, ${JWTHeader.TYPE} = ${JWTHeader.JWT_TYPE}`);
+
 		// Create JWT token with presentation.
 		let doc: DIDDocument = await this.getDocument();
-    console.log(`createToken 2, ${doc}`);
-		let builder = await doc.jwtBuilder()
+		let token = await doc.jwtBuilder()
 				.addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
 				.addHeader("version", "1.0")
 				.setSubject("DIDAuthResponse")
@@ -60,51 +57,48 @@ export class AppDID extends DIDEntity {
 				.setExpiration(exp)
 				.setNotBefore(nbf)
 				.claimsWithJson("presentation", vp.toString(true))
-    console.log(`createToken 3, ${this.storepass}`);
-    const contains = await this.getDIDStore().containsPrivateKey(doc.getDefaultPublicKeyId());
-    console.log(`createToken 31, ${contains}`);
-    let token = await builder.sign(this.storepass);
-    console.log(`createToken 4， ${token}`);
-		// AppDID.LOG.info("JWT Token: {}", token);
+				.sign(this.storepass);
+
+		AppDID.LOG.info("JWT Token: {}", token);
 		return token;
 	}
 
-	static async getAppInstanceDIDDoc(): Promise<DIDDocument> {
-		let access = new DID.DIDAccess();
-		let info = await access.getOrCreateAppInstanceDID();
-		return await info.didStore.loadDid(info.did);
-	}
+  static async getAppInstanceDIDDoc(): Promise<DIDDocument> {
+    let access = new DID.DIDAccess();
+    let info = await access.getOrCreateAppInstanceDID();
+    return await info.didStore.loadDid(info.did);
+  }
 
-	static async createVerifiablePresentation(
-			vc: VerifiableCredential, hiveDid: string, nonce: string, storepass: string):
-			Promise<VerifiablePresentation> {
-		let access = new DID.DIDAccess();
-		let info = await access.getOrCreateAppInstanceDID();
-		let vpb = await VerifiablePresentation.createFor(info.did, null, info.didStore);
-		let vp = await vpb.credentials(vc).realm(hiveDid).nonce(nonce).seal(storepass);
-		let listener = VerificationEventListener.getDefaultWithIdent("isValid");
-		return vp;
-	}
+  static async createVerifiablePresentation(
+    vc: VerifiableCredential, hiveDid: string, nonce: string, storepass: string):
+    Promise<VerifiablePresentation> {
+    let access = new DID.DIDAccess();
+    let info = await access.getOrCreateAppInstanceDID();
+    let vpb = await VerifiablePresentation.createFor(info.did, null, info.didStore);
+    let vp = await vpb.credentials(vc).realm(hiveDid).nonce(nonce).seal(storepass);
+    let listener = VerificationEventListener.getDefaultWithIdent("isValid");
+    return vp;
+  }
 
-	static async createChallengeResponse(vp: VerifiablePresentation, hiveDid: string, storepass: string): Promise<string> {
-		let cal = dayjs();
-		let iat = cal.unix();
-		let nbf = cal.unix();
-		let exp = cal.add(3, 'month').unix();
+  static async createChallengeResponse(vp: VerifiablePresentation, hiveDid: string, storepass: string): Promise<string> {
+    let cal = dayjs();
+    let iat = cal.unix();
+    let nbf = cal.unix();
+    let exp = cal.add(3, 'month').unix();
 
-		// Create JWT token with presentation.
-		let doc: DIDDocument = await AppDID.getAppInstanceDIDDoc();
-		let token = await doc.jwtBuilder().addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
-			.addHeader("version", "1.0")
-			.setSubject("DIDAuthResponse")
-			.setAudience(hiveDid)
-			.setIssuedAt(iat)
-			.setExpiration(exp)
-			.setNotBefore(nbf)
-			.claimsWithJson("presentation", vp.toString(true))
-			.sign(storepass);
+    // Create JWT token with presentation.
+    let doc: DIDDocument = await AppDID.getAppInstanceDIDDoc();
+    let token = await doc.jwtBuilder().addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
+      .addHeader("version", "1.0")
+      .setSubject("DIDAuthResponse")
+      .setAudience(hiveDid)
+      .setIssuedAt(iat)
+      .setExpiration(exp)
+      .setNotBefore(nbf)
+      .claimsWithJson("presentation", vp.toString(true))
+      .sign(storepass);
 
-		// AppDID.LOG.info("JWT Token: {}", token);
-		return token;
-	}
+    // AppDID.LOG.info("JWT Token: {}", token);
+    return token;
+  }
 }

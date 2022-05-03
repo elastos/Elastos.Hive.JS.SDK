@@ -17,7 +17,7 @@ export class Tab1Page {
 
   async getVault(): Promise<Vault> {
     if (!this.vault) {
-      this.vault = await Vault.getInstance('http://localhost:5004');
+      this.vault = await Vault.getInstance();
     }
     return this.vault;
   }

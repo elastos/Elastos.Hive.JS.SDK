@@ -1,6 +1,6 @@
 {
-  "name": "demo",
-  "version": "0.0.1",
+  "name": "hive_js_ionic",
+  "version": "1.0.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -57,10 +57,10 @@
     "@angular/compiler-cli": "~13.0.0",
     "@angular/language-service": "~13.0.0",
     "@capacitor/cli": "3.3.4",
-    "@elastosfoundation/hive-js-sdk": "2.4.0",
-    "@elastosfoundation/did-js-sdk": "^2.2.3",
-    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.15",
-    "@elastosfoundation/essentials-connector-client-browser": "^1.0.32",
+    "@elastosfoundation/hive-js-sdk": "^2.6.3",
+    "@elastosfoundation/did-js-sdk": "^2.2.6",
+    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.20",
+    "@elastosfoundation/essentials-connector-client-browser": "^1.0.37",
     "@ionic/angular-toolkit": "^5.0.0",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",

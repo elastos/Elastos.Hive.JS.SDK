@@ -1,0 +1,29 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Tab 1
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Tab 1</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <app-explore-container name="[{{message}}]"></app-explore-container>
+
+  <ion-button (click)="subscribe()">Subscribe</ion-button>
+  <ion-button (click)="vaultInfo()">Vault Info</ion-button>
+  <ion-button (click)="unsubscribe()">Unsubscribe</ion-button>
+  <ion-button (click)="insertDocument()">Insert Document</ion-button>
+  <ion-button (click)="deleteDocument()">Delete Document</ion-button>
+  <ion-button (click)="uploadFile()">Upload File</ion-button>
+  <ion-button (click)="downloadFile()">Download File</ion-button>
+  <ion-button (click)="scriptingUpload()">Scripting Upload</ion-button>
+  <ion-button (click)="scriptingDownload()">Scripting Download</ion-button>
+  <ion-button (click)="backup()">Backup</ion-button>
+  <ion-button (click)="restore()">Restore</ion-button>
+</ion-content>

@@ -1,20 +1,21 @@
 {
-  "resolverUrl": "https://api-testnet.elastos.io/newid",
+  "resolverUrl": "testnet",
+  "ipfsGateUrl": "https://ipfs-test.trinity-feeds.app",
 
   "application": {
     "name": "developApp",
     "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
     "passPhrase": "password",
-    "mnemonics2":"curious push water point border mutual install govern message ordinary fish small",
-    "did":"did:elastos:iag8qwq1xPBpLsGv4zR4CmzLpLUkBNfPHX",
-    "storepass": "password"
+    "storepass": "password",
+    "did":"did:elastos:imMY7uHc5WCDUhWCVaH5MtFFCBMegCaEYH"
   },
 
   "user": {
     "name": "developUser",
-    "mnemonic": "firm dash language credit twist puzzle crouch order slim now issue trap",
-    "passPhrase": "",
-    "storepass": "password"
+    "mnemonic": "decrease eagle devote evoke dragon dignity affair fame honey tourist shrug divorce",
+    "passPhrase": "123456",
+    "storepass": "123456",
+    "did": "did:elastos:ipBaBr6HQ6h92T1fh5fFQS14xhTcyt3Azq"
   },
 
   "node": {
@@ -33,11 +34,11 @@
     },
 
     "user": {
-      "did": "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7",
       "name": "crossUser",
       "mnemonic": "stage west lava group genre ten farm pony small family february drink",
-      "passPhrase": "password",
-      "storepass": "password"
+      "passPhrase": "secret",
+      "storepass": "password",
+      "did": "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7"
     },
 
     "crossDid":"did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n"

@@ -1,4 +1,4 @@
-import { VerifiableCredential, Issuer, VerifiablePresentation, DIDDocument, JWTHeader, DIDURL } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, Issuer, DIDURL } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { AppDID } from "./appdid";
 import { DIDEntity } from "./didentity";
@@ -12,12 +12,9 @@ export class UserDID extends DIDEntity {
 
     public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?:string): Promise<UserDID> {
         let newInstance = new UserDID(name, mnemonic, phrasepass, storepass, did);
-		await newInstance.initPrivateIdentity(mnemonic);	
-		await newInstance.initDid();
-
+        await newInstance.initDid(mnemonic, true);
         let doc = await newInstance.getDocument();
         newInstance.setIssuer(new Issuer(doc));
-
         return newInstance;
     }
 
@@ -25,29 +22,15 @@ export class UserDID extends DIDEntity {
         this.issuer = issuer;
     }
 
-	public async issueDiplomaFor(appInstanceDid: AppDID): Promise<VerifiableCredential> {
-		
-	// 	let issuerObject = new Issuer(userDocument, id);
-    // let vcBuilder = new VerifiableCredential.Builder(issuerObject, appDid);
-    // let vc = await vcBuilder
-    //   .expirationDate(this.getExpirationDate())
-    //   .type('AppIdCredential')
-    //   .property('appDid', appDid.toString())
-    //   .property('appInstanceDid', appDid.toString())
-    //   .id(DIDURL.from('#app-id-credential', appDid) as DIDURL)
-    //   .seal(process.env.REACT_APP_DID_STORE_PASSWORD as string); // and we sign so it creates a Proof with method and signature
-
-		
-		
+	public async issueDiplomaFor(appInstanceDid: AppDID, appDid?: string): Promise<VerifiableCredential> {
 		let subject = {};
 
-		subject["appDid"] = appInstanceDid.getDid();
-		subject["appInstanceDid"] = appInstanceDid.getDid();
+		subject["appDid"] = appDid ? appDid : AppDID.APP_DID;
+		// subject["appInstanceDid"] = appInstanceDid.getDid();
 
         let cal = dayjs();
         cal = cal.add(5, 'year');
 
-		
 		let cb = this.issuer.issueFor(appInstanceDid.getDid());
 		let vc = await cb.id(DIDURL.from('#app-id-credential', appInstanceDid.getDid()) as DIDURL)
 				.type("AppIdCredential")
@@ -67,7 +50,10 @@ export class UserDID extends DIDEntity {
 		subject["targetDID"] = targetDID;
 
         let cal = dayjs();
-        cal.add(5, 'year');
+        cal = cal.add(5, 'year');
+
+        // TODO: remove this line.
+		this.setIssuer(new Issuer(await this.getDocument()));
 
 		let cb = this.issuer.issueFor(sourceDID);
 		let vc = await cb.id("backupId")
