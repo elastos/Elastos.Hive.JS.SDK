@@ -1,7 +1,7 @@
 import { VerifiableCredential, Issuer, DIDURL } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
-import { AppDID } from "./appdid";
 import { DIDEntity } from "./didentity";
+import { AppDID } from "./appdid";
 
 export class UserDID extends DIDEntity {
 	private issuer: Issuer;

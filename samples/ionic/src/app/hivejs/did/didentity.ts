@@ -1,6 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@elastosfoundation/hive-js-sdk";
-import SdkContext from "../testdata";
+import {NodeVault} from "../v2/node_vault";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
@@ -23,7 +23,7 @@ export class DIDEntity {
 	}
 
 	public async initDid(mnemonic: string, needResolve: boolean) {
-		const path = SdkContext.RESOLVE_CACHE + File.SEPARATOR + this.name;
+		const path = NodeVault.RESOLVE_CACHE + File.SEPARATOR + this.name;
     console.log('DIDEntity.initDid: before store.open');
 		this.didStore = await DIDStore.open(path);
     console.log('DIDEntity.initDid: before this.getRootIdentity');

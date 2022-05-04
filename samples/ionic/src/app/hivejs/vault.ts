@@ -41,7 +41,8 @@ export default class Vault {
   }
 
   private async init(): Promise<void> {
-    this.sdkContext = await SdkContext.getInstance('hive js demo', ClientConfig.CUSTOM, SdkContext.USER_DIR);
+    // INFO: mainnet, testnet switch here.
+    this.sdkContext = await SdkContext.getInstance('hive js demo', ClientConfig.DEV, SdkContext.USER_DIR);
     this.hiveUrl = this.sdkContext.getProviderAddress();
     this.targetUserDid = this.sdkContext.getUserDid();
     this.targetAppDid = this.sdkContext.getAppDid();
