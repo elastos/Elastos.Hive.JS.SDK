@@ -156,7 +156,7 @@ export default class SdkContext {
     }
 
     getProviderAddress(): string {
-        return this.clientConfig.node.targetHost;
+        return this.clientConfig.node.provider;
     }
 
     public getLocalStorePath(): string {
