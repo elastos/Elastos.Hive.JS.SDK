@@ -24,8 +24,11 @@ export class DIDEntity {
 
 	public async initDid(mnemonic: string, needResolve: boolean) {
 		const path = SdkContext.RESOLVE_CACHE + File.SEPARATOR + this.name;
+    console.log('DIDEntity.initDid: before store.open');
 		this.didStore = await DIDStore.open(path);
+    console.log('DIDEntity.initDid: before this.getRootIdentity');
 		const rootIdentity = await this.getRootIdentity(mnemonic);
+    console.log('DIDEntity.initDid: before this.initDidByRootIdentity');
 		await this.initDidByRootIdentity(rootIdentity, needResolve);
 	}
 
@@ -38,14 +41,18 @@ export class DIDEntity {
 	protected async initDidByRootIdentity(rootIdentity: RootIdentity, needResolve: boolean): Promise<void> {
 		const dids = await this.didStore.listDids();
 		if (dids.length > 0) {
+      console.log('DIDEntity.initDidByRootIdentity: got did');
 			this.did = dids[0];
 		} else {
 			if (needResolve) {
+        console.log('DIDEntity.initDidByRootIdentity: need resolve');
 				const synced = await rootIdentity.synchronizeIndex(0);
 				DIDEntity.LOG.info(`${this.name}: identity synchronized result: ${synced}`);
 				this.did = rootIdentity.getDid(0);
 			} else {
+        console.log(`DIDEntity.initDidByRootIdentity: need create did, ${this.storepass}`);
 				const doc: DIDDocument = await rootIdentity.newDid(this.storepass);
+        console.log('DIDEntity.initDidByRootIdentity: before doc.getSubject');
 				this.did = doc.getSubject();
 				DIDEntity.LOG.info(`[${this.name}] My new DID created: ${this.did.toString()}`);
 			}
