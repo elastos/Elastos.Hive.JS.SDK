@@ -59,12 +59,15 @@ export default class SdkContext {
         AppContext.setupResolver(this.clientConfig.resolverUrl, SdkContext.USER_DIR);
 
         const applicationConfig = this.clientConfig.application;
-      console.log('init SdkContest.init 1.');
+      console.log(`init SdkContest.init 1, ${applicationConfig.name}, ${this.clientConfig.resolverUrl}`);
+      console.log(`init SdkContest.init 1, ${applicationConfig.mnemonic}`);
+      console.log(`init SdkContest.init 1, ${applicationConfig.passPhrase}`);
+      console.log(`init SdkContest.init 1, ${applicationConfig.storepass}`);
         this.appInstanceDid = await AppDID.create(applicationConfig.name,
             applicationConfig.mnemonic,
             applicationConfig.passPhrase,
             applicationConfig.storepass,
-            applicationConfig.did);
+          this.clientConfig.resolverUrl);
       console.log('init SdkContest.init 2.');
         const userConfig = this.clientConfig.user;
         this.userDid = await UserDID.create(userConfig.name,

@@ -13,10 +13,14 @@ export class AppDID extends DIDEntity {
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
 							   resolver: string, did?: string): Promise<AppDID> {
+    console.log('AppDID.create: before DIDBackend.initialize');
 		  // TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
 		  DIDBackend.initialize(new DefaultDIDAdapter(resolver));
+    console.log('AppDID.create: before new AppDID');
 		  let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
+    console.log('AppDID.create: before newInstance.initDid');
 		  await newInstance.initDid(mnemonic, false);
+    console.log('AppDID.create: before return');
 		  return newInstance;
     }
 
