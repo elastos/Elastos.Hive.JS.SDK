@@ -27,14 +27,13 @@ export class Tab1Page {
     // user's vault.
     private vault: any;
 
-    private readonly config: ClientConfig;
     private readonly isBrowser: boolean;
 
     constructor() {
         this.message = 'Tab 1 Page';
 
         // This used to switch between mainnet and testnet.
-        this.config = ClientConfig.DEV;
+        ClientConfig.setCurrent(ClientConfig.DEV);
 
         // This used to run in node style or browser style which will work with essentials application.
         this.isBrowser = true;
@@ -48,9 +47,9 @@ export class Tab1Page {
         if (!this.vault) {
             await browserLogin.initAndLogin();
             if (this.isBrowser)
-                this.vault = new BrowserVault(this.config);
+                this.vault = new BrowserVault();
             else
-                this.vault = await NodeVault.create(this.config);
+                this.vault = await NodeVault.create();
         }
         return this.vault;
     }

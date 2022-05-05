@@ -6,8 +6,8 @@ import {AppDID} from "./did/appdid";
 export abstract class VaultBase {
     protected readonly config: ClientConfig;
 
-    protected constructor(config: ClientConfig) {
-        this.config = config;
+    protected constructor() {
+        this.config = ClientConfig.getCurrent();
     }
 
     public async createVault(): Promise<VaultServices> {

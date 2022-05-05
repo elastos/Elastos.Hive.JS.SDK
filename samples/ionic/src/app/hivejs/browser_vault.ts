@@ -1,6 +1,5 @@
 import {VaultBase} from "./vault_base";
 import {BrowserConnectivitySDKHiveAuthHelper} from "./browser_helper";
-import ClientConfig from "./config/clientconfig";
 import {AppContext} from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "./browser_login";
 
@@ -19,8 +18,8 @@ import {browserLogin} from "./browser_login";
 export class BrowserVault extends VaultBase {
     private helper: BrowserConnectivitySDKHiveAuthHelper;
 
-    constructor(config: ClientConfig) {
-        super(config);
+    constructor() {
+        super();
         this.helper = new BrowserConnectivitySDKHiveAuthHelper(this.config['resolverUrl']);
     }
 

@@ -26,8 +26,8 @@ export class NodeVault extends VaultBase {
     private appInstanceDid: AppDID;
     private userDid: UserDID;
 
-    private constructor(config: ClientConfig) {
-        super(config);
+    private constructor() {
+        super();
     }
 
     private async init(): Promise<NodeVault> {
@@ -51,8 +51,8 @@ export class NodeVault extends VaultBase {
         return this;
     }
 
-    public static async create(config: ClientConfig): Promise<NodeVault> {
-        return await new NodeVault(config).init();
+    public static async create(): Promise<NodeVault> {
+        return await new NodeVault().init();
     }
 
     // Override
