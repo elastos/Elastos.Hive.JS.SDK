@@ -3,9 +3,19 @@ import {BrowserConnectivitySDKHiveAuthHelper} from "./browser_helper";
 import ClientConfig from "../config/clientconfig";
 import {AppContext} from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "./browser_login";
-import {AppDID} from "../did/appdid";
 
-
+/**
+ * This class is used to work with essentials app in browser.
+ *
+ * Usage:
+ *
+ *      const browser = new BrowserVault();
+ *      const vault = await node.createVault();
+ *
+ *      // create collection.
+ *      await vault.getDatabaseService().createCollection(collectionName);
+ *
+ */
 export class BrowserVault extends VaultBase {
     private helper: BrowserConnectivitySDKHiveAuthHelper;
 
@@ -18,12 +28,8 @@ export class BrowserVault extends VaultBase {
         return await this.helper.getAppContext(browserLogin.getUserDidStr());
     }
 
-    public getTargetAppDid(): string {
-        return browserLogin.getUserDidStr();
-    }
-
     public getTargetUserDid(): string {
-        return AppDID.APP_DID;
+        return browserLogin.getUserDidStr();
     }
 
 }

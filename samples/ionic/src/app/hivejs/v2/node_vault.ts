@@ -85,8 +85,4 @@ export class NodeVault extends VaultBase {
     public getTargetUserDid(): string {
         return this.userDid.toString();
     }
-
-    public getTargetAppDid(): string {
-        return AppDID.APP_DID;
-    }
 }
