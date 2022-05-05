@@ -1,8 +1,8 @@
-import ClientConfig from "../config/clientconfig";
+import ClientConfig from "./config/clientconfig";
 import {AppContext, HiveException, VaultServices, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
 import {Claims, DIDDocument, JWTParserBuilder} from "@elastosfoundation/did-js-sdk";
-import {AppDID} from "../did/appdid";
-import {UserDID} from "../did/userdid";
+import {AppDID} from "./did/appdid";
+import {UserDID} from "./did/userdid";
 import {VaultBase} from "./vault_base";
 
 /**
@@ -21,7 +21,7 @@ import {VaultBase} from "./vault_base";
 export class NodeVault extends VaultBase {
     private static readonly LOCAL_STORE_PATH = '/data/userDir/data/store';
     private static readonly USER_DIR = '/data/userDir';
-    public static readonly RESOLVE_CACHE = '/data/didCache';
+
 
     private appInstanceDid: AppDID;
     private userDid: UserDID;

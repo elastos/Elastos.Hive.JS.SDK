@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import ClientConfig from "../hivejs/config/clientconfig";
-import {NodeVault} from "../hivejs/v2/node_vault";
+import {NodeVault} from "../hivejs/node_vault";
 import {
     Executable,
     FileDownloadExecutable,
@@ -8,8 +8,8 @@ import {
     InsertOptions,
     VaultInfo
 } from "@elastosfoundation/hive-js-sdk";
-import {browserLogin} from "../hivejs/v2/browser_login";
-import {BrowserVault} from "../hivejs/v2/browser_vault";
+import {browserLogin} from "../hivejs/browser_login";
+import {BrowserVault} from "../hivejs/browser_vault";
 
 @Component({
     selector: 'app-tab1',
@@ -40,6 +40,10 @@ export class Tab1Page {
         this.isBrowser = true;
     }
 
+    /**
+     * Here is the example which shows how to initialize hive js relating functions.
+     * @private
+     */
     private async getVault(): Promise<NodeVault> {
         if (!this.vault) {
             await browserLogin.initAndLogin();

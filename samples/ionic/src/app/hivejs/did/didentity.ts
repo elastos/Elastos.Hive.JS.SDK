@@ -1,13 +1,13 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File, Logger } from "@elastosfoundation/hive-js-sdk";
-import {NodeVault} from "../v2/node_vault";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
+    private static readonly RESOLVE_CACHE = '/data/didCache';
 
 	private readonly name: string;
 	private readonly phrasepass: string;
-	private mnemonic: string
+	private mnemonic: string;
 	protected storepass: string;
 
 	private didStore: DIDStore;
@@ -23,12 +23,9 @@ export class DIDEntity {
 	}
 
 	public async initDid(mnemonic: string, needResolve: boolean) {
-		const path = NodeVault.RESOLVE_CACHE + File.SEPARATOR + this.name;
-    console.log('DIDEntity.initDid: before store.open');
+		const path = DIDEntity.RESOLVE_CACHE + File.SEPARATOR + this.name;
 		this.didStore = await DIDStore.open(path);
-    console.log('DIDEntity.initDid: before this.getRootIdentity');
 		const rootIdentity = await this.getRootIdentity(mnemonic);
-    console.log('DIDEntity.initDid: before this.initDidByRootIdentity');
 		await this.initDidByRootIdentity(rootIdentity, needResolve);
 	}
 
@@ -41,18 +38,14 @@ export class DIDEntity {
 	protected async initDidByRootIdentity(rootIdentity: RootIdentity, needResolve: boolean): Promise<void> {
 		const dids = await this.didStore.listDids();
 		if (dids.length > 0) {
-      console.log('DIDEntity.initDidByRootIdentity: got did');
 			this.did = dids[0];
 		} else {
 			if (needResolve) {
-        console.log('DIDEntity.initDidByRootIdentity: need resolve');
 				const synced = await rootIdentity.synchronizeIndex(0);
 				DIDEntity.LOG.info(`${this.name}: identity synchronized result: ${synced}`);
 				this.did = rootIdentity.getDid(0);
 			} else {
-        console.log(`DIDEntity.initDidByRootIdentity: need create did, ${this.storepass}`);
 				const doc: DIDDocument = await rootIdentity.newDid(this.storepass);
-        console.log('DIDEntity.initDidByRootIdentity: before doc.getSubject');
 				this.did = doc.getSubject();
 				DIDEntity.LOG.info(`[${this.name}] My new DID created: ${this.did.toString()}`);
 			}

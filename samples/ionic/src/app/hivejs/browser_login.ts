@@ -1,6 +1,6 @@
 import {EssentialsConnector} from "@elastosfoundation/essentials-connector-client-browser";
 import {connectivity, DID} from "@elastosfoundation/elastos-connectivity-sdk-js";
-import {AppDID} from "../did/appdid";
+import {AppDID} from "./did/appdid";
 
 class BrowserLogin {
     private static readonly KEY_USER_DID = 'user_did';
