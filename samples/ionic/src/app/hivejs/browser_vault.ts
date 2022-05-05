@@ -1,6 +1,6 @@
 import {VaultBase} from "./vault_base";
 import {BrowserConnectivitySDKHiveAuthHelper} from "./browser_helper";
-import ClientConfig from "../config/clientconfig";
+import ClientConfig from "./config/clientconfig";
 import {AppContext} from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "./browser_login";
 

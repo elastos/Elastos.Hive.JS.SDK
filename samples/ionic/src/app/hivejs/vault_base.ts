@@ -1,6 +1,6 @@
 import {AppContext, VaultServices, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
-import ClientConfig from "../config/clientconfig";
-import {AppDID} from "../did/appdid";
+import ClientConfig from "./config/clientconfig";
+import {AppDID} from "./did/appdid";
 
 
 export abstract class VaultBase {

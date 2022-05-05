@@ -52,7 +52,7 @@ export class UserDID extends DIDEntity {
         let cal = dayjs();
         cal = cal.add(5, 'year');
 
-        // TODO: remove this line.
+        // INFO: try to remove this line.
 		this.setIssuer(new Issuer(await this.getDocument()));
 
 		let cb = this.issuer.issueFor(sourceDID);
