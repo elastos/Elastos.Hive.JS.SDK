@@ -19,7 +19,6 @@ import {VaultBase} from "./vault_base";
  *
  */
 export class NodeVault extends VaultBase {
-    private readonly config: ClientConfig;
     private static readonly LOCAL_STORE_PATH = '/data/userDir/data/store';
     private static readonly USER_DIR = '/data/userDir';
     public static readonly RESOLVE_CACHE = '/data/didCache';
@@ -28,8 +27,7 @@ export class NodeVault extends VaultBase {
     private userDid: UserDID;
 
     private constructor(config: ClientConfig) {
-        super();
-        this.config = config;
+        super(config);
     }
 
     private async init(): Promise<NodeVault> {
@@ -57,6 +55,7 @@ export class NodeVault extends VaultBase {
         return await new NodeVault(config).init();
     }
 
+    // Override
     protected async createAppContext(): Promise<AppContext> {
         const owner = this;
         return await AppContext.build({
@@ -81,14 +80,6 @@ export class NodeVault extends VaultBase {
                 return await owner.appInstanceDid.createToken(presentation,  claims.getIssuer());
             }
         }, owner.userDid.getDid().toString());
-    }
-
-    public async createVault(): Promise<VaultServices> {
-        return new VaultServices(await this.createAppContext(), this.config['node']['provider']);
-    }
-
-    public async createVaultSubscription(): Promise<VaultSubscriptionService> {
-        return new VaultSubscriptionService(await this.createAppContext(), this.config['node']['provider']);
     }
 
     public getTargetUserDid(): string {

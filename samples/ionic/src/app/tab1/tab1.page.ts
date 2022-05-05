@@ -8,6 +8,8 @@ import {
     InsertOptions,
     VaultInfo
 } from "@elastosfoundation/hive-js-sdk";
+import {browserLogin} from "../hivejs/v2/browser_login";
+import {BrowserVault} from "../hivejs/v2/browser_vault";
 
 @Component({
     selector: 'app-tab1',
@@ -23,16 +25,28 @@ export class Tab1Page {
 
     public message: string;
     // user's vault.
-    private vault: NodeVault;
+    private vault: any;
+
+    private readonly config: ClientConfig;
+    private readonly isBrowser: boolean;
 
     constructor() {
         this.message = 'Tab 1 Page';
+
+        // This used to switch between mainnet and testnet.
+        this.config = ClientConfig.DEV;
+
+        // This used to run in node style or browser style which will work with essentials application.
+        this.isBrowser = true;
     }
 
     private async getVault(): Promise<NodeVault> {
         if (!this.vault) {
-            // INFO: change config file here.
-            this.vault = await NodeVault.create(ClientConfig.DEV);
+            await browserLogin.initAndLogin();
+            if (this.isBrowser)
+                this.vault = new BrowserVault(this.config);
+            else
+                this.vault = await NodeVault.create(this.config);
         }
         return this.vault;
     }
