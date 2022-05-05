@@ -4,7 +4,7 @@ import { DIDEntity } from "./didentity";
 import {DID} from '@elastosfoundation/elastos-connectivity-sdk-js';
 
 export class AppDID extends DIDEntity {
-	public static APP_DID = "appId";
+	public static APP_DID = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB";
 	public static APP_DID2 = "appDID2";
 
 	public constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did: string) {
