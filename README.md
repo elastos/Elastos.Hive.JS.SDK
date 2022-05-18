@@ -1,7 +1,5 @@
 # Elastos Hive JS SDK
 
-===================
-
 Elastos Hive is an essential service infrastructure as a decentralized network of Hive nodes presenting data storage capabilities to dApps. And the JS SDK provides a group of APIs for Elastos dApps to easily access and store application data to remote Vault services on Hive nodes with the following features:
 
 - Subscribe/unsubscribe to vault or backup vault
@@ -76,7 +74,7 @@ Example:
 testData = await TestData.getInstance("My service tests", ClientConfig.LOCAL);
 ```
 
-**Note:** The optional third parameter of the TestData.getInstance method is the user directory which defaults to the path defined by the HIVE_USER_DIR environment variable (See [Test configuration](#test-configuration). You may also specify a custom folder, but it's recommended to only use this parameter on local workstation for validation.
+**Note:** The optional third parameter of the TestData.getInstance method is the user directory which defaults to the path defined by the HIVE_USER_DIR environment variable (See [Test configuration](#test-configuration). You may also specify a custom folder, but it's recommended to only use this parameter on a local workstation for validation.
 
 ### Test example
 
