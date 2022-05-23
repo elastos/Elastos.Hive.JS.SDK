@@ -38,11 +38,11 @@ export class TestData {
 	}
 
     public static async getInstance(testName: string): Promise<TestData> {
-		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
-			// TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
+            // TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
             TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
-			await TestData.INSTANCE.init();
+            TestData.LOG.log(`Get TestData instance for test: ${testName}, hive url, ${TestData.INSTANCE.getProviderAddress()}`);
+            await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
     }
@@ -126,8 +126,8 @@ export class TestData {
 				} catch (e) {
 					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
 					TestData.LOG.error(e.stack);
+					return null;
 				}
-				return Promise.resolve(null);
 			},
 
 			async getAuthorization(jwtToken : string) : Promise<string> {
