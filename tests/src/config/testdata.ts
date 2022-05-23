@@ -1,4 +1,3 @@
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import {
 	HiveException,
 	Vault,
@@ -6,7 +5,8 @@ import {
 	AppContext,
 	Logger,
 	File, Provider, Backup, ScriptRunner, AppContextProvider
-} from '../../../src';
+} from '@elastosfoundation/hive-js-sdk';
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import {ClientConfig} from "./clientconfig";
@@ -133,6 +133,7 @@ export class TestData {
 
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
+
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonic,
