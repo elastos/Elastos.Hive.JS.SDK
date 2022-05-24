@@ -2,80 +2,94 @@
  * The receipt contains the details of the paid information.
  */
 export class Receipt {
-//	@SerializedName("receipt_id")
-	private receiptId: string;
-//	@SerializedName("order_id")
-	private orderId: string;
-//	@SerializedName("transaction_id")
-	private transactionId: string;
-//	@SerializedName("pricing_name")
-	private pricingName: string;
-//	@SerializedName("paid_did")
-	private paidDid: string;
-//	@SerializedName("ela_amount")
-	private elaAmount: number;
-	private proof: string;
+	private receipt_id: string;
+	private order_id: string;
+    private subscription: string;
+    private pricing_plan: string;
+    private payment_amount: number;
+    private paid_did: string;
+    private create_time: number;
+    private receiving_address: string;
+    private receipt_proof: string;
 
-	public getReceiptId(): string {
-		return this.receiptId;
+	getReceiptId(): string {
+		return this.receipt_id;
 	}
 
-	public setReceiptId(receiptId: string): Receipt {
-		this.receiptId = receiptId;
+	setReceiptId(receiptId: string): Receipt {
+		this.receipt_id = receiptId;
         return this;
 	}
 
-	public getOrderId(): string {
-		return this.orderId;
+	getOrderId(): string {
+		return this.order_id;
 	}
 
-	public setOrderId(orderId: string): Receipt {
-		this.orderId = orderId;
+	setOrderId(orderId: string): Receipt {
+		this.order_id = orderId;
         return this;
 	}
 
-	public getTransactionId(): string {
-		return this.transactionId;
-	}
+    getSubscription(): string {
+        return this.subscription;
+    }
 
-	public setTransactionId(transactionId: string): Receipt {
-		this.transactionId = transactionId;
+    setSubscription(subscription: string): Receipt {
+        this.subscription = subscription;
         return this;
-	}
+    }
 
-	public getPricingName(): string {
-		return this.pricingName;
-	}
+    getPricingPlan(): string {
+        return this.pricing_plan;
+    }
 
-	public setPricingName(pricingName: string): Receipt {
-		this.pricingName = pricingName;
+    setPricingPlan(pricingPlan: string): Receipt {
+        this.pricing_plan = pricingPlan;
         return this;
-	}
+    }
 
-	public getPaidDid(): string {
-		return this.paidDid;
-	}
+    getPaymentAmount(): number {
+        return this.payment_amount;
+    }
 
-	public setPaidDid(paidDid: string): Receipt {
-		this.paidDid = paidDid;
+    setPaymentAmount(paymentAmount: number): Receipt {
+        this.payment_amount = paymentAmount;
         return this;
-	}
+    }
 
-	public getElaAmount(): number {
-		return this.elaAmount;
-	}
+    getPaidDid(): string {
+        return this.paid_did;
+    }
 
-	public setElaAmount(elaAmount: number): Receipt {
-		this.elaAmount = elaAmount;
+    setPaidDid(paidDid: string): Receipt {
+        this.paid_did = paidDid;
         return this;
+    }
+
+    getCreateTime(): number {
+        return this.create_time;
+    }
+
+    setCreateTime(createTime: number): Receipt {
+        this.create_time = createTime;
+        return this;
+    }
+
+    getReceivingAddress(): string {
+        return this.receiving_address;
+    }
+
+    setReceivingAddress(receivingAddress: string): Receipt {
+        this.receiving_address = receivingAddress;
+        return this;
+    }
+
+	getReceiptProof(): string {
+		return this.receipt_proof;
 	}
 
-	public getProof(): string {
-		return this.proof;
-	}
-
-	public setProof(proof: string): Receipt {
-		this.proof = proof;
+	setReceiptProof(receiptProof: string): Receipt {
+		this.receipt_proof = receiptProof;
         return this;
 	}
 }
