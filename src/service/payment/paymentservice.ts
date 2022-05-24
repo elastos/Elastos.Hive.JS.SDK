@@ -6,7 +6,7 @@ import { Order } from  "./order";
 import { Receipt } from  "./receipt";
 import { checkNotNull } from "../../utils/utils";
 import { HttpMethod } from "../../connection/httpmethod";
-import { IllegalArgumentException } from "../../exceptions";
+import {IllegalArgumentException, NotImplementedException} from "../../exceptions";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { NetworkException, NodeRPCException } from "../../exceptions";
 
@@ -29,11 +29,11 @@ export class PaymentService extends RestService {
 	 * @return The details of the order.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	 public async placeOrder(subscription: string, pricingName: string): Promise<Order> {
+	 async placeOrder(subscription: string, pricingName: string): Promise<Order> {
 		checkNotNull(subscription, "Missing subscription.");
 		checkNotNull(pricingName, "Missing pricing name.");
 
-		try {	
+		try {
 			return await this.httpClient.send<Order>(PaymentService.API_ORDER_ENDPOINT,
 			{
 				"subscription": subscription,
@@ -41,17 +41,7 @@ export class PaymentService extends RestService {
 			},
 			<HttpResponseParser<Order>> {
 				deserialize(content: any): Order {
-					let jsonObj = JSON.parse(content);
-					let order = new Order();
-					order.setCreateTime(jsonObj['create_time']);
-					order.setElaAddress(jsonObj['ela_address']);
-					order.setElaAmount(jsonObj['ela_amount']);
-					order.setOrderId(jsonObj['order_id']);
-					order.setPricingName(jsonObj['pricina_name']);
-					order.setProof(jsonObj['proof']);
-					order.setSubscription(jsonObj['subscription']);
-
-					return order;
+                    return Object.assign(new Order(), JSON.parse(content));
 				}
 			},
 			HttpMethod.PUT);
@@ -61,36 +51,31 @@ export class PaymentService extends RestService {
 		}
 	}
 
+    /**
+     * Pay order with smart contract by wallet application.
+     */
+	async payOrder(): Promise<number> {
+        return await new Promise<number>((resolve, reject) => {
+            reject(new NotImplementedException());
+        });
+    }
+
 	/**
-	 * Pay the order by the order id and the transaction id.
+	 * Settle the order by the contract order id.
 	 *
-	 * @param orderId The order id.
-	 * @param transactionId The transaction id.
-	 * @return The receipt which is the proof of the payment of the order for the user.
-	 * @throws HiveException The error comes from the hive node.
+	 * @param orderId The order id from paying order.
 	 */
-	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {
+	async settleOrder(orderId: number): Promise<Receipt> {
 		checkNotNull(orderId, "Missing order id.");
-		checkNotNull(transactionId, "Missing transaction id.");
 
 		try {	
-			return await this.httpClient.send<Receipt>(`${PaymentService.API_ORDER_ENDPOINT}/${orderId}`, { "transaction_id": transactionId },
-			<HttpResponseParser<Receipt>> {
-				deserialize(content: any): Receipt {
-					let jsonObj = JSON.parse(content);
-					let receipt = new Receipt();
-					receipt.setReceiptId(jsonObj['receipt_id']);
-					receipt.setOrderId(jsonObj['order_id']);
-					receipt.setTransactionId(jsonObj['transaction_id']);
-					receipt.setPricingName(jsonObj['pricing_name']);
-					receipt.setPaidDid(jsonObj['paid_did']);
-					receipt.setElaAmount(jsonObj['ela_amount']);
-					receipt.setProof(jsonObj['proof']);
-
-					return receipt;
-				}
-			},
-			HttpMethod.POST);
+			return await this.httpClient.send<Receipt>(`${PaymentService.API_ORDER_ENDPOINT}/${orderId}`, {},
+                <HttpResponseParser<Receipt>> {
+                    deserialize(content: any): Receipt {
+                        return Object.assign(new Receipt(), JSON.parse(content));
+                    }
+                },
+                HttpMethod.POST);
 		} 
 		catch (e) {
 			this.handleError(e);
@@ -100,11 +85,12 @@ export class PaymentService extends RestService {
 	/**
 	 * Get the order information by the order id.
 	 *
-	 * @param orderId The order id.
+	 * @param subscription vault/backup
+	 * @param orderId The contract order id.
 	 * @return The details of the order.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getOrder(subscription: string, orderId: string): Promise<Order> {
+	async getOrder(subscription: string, orderId: string): Promise<Order> {
 		checkNotNull(subscription, "Missing subscription.");
 		checkNotNull(orderId, "Missing order id.");
 
@@ -112,7 +98,8 @@ export class PaymentService extends RestService {
 			throw new IllegalArgumentException("Invalid subscription. Must be 'vault' or 'backup'");
 		}
 
-		return await this.getOrdersInternal(subscription, orderId)[0];
+		const orders =  await this.getOrdersInternal(subscription, orderId);
+        return !orders ? null : orders[0];
 	}
 
 	/**
@@ -122,7 +109,7 @@ export class PaymentService extends RestService {
 	 * @return The order list, MUST not empty.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getOrders(subscription: string): Promise<Order[]> {
+	async getOrders(subscription: string): Promise<Order[]> {
 		checkNotNull(subscription, "Missing subscription.");
 		return await this.getOrdersInternal(subscription);
 	}
@@ -132,21 +119,8 @@ export class PaymentService extends RestService {
 			return await this.httpClient.send<Order[]>(PaymentService.API_ORDER_ENDPOINT, { "subscription": subscription, "order_id": orderId },
 			<HttpResponseParser<Order[]>> {
 				deserialize(content: any): Order[] {
-					let jsonObj = JSON.parse(content)['orders'];
-					let orders = [];
-					for (let orderObj in jsonObj) {
-						let order = new Order();
-						order.setCreateTime(orderObj['create_time']);
-						order.setElaAddress(orderObj['ela_address']);
-						order.setElaAmount(orderObj['ela_amount']);
-						order.setOrderId(orderObj['order_id']);
-						order.setPricingName(orderObj['pricina_name']);
-						order.setProof(orderObj['proof']);
-						order.setSubscription(orderObj['subscription']);	
-						orders.push(order);
-					}
-
-					return orders;
+					const jsonObjs: [] = JSON.parse(content)['orders'];
+					return jsonObjs.map(o => Object.assign(new Order(), o));
 				}
 			},
 			HttpMethod.GET);
@@ -163,22 +137,12 @@ export class PaymentService extends RestService {
 	 * @return The details of the receipt.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getReceipt(orderId: string): Promise<Receipt> {
+	async getReceipt(orderId: string): Promise<Receipt> {
 		try {	
 			return await this.httpClient.send<Receipt>(PaymentService.API_RECEIPT_ENDPOINT, { "order_id": orderId },
 			<HttpResponseParser<Receipt>> {
 				deserialize(content: any): Receipt {
-					let jsonObj = JSON.parse(content);
-					let receipt = new Receipt();
-					receipt.setReceiptId(jsonObj['receipt_id']);
-					receipt.setOrderId(jsonObj['order_id']);
-					receipt.setTransactionId(jsonObj['transaction_id']);
-					receipt.setPricingName(jsonObj['pricing_name']);
-					receipt.setPaidDid(jsonObj['paid_did']);
-					receipt.setElaAmount(jsonObj['ela_amount']);
-					receipt.setProof(jsonObj['proof']);
-
-					return receipt;
+                    return Object.assign(new Receipt(), JSON.parse(content));
 				}
 			},
 			HttpMethod.GET);
@@ -194,7 +158,7 @@ export class PaymentService extends RestService {
 	 * @return The version.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getVersion(): Promise<string> {
+	async getVersion(): Promise<string> {
 		try {	
 			return await this.httpClient.send<string>(PaymentService.API_VERSION_ENDPOINT, HttpClient.NO_PAYLOAD,
 			<HttpResponseParser<string>> {
