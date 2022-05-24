@@ -5,71 +5,91 @@ export class Order {
 	private order_id: string;
 	private subscription: string;
 	private pricing_name: string;
-	private ela_amount: number;
-	private ela_address: string;
-	private proof: string;
-	private create_time: Date;
+	private paying_did: string;
+	private payment_amount: number;
+    private create_time: number;
+    private expiration_time: number;
+    private receiving_address: string;
+    private proof: string;
 
-	public getOrderId(): string {
+	getOrderId(): string {
 		return this.order_id;
 	}
 
-	public setOrderId(orderId: string): Order {
+	setOrderId(orderId: string): Order {
 		this.order_id = orderId;
         return this;
 	}
 
-	public getSubscription(): string {
+	getSubscription(): string {
 		return this.subscription;
 	}
 
-	public setSubscription(subscription: string): Order {
+	setSubscription(subscription: string): Order {
 		this.subscription = subscription;
         return this;
 	}
 
-	public getPricingName(): string {
+	getPricingName(): string {
 		return this.pricing_name;
 	}
 
-	public setPricingName(pricingName: string): Order {
+	setPricingName(pricingName: string): Order {
 		this.pricing_name = pricingName;
         return this;
 	}
 
-	public getElaAmount(): number {
-		return this.ela_amount;
+    getPayingDid(): string {
+        return this.paying_did;
+    }
+
+    setPayingDid(payingDid: string): Order {
+        this.paying_did = payingDid;
+        return this;
+    }
+
+	getPaymentAmount(): number {
+		return this.payment_amount;
 	}
 
-	public setElaAmount(elaAmount: number): Order {
-		this.ela_amount = elaAmount;
+	setPaymentAmount(paymentAmount: number): Order {
+		this.payment_amount = paymentAmount;
         return this;
 	}
 
-	public getElaAddress(): string {
-		return this.ela_address;
+    getCreateTime(): number {
+        return this.create_time;
+    }
+
+    setCreateTime(createTime: number): Order {
+        this.create_time = createTime;
+        return this;
+    }
+
+    getExpirationTime(): number {
+        return this.expiration_time;
+    }
+
+    setExpirationTime(expirationTime: number): Order {
+        this.expiration_time = expirationTime;
+        return this;
+    }
+
+	getReceivingAddress(): string {
+		return this.receiving_address;
 	}
 
-	public setElaAddress(elaAddress: string): Order {
-		this.ela_address = elaAddress;
+	setReceivingAddress(receivingAddress: string): Order {
+		this.receiving_address = receivingAddress;
         return this;
 	}
 
-	public getProof(): string {
+	getProof(): string {
 		return this.proof;
 	}
 
-	public setProof(proof: string): Order {
+	setProof(proof: string): Order {
 		this.proof = proof;
-        return this;
-	}
-
-	public getCreateTime(): Date {
-		return this.create_time;
-	}
-
-	public setCreateTime(createTime: Date): Order {
-		this.create_time = createTime;
         return this;
 	}
 }
