@@ -1,20 +1,27 @@
-import { Order, Receipt, VaultSubscription, Logger } from "../../../src";
+import {Order, Receipt, VaultSubscription, Logger, BackupSubscription} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-describe.skip("test payment service", () => {
+describe("test payment service", () => {
     const LOG = new Logger("paymentservice.test");
 
 	const PRICING_PLAN_NAME = "Rookie";
 
 	let testData: TestData;
-    let testTransactionId: string;
 	let vaultSubscription: VaultSubscription;
+	let backupSubscription: BackupSubscription;
 
     beforeAll(async () => {
 		testData = await TestData.getInstance("paymentservice.test");
         vaultSubscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
         try {
             await vaultSubscription.subscribe();
+        } catch (e){
+            LOG.log("vault is already subscribed");
+        }
+
+        backupSubscription = new BackupSubscription(testData.getAppContext(), testData.getProviderAddress());
+        try {
+            await backupSubscription.subscribe();
         } catch (e){
             LOG.log("vault is already subscribed");
         }
@@ -29,9 +36,29 @@ describe.skip("test payment service", () => {
     test("testPlaceOrder", async () => {
         let order: Order = await vaultSubscription.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
+        expect(order.getSubscription()).toEqual('vault');
+        expect(order.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(order.getPayingDid()).not.toBeNull();
+        expect(order.getPaymentAmount()).toBeGreaterThan(0);
+        expect(order.getCreateTime()).toBeGreaterThan(0);
+        expect(order.getExpirationTime()).toBeGreaterThan(0);
+        expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getProof()).not.toBeNull();
         console.log(`PROOF: ${order.getProof()}`);
-        // testOrderId = order.getOrderId();
-        // expect(testOrderId).not.toBeNull();
+    });
+
+    test("testPlaceOrder backup", async () => {
+        let order: Order = await backupSubscription.placeOrder(PRICING_PLAN_NAME);
+        expect(order).not.toBeNull();
+        expect(order.getSubscription()).toEqual('backup');
+        expect(order.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(order.getPayingDid()).not.toBeNull();
+        expect(order.getPaymentAmount()).toBeGreaterThan(0);
+        expect(order.getCreateTime()).toBeGreaterThan(0);
+        expect(order.getExpirationTime()).toBeGreaterThan(0);
+        expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getProof()).not.toBeNull();
+        console.log(`PROOF: ${order.getProof()}`);
     });
 
     test("testSettleOrder", async () => {
@@ -39,15 +66,44 @@ describe.skip("test payment service", () => {
 
         let receipt: Receipt = await vaultSubscription.settleOrder(1);
         expect(receipt).not.toBeNull();
-        testTransactionId = receipt.getReceiptId();
-        expect(testTransactionId).not.toBeNull();
+        expect(receipt.getReceiptId()).not.toBeNull();
         expect(receipt.getOrderId()).not.toBeNull();
+        expect(receipt.getSubscription()).toEqual('vault');
+        expect(receipt.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(receipt.getPaymentAmount()).toBeGreaterThan(0);
+        expect(receipt.getPaidDid()).not.toBeNull();
+        expect(receipt.getCreateTime()).toBeGreaterThan(0);
+        expect(receipt.getReceivingAddress()).not.toBeNull();
+        expect(receipt.getReceiptProof()).not.toBeNull();
+    });
+
+    test("testSettleOrder backup", async () => {
+        // payOrder from demo.
+
+        let receipt: Receipt = await backupSubscription.settleOrder(3);
+        expect(receipt).not.toBeNull();
+        expect(receipt.getReceiptId()).not.toBeNull();
+        expect(receipt.getOrderId()).not.toBeNull();
+        expect(receipt.getSubscription()).toEqual('backup');
+        expect(receipt.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(receipt.getPaymentAmount()).toBeGreaterThan(0);
+        expect(receipt.getPaidDid()).not.toBeNull();
+        expect(receipt.getCreateTime()).toBeGreaterThan(0);
+        expect(receipt.getReceivingAddress()).not.toBeNull();
+        expect(receipt.getReceiptProof()).not.toBeNull();
     });
 
     test("testGetOrder", async () => {
         let order: Order = await vaultSubscription.getOrder(1);
         expect(order).not.toBeNull();
-        expect(order.getOrderId()).not.toBeNull();
+        expect(order.getSubscription()).not.toBeNull();
+        expect(order.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(order.getPayingDid()).not.toBeNull();
+        expect(order.getPaymentAmount()).toBeGreaterThan(0);
+        expect(order.getCreateTime()).toBeGreaterThan(0);
+        expect(order.getExpirationTime()).toBeGreaterThan(0);
+        expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getProof()).not.toBeNull();
     });
 
     test("testGetOrders", async () => {
@@ -59,15 +115,22 @@ describe.skip("test payment service", () => {
     test("testGetReceipt", async () => {
         const receipts: Receipt[] = await vaultSubscription.getReceipts(1);
         expect(receipts.length).toEqual(1);
-        expect(receipts[0].getReceiptId()).not.toBeNull();
-        expect(receipts[0].getOrderId()).not.toBeNull();
+        const receipt = receipts[0];
+        expect(receipt).not.toBeNull();
+        expect(receipt.getReceiptId()).not.toBeNull();
+        expect(receipt.getOrderId()).not.toBeNull();
+        expect(receipt.getSubscription()).not.toBeNull();
+        expect(receipt.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(receipt.getPaymentAmount()).toBeGreaterThan(0);
+        expect(receipt.getPaidDid()).not.toBeNull();
+        expect(receipt.getCreateTime()).toBeGreaterThan(0);
+        expect(receipt.getReceivingAddress()).not.toBeNull();
+        expect(receipt.getReceiptProof()).not.toBeNull();
     });
 
     test("testGetReceipts", async () => {
         const receipts: Receipt[] = await vaultSubscription.getReceipts();
         expect(receipts.length).toBeGreaterThanOrEqual(1);
-        expect(receipts[0].getReceiptId()).not.toBeNull();
-        expect(receipts[0].getOrderId()).not.toBeNull();
     });
 
 });

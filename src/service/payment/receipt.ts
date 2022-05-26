@@ -3,7 +3,7 @@
  */
 export class Receipt {
 	private receipt_id: string;
-	private order_id: string;
+	private order_id: number;
     private subscription: string;
     private pricing_plan: string;
     private payment_amount: number;
@@ -21,11 +21,11 @@ export class Receipt {
         return this;
 	}
 
-	getOrderId(): string {
+	getOrderId(): number {
 		return this.order_id;
 	}
 
-	setOrderId(orderId: string): Receipt {
+	setOrderId(orderId: number): Receipt {
 		this.order_id = orderId;
         return this;
 	}
