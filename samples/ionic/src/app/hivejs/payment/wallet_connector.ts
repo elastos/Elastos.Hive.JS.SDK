@@ -48,7 +48,8 @@ export class WalletConnector {
         await this.initProvider();
         this.web3 = new Web3(this.provider as any);
         this.accountAddress = (await this.web3.eth.getAccounts())[0];
-        this.contract = new (await this.getWeb3()).eth.Contract(this.paymentAbi, this.paymentAddr);
+        this.contract = new this.web3.eth.Contract(this.paymentAbi, this.paymentAddr);
+        console.log('connector initialized.')
     }
 
     getWeb3(): Web3 {

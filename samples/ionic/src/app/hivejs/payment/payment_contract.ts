@@ -26,6 +26,24 @@ export class PaymentContract {
 
     async initialize() {
         await this.connector.initialize();
+
+        this.connector.getContract().events.OrderPay(null,
+            function(error, event){ console.log('events.OrderPay', event); })
+            .on("connected", function(subscriptionId){
+                // events.OrderPay.connected 0xbfd0d15d9085f0c5f4008f6d6b2d460d, sender account.
+                console.log('events.OrderPay.connected', subscriptionId)
+            })
+            .on('data', function(event){
+                // same results as the optional callback above
+                console.log('events.OrderPay.data', event)
+            })
+            .on('changed', function(event){
+                // remove event from local database
+                console.log('events.OrderPay.changed', event)
+            })
+            .on('error', function(error, receipt) {
+                console.log('events.OrderPay.error', error, receipt)
+            });
     }
 
     /**
@@ -40,25 +58,32 @@ export class PaymentContract {
         const orderData = this.connector.getContract().methods.payOrder(to, memo).encodeABI();
         let transactionParams = await this.createTxParams(orderData, amount, to);
 
-        // return await contract.methods.payOrder(to, memo).call(transactionParams);
         console.log('after createTxParams', orderData, transactionParams)
+
+        // // Can not work with call() because of no transaction sending.
+        // return await this.connector.getContract().methods.payOrder(to, memo).call(transactionParams);
         // contract.methods.payOrder(to, memo).call(transactionParams, function (error, result) {
         //     console.log(`payOrder error: ${error}, ${result}`);
         // });
+
+        // OK with send()
         this.connector.getContract().methods
             .payOrder(to, memo)
             .send(transactionParams)
             .on('transactionHash', hash => {
-                console.log('transactionHash', hash)
+                // transaction id
+                console.log('methods.payOrder.transactionHash', hash)
             })
             .on('receipt', receipt => {
-                console.log('receipt', receipt)
+                // contains sender wallet address.
+                console.log('methods.payOrder.receipt', receipt)
             })
             .on('confirmation', (confirmationNumber, receipt) => {
-                console.log('confirmation', confirmationNumber, receipt)
+                // confirmed by other accounts ???
+                console.log('methods.payOrder.confirmation', confirmationNumber, receipt)
             })
             .on('error', (error, receipt) => {
-                console.log('error', error, receipt)
+                console.log('methods.payOrder.error', error, receipt)
             });
         return 0;
     }
