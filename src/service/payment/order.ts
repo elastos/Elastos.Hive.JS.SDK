@@ -2,7 +2,7 @@
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 export class Order {
-	private order_id: string;
+	private order_id: number;
 	private subscription: string;
 	private pricing_name: string;
 	private paying_did: string;
@@ -12,11 +12,11 @@ export class Order {
     private receiving_address: string;
     private proof: string;
 
-	getOrderId(): string {
+	getOrderId(): number {
 		return this.order_id;
 	}
 
-	setOrderId(orderId: string): Order {
+	setOrderId(orderId: number): Order {
 		this.order_id = orderId;
         return this;
 	}

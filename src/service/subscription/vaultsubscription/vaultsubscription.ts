@@ -51,20 +51,20 @@ export class VaultSubscription extends ServiceEndpoint {
 		return await this.paymentService.placeOrder("vault", planName);
 	}
 
-	public async getOrder(orderId: string): Promise<Order> {
+	public async getOrder(orderId: number): Promise<Order> {
 		return await this.paymentService.getOrder("vault", orderId);
 	}
 
-	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {
-		return await this.paymentService.payOrder(orderId, transactionId);
+	public async settleOrder(orderId: number): Promise<Receipt> {
+		return await this.paymentService.settleOrder(orderId);
 	}
 
 	public async getOrderList(): Promise<Order[]> {
 		return await this.paymentService.getOrders("vault");
 	}
 
-	public async getReceipt(orderId: string): Promise<Receipt> {
-		return await this.paymentService.getReceipt(orderId);
+	public async getReceipts(orderId?: number): Promise<Receipt[]> {
+		return await this.paymentService.getReceipts(orderId);
 	}
 
 	public async getVersion(): Promise<string> {
