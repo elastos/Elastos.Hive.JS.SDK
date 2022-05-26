@@ -21,6 +21,12 @@ describe("test backup services", () => {
         }
     });
 
+    test("testCheckResult", async () => {
+        let result = await backupService.checkResult();
+        expect(result.getState()).not.toBeNull();
+        expect(result.getResult()).not.toBeNull();
+    });
+    
     test.skip("testStartBackup", async () => {
         await backupService.startBackup();
     });
@@ -28,11 +34,4 @@ describe("test backup services", () => {
     test.skip("testRestoreFrom", async () => {
         await backupService.restoreFrom();
     });
-
-    test("testCheckResult", async () => {
-        let result = await backupService.checkResult();
-        expect(result.getState()).not.toBeNull();
-        expect(result.getResult()).not.toBeNull();
-    });
-
 });
