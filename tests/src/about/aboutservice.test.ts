@@ -1,7 +1,7 @@
 import {NodeInfo, NodeVersion, ServiceEndpoint} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-describe("test about service", () => {
+describe.skip("test about service", () => {
 
 	let testData: TestData;
     let serviceEndpoint: ServiceEndpoint;
