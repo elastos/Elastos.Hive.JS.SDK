@@ -1,7 +1,7 @@
 import {Order, Receipt, VaultSubscription, Logger, BackupSubscription} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-describe("test payment service", () => {
+describe.skip("test payment service", () => {
     const LOG = new Logger("paymentservice.test");
 
 	const PRICING_PLAN_NAME = "Rookie";
