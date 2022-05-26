@@ -81,6 +81,9 @@ export class TestData {
 
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
+		if (!DIDBackend.isInitialized()) {
+			DIDBackend.initialize(new DefaultDIDAdapter(this.clientConfig.resolverUrl));
+		}
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonic,
