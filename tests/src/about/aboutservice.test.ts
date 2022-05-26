@@ -1,7 +1,7 @@
 import {NodeInfo, NodeVersion, VaultSubscription} from "../../../src";
 import { TestData } from "../config/testdata";
 
-describe("test about service", () => {
+describe.skip("test about service", () => {
 
 	let testData: TestData;
     let vaultSubscription: VaultSubscription;
