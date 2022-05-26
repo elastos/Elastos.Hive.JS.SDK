@@ -4,7 +4,7 @@
 export class Order {
 	private order_id: number;
 	private subscription: string;
-	private pricing_name: string;
+	private pricing_plan: string;
 	private paying_did: string;
 	private payment_amount: number;
     private create_time: number;
@@ -30,12 +30,12 @@ export class Order {
         return this;
 	}
 
-	getPricingName(): string {
-		return this.pricing_name;
+	getPricingPlan(): string {
+		return this.pricing_plan;
 	}
 
-	setPricingName(pricingName: string): Order {
-		this.pricing_name = pricingName;
+	setPricingPlan(pricingName: string): Order {
+		this.pricing_plan = pricingName;
         return this;
 	}
 
