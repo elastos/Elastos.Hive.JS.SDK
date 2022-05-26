@@ -6,7 +6,7 @@ import {
 	Logger,
 	File, Provider, Backup, ScriptRunner
 } from '@elastosfoundation/hive-js-sdk';
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
+import { Claims, DIDDocument, JWTParserBuilder, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import {ClientConfig} from "./clientconfig";
@@ -37,11 +37,11 @@ export class TestData {
 		return `${prefix}_${Date.now().toString()}`;
 	}
 
-    public static async getInstance(testName: string): Promise<TestData> {
+    public static async getInstance(testName: string, clientConfig: any = ClientConfig.DEV): Promise<TestData> {
 		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
 			// TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
-            TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
+            TestData.INSTANCE = new TestData(clientConfig, TestData.USER_DIR);
 			await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
@@ -81,7 +81,6 @@ export class TestData {
 
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
-
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonic,

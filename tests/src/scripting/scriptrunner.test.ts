@@ -52,7 +52,7 @@ describe("test scripting runner function", () => {
     let fileName: string = "test.txt";
 
     beforeAll(async () => {
-        testData = await TestData.getInstance("scriptingservice.test");
+        testData = await TestData.getInstance("scriptrunner.test");
         vaultSubscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
         vault = new Vault(testData.getAppContext(), testData.getProviderAddress());
         scriptRunner = new ScriptRunner(testData.getAppContext(), testData.getProviderAddress());

@@ -7,7 +7,7 @@ describe("test auth service", () => {
     let serviceEndpoint: ServiceEndpoint;
 
 	beforeAll(async () => {
-		testData = await TestData.getInstance("aboutservice.test");
+		testData = await TestData.getInstance("authservice.test (auth test)");
         serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
 	});
 
@@ -29,7 +29,7 @@ describe("authentication fail test", () => {
     });
 
     beforeEach(async () => {
-        testData = await TestData.getInstance("vault subscribe.test");
+        testData = await TestData.getInstance("authservice.test (fail test)");
         vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
