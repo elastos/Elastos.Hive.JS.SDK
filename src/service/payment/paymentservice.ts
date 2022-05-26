@@ -90,7 +90,7 @@ export class PaymentService extends RestService {
 	 * @return The details of the order.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	async getOrder(subscription: string, orderId: string): Promise<Order> {
+	async getOrder(subscription: string, orderId: number): Promise<Order> {
 		checkNotNull(subscription, "Missing subscription.");
 		checkNotNull(orderId, "Missing order id.");
 
@@ -114,7 +114,7 @@ export class PaymentService extends RestService {
 		return await this.getOrdersInternal(subscription);
 	}
 
-	private async getOrdersInternal(subscription: string, orderId?: string): Promise<Order[]> {
+	private async getOrdersInternal(subscription: string, orderId?: number): Promise<Order[]> {
 		try {	
 			return await this.httpClient.send<Order[]>(PaymentService.API_ORDER_ENDPOINT, { "subscription": subscription, "order_id": orderId },
 			<HttpResponseParser<Order[]>> {
@@ -137,12 +137,14 @@ export class PaymentService extends RestService {
 	 * @return The details of the receipt.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	async getReceipt(orderId: string): Promise<Receipt> {
-		try {	
-			return await this.httpClient.send<Receipt>(PaymentService.API_RECEIPT_ENDPOINT, { "order_id": orderId },
-			<HttpResponseParser<Receipt>> {
-				deserialize(content: any): Receipt {
-                    return Object.assign(new Receipt(), JSON.parse(content));
+	async getReceipts(orderId?: number): Promise<Receipt[]> {
+		try {
+		    const payload = (orderId === undefined || orderId === null) ? {} : { "order_id": orderId };
+			return await this.httpClient.send<Receipt[]>(PaymentService.API_RECEIPT_ENDPOINT, payload,
+			<HttpResponseParser<Receipt[]>> {
+				deserialize(content: any): Receipt[] {
+                    const jsonObjs: [] = JSON.parse(content)['receipts'];
+                    return jsonObjs.map(o => Object.assign(new Receipt(), o));
 				}
 			},
 			HttpMethod.GET);
