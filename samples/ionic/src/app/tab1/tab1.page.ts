@@ -46,8 +46,10 @@ export class Tab1Page {
     }
 
     async initPaymentContract() {
-        if (!this.isInitPayment)
+        if (!this.isInitPayment) {
             await this.paymentContract.initialize();
+            this.isInitPayment = true;
+        }
     }
 
     /**
@@ -203,7 +205,7 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const nodeWalletAddress = '0x60ECEFaFA8618F4eAC7a04ba58F67f56e12750d3'; // contract owner wallet
-            const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlwVUdCUHVBZ0V4NkxlOTlmNFR5RGZOWnRYVlQyTktYUFIjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcFVHQlB1QWdFeDZMZTk5ZjRUeURmTlp0WFZUMk5LWFBSIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1MzQ1NzkxOCwiZXhwIjozMzA3NDkxODM2LCJuYmYiOjE2NTM0NTc5MTgsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOGRjM2ZlMjE3NTBmMGU1YjUwNjFlNSIsInN1YnNjcmlwdGlvbiI6InZhdWx0IiwicHJpY2luZ19wbGFuIjoiUm9va2llIiwicGF5bWVudF9hbW91bnQiOjkuOTk5OTk5OTk5OTk5OTk5NWUtNywiY3JlYXRlX3RpbWUiOjE2NTM0MjkxMTgsImV4cGlyYXRpb25fdGltZSI6MTY1NDAzMzkxOCwicmVjZWl2aW5nX2FkZHJlc3MiOiIweEY3NkJlRTRkRTZjYkJCRUZBNTEyMmY3OUMxMzJiY2U3NWRBNjNiZDYifX0.spGiAOWVUiYc8hOjBgG1mJ5abGFPSpuWfFnDBm1cEGrY-Rym1fGtAxWqXED02xYKwZ4tv5nbMAKLvMkIt2VIsA'
+            const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlwVUdCUHVBZ0V4NkxlOTlmNFR5RGZOWnRYVlQyTktYUFIjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcFVHQlB1QWdFeDZMZTk5ZjRUeURmTlp0WFZUMk5LWFBSIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1MzU0MzcxMSwiZXhwIjozMzA3NjYzNDIyLCJuYmYiOjE2NTM1NDM3MTEsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOGYxMzFmM2E1NDRjOWFkODExNjkwOCIsInN1YnNjcmlwdGlvbiI6InZhdWx0IiwicHJpY2luZ19wbGFuIjoiUm9va2llIiwicGF5bWVudF9hbW91bnQiOjAuMDEsImNyZWF0ZV90aW1lIjoxNjUzNTE0OTExLCJleHBpcmF0aW9uX3RpbWUiOjE2NTQxMTk3MTEsInJlY2VpdmluZ19hZGRyZXNzIjoiMHg2MEVDRUZhRkE4NjE4RjRlQUM3YTA0YmE1OEY2N2Y1NmUxMjc1MGQzIn19.uhp2qJ1CN5jfIw3ot_dz6hXJaI66dPUP2d0BGw-ZCGLirn4rwe2VMkP6xEjTKMwEvPxW-7JleaYl9NGT3_u70Q';
             const orderId = await this.paymentContract.payOrder("0.01", nodeWalletAddress, proof);
             console.log(`pay order successfully: ${orderId}.`);
         });
