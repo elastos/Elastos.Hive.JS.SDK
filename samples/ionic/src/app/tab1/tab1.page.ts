@@ -10,6 +10,7 @@ import {
 } from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "../hivejs/browser_login";
 import {BrowserVault} from "../hivejs/browser_vault";
+import {PaymentContract} from "../hivejs/payment/payment_contract";
 
 @Component({
     selector: 'app-tab1',
@@ -29,6 +30,9 @@ export class Tab1Page {
 
     private readonly isBrowser: boolean;
 
+    private paymentContract: PaymentContract;
+    private isInitPayment = false;
+
     constructor() {
         this.message = 'Tab 1 Page';
 
@@ -37,6 +41,13 @@ export class Tab1Page {
 
         // This used to run in node style or browser style which will work with essentials application.
         this.isBrowser = true;
+
+        this.paymentContract = new PaymentContract();
+    }
+
+    async initPaymentContract() {
+        if (!this.isInitPayment)
+            await this.paymentContract.initialize();
     }
 
     /**
@@ -185,6 +196,33 @@ export class Tab1Page {
             // clean
             await filesService.delete(Tab1Page.FILE_NAME);
             await scriptingService.unregisterScript(Tab1Page.SCRIPT_NAME);
+        });
+    }
+
+    async payOrder() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const nodeWalletAddress = '0x60ECEFaFA8618F4eAC7a04ba58F67f56e12750d3'; // contract owner wallet
+            const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlwVUdCUHVBZ0V4NkxlOTlmNFR5RGZOWnRYVlQyTktYUFIjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcFVHQlB1QWdFeDZMZTk5ZjRUeURmTlp0WFZUMk5LWFBSIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1MzQ1NzkxOCwiZXhwIjozMzA3NDkxODM2LCJuYmYiOjE2NTM0NTc5MTgsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOGRjM2ZlMjE3NTBmMGU1YjUwNjFlNSIsInN1YnNjcmlwdGlvbiI6InZhdWx0IiwicHJpY2luZ19wbGFuIjoiUm9va2llIiwicGF5bWVudF9hbW91bnQiOjkuOTk5OTk5OTk5OTk5OTk5NWUtNywiY3JlYXRlX3RpbWUiOjE2NTM0MjkxMTgsImV4cGlyYXRpb25fdGltZSI6MTY1NDAzMzkxOCwicmVjZWl2aW5nX2FkZHJlc3MiOiIweEY3NkJlRTRkRTZjYkJCRUZBNTEyMmY3OUMxMzJiY2U3NWRBNjNiZDYifX0.spGiAOWVUiYc8hOjBgG1mJ5abGFPSpuWfFnDBm1cEGrY-Rym1fGtAxWqXED02xYKwZ4tv5nbMAKLvMkIt2VIsA'
+            const orderId = await this.paymentContract.payOrder("0.01", nodeWalletAddress, proof);
+            console.log(`pay order successfully: ${orderId}.`);
+        });
+    }
+
+    async getOrders() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const orders = await this.paymentContract.getOrders();
+            console.log(`get orders successfully: ${orders}`);
+        });
+    }
+
+    async getOrder() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const orderId = 0;
+            const order = await this.paymentContract.getOrder(orderId);
+            console.log(`get order successfully: ${order}`);
         });
     }
 }
