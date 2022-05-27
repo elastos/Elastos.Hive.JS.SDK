@@ -45,7 +45,8 @@ package-lock.json
 
 .jscramblerrc
 appdid
-
+#data/
+#generated/
 src/**/*.js
 src/**/*.map
 tests/src/**/*.js
