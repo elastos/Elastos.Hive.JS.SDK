@@ -12,22 +12,16 @@ import {
     ScriptingService, 
     Vault,
     QueryHasResultCondition, 
-    Executable } from "../../../src";
+    FilesService,
+    Executable } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-interface DatabaseDeleteResponse {
-    database_delete: { acknowledged: boolean, deleted_count: number};
-}
-
-interface DatabaseInsertResponse {
-    database_insert: { acknowledged: boolean, inserted_id: string};
-}
-
-interface DatabaseUpdateResponse {
-    database_insert: { acknowledged: boolean, matched_count: number, upserted_id: string};
-}
-
 describe("test scripting function", () => {
+
+    let testData: TestData;
+    let vaultSubscription: VaultSubscription;
+    let vault: Vault;
+    let PRICING_PLAN_NAME = "Rookie";
 
     const FIND_NAME = "get_group_messages";
     const FIND_NO_CONDITION_NAME = "script_no_condition";
@@ -38,22 +32,27 @@ describe("test scripting function", () => {
     const DOWNLOAD_FILE_NAME = "download_file";
     const FILE_PROPERTIES_NAME = "file_properties";
     const FILE_HASH_NAME = "file_hash";
+
     const COLLECTION_NAME = "script_database";
     const FILE_CONTENT = "this is test file abcdefghijklmnopqrstuvwxyz";
 
-    let testData: TestData;
-    let vaultSubscription: VaultSubscription;
-    let vault: Vault;
     let targetDid: string;
     let appDid: string;
+    
+    let filesService: FilesService;
     let databaseService: DatabaseService;
     let scriptingService: ScriptingService;
+    
+    let localSrcFilePath: string;
+    let localDstFileRoot: string;
+    let localDstFilePath: string;
+    let fileName: string = "test.txt";
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");
 
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         
         try {
@@ -62,9 +61,12 @@ describe("test scripting function", () => {
             console.log("vault is already subscribed");
         }
 
-        vault = testData.newVault();
+        vault = new Vault(
+            testData.getUserAppContext(),
+            testData.getProviderAddress());
         
         scriptingService = vault.getScriptingService();
+        filesService = vault.getFilesService();
         databaseService = vault.getDatabaseService();
         targetDid = testData.getUserDid();
         appDid = testData.getAppDid();
@@ -81,6 +83,19 @@ describe("test scripting function", () => {
             console.log("vault is already unsubscribed");
         }
     });
+    
+	function expectBuffersToBeEqual(expected: Buffer, actual: Buffer): void {
+        expect(actual).not.toBeNull();
+        expect(actual).not.toBeUndefined();
+		expect(actual.byteLength).toEqual(expected.byteLength);
+		for (var i = 0 ; i != actual.byteLength ; i++)
+		{
+			if (actual[i] != expected[i]) {
+				console.log(i + ": Actual: " + actual[i] + " Expected: " + expected[i]);
+			}
+			expect(actual[i]).toEqual(expected[i]);
+		}
+	}
 
     test("testInsert", async () => {
         await registerScriptInsert(INSERT_NAME);
@@ -106,7 +121,7 @@ describe("test scripting function", () => {
 
     test("testDelete", async () => {
 
-        let collectionName = COLLECTION_NAME;
+        let collectionName = "collectionToDelete";
         await create_test_database(collectionName);
         await registerScriptDelete(DELETE_NAME, collectionName);
         await callScriptDelete(DELETE_NAME);
@@ -155,21 +170,7 @@ describe("test scripting function", () => {
         await scriptingService.unregisterScript(FILE_HASH_NAME);
     });
 
-        
-	function expectBuffersToBeEqual(expected: Buffer, actual: Buffer): void {
-        expect(actual).not.toBeNull();
-        expect(actual).not.toBeUndefined();
-		expect(actual.byteLength).toEqual(expected.byteLength);
-		for (var i = 0 ; i != actual.byteLength ; i++)
-		{
-			if (actual[i] != expected[i]) {
-				console.log(i + ": Actual: " + actual[i] + " Expected: " + expected[i]);
-			}
-			expect(actual[i]).toEqual(expected[i]);
-		}
-	}
-
-    async function create_test_database(collectionName: string = COLLECTION_NAME): Promise<void> {
+    async function create_test_database(collectionName: string = COLLECTION_NAME) {
         try {
             await databaseService.createCollection(collectionName);
         } catch (e) {
@@ -180,7 +181,7 @@ describe("test scripting function", () => {
     /**
 	 * If not exists, also return OK(_status).
 	 */
-	async function remove_test_database(): Promise<void> {
+	async function remove_test_database() {
 		try {
 			await databaseService.deleteCollection(COLLECTION_NAME);
 		} catch (e) {
@@ -199,6 +200,7 @@ describe("test scripting function", () => {
         }
         expect(error).toBeUndefined();
     }
+
 
     async function registerScriptInsert(scriptName: string) {
         let doc = { "author": "$params.author", "content": "$params.content" };
@@ -248,13 +250,20 @@ describe("test scripting function", () => {
     }
 
     async function callScriptUpdate( scriptName: string) {
-        let params = {"author": "John", "content": "updatedMessage" };
-        let result = await scriptingService.callScript<DatabaseUpdateResponse>(scriptName, params, targetDid, appDid);
+        let params = {"author": "John", "content": "message" };
+        let result = await scriptingService.callScript(scriptName, params, targetDid, appDid);
 
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
-        //TODO: There may be an issue with Hive Node returning 'null' or empty upserted_id.
-        //expect(result[scriptName].upserted_id).not.toBeNull();
+        expect(result[scriptName].upserted_id).not.toBeNull();
+    }
+
+    interface DatabaseDeleteResponse {
+        database_delete: { acknowledged: boolean, deleted_count: number};
+    }
+
+    interface DatabaseInsertResponse {
+        database_insert: { acknowledged: boolean, inserted_id: string};
     }
 
     async function callScriptDelete( scriptName: string) {
@@ -303,7 +312,7 @@ describe("test scripting function", () => {
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
         expect(result[scriptName].size).not.toBeNull();
-        expect(Number(result[scriptName].size)).toBeGreaterThan(0);
+        expect(Number(result[scriptName].size) > 0);
     }
         
     async function registerScriptFileHash(scriptName: string) {

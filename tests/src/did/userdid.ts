@@ -10,9 +10,10 @@ export class UserDID extends DIDEntity {
 		super(name, mnemonic, phrasepass, storepass, did);
 	}
 
-    public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string, did?:string): Promise<UserDID> {
+    public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
+                               storeRoot: string, did?:string): Promise<UserDID> {
         let newInstance = new UserDID(name, mnemonic, phrasepass, storepass, did);
-        await newInstance.initDid(mnemonic, true);
+        await newInstance.initDid(mnemonic, true, storeRoot);
         let doc = await newInstance.getDocument();
         newInstance.setIssuer(new Issuer(doc));
         return newInstance;

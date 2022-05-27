@@ -8,7 +8,7 @@ describe.skip("test database services", () => {
     beforeAll(async () => {
         testData = await TestData.getInstance("promotionservice.tests");
         const vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         try {
             await vaultSubscription.unsubscribe();

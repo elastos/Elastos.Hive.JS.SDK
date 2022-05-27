@@ -1,4 +1,4 @@
-import { BackupService, AlreadyExistsException, VaultSubscription, Vault } from "../../../src";
+import { BackupService, AlreadyExistsException, VaultSubscription, Vault } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata"
 
 
@@ -28,7 +28,7 @@ describe("test backup services", () => {
         expect(result.getState()).not.toBeNull();
         expect(result.getResult()).not.toBeNull();
     });
-    
+
     test.skip("testStartBackup", async () => {
         await backupService.startBackup();
     });
