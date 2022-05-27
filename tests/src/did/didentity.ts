@@ -22,8 +22,8 @@ export class DIDEntity {
 		this.mnemonic = mnemonic;
 	}
 
-	public async initDid(mnemonic: string, needResolve: boolean) {
-		const path = TestData.RESOLVE_CACHE + File.SEPARATOR + this.name;
+	public async initDid(mnemonic: string, needResolve: boolean, storeRoot: string) {
+		const path = storeRoot + File.SEPARATOR + this.name;
 		this.didStore = await DIDStore.open(path);
 		const rootIdentity = await this.getRootIdentity(mnemonic);
 		await this.initDidByRootIdentity(rootIdentity, needResolve);

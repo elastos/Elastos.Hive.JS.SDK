@@ -9,7 +9,7 @@ describe.skip("test database services", () => {
         const testData = await TestData.getInstance("promotionservice.tests");
         promotionService = testData.newBackup().getPromotionService();
         const vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         try {
             await vaultSubscription.unsubscribe();

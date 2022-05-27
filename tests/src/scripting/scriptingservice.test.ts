@@ -52,7 +52,7 @@ describe("test scripting function", () => {
         testData = await TestData.getInstance("scriptingservice.test");
 
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         
         try {
@@ -62,7 +62,7 @@ describe("test scripting function", () => {
         }
 
         vault = new Vault(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         
         scriptingService = vault.getScriptingService();

@@ -11,11 +11,11 @@ export class AppDID extends DIDEntity {
 	}
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
-							   resolver: string, did?: string): Promise<AppDID> {
+							   resolver: string, storeRoot: string, did?: string): Promise<AppDID> {
 		// TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
 		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
         let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
-		await newInstance.initDid(mnemonic, false);
+		await newInstance.initDid(mnemonic, false, storeRoot);
         return newInstance;
     }
 

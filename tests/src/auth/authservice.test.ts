@@ -8,7 +8,7 @@ describe("test auth service", () => {
 
 	beforeAll(async () => {
 		testData = await TestData.getInstance("aboutservice.test");
-        serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
+        serviceEndpoint = new ServiceEndpoint(testData.getUserAppContext(), testData.getProviderAddress());
 	});
 
 	afterAll(() => { serviceEndpoint.getAccessToken().invalidate(); });
@@ -31,7 +31,7 @@ describe("authentication fail test", () => {
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
     });
 

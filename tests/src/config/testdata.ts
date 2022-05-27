@@ -1,115 +1,116 @@
-import {
-	HiveException,
-	Vault,
-	BackupService,
-	AppContext,
-	Logger,
-	File, Provider, Backup, ScriptRunner
-} from '@elastosfoundation/hive-js-sdk';
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
+import { HiveException, Vault, BackupService, AppContext, Logger, Provider, Backup, ScriptRunner } from '@elastosfoundation/hive-js-sdk';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
-import {ClientConfig} from "./clientconfig";
+import { ClientConfig } from "./clientconfig";
 
 export class TestData {
-	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ?
-		process.env["HIVE_USER_DIR"] : __dirname + '/../../data/userDir';
+    private static LOG = new Logger("TestData");
 
-	private static LOG = new Logger("TestData");
-    public static readonly RESOLVE_CACHE = "data/didCache";
     private static INSTANCE: TestData;
+    // configure for mainnet or testnet
+    private readonly clientConfig: any;
 
+    private appInstanceDid: AppDID;
+    // user & owner DID
     private userDid: UserDID;
-	private callerDid: UserDID;
-	private appInstanceDid: AppDID;
-	private context: AppContext;
-	private anonymousContext: AppContext;
-	private callerContext: AppContext;
-	private clientConfig: any;
-	private userDir: string;
+    // caller DID for the scripting service
+    private callerDid: UserDID;
 
-    constructor(clientConfig: any, userDir: string) {
-		this.userDir = userDir;
-		this.clientConfig = clientConfig;
-    }
+    // for user and caller DIDs
+    private userAppContext: AppContext;
+    private callerAppContext: AppContext;
+    // ???
+    private anonymousContext: AppContext;
 
-	public static getUniqueName(prefix: string){
-		return `${prefix}_${Date.now().toString()}`;
-	}
-
-    public static async getInstance(testName: string): Promise<TestData> {
+    static async getInstance(testName: string): Promise<TestData> {
         if (!TestData.INSTANCE) {
-            // TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
-            TestData.INSTANCE = new TestData(ClientConfig.DEV, TestData.USER_DIR);
-            TestData.LOG.log(`Get TestData instance for test: ${testName}, hive url, ${TestData.INSTANCE.getProviderAddress()}`);
-            await TestData.INSTANCE.init();
+            TestData.INSTANCE = await new TestData().init();
+            TestData.LOG.log(`TestData.INSTANCE for test: ${testName}, provider, ${TestData.INSTANCE.getProviderAddress()}`);
         }
         return TestData.INSTANCE;
     }
 
-    public getClientConfig() {
-    	return this.clientConfig;
+    constructor() {
+        // TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
+        this.clientConfig = ClientConfig.DEV;
+    }
+
+    async init(): Promise<TestData> {
+        const storeRoot = this.getLocalCachePath(true);
+        AppContext.setupResolver(this.clientConfig.resolverUrl, storeRoot);
+
+        let applicationConfig = this.clientConfig.application;
+        this.appInstanceDid = await AppDID.create(applicationConfig.name,
+            applicationConfig.mnemonic,
+            applicationConfig.passPhrase,
+            applicationConfig.storepass,
+            this.clientConfig.resolverUrl,
+            storeRoot, applicationConfig.did);
+
+        let userConfig = this.clientConfig.user;
+        this.userDid = await UserDID.create(userConfig.name,
+            userConfig.mnemonic,
+            userConfig.passPhrase,
+            userConfig.storepass,
+            storeRoot, userConfig.did);
+
+        TestData.LOG.trace("UserDid created");
+
+        let userConfigCaller = this.clientConfig.cross.user;
+        this.callerDid = await UserDID.create(userConfigCaller.name,
+            userConfigCaller.mnemonic,
+            userConfigCaller.passPhrase,
+            userConfigCaller.storepass,
+            storeRoot, userConfigCaller.did);
+
+        this.userAppContext = await this.createContext(this.userDid, AppDID.APP_DID);
+        this.callerAppContext = await this.createContext(this.callerDid, AppDID.APP_DID2);
+        this.anonymousContext = await this.createContext(this.callerDid, AppDID.APP_DID2);
+        return this;
+    }
+
+    /**
+     * cache tokens and DIDs, to separate testnet and mainnet
+     */
+    private getLocalCachePath(containDIDs): string {
+        const network = this.clientConfig.resolverUrl;
+        if (containDIDs) {
+            // based on 'tests' folder for DIDs cache dir.
+            return `data/${network}/didCache`;
+        }
+
+        // absolute path for tokens cache dir.
+        const testsDir = __dirname + '/../..';
+        return `${testsDir}/data/${network}/localCache`;
+    }
+
+	getUserAppContext(): AppContext {
+		return this.userAppContext;
 	}
 
-	public getLocalStorePath(): string {
-		return this.userDir + File.SEPARATOR + "data/store" + File.SEPARATOR + this.clientConfig.node.storePath;
-	}
+    getCallerAppContext(): AppContext {
+        return this.callerAppContext;
+    }
 
-	public getAppContext(): AppContext {
-		return this.context;
-	}
-
-	public getProviderAddress(): string {
+	getProviderAddress(): string {
 		return this.clientConfig.node.provider;
 	}
 
-	public newVault(): Vault {
-		return new Vault(this.context, this.getProviderAddress());
+	newVault(): Vault {
+		return new Vault(this.userAppContext, this.getProviderAddress());
 	}
 
-	public newAnonymousCallerScriptRunner(): ScriptRunner {
+	newAnonymousCallerScriptRunner(): ScriptRunner {
 		return new ScriptRunner(this.anonymousContext, this.getProviderAddress());
 	}
 
-	public newBackup(): Backup {
-		return new Backup(this.context, this.getProviderAddress());
+	newBackup(): Backup {
+		return new Backup(this.userAppContext, this.getProviderAddress());
 	}
 
-	public createProviderService() {
-		return new Provider(this.context, this.getProviderAddress());
-	}
-
-    public async init(): Promise<TestData> {
-		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
-
-		let applicationConfig = this.clientConfig.application;
-		this.appInstanceDid = await AppDID.create(applicationConfig.name,
-				applicationConfig.mnemonic,
-				applicationConfig.passPhrase,
-				applicationConfig.storepass,
-				this.clientConfig.resolverUrl,
-				applicationConfig.did);
-
-		
-		let userConfig = this.clientConfig.user;
-		this.userDid = await UserDID.create(userConfig.name,
-				userConfig.mnemonic,
-				userConfig.passPhrase,
-				userConfig.storepass,
-				userConfig.did);
-				
-		TestData.LOG.trace("UserDid created"); 
-		let userConfigCaller = this.clientConfig.cross.user;
-		this.callerDid = await UserDID.create(userConfigCaller.name,
-			userConfigCaller.mnemonic,
-			userConfigCaller.passPhrase,
-			userConfigCaller.storepass,
-			userConfigCaller.did);
-					
-		//Application Context
-		this.context = await this.createContext(this.userDid, AppDID.APP_DID);
-		this.anonymousContext = await this.createContext(this.callerDid, AppDID.APP_DID2);
-		return this;
+	createProviderService() {
+		return new Provider(this.userAppContext, this.getProviderAddress());
 	}
 
 	private async createContext(userDid: UserDID, appDid: string): Promise<AppContext> {
@@ -117,7 +118,7 @@ export class TestData {
 		return await AppContext.build({
 
 			getLocalDataDir() : string {
-				return self.getLocalStorePath();
+				return self.getLocalCachePath(false);
 			},
 
 			async getAppInstanceDocument() : Promise<DIDDocument>  {
@@ -126,7 +127,7 @@ export class TestData {
 				} catch (e) {
 					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
 					TestData.LOG.error(e.stack);
-					return null;
+                    throw e;
 				}
 			},
 
@@ -145,21 +146,18 @@ export class TestData {
 				} catch (e) {
 					TestData.LOG.info("TestData->getAuthorization error: " + e);
 					TestData.LOG.error(e.stack);
+					throw e;
 				}
 			}
 		}, userDid.getDid().toString());
 	}
 
-	public getAppDid(): string {
+	getAppDid(): string {
 		return AppDID.APP_DID;
 	}
 
-	public getUserDid(): string {
+	getUserDid(): string {
 		return this.userDid.toString();
-	}
-
-	public getUser(): UserDID {
-		return this.userDid;
 	}
 
 	private getTargetProviderAddress(): string {
@@ -170,15 +168,15 @@ export class TestData {
 		return this.clientConfig.node.targetDid;
 	}
 
-	public getCallerDid(): string {
+	getCallerDid(): string {
 		return this.callerDid.toString();
 	}
 
-	public getIpfsGatewayUrl(): string {
+	getIpfsGatewayUrl(): string {
 		return this.clientConfig.ipfsGateUrl;
 	}
 
-	public getBackupService(): BackupService {
+	getBackupService(): BackupService {
 		const backupService = this.newVault().getBackupService();
 		const self = this;
 		backupService.setBackupContext({

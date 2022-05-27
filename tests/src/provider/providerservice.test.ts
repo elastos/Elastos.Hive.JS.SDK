@@ -10,8 +10,8 @@ describe("test provider service", () => {
 
     beforeAll(async () => {
         testData = await TestData.getInstance("providerservice.test");
-        vaultSubscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
-        backupSubscription = new BackupSubscription(testData.getAppContext(), testData.getProviderAddress());
+        vaultSubscription = new VaultSubscription(testData.getUserAppContext(), testData.getProviderAddress());
+        backupSubscription = new BackupSubscription(testData.getUserAppContext(), testData.getProviderAddress());
         provider = testData.createProviderService();
         try {
             await vaultSubscription.subscribe();

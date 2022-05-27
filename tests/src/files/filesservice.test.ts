@@ -38,7 +38,7 @@ describe("test files service", () => {
 		prepareTestFile();
 		try {
 			const vaultSubscription = new VaultSubscription(
-				testData.getAppContext(),
+				testData.getUserAppContext(),
 				testData.getProviderAddress());
 			await vaultSubscription.subscribe();
 		} catch (e) {

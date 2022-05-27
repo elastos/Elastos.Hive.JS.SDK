@@ -16,7 +16,7 @@ describe("test database services", () => {
         let testData = await TestData.getInstance("databaseservice.tests");
 
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         
         try {
@@ -26,7 +26,7 @@ describe("test database services", () => {
         }
 
         vault = new Vault(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
         
         databaseService = vault.getDatabaseService();
