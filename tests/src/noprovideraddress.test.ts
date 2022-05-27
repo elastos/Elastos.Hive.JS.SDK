@@ -14,7 +14,7 @@ describe.skip("test service without provider address", () => {
     test("testDatabaseServiceWithoutProviderAddress", async () => {
         DIDBackend.initialize(new DefaultDIDAdapter('mainnet'));
         const testData = await TestData.getInstance("databaseservice.tests");
-        const vaultSubscription = new VaultSubscription(testData.getAppContext());
+        const vaultSubscription = new VaultSubscription(testData.getUserAppContext());
         try {
             await vaultSubscription.subscribe();
         } catch (e) {

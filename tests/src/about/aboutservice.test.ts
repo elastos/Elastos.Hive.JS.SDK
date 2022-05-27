@@ -8,7 +8,7 @@ describe.skip("test about service", () => {
 
     beforeAll(async () => {
 		testData = await TestData.getInstance("aboutservice.test");
-        serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
+        serviceEndpoint = new ServiceEndpoint(testData.getUserAppContext(), testData.getProviderAddress());
 	});
 
     test("testGetNodeVersion", async () => {
