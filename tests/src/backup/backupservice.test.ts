@@ -1,16 +1,18 @@
-import { BackupService, AlreadyExistsException, VaultSubscription } from "../../../src";
+import { BackupService, AlreadyExistsException, VaultSubscription, Vault } from "../../../src";
 import { TestData } from "../config/testdata"
 
 
 describe("test backup services", () => {
 
+    let testData: TestData;
+    let vault: Vault;
+    let vaultSubscription: VaultSubscription;
     let backupService: BackupService;
 
     beforeAll(async () => {
-        const testData = await TestData.getInstance("backupservice.tests");
-        backupService = testData.getBackupService();
+        testData = await TestData.getInstance("backupservice.tests");
         try {
-            const vaultSubscription = new VaultSubscription(
+            vaultSubscription = new VaultSubscription(
                 testData.getAppContext(),
                 testData.getProviderAddress());
             await vaultSubscription.subscribe();
@@ -19,6 +21,11 @@ describe("test backup services", () => {
                 throw e;
             }
         }
+        vault = new Vault(
+            testData.getAppContext(),
+            testData.getProviderAddress());
+
+        backupService = vault.getBackupService();
     });
 
     test("testCheckResult", async () => {
