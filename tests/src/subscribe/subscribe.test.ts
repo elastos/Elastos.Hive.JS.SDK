@@ -16,7 +16,7 @@ describe("test vault subscribe function", () => {
     beforeAll(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
     });
 
@@ -109,7 +109,7 @@ describe("test backup subscribe function", () => {
     beforeAll(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
         backupsubscriptionService = new BackupSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
     });
 
