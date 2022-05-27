@@ -14,7 +14,7 @@ import {
     QueryHasResultCondition,
     FilesService,
     Executable, NotFoundException
-} from "@elastosfoundation/hive-js-sdk";
+} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test scripting runner function", () => {

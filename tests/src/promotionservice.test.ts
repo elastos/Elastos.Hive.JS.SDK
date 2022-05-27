@@ -1,6 +1,6 @@
 import { TestData } from "./config/testdata";
 
-import {PromotionService, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import {PromotionService, VaultSubscription} from "../../src";
 
 describe.skip("test database services", () => {
     let promotionService: PromotionService;

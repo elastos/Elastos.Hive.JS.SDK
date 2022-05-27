@@ -1,5 +1,5 @@
 import {BackupSubscription, NotFoundException, VaultSubscription,
-    Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "@elastosfoundation/hive-js-sdk";
+    Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "../../../src";
 import {TestData} from "../config/testdata";
 
 describe("test provider service", () => {

@@ -1,4 +1,4 @@
-import { Vault, VaultSubscription, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, CountOptions, UpdateOptions, NotFoundException, QueryOptions, AscendingSortItem } from "@elastosfoundation/hive-js-sdk";
+import { Vault, VaultSubscription, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, CountOptions, UpdateOptions, NotFoundException, QueryOptions, AscendingSortItem } from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {

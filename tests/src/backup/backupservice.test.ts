@@ -1,4 +1,4 @@
-import { BackupService, AlreadyExistsException, VaultSubscription } from "@elastosfoundation/hive-js-sdk";
+import { BackupService, AlreadyExistsException, VaultSubscription } from "../../../src";
 import { TestData } from "../config/testdata"
 
 

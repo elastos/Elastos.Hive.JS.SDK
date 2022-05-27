@@ -1,4 +1,4 @@
-import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "@elastosfoundation/hive-js-sdk";
+import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test auth service", () => {

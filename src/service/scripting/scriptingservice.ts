@@ -82,6 +82,7 @@ export class ScriptingService extends RestService {
 			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, { "context": context, "params": params }, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
+					ScriptingService.LOG.debug("CALLSCRIPT: " + content);
 					return JSON.parse(content) as T;
 				}
 			}, HttpMethod.PATCH);

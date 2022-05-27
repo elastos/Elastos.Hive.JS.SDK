@@ -1,5 +1,5 @@
 import {DefaultDIDAdapter, DIDBackend} from "@elastosfoundation/did-js-sdk";
-import {AppContext} from "@elastosfoundation/hive-js-sdk";
+import {AppContext} from "../../src";
 
 /**
  * Please run this file with a prod hive node.

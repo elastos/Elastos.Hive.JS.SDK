@@ -1,4 +1,4 @@
-import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "../../../src";
 import {TestData} from "../config/testdata";
 
 

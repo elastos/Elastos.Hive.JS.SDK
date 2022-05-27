@@ -1,5 +1,5 @@
 import {TestData} from "./config/testdata";
-import {AlreadyExistsException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import {AlreadyExistsException, VaultSubscription} from "../../src";
 import {ClientConfig} from "./config/clientconfig";
 
 /**

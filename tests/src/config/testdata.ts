@@ -1,15 +1,64 @@
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
 import {
 	HiveException,
 	Vault,
 	BackupService,
 	AppContext,
 	Logger,
-	File, Provider, Backup, ScriptRunner
-} from '@elastosfoundation/hive-js-sdk';
-import { Claims, DIDDocument, JWTParserBuilder, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
+	File, Provider, Backup, ScriptRunner, AppContextProvider
+} from '../../../src';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import {ClientConfig} from "./clientconfig";
+
+class TestAppContextProvider implements AppContextProvider {
+
+	private static LOG = new Logger("TestAppContextProvider");
+
+	private testData: TestData;
+	private appInstanceDid: AppDID;
+	private userDid: UserDID;
+	private appDid: string
+
+	constructor(testData: TestData, userDid: UserDID, appDid: string, appInstanceDid: AppDID) {
+		this.userDid = userDid;
+		this.appDid = appDid;
+		this.appInstanceDid = appInstanceDid;
+		this.testData = testData;
+	}
+
+	getLocalDataDir() : string {
+		return this.testData.getLocalStorePath();
+	}
+
+	async getAppInstanceDocument() : Promise<DIDDocument>  {
+		try {
+			return await this.appInstanceDid.getDocument();
+		} catch (e) {
+			TestAppContextProvider.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
+			TestAppContextProvider.LOG.error(e.stack);
+		}
+		return Promise.resolve(null);
+	}
+
+	async getAuthorization(jwtToken : string) : Promise<string> {
+		try {
+			let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtToken)).getBody();
+			if (claims == null)
+				throw new HiveException("Invalid jwt token as authorization.");
+
+			let presentation = await this.appInstanceDid.createPresentation(
+				await this.userDid.issueDiplomaFor(this.appInstanceDid, this.appDid),
+				claims.getIssuer(), claims.get("nonce") as string);
+
+				TestAppContextProvider.LOG.debug("TestData->presentation: " + presentation.toString(true));
+			return await this.appInstanceDid.createToken(presentation,  claims.getIssuer());
+		} catch (e) {
+			TestAppContextProvider.LOG.info("TestData->getAuthorization error: " + e);
+			TestAppContextProvider.LOG.error(e.stack);
+		}
+	}
+}
 
 export class TestData {
 	public static readonly USER_DIR = process.env["HIVE_USER_DIR"] ?
@@ -27,10 +76,13 @@ export class TestData {
 	private callerContext: AppContext;
 	private clientConfig: any;
 	private userDir: string;
+	private testName: string;
 
-    constructor(clientConfig: any, userDir: string) {
+    constructor(clientConfig: any, testName: string, userDir: string) {
+		Logger.setDefaultLevel(Logger.TRACE);
 		this.userDir = userDir;
 		this.clientConfig = clientConfig;
+		this.testName = testName;
     }
 
 	public static getUniqueName(prefix: string){
@@ -41,7 +93,7 @@ export class TestData {
 		TestData.LOG.log(`Get TestData instance for test: ${testName}`);
         if (!TestData.INSTANCE) {
 			// TODO: Update ClientConfig here: ClientConfig.CUSTOM for mainnet, ClientConfig.DEV for testnet.
-            TestData.INSTANCE = new TestData(clientConfig, TestData.USER_DIR);
+            TestData.INSTANCE = new TestData(clientConfig, testName, TestData.USER_DIR);
 			await TestData.INSTANCE.init();
         }
         return TestData.INSTANCE;
@@ -81,9 +133,6 @@ export class TestData {
 
     public async init(): Promise<TestData> {
 		AppContext.setupResolver(this.clientConfig.resolverUrl, TestData.RESOLVE_CACHE);
-		if (!DIDBackend.isInitialized()) {
-			DIDBackend.initialize(new DefaultDIDAdapter(this.clientConfig.resolverUrl));
-		}
 		let applicationConfig = this.clientConfig.application;
 		this.appInstanceDid = await AppDID.create(applicationConfig.name,
 				applicationConfig.mnemonic,
@@ -113,8 +162,8 @@ export class TestData {
 		this.anonymousContext = await this.createContext(this.callerDid, AppDID.APP_DID2);
 		return this;
 	}
-
-	private async createContext(userDid: UserDID, appDid: string): Promise<AppContext> {
+/*
+	private async createContext2(userDid: UserDID, appDid: string): Promise<AppContext> {
     	const self = this;
 		return await AppContext.build({
 
@@ -150,6 +199,10 @@ export class TestData {
 				}
 			}
 		}, userDid.getDid().toString());
+	}
+*/
+	private async createContext(userDid: UserDID, appDid: string): Promise<AppContext> {
+		return await AppContext.build(new TestAppContextProvider(this, userDid, appDid, this.appInstanceDid), userDid.getDid().toString());
 	}
 
 	public getAppDid(): string {

@@ -13,7 +13,8 @@ import {
     Vault,
     QueryHasResultCondition, 
     FilesService, 
-    Executable } from "@elastosfoundation/hive-js-sdk";
+    Executable } from "../../../src";
+import { ClientConfig } from "../config/clientconfig";
 import { TestData } from "../config/testdata";
 
 describe("test scripting function", () => {
@@ -46,7 +47,7 @@ describe("test scripting function", () => {
     let localSrcFilePath: string;
     let localDstFileRoot: string;
     let localDstFilePath: string;
-    let fileName: string = "test.txt";
+    let fileName = "test.txt";
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");

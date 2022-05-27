@@ -1,4 +1,4 @@
-import {NodeInfo, NodeVersion, ServiceEndpoint, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import {NodeInfo, NodeVersion, ServiceEndpoint, VaultSubscription} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test about service", () => {
