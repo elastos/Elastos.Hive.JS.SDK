@@ -33,7 +33,7 @@ describe("test default appcontext provider", () => {
             throw e;
         }
     });
-
+/*
     test.skip("test", async () => {
         try {
             await vaultSubscription.subscribe();
@@ -41,5 +41,5 @@ describe("test default appcontext provider", () => {
             console.debug("error on subscribe:" +e);
         }
     });
-
+*/
 });
