@@ -10,10 +10,10 @@ import { Blob } from 'buffer';
 
 describe("test files service", () => {
 
-	const FILE_NAME_TXT = "tests/test.txt";
+	const FILE_NAME_TXT = "test.txt";
 	const FILE_CONTENT_TXT = "This is a test file";
 	const FILE_NAME_BACKUP = "testbackup.txt";
-	const FILE_NAME_BIN = "tests/test.dat";
+	const FILE_NAME_BIN = "test.dat";
 	const FILE_CONTENT_BIN = "This is a binary test file";
 	const FILE_NAME_NOT_EXISTS = "not_exists";
 	const REMOTE_DIR = "hive/";

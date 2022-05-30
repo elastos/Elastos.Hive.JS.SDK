@@ -32,17 +32,11 @@ describe("test provider service", () => {
     });
 
     test("testGetProviderBackups", async () => {
-        let expectedException;
-        try {
-            let backups: BackupDetail[] = await provider.getBackups();
-            expect(backups).not.toBeNull();
-            expect(backups).not.toEqual([]);
-        } catch (e) {
-            expectedException = e;
-        }
-        expect(expectedException).toBeInstanceOf(NotFoundException);
+        let backups: BackupDetail[] = await provider.getBackups();
+        expect(backups).not.toBeNull();
+        expect(backups).not.toEqual([]);
     });
-/*
+
     test.skip("testGetProviderFilledOrders", async () => {
         let expectedException;
         try {
@@ -54,5 +48,5 @@ describe("test provider service", () => {
         }
         expect(expectedException).toBeInstanceOf(NotFoundException);
     });
-*/
+
 });
