@@ -1,6 +1,6 @@
 import { Claims, DIDDocument, JWTHeader, JWTParserBuilder, VerifiableCredential, VerifiablePresentation } from "@elastosfoundation/did-js-sdk";
 import { DID as ConnDID, DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { AppContext, AppContextProvider, DIDResolverAlreadySetupException, VaultServices } from "@elastosfoundation/hive-js-sdk";
+import { AppContext, AppContextProvider, DIDResolverAlreadySetupException, Vault } from "@elastosfoundation/hive-js-sdk";
 import dayjs from "dayjs";
 
 /**
@@ -73,11 +73,11 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     return new VaultSubscriptionService(appContext, providerAddress);
   } */
 
-  public async getVaultServices(userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultServices> {
+  public async getVaultServices(userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<Vault> {
     let appContext = await this.getAppContext(userDid, onAuthError);
     if (!providerAddress)
       providerAddress = await AppContext.getProviderAddress(userDid); // TODO: cache, don't resolve every time
-    return new VaultServices(appContext, providerAddress);
+    return new Vault(appContext, providerAddress);
   }
 
   /**

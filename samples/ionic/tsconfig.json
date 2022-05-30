@@ -15,12 +15,11 @@
     "lib": ["es2020", "dom"],
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "crypto": [
-        "node_modules/crypto-browserify"
-      ],
-      "stream": [
-        "node_modules/stream-browserify"
-      ]
+      "crypto": ["node_modules/crypto-browserify"],
+      "stream": ["node_modules/stream-browserify"],
+      "assert": ["node_modules/assert"],
+      "process": ["node_modules/process"],
+      "url": ["node_modules/url"]
     }
   },
   "angularCompilerOptions": {
