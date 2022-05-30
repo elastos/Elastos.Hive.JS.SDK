@@ -5,11 +5,12 @@ import {TestData} from "../config/testdata";
 
 describe("test default appcontext provider", () => {
    
+    let testData: TestData;
     let vaultSubscription: VaultSubscription;
     
     beforeAll(async() => {
-        const testData = await TestData.getInstance("appcontextprovider.test");
-        const clientConfig = testData.getClientConfig();
+        testData = await TestData.getInstance("appcontextprovider.test");
+        let clientConfig = testData.getClientConfig();
 
         let appContextParameters = {
             storePath: `${process.env["HIVE_USER_DIR"]}/data/store/app`,
@@ -29,7 +30,7 @@ describe("test default appcontext provider", () => {
             vaultSubscription = new VaultSubscription(appContext, clientConfig.node.targetHost);
         } catch(e){
             console.debug(e);
-            fail("failed");
+            throw e;
         }
     });
 

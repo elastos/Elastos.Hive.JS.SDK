@@ -2,16 +2,22 @@ module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
     plugins: [
-      '@typescript-eslint'
+      '@typescript-eslint',
+      'jest'
     ],
     parserOptions: {
       project: "./tsconfig.json"
     },
-     extends: [
+    extends: [
       'eslint:recommended',
-     // 'plugin:node/recommended',
       'plugin:@typescript-eslint/recommended',
+      'plugin:jest/recommended',
     ],
+    env: {
+      browser: true,
+      es6: true,
+      jest: true,
+    },
     rules: {
         // Generic JS
         "space-before-function-paren": "off",

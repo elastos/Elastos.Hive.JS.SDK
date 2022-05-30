@@ -11,7 +11,7 @@ describe("test auth service", () => {
         serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
 	});
 
-	afterAll(() => { serviceEndpoint.getAccessToken().invalidate(); });
+	afterAll(async () => { await serviceEndpoint.getAccessToken().invalidate(); });
 
     test("testAuth", async () => {
 		let token = await serviceEndpoint.getAccessToken().fetch();

@@ -19,13 +19,14 @@
     "prepublishOnly": "npm run build",
     "build": "npm run build:release",
     "build:debug": "npm run clean && npm run types && rollup -c",
-    "build:release": "npm run clean && npm run types && rollup -c --environment prodbuild",
+    "build:release": "npm run lint && npm run clean && npm run types && rollup -c --environment prodbuild",
     "dev": "rollup -c -w",
     "clean": "rm -rf dist/ typings/ generated/",
     "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
     "tsc:build": "rollup -c",
     "tsc:w": "tsc -w",
     "docs": "npx typedoc src/index.ts --excludePrivate --excludeProtected --excludeInternal",
+    "lint": "eslint './src/**/*.{ts,tsx}' && eslint './tests/src/**/*.{ts,tsx}'",
     "test": "jest",
     "test:node": "JEST_CIRCUS=1 jest --silent=false --verbose --runInBand --config jest.node.config.ts",
     "test:node:debug": "JEST_CIRCUS=1 node --inspect-brk node_modules/.bin/jest --runInBand --config jest.node.config.ts",
@@ -34,9 +35,12 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
+    "@elastosfoundation/did-js-sdk": "^2.2.9",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",
+    "buffer": "^5.6.0",
+    "cd": "^0.3.3",
     "dayjs": "^1.10.4",
     "jsrsasign": "^10.5.0",
     "jsrsasign-util": "^1.0.2",
@@ -44,10 +48,7 @@
     "pretend": "^3.1.0",
     "tslib": "^2.3.1",
     "url": "^0.11.0",
-    "web3": "^1.6.0",
-    "buffer": "^5.6.0",
-    "cd": "^0.3.3",
-    "@elastosfoundation/did-js-sdk": "^2.2.9"
+    "web3": "^1.6.0"
   },
   "repository": {
     "type": "git",
@@ -71,8 +72,11 @@
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.24",
     "@types/node": "^14.18.2",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "eslint": "^8.16.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jest": "^26.2.2",
     "antlr4ts-cli": "^0.5.0-alpha.4",
     "babel-jest": "^27.5.1",
     "jest": "^26.6.3",
@@ -99,7 +103,8 @@
     "ts-jest": "^26.5.6",
     "ts-node": "^10.8.0",
     "typedoc": "^0.22.13",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.2",
+    "lint-staged": "^10.0.8"
   },
   "files": [
     "dist",
@@ -117,5 +122,13 @@
   "homepage": "https://github.com/elastos/Elastos.Hive.JS.SDK#readme",
   "directories": {
     "test": "tests"
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,tsx}": [
+      "eslint"
+    ],
+    "tests/src/**/*.{js,ts,tsx}": [
+      "eslint"
+    ]
   }
 }

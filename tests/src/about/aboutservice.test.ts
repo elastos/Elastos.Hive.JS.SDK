@@ -1,4 +1,4 @@
-import {NodeInfo, NodeVersion, ServiceEndpoint, VaultSubscription} from "../../../src";
+import {NodeInfo, NodeVersion, VaultSubscription} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test about service", () => {

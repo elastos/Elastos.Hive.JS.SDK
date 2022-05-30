@@ -5,7 +5,6 @@ import { TestData } from "../config/testdata"
 describe("test backup services", () => {
 
     let testData: TestData;
-    let vault: Vault;
     let vaultSubscription: VaultSubscription;
     let backupService: BackupService;
 
@@ -21,11 +20,7 @@ describe("test backup services", () => {
                 throw e;
             }
         }
-        vault = new Vault(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-
-        backupService = vault.getBackupService();
+        backupService = testData.newVault().getBackupService();
     });
 
     test("testCheckResult", async () => {

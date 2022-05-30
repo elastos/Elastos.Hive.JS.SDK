@@ -25,29 +25,33 @@ describe("test provider service", () => {
         }
     });
 
-    test("test get vaults", async () => {
+    test("testGetProviderVaults", async () => {
         let vaults: VaultDetail[] = await provider.getVaults();
         expect(vaults).not.toBeNull();
         expect(vaults).not.toEqual([]);
     });
 
-    test("test get backups", async () => {
+    test("testGetProviderBackups", async () => {
+        let expectedException;
         try {
             let backups: BackupDetail[] = await provider.getBackups();
             expect(backups).not.toBeNull();
             expect(backups).not.toEqual([]);
         } catch (e) {
-            expect(e).toBeInstanceOf(NotFoundException);
+            expectedException = e;
         }
+        expect(expectedException).toBeInstanceOf(NotFoundException);
     });
 
-    test.skip("test get filled orders", async () => {
+    test.skip("testGetProviderFilledOrders", async () => {
+        let expectedException;
         try {
             let orders: FilledOrderDetail[] = await provider.getFilledOrders();
             expect(orders).not.toBeNull();
             expect(orders).not.toEqual([]);
         } catch (e) {
-            expect(e).toBeInstanceOf(NotFoundException);
+            expectedException = e;
         }
+        expect(expectedException).toBeInstanceOf(NotFoundException);
     });
 });

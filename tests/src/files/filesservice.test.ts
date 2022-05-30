@@ -10,10 +10,10 @@ import { Blob } from 'buffer';
 
 describe("test files service", () => {
 
-	const FILE_NAME_TXT = "test.txt";
+	const FILE_NAME_TXT = "tests/test.txt";
 	const FILE_CONTENT_TXT = "This is a test file";
 	const FILE_NAME_BACKUP = "testbackup.txt";
-	const FILE_NAME_BIN = "test.dat";
+	const FILE_NAME_BIN = "tests/test.dat";
 	const FILE_CONTENT_BIN = "This is a binary test file";
 	const FILE_NAME_NOT_EXISTS = "not_exists";
 	const REMOTE_DIR = "hive/";
@@ -22,7 +22,7 @@ describe("test files service", () => {
 	const FILE_STR_NAME = "string.dat";
 	const FILE_STR_CONTENT = "This is a string test file";
 
-	const FILE_PUBLIC_NAME = "test_public.txt";
+	const FILE_PUBLIC_NAME = "tests/test_public.txt";
 	const FILE_PUBLIC_CONTENT = "This is a public test file";
 
 	let filesService: FilesService;
@@ -141,7 +141,7 @@ describe("test files service", () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME
 		await filesService.upload(filePath, FILE_STR_CONTENT);
 		const data = await filesService.download(filePath);
-		expectBuffersToBeEqual(new Buffer(FILE_STR_CONTENT), data);
+		expectBuffersToBeEqual(Buffer.from(FILE_STR_CONTENT), data);
 		await filesService.delete(filePath);
 	});
 
@@ -156,7 +156,7 @@ describe("test files service", () => {
 		const obj = {hello: 'world'};
 		const blob = new Blob([JSON.stringify(obj, null, 2)], {type : 'application/json'});
 		const arrayBuffer2Buffer = (arrayBuffer: ArrayBuffer) => {
-			const buffer = new Buffer(arrayBuffer.byteLength);
+			const buffer = Buffer.alloc(arrayBuffer.byteLength);
 			const view = new Uint8Array(arrayBuffer);
 			for (let i = 0; i < buffer.length; ++i) {
 				buffer[i] = view[i];

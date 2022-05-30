@@ -1,13 +1,12 @@
 import { TestData } from "./config/testdata";
-
 import {PromotionService, VaultSubscription} from "../../src";
 
 describe.skip("test database services", () => {
+    let testData:TestData;
     let promotionService: PromotionService;
 
     beforeAll(async () => {
-        const testData = await TestData.getInstance("promotionservice.tests");
-        promotionService = testData.newBackup().getPromotionService();
+        testData = await TestData.getInstance("promotionservice.tests");
         const vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
             testData.getProviderAddress());
@@ -16,6 +15,7 @@ describe.skip("test database services", () => {
         } catch (e) {
             // do nothing.
         }
+        promotionService = testData.newBackup().getPromotionService();
     });
 
     test("testPromote", async () => {

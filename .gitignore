@@ -33,9 +33,6 @@ plugins/ios.json
 www/
 docs/
 $RECYCLE.BIN/
-tests/data/**
-tests/generated/
-tests/test-report.html
 typings/
 
 .DS_Store
@@ -45,8 +42,8 @@ package-lock.json
 
 .jscramblerrc
 appdid
-#data/
-#generated/
+data/
+generated/
 src/**/*.js
 src/**/*.map
 tests/src/**/*.js
