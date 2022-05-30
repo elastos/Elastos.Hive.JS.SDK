@@ -1,5 +1,4 @@
-import ClientConfig from "./config/clientconfig";
-import {AppContext, HiveException, VaultServices, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
+import {AppContext, HiveException} from "@elastosfoundation/hive-js-sdk";
 import {Claims, DIDDocument, JWTParserBuilder} from "@elastosfoundation/did-js-sdk";
 import {AppDID} from "./did/appdid";
 import {UserDID} from "./did/userdid";
