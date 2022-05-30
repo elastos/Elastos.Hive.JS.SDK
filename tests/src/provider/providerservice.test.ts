@@ -42,7 +42,7 @@ describe("test provider service", () => {
         }
         expect(expectedException).toBeInstanceOf(NotFoundException);
     });
-
+/*
     test.skip("testGetProviderFilledOrders", async () => {
         let expectedException;
         try {
@@ -54,4 +54,5 @@ describe("test provider service", () => {
         }
         expect(expectedException).toBeInstanceOf(NotFoundException);
     });
+*/
 });

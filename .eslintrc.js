@@ -65,6 +65,7 @@ module.exports = {
         "jest/no-focused-tests": "warn",
         "jest/no-identical-title": "warn",
         "jest/prefer-to-have-length": "warn",
+        "jest/no-commented-out-tests":"warn",
         "jest/valid-expect": "error"
     }
 };
