@@ -39,7 +39,8 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "allowedCommonJsDependencies": ["assert", "url", "process"]
           },
           "configurations": {
             "production": {

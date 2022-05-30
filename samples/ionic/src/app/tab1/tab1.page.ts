@@ -10,7 +10,7 @@ import {
 } from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "../hivejs/browser_login";
 import {BrowserVault} from "../hivejs/browser_vault";
-import {PaymentContract} from "../hivejs/payment/payment_contract";
+import {PaymentContract} from "hive-js-payment-sdk";
 
 @Component({
     selector: 'app-tab1',
@@ -42,7 +42,7 @@ export class Tab1Page {
         // This used to run in node style or browser style which will work with essentials application.
         this.isBrowser = true;
 
-        this.paymentContract = new PaymentContract();
+        this.paymentContract = new PaymentContract(true);
     }
 
     async initPaymentContract() {
