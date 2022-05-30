@@ -58,6 +58,13 @@ module.exports = {
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-empty-interface": "off"
+        "@typescript-eslint/no-empty-interface": "off",
+
+        // Test specific
+        "jest/no-disabled-tests":"warn",
+        "jest/no-focused-tests": "warn",
+        "jest/no-identical-title": "warn",
+        "jest/prefer-to-have-length": "warn",
+        "jest/valid-expect": "error"
     }
 };
