@@ -53,12 +53,15 @@ export class HttpClient {
         headers: HttpClient.DEFAULT_HEADERS
     };
 
-    private withAuthorization = false;
+    private readonly withAuthorization;
     private serviceContext: ServiceEndpoint;
     private httpOptions: HttpOptions;
     private httpOptionsInitialized = false;
 
     constructor(serviceContext: ServiceEndpoint, withAuthorization: boolean, httpOptions: HttpOptions) {
+        if (withAuthorization && !serviceContext.hasAppContext())
+            throw new Error('Can not set authorization without AppContext');
+
         this.serviceContext = serviceContext;
         this.withAuthorization = withAuthorization;
         this.httpOptions = httpOptions;
@@ -76,7 +79,7 @@ export class HttpClient {
 
       if (statusCode >= 300) {
 
-        if (this.withAuthorization && statusCode == 401) {
+        if (this.serviceContext.hasAppContext() && this.withAuthorization && statusCode == 401) {
           await this.serviceContext.getAccessToken().invalidate();
         }
         if (!content) {

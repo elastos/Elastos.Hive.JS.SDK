@@ -1,7 +1,8 @@
-import {NodeInfo, NodeVersion, ServiceEndpoint} from "@elastosfoundation/hive-js-sdk";
+import {NodeInfo, NodeVersion, ServiceEndpoint, Logger} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe.skip("test about service", () => {
+    const LOG = new Logger('aboutservice.test');
 
 	let testData: TestData;
     let serviceEndpoint: ServiceEndpoint;
@@ -14,13 +15,12 @@ describe.skip("test about service", () => {
     test("testGetNodeVersion", async () => {
 		let nodeVersion: NodeVersion = await serviceEndpoint.getNodeVersion();
 		expect(nodeVersion).not.toBeNull();
-        console.log("Hive Node version: " + nodeVersion.toString());
+        LOG.info("Hive Node version: {}", nodeVersion.toString());
     });
-
     test("testGetCommitId", async () => {
 		let commitId = await serviceEndpoint.getLatestCommitId();
 		expect(commitId).not.toBeNull();
-        console.log("Hive Node commit id: " + commitId);
+        LOG.info("Hive Node commit id: {}", commitId);
     });
 
     test("testGetNodeInfo", async () => {
