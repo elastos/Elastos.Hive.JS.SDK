@@ -10,7 +10,7 @@ import {
 } from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "../hivejs/browser_login";
 import {BrowserVault} from "../hivejs/browser_vault";
-import {PaymentContract} from "hive-js-payment-sdk";
+import {PaymentContract} from "@elastosfoundation/hive-payment-js-sdk";
 
 @Component({
     selector: 'app-tab1',
