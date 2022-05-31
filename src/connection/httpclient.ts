@@ -1,12 +1,12 @@
-import { checkNotNull } from '../utils/utils';
-import { ServiceEndpoint } from './serviceendpoint';
-import { HttpResponseParser } from './httpresponseparser';
-import { NodeRPCException, UnauthorizedException } from '../exceptions';
-import { StreamResponseParser } from './streamresponseparser';
-import { HttpMethod } from './httpmethod';
-import { HttpOptions, HttpHeaders } from './httpoptions';
-import { Logger } from '../utils/logger';
-import axios, { Method } from "axios";
+import {checkNotNull} from '../utils/utils';
+import {ServiceEndpoint} from './serviceendpoint';
+import {HttpResponseParser} from './httpresponseparser';
+import {NodeRPCException, UnauthorizedException} from '../exceptions';
+import {StreamResponseParser} from './streamresponseparser';
+import {HttpMethod} from './httpmethod';
+import {HttpHeaders, HttpOptions} from './httpoptions';
+import {Logger} from '../utils/logger';
+import axios, {Method} from "axios";
 
 export class HttpClient {
     private static LOG = new Logger("HttpClient");
@@ -134,9 +134,9 @@ export class HttpClient {
         }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.info("HTTP Request: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + " withAuthorization: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? " payload: " + payload.toString() : ""));
+        HttpClient.LOG.info("HTTP Request URL: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + ", token: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? ", payload: " + payload.toString() : ""));
         if (options.headers['Authorization']) {
-          HttpClient.LOG.debug("HTTP Header: " + options.headers['Authorization']);
+          HttpClient.LOG.debug("HTTP Request Header: " + options.headers['Authorization']);
         }
 
         return new Promise<T>((resolve, reject) => {
@@ -152,17 +152,17 @@ export class HttpClient {
               }
             }).then(async (response) => {
                 if (isStream) {
-                  HttpClient.LOG.info("HTTP Response: Status: " + response.status + " (\"STREAM\")");
-                  HttpClient.LOG.debug("HTTP Response: Size: " + response.data.byteLength);
+                  HttpClient.LOG.info("HTTP Response Status: " + response.status + " (\"STREAM\")");
+                  HttpClient.LOG.debug("HTTP Response Size: " + response.data.byteLength + " (\"STREAM\")");
                   streamParser.onData(Buffer.from(response.data, 'binary'));
                   await self.handleResponse(response.status);
                   streamParser.onEnd();
                   resolve(null as T);
                 } else {
                   const rawContent = response.data;
-                  HttpClient.LOG.info("HTTP Response: Status: " + response.status);
+                  HttpClient.LOG.info("HTTP Response Status: " + response.status);
                   if (rawContent) {
-                    HttpClient.LOG.debug("HTTP response: " + rawContent);
+                    HttpClient.LOG.debug("HTTP Response Content: " + rawContent);
                   }
                     await self.handleResponse(response.status, rawContent);
                   let deserialized = responseParser.deserialize(rawContent);
@@ -193,10 +193,8 @@ export class HttpClient {
 
         if (this.withAuthorization) {
           try {
-            let accessToken = this.serviceContext.getAccessToken();
-            let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
-            HttpClient.LOG.debug("Canonical Access Token: " + canonicalAccessToken);
-            requestOptions.headers['Authorization'] = canonicalAccessToken;
+            const accessToken = this.serviceContext.getAccessToken();
+            requestOptions.headers['Authorization'] = await accessToken.getCanonicalizedAccessToken();
           } catch(e) {
             HttpClient.LOG.error("Authentication error: {}", e);
             throw new UnauthorizedException("Authentication error", e);

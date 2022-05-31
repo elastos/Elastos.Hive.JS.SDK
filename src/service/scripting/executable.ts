@@ -13,7 +13,7 @@ export class ExecutableType {
 }
 export class Executable extends Condition {
 
-    output: boolean;
+    output = true;
    
     constructor(name: string, type: ExecutableType, body: any) {
         super(name, type as string, body);
@@ -25,8 +25,7 @@ export class Executable extends Condition {
     }
 
     public static createRunFileParams(path: string) : any {
-		let node = {"path": path};
-		return node;
+		return {"path": path};
 	}
 }
 

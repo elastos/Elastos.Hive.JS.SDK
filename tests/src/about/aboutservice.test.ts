@@ -25,6 +25,7 @@ describe.skip("test about service", () => {
 		expect(nodeVersion).not.toBeNull();
         LOG.info("Hive Node version: {}", nodeVersion.toString());
     });
+
     test("testGetCommitId", async () => {
 		let commitId = await vaultSubscription.getLatestCommitId();
 		expect(commitId).not.toBeNull();
