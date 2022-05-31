@@ -8,9 +8,16 @@ export class ScriptRunner extends ServiceEndpoint{
 
     private scriptService: ScriptingService;
 
+    /**
+     * ScriptRunner can be used by other caller with or without auth token.
+     *
+     * @param context null means to do anonymous access the script
+     * @param providerAddress must provide when context is null
+     */
     public constructor(context: AppContext, providerAddress?: string) {
         super(context, providerAddress);
-        const httpClient   = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
+        const is_auth = context != null ? HttpClient.WITH_AUTHORIZATION : HttpClient.NO_AUTHORIZATION;
+        const httpClient   = new HttpClient(this, is_auth, HttpClient.DEFAULT_OPTIONS);
         this.scriptService = new ScriptingService(this, httpClient);
     }
 
