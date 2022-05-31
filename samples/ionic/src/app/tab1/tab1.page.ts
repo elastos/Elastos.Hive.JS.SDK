@@ -215,7 +215,23 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const orders = await this.paymentContract.getOrders();
-            console.log(`get orders successfully: ${orders}`);
+            console.log(`getOrders() successfully: ${orders}`);
+        });
+    }
+
+    async getOrderByIndex() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const order = await this.paymentContract.getOrderByIndex(0);
+            console.log(`getOrderByIndex() successfully: ${order}`);
+        });
+    }
+
+    async getOrderCount() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const count = await this.paymentContract.getOrderCount();
+            console.log(`getOrderCount() successfully: ${count}`);
         });
     }
 
@@ -224,7 +240,7 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const orderId = 0;
             const order = await this.paymentContract.getOrder(orderId);
-            console.log(`get order successfully: ${order}`);
+            console.log(`getOrder() successfully: ${order}`);
         });
     }
 }
