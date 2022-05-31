@@ -116,7 +116,7 @@ export class ScriptingService extends RestService {
 	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(data, "data must be provided.");
-		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
 		try {
 			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
