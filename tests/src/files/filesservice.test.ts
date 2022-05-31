@@ -141,7 +141,7 @@ describe("test files service", () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME
 		await filesService.upload(filePath, FILE_STR_CONTENT);
 		const data = await filesService.download(filePath);
-		expectBuffersToBeEqual(new Buffer(FILE_STR_CONTENT), data);
+		expectBuffersToBeEqual(Buffer.from(FILE_STR_CONTENT), data);
 		await filesService.delete(filePath);
 	});
 
@@ -156,7 +156,7 @@ describe("test files service", () => {
 		const obj = {hello: 'world'};
 		const blob = new Blob([JSON.stringify(obj, null, 2)], {type : 'application/json'});
 		const arrayBuffer2Buffer = (arrayBuffer: ArrayBuffer) => {
-			const buffer = new Buffer(arrayBuffer.byteLength);
+			const buffer = Buffer.alloc(arrayBuffer.byteLength);
 			const view = new Uint8Array(arrayBuffer);
 			for (let i = 0; i < buffer.length; ++i) {
 				buffer[i] = view[i];

@@ -16,7 +16,8 @@ import {
     Executable } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-describe("test scripting function", () => {
+// @deprecated
+describe.skip("test scripting function", () => {
 
     let testData: TestData;
     let vaultSubscription: VaultSubscription;

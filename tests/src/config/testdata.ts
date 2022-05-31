@@ -85,6 +85,10 @@ export class TestData {
         return `${testsDir}/data/${network}/localCache`;
     }
 
+    getClientConfig() {
+        return this.clientConfig;
+    }
+
 	getUserAppContext(): AppContext {
 		return this.userAppContext;
 	}
