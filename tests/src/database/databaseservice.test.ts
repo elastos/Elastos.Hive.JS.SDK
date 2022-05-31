@@ -68,7 +68,7 @@ describe("test database services", () => {
 
     test("testFindOne", async () => {
         //setup
-        let collectionName = TestData.getUniqueName("testFindOne");
+        let collectionName = getUniqueName("testFindOne");
         await databaseService.createCollection(collectionName);
         let nodes = {"author": "john doe1", "title": "Eve for Dummies1"};
         await expect(databaseService.insertOne(collectionName, nodes)).resolves.not.toThrow();
@@ -80,7 +80,7 @@ describe("test database services", () => {
 
     test("testFindOne4NotFoundException", async () => {
 		let query = {"author": "john doe1"};
-        await expect(databaseService.findOne(TestData.getUniqueName("testFindOne4NotFoundException"), query)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.findOne(getUniqueName("testFindOne4NotFoundException"), query)).rejects.toThrow(NotFoundException);
 	});
    
     test("testFindMany", async () => {
@@ -195,6 +195,10 @@ describe("test database services", () => {
     test("testDeleteCollection", async () => {
         await expect(databaseService.deleteCollection(COLLECTION_NAME)).resolves.not.toThrow();
     });
+
+    function getUniqueName(prefix: string){
+        return `${prefix}_${Date.now().toString()}`;
+    }
 
     async function deleteCollectionAnyway() {
         try {
