@@ -141,7 +141,7 @@ describe("test files service", () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME
 		await filesService.upload(filePath, FILE_STR_CONTENT);
 		const data = await filesService.download(filePath);
-		expectBuffersToBeEqual(new Buffer(FILE_STR_CONTENT), data);
+		expectBuffersToBeEqual(Buffer.from(FILE_STR_CONTENT), data);
 		await filesService.delete(filePath);
 	});
 
