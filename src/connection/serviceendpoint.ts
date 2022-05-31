@@ -1,4 +1,3 @@
-import { checkNotNull } from '../utils/utils'
 import { File } from '../utils/storage/file'
 import { AppContext } from './auth/appcontext'
 import { AccessToken } from './auth/accesstoken'
@@ -26,28 +25,37 @@ export class ServiceEndpoint {
     private static LOG_SERVICE_CONTEXT = new Logger("ServiceEndpoint");
 
     constructor(context: AppContext, providerAddress?: string) {
-        checkNotNull(context, "Empty context parameter");
+        if (!context && !providerAddress)
+            throw new Error('Invalid parameter: context and providerAddress can not all empty');
 
-        this.context = context;
+        this.context = context;  // nullable
         this.providerAddress = providerAddress;
 
         this.init();
     }
 
     private init(): void {
-
-        let dataDir = this.context.getAppContextProvider().getLocalDataDir();
-        if (!dataDir.endsWith(File.SEPARATOR))
-            dataDir += File.SEPARATOR;
-
-        //ServiceEndpoint.LOG_SERVICE_CONTEXT.debug("Init Service Context");
-        this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
-        this.accessToken = new AccessToken(this, this.dataStorage);
         this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
-        this.aboutServiceAuth = new AboutService(this, new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+
+        if (this.context) {
+            let dataDir = this.context.getAppContextProvider().getLocalDataDir();
+            if (!dataDir.endsWith(File.SEPARATOR))
+                dataDir += File.SEPARATOR;
+
+            this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
+            this.accessToken = new AccessToken(this, this.dataStorage);
+            this.aboutServiceAuth = new AboutService(this, new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+        }
+    }
+
+    hasAppContext(): boolean {
+        return this.context != null;
     }
 
     public getAccessToken(): AccessToken {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         return this.accessToken;
     }
 
@@ -59,6 +67,9 @@ export class ServiceEndpoint {
     }
 
     public getAppContext(): AppContext {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         return this.context;
     }
 
@@ -68,6 +79,9 @@ export class ServiceEndpoint {
      * @return user did
      */
     public getUserDid(): string {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         return this.context.getUserDid();
     }
 
@@ -77,7 +91,7 @@ export class ServiceEndpoint {
      * @return application did
      */
     public getAppDid(): string {
-        return this.appDid;
+        throw new NotImplementedException();
     }
 
     /**
@@ -95,7 +109,7 @@ export class ServiceEndpoint {
      * @return node service did
      */
     public getServiceDid(): string {
-        throw new NotImplementedException();
+        return this.serviceInstanceDid;
     }
 
     /**
@@ -113,10 +127,16 @@ export class ServiceEndpoint {
     }
 
     public getStorage(): DataStorage {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         return this.dataStorage;
     }
 
     public async refreshAccessToken(): Promise<void> {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         await this.accessToken.fetch();
     }
 
@@ -129,6 +149,9 @@ export class ServiceEndpoint {
     }
 
     public async getNodeInfo(): Promise<NodeInfo> {
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
         return await this.aboutServiceAuth.getInfo();
     }
 }
