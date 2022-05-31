@@ -22,14 +22,10 @@ describe("test scripting runner function", () => {
     let vaultSubscription: VaultSubscription;
     let vault: Vault;
 
-    const UPLOAD_FILE_NAME = "upload_file";
-    const DOWNLOAD_FILE_NAME = "download_file";
-    const DOWNLOAD_BY_HIVE_URL = "download_by_hive_url";
-    const FILE_PROPERTIES_NAME = "file_properties";
-    const FILE_HASH_NAME = "file_hash";
-
     const COLLECTION_NAME = "js_script_database";
-    const FILE_CONTENT = "this is test file abcdefghijklmnopqrstuvwxyz";
+    const FILE_NAME = "js_script_file.txt";
+    const FILE_CONTENT = 'File Content: 1234567890';
+    const FILE_HASH = '161d165c6b49616cc82846814ccb2bbaa0928b8570bac7f6ba642c65d6006cfe';
 
     let targetDid: string;
     let appDid: string;
@@ -37,11 +33,7 @@ describe("test scripting runner function", () => {
     let databaseService: DatabaseService;
     let scriptingService: ScriptingService;
     let scriptRunner: ScriptRunner;
-
-    let localSrcFilePath: string;
-    let localDstFileRoot: string;
-    let localDstFilePath: string;
-    let fileName: string = "test.txt";
+    let anonymousRunner: ScriptRunner;
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");
@@ -49,6 +41,7 @@ describe("test scripting runner function", () => {
         vault = new Vault(testData.getUserAppContext(), testData.getProviderAddress());
 
         scriptRunner = new ScriptRunner(testData.getCallerAppContext(), testData.getProviderAddress());
+        anonymousRunner = new ScriptRunner(null, testData.getProviderAddress());
 
         try {
             await vaultSubscription.subscribe();
@@ -82,7 +75,7 @@ describe("test scripting runner function", () => {
                 console.error(`Failed to remove collection: ${e}`);
             }
         }
-        try {
+        try { // remove vault to remove file
             await vaultSubscription.unsubscribe();
         } catch (e) {
             console.log("vault is already subscribed");
@@ -201,70 +194,47 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     });
 
-    test("testDownloadAndUpload", async () => {
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
-        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
-        await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
-        let buffer = await downloadFileByTransActionId(downloadTransactionId);
-        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+    test("testUpload", async () => {
+        await uploadFile();
+        await uploadFile(true, true);
     });
 
-    test("testDownloadAndUploadWithString", async () => {
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
-        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUpload.txt");
-        await uploadFileByTransActionId(uploadTransactionId, FILE_CONTENT);
-
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUpload.txt");
-        let buffer = await downloadFileByTransActionId(downloadTransactionId);
-        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+    test("testUploadAndDownload", async () => {
+        await uploadFile();
+        await downloadFile();
+        await downloadFile(true);
     });
 
     test("testDownloadFileByHiveUrl", async () => {
-        const fileName = "testDownloadUploadByHiveUrl.txt";
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
-        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-        await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
-
-        await registerScriptFileDownload(DOWNLOAD_BY_HIVE_URL, false, 'fake_executable_name');
-        const hiveUrl = `hive://${targetDid}@${appDid}/${DOWNLOAD_BY_HIVE_URL}?params={"path": "${fileName}"}`;
-        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
-        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
-    });
-
-    test("testDownloadAndUploadAnonymous", async () => {
-        await registerScriptFileUpload(UPLOAD_FILE_NAME);
-        let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUploadAnonymous.txt");
-        await uploadFileByTransActionId(uploadTransactionId, Buffer.from(FILE_CONTENT));
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME, true);
-        let downloadTransactionId = await callScriptFileDownload(DOWNLOAD_FILE_NAME, "testDownloadUploadAnonymous.txt");
-        let buffer = await downloadFileByTransActionId(downloadTransactionId);
-        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+        await uploadFile();
+        await downloadFileByHiveUrl();
+        await downloadFileByHiveUrl(true);
     });
 
     test("testDownloadWithInvalidTransactionId", async () => {
-        let expectedException;
-        await registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-        let invalidTransactionId = "0000000";
-        try {
-            await downloadFileByTransActionId(invalidTransactionId);
-        } catch (e) {
-            expectedException = e;
+        const invalidTransactionId = "0000000";
+        async function downloadFileWithInvalidTransId(anonymous=false) {
+            try {
+                await getScriptRunner(anonymous).downloadFile(invalidTransactionId);
+            } catch (e) {
+                expect(e).toBeInstanceOf(InvalidParameterException);
+            }
         }
-        expect(expectedException).toBeInstanceOf(InvalidParameterException);
+
+        await downloadFileWithInvalidTransId();
+        await downloadFileWithInvalidTransId(true);
     });
 
     test("testFileProperties", async () => {
-        await registerScriptFileProperties(FILE_PROPERTIES_NAME);
-        await callScriptFileProperties(FILE_PROPERTIES_NAME, "testDownloadUpload.txt");
+        await uploadFile();
+        await fileProperties();
+        await fileProperties(true);
     });
 
     test("testFileHash", async () => {
-        await registerScriptFileHash(FILE_HASH_NAME);
-        await callScriptFileHash(FILE_HASH_NAME, "testDownloadUpload.txt");
-        await scriptingService.unregisterScript(FILE_HASH_NAME);
+        await uploadFile();
+        await fileHash();
+        await fileHash(true);
     });
 
     interface InsertResponse {
@@ -288,6 +258,22 @@ describe("test scripting runner function", () => {
         database_delete: { acknowledged: boolean, deleted_count: number};
     }
 
+    interface UploadResponse {
+        file_upload: { transaction_id: string };
+    }
+
+    interface DownloadResponse {
+        file_download: { transaction_id: string };
+    }
+
+    interface PropertiesResponse {
+        file_properties: { type: string, name: string, size: number, last_modify: number };
+    }
+
+    interface HashResponse {
+        file_hash: { SHA256: string };
+    }
+
     /**
      * except buffers are equal.
      * @param expected
@@ -306,83 +292,100 @@ describe("test scripting runner function", () => {
         }
     }
 
-    async function registerScriptFileUpload(scriptName: string) {
+    function getScriptRunner(anonymous=false) {
+        return anonymous ? anonymousRunner : scriptRunner;
+    }
+
+    async function uploadFile(anonymous=false, bufferContent=false) {
+        const [scriptName, executableName] = ['script_file_upload', 'file_upload'];
+
+        // register upload script
         await scriptingService.registerScript(scriptName,
-            new FileUploadExecutable(scriptName).setOutput(true),
-            undefined,
-            false, false);
-    }
+            new FileUploadExecutable(executableName), null, anonymous, anonymous);
 
-    async function callScriptFileUpload(scriptName: string, fileName: string): Promise<string> {
-        let result = await scriptRunner.callScript<any>(scriptName,
-            Executable.createRunFileParams(fileName),
-            targetDid, appDid);
+        // call upload script
+        const result: UploadResponse = await getScriptRunner(anonymous).callScript<UploadResponse>(scriptName,
+            Executable.createRunFileParams(FILE_NAME), targetDid, appDid);
         expect(result).not.toBeNull();
-        expect(result[scriptName]).not.toBeNull();
+        expect(result.file_upload).not.toBeNull();
+        expect(result.file_upload.transaction_id).not.toBeNull();
 
-        console.log(JSON.stringify(result[scriptName]));
-        expect(result[scriptName].transaction_id).not.toBeNull();
-        return result[scriptName].transaction_id;
+        // upload file
+        const content = bufferContent ? Buffer.from(FILE_CONTENT) : FILE_CONTENT;
+        await getScriptRunner(anonymous).uploadFile(result.file_upload.transaction_id, content);
+
+        await scriptingService.unregisterScript(scriptName);
     }
 
-    async function uploadFileByTransActionId( transactionId: string, content: any): Promise<void> {
-        await scriptRunner.uploadFile(transactionId, content);
-    }
+    async function downloadFile(anonymous=false) {
+        const [scriptName, executableName] = ['script_file_download', 'file_download'];
 
-    async function registerScriptFileProperties( scriptName: string) {
+        // register download script
         await scriptingService.registerScript(scriptName,
-            new FilePropertiesExecutable(scriptName).setOutput(true),
-            undefined,
-            false, false);
-    }
+            new FileDownloadExecutable(executableName), null, anonymous, anonymous);
 
-    async function callScriptFileProperties(scriptName: string, fileName: string): Promise<void> {
-        let result = await scriptRunner.callScript<any>(scriptName,
-            Executable.createRunFileParams(fileName),
-            targetDid, appDid);
+        // call download script
+        const result: DownloadResponse = await getScriptRunner(anonymous).callScript<DownloadResponse>(scriptName,
+            Executable.createRunFileParams(FILE_NAME), targetDid, appDid);
         expect(result).not.toBeNull();
-        expect(result[scriptName]).not.toBeNull();
-        expect(result[scriptName].size).not.toBeNull();
-        expect(Number(result[scriptName].size) > 0);
+        expect(result.file_download).not.toBeNull();
+        expect(result.file_download.transaction_id).not.toBeNull();
+
+        // download file
+        const buffer = await getScriptRunner(anonymous).downloadFile(result.file_download.transaction_id);
+        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+
+        await scriptingService.unregisterScript(scriptName);
     }
 
-    async function registerScriptFileHash(scriptName: string) {
+    async function downloadFileByHiveUrl(anonymous=false) {
+        const [scriptName, executableName] = ['script_file_download_by_hiveurl', 'file_download'];
+
+        // register download script
         await scriptingService.registerScript(scriptName,
-            new FileHashExecutable(scriptName).setOutput(true));
+            new FileDownloadExecutable(executableName), null, anonymous, anonymous);
+
+        const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}?params={"path":"${FILE_NAME}"}`;
+        const buffer = await getScriptRunner(anonymous).downloadFileByHiveUrl(hiveUrl);
+        expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
+
+        await scriptingService.unregisterScript(scriptName);
     }
 
-    async function callScriptFileHash(scriptName: string, fileName: string) {
-        let result = await scriptRunner.callScript(scriptName,
-            Executable.createRunFileParams(fileName),
-            targetDid, appDid);
-        expect(result).not.toBeNull();
-        expect(result[scriptName]).not.toBeNull();
-        expect(result[scriptName].SHA256).not.toBeNull();
-        expect(result[scriptName].SHA256.length).toBeGreaterThan(0);
-    }
+    async function fileProperties(anonymous=false) {
+        const [scriptName, executableName] = ['script_file_properties', 'file_properties'];
 
-    async function registerScriptFileDownload(scriptName: string, anonymous?: boolean, executableName?: string) {
-        const name = executableName ? executableName : scriptName;
+        // register script
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(name).setOutput(true),
-            undefined,
-            anonymous ?? false, anonymous ?? false);
+            new FilePropertiesExecutable(executableName), null, anonymous, anonymous);
+
+        // call script
+        const result: PropertiesResponse = await getScriptRunner(anonymous).callScript<PropertiesResponse>(scriptName,
+            Executable.createRunFileParams(FILE_NAME), targetDid, appDid);
+        expect(result).not.toBeNull();
+        expect(result.file_properties).not.toBeNull();
+        expect(result.file_properties.type).toEqual('file');
+        expect(result.file_properties.name).toEqual(FILE_NAME);
+        expect(result.file_properties.size).toEqual(FILE_CONTENT.length);
+        expect(result.file_properties.last_modify).toBeGreaterThan(0);
+
+        await scriptingService.unregisterScript(scriptName);
     }
 
-    async function callScriptFileDownload(scriptName: string, fileName: string): Promise<string> {
-        let result = await scriptRunner.callScript(scriptName,
-            Executable.createRunFileParams(fileName),
-            targetDid, appDid);
+    async function fileHash(anonymous=false) {
+        const [scriptName, executableName] = ['script_file_hash', 'file_hash'];
+
+        // register script
+        await scriptingService.registerScript(scriptName,
+            new FileHashExecutable(executableName), null, anonymous, anonymous);
+
+        // call script
+        const result: HashResponse = await getScriptRunner(anonymous).callScript<HashResponse>(scriptName,
+            Executable.createRunFileParams(FILE_NAME), targetDid, appDid);
         expect(result).not.toBeNull();
-        expect(result[scriptName]).not.toBeNull();
-        expect(result[scriptName].transaction_id).not.toBeNull();
-        if ('anonymous_url' in result[scriptName]) {
-            expect(result[scriptName].anonymous_url).not.toBeNull();
-            console.log(`anonymous_url: ${result[scriptName].anonymous_url}`);
-        }
-        return result[scriptName].transaction_id;
-    }
-    async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
-        return await scriptRunner.downloadFile(transactionId);
+        expect(result.file_hash).not.toBeNull();
+        expect(result.file_hash.SHA256).toEqual(FILE_HASH);
+
+        await scriptingService.unregisterScript(scriptName);
     }
 });
