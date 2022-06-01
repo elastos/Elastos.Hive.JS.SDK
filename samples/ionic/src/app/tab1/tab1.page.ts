@@ -36,10 +36,10 @@ export class Tab1Page {
     constructor() {
         this.message = 'Tab 1 Page';
 
-        // This used to switch between mainnet and testnet.
+        // TODO: This used to switch between mainnet and testnet.
         ClientConfig.setCurrent(ClientConfig.DEV);
 
-        // This used to run in node style or browser style which will work with essentials application.
+        // TODO: This used to run in node style or browser style which will work with essentials application.
         this.isBrowser = true;
 
         this.paymentContract = new PaymentContract(true);
@@ -58,10 +58,10 @@ export class Tab1Page {
      */
     private async getVault(): Promise<NodeVault> {
         if (!this.vault) {
-            await browserLogin.initAndLogin();
-            if (this.isBrowser)
+            if (this.isBrowser) {
+                await browserLogin.initAndLogin();
                 this.vault = new BrowserVault();
-            else
+            } else
                 this.vault = await NodeVault.create();
         }
         return this.vault;
