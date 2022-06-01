@@ -22,7 +22,7 @@ describe("test files service", () => {
 	const FILE_STR_NAME = "string.dat";
 	const FILE_STR_CONTENT = "This is a string test file";
 
-	const FILE_PUBLIC_NAME = "tests/test_public.txt";
+	const FILE_PUBLIC_NAME = "test_public.txt";
 	const FILE_PUBLIC_CONTENT = "This is a public test file";
 
 	let filesService: FilesService;
@@ -154,22 +154,11 @@ describe("test files service", () => {
 	test("testUploadBinBlob", async () => {
 		const fileName = REMOTE_DIR + FILE_NAME_BIN + 'Blob';
 		const obj = {hello: 'world'};
-		const blob = new Blob([JSON.stringify(obj, null, 2)], {type : 'application/json'});
-		const arrayBuffer2Buffer = (arrayBuffer: ArrayBuffer) => {
-			const buffer = Buffer.alloc(arrayBuffer.byteLength);
-			const view = new Uint8Array(arrayBuffer);
-			for (let i = 0; i < buffer.length; ++i) {
-				buffer[i] = view[i];
-			}
-			return buffer;
-		};
-		const blob2Buffer = async (b: Blob) => {
-			return arrayBuffer2Buffer(await b.arrayBuffer());
-		};
-		await filesService.upload(fileName, await blob2Buffer(blob));
+		const blob = Buffer.from(JSON.stringify(obj));
+		await filesService.upload(fileName, blob);
 		await verifyRemoteFileExists(fileName);
 		const dataBuffer = await filesService.download(fileName);
-		expectBuffersToBeEqual(await blob2Buffer(blob), dataBuffer);
+		expectBuffersToBeEqual(blob, dataBuffer);
 	});
 
 	test("testDownloadText", async () => {

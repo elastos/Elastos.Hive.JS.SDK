@@ -40,7 +40,7 @@ describe("test default appcontext provider", () => {
         }
     });
 
-    test("testValidProvider", async () => {
+    test.skip("testValidProvider", async () => {
         await vaultSubscription.subscribe();
     });
 
