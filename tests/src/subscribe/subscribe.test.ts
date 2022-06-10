@@ -4,7 +4,7 @@ import {
     BackupSubscription,
     Order,
     AlreadyExistsException
-} from "@elastosfoundation/hive-js-sdk";
+} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test vault subscribe function", () => {
@@ -13,7 +13,7 @@ describe("test vault subscribe function", () => {
     let vaultSubscription: VaultSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
         vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
@@ -106,7 +106,7 @@ describe("test backup subscribe function", () => {
     let backupsubscriptionService: BackupSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
         backupsubscriptionService = new BackupSubscription(
             testData.getAppContext(),

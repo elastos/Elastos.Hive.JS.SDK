@@ -121,7 +121,6 @@ export class DefaultAppContextProvider implements AppContextProvider {
             if (claims == null)
                 throw new HiveException("Invalid jwt token as authorization.");
 
-
 			DefaultAppContextProvider.LOG.debug("getAuthorization createPresentation");	
 			
 			let diploma = await this.issueDiplomaFor(DID.from(this.contextParameters.appDID));
@@ -130,11 +129,9 @@ export class DefaultAppContextProvider implements AppContextProvider {
 			let presentation = await this.createPresentation(
                 diploma,
                 claims.getIssuer(), claims.get("nonce") as string);
-                
-            //TestData.LOG.debug("TestData->presentation: " + presentation.toString(true)); 
             return await this.createToken(presentation,  claims.getIssuer());
         } catch (e) {
-			DefaultAppContextProvider.LOG.error("TestData->getAuthorization error: {} stack {}", e, e.stack);	
+			DefaultAppContextProvider.LOG.error("{} stack {}", e, e.stack);	
         }
     }
 

@@ -1,5 +1,4 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
-import { checkNotNull } from '../../utils/utils';
 import {
      IllegalArgumentException,
      DIDResolverAlreadySetupException,

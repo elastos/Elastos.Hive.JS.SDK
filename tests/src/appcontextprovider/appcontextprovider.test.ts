@@ -1,15 +1,16 @@
-import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
+import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "../../../src";
 import {TestData} from "../config/testdata";
 
 
 
 describe("test default appcontext provider", () => {
    
+    let testData: TestData;
     let vaultSubscription: VaultSubscription;
     
     beforeAll(async() => {
-        const testData = await TestData.getInstance("appcontextprovider.test");
-        const clientConfig = testData.getClientConfig();
+        testData = await TestData.getInstance("appcontextprovider.test");
+        let clientConfig = testData.getClientConfig();
 
         let appContextParameters = {
             storePath: `${process.env["HIVE_USER_DIR"]}/data/store/app`,
@@ -29,16 +30,18 @@ describe("test default appcontext provider", () => {
             vaultSubscription = new VaultSubscription(appContext, clientConfig.node.targetHost);
         } catch(e){
             console.debug(e);
-            fail("failed");
+            throw e;
+        }
+
+        try {
+            await vaultSubscription.unsubscribe();
+        } catch (e) {
+            // Prevent an error on already subscribed vault
         }
     });
 
-    test.skip("test", async () => {
-        try {
-            await vaultSubscription.subscribe();
-        } catch(e) {
-            console.debug("error on subscribe:" +e);
-        }
+    test.skip("testValidProvider", async () => {
+        await vaultSubscription.subscribe();
     });
 
 });

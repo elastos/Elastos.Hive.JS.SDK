@@ -1,6 +1,6 @@
 import {TestData} from "./config/testdata";
-import {AlreadyExistsException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
-import {DefaultDIDAdapter, DIDBackend} from "@elastosfoundation/did-js-sdk";
+import {AlreadyExistsException, VaultSubscription} from "../../src";
+import {ClientConfig} from "./config/clientconfig";
 
 /**
  * Please run this file in mainnet
@@ -8,12 +8,8 @@ import {DefaultDIDAdapter, DIDBackend} from "@elastosfoundation/did-js-sdk";
  */
 
 describe.skip("test service without provider address", () => {
-    beforeAll(() => {
-    });
-
     test("testDatabaseServiceWithoutProviderAddress", async () => {
-        DIDBackend.initialize(new DefaultDIDAdapter('mainnet'));
-        const testData = await TestData.getInstance("databaseservice.tests");
+        const testData = await TestData.getInstance("noprovideraddress.test", ClientConfig.CUSTOM);
         const vaultSubscription = new VaultSubscription(testData.getAppContext());
         try {
             await vaultSubscription.subscribe();

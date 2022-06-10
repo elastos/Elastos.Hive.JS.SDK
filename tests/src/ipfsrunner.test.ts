@@ -1,5 +1,5 @@
 import {assertEquals} from "./util";
-import {IpfsRunner} from "@elastosfoundation/hive-js-sdk";
+import {IpfsRunner} from "../../src";
 
 describe.skip("test ipfs runner", () => {
     beforeAll(() => {

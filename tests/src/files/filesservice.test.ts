@@ -4,7 +4,7 @@ import {
 	FilesService, IpfsRunner,
 	NotFoundException, ScriptRunner,
 	VaultSubscription
-} from "@elastosfoundation/hive-js-sdk";
+} from "../../../src";
 import { TestData } from "../config/testdata";
 import { Blob } from 'buffer';
 
@@ -141,7 +141,7 @@ describe("test files service", () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME
 		await filesService.upload(filePath, FILE_STR_CONTENT);
 		const data = await filesService.download(filePath);
-		expectBuffersToBeEqual(new Buffer(FILE_STR_CONTENT), data);
+		expectBuffersToBeEqual(Buffer.from(FILE_STR_CONTENT), data);
 		await filesService.delete(filePath);
 	});
 
@@ -154,22 +154,11 @@ describe("test files service", () => {
 	test("testUploadBinBlob", async () => {
 		const fileName = REMOTE_DIR + FILE_NAME_BIN + 'Blob';
 		const obj = {hello: 'world'};
-		const blob = new Blob([JSON.stringify(obj, null, 2)], {type : 'application/json'});
-		const arrayBuffer2Buffer = (arrayBuffer: ArrayBuffer) => {
-			const buffer = new Buffer(arrayBuffer.byteLength);
-			const view = new Uint8Array(arrayBuffer);
-			for (let i = 0; i < buffer.length; ++i) {
-				buffer[i] = view[i];
-			}
-			return buffer;
-		};
-		const blob2Buffer = async (b: Blob) => {
-			return arrayBuffer2Buffer(await b.arrayBuffer());
-		};
-		await filesService.upload(fileName, await blob2Buffer(blob));
+		const blob = Buffer.from(JSON.stringify(obj));
+		await filesService.upload(fileName, blob);
 		await verifyRemoteFileExists(fileName);
 		const dataBuffer = await filesService.download(fileName);
-		expectBuffersToBeEqual(await blob2Buffer(blob), dataBuffer);
+		expectBuffersToBeEqual(blob, dataBuffer);
 	});
 
 	test("testDownloadText", async () => {

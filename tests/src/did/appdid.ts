@@ -1,4 +1,4 @@
-import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, DefaultDIDAdapter, DIDBackend, VerificationEventListener } from "@elastosfoundation/did-js-sdk";
+import { VerifiableCredential, VerifiablePresentation, DIDDocument, JWTHeader, VerificationEventListener } from "@elastosfoundation/did-js-sdk";
 import dayjs from "dayjs";
 import { DIDEntity } from "./didentity";
 
@@ -12,8 +12,6 @@ export class AppDID extends DIDEntity {
 
 	public static async create(name: string, mnemonic: string, phrasepass: string, storepass: string,
 							   resolver: string, did?: string): Promise<AppDID> {
-		// TODO: should not call this again because of AppContext.setupResolver(), check this with did js sdk.
-		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
         let newInstance = new AppDID(name, mnemonic, phrasepass, storepass, did);
 		await newInstance.initDid(mnemonic, false);
         return newInstance;

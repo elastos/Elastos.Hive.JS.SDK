@@ -50,7 +50,7 @@ export class FilesService extends RestService {
 	public async upload(path: string, data: Buffer | string, is_public = false, script_name?: string): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkNotNull(data, "data must be provided.");
-		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
 		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 

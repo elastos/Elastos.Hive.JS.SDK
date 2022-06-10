@@ -82,6 +82,7 @@ export class ScriptingService extends RestService {
 			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, { "context": context, "params": params }, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
+					ScriptingService.LOG.debug("CALLSCRIPT: " + content);
 					return JSON.parse(content) as T;
 				}
 			}, HttpMethod.PATCH);
@@ -116,7 +117,7 @@ export class ScriptingService extends RestService {
 	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(data, "data must be provided.");
-		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
 		try {
 			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
