@@ -1,6 +1,6 @@
 {
-  "name": "@elastosfoundation/hive-js-sdk",
-  "version": "2.6.3",
+  "name": "@dchagastelles/hive-js-sdk",
+  "version": "2.7.13",
   "description": "Elastos Hive JS SDK",
   "exports": {
     "node": "./dist/hive.js",
@@ -29,6 +29,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@dchagastelles/commons.js.tools": "^1.0.11",
+    "@elastosfoundation/did-js-sdk": "^2.2.4",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",
@@ -37,8 +39,7 @@
     "jsrsasign-util": "^1.0.2",
     "postcss": "^8.4.4",
     "pretend": "^3.1.0",
-    "tslib": "^2.3.1",
-    "@elastosfoundation/did-js-sdk": "^2.2.4"
+    "tslib": "^2.3.1"
   },
   "repository": {
     "type": "git",

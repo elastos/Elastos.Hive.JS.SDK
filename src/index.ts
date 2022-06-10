@@ -113,6 +113,8 @@ import { AppInfo } from "./service/subscription/appinfo"
 import { BackupResult, BackupResultResult, BackupResultState } from "./service/backup/backupresult"
 import { InsertResult } from "./service/database/insertresult"
 import { SubscriptionInfo } from "./service/subscription/subscriptioninfo"
+import { HiveClient } from "./hiveclient";
+import { HiveContextProvider } from "./hivecontextprovider";
 
 Logger.setDefaultLevel(Logger.DEBUG);
 
@@ -257,4 +259,6 @@ export {
     // Utilities
     SHA256,
     Utils,
+    HiveClient,
+    HiveContextProvider, 
 }
