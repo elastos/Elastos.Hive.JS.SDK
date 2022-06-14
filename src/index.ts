@@ -76,6 +76,7 @@ import { IllegalArgumentException,
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./service/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./service/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./service/scripting/findexecutable";
+import { CountExecutable, CountExecutableBody } from "./service/scripting/countexecutable";
 import { InsertExecutable, InsertExecutableBody } from "./service/scripting/insertexecutable";
 import { FileHashExecutable } from "./service/scripting/filehashexecutable";
 import { AggregatedExecutable } from "./service/scripting/aggregatedexecutable";
@@ -196,6 +197,8 @@ export {
     InsertExecutableBody,
     FindExecutable,
     FindExecutableBody,
+    CountExecutable,
+    CountExecutableBody,
     FileHashExecutable,
     UpdateExecutable,
     UpdateExecutableBody,

@@ -73,7 +73,7 @@ export class AboutService extends RestService {
 				}
 			},HttpMethod.GET);
 		} catch (e) {
-			throw new NetworkException("Error getting node commit id", e);
+			throw new NetworkException("Error getting node information.", e);
 		}
 	}
 

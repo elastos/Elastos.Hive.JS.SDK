@@ -3,6 +3,7 @@ import { Condition } from "./condition";
 export class ExecutableType {
     public static AGGREGATED = "aggregated";
     public static FIND = "find";
+    public static COUNT = "count";
     public static INSERT = "insert";
     public static UPDATE = "update";
     public static DELETE = "delete";
