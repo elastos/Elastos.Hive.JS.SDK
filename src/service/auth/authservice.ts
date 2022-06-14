@@ -53,8 +53,7 @@ export class AuthService extends RestService {
 
 		AuthService.LOG.trace("challenge={} appInstanceDidDoc.getSubject().toString()={}", challenge, appInstanceDidDoc.getSubject().toString());
 		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
-			AuthService.LOG.error("Failed to check the valid of challenge code when sign in.");
-			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid challenge code, possibly being hacked.");
+			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid challenge code.");
 		}
 		return challenge;
     }

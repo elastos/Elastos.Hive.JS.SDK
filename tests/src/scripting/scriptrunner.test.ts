@@ -12,7 +12,7 @@ import {
     ScriptingService, ScriptRunner,
     Vault,
     QueryHasResultCondition,
-    Executable, NotFoundException, AlreadyExistsException
+    Executable, NotFoundException, AlreadyExistsException, CountExecutable
 } from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
@@ -131,6 +131,25 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     });
 
+    test("testCount", async () => {
+        const scriptName = 'script_database_count';
+        const executableName = 'database_count';
+        const filter = { "author": "$params.author" };
+
+        await scriptingService.registerScript(scriptName,
+            new CountExecutable(executableName, COLLECTION_NAME, filter, null),
+            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+
+        const result: CountResponse =
+            await scriptRunner.callScript<CountResponse>(scriptName, {"author": "John"}, targetDid, appDid);
+
+        expect(result).not.toBeNull();
+        expect(result.database_count).not.toBeNull();
+        expect(result.database_count.count).toEqual(4);
+
+        await scriptingService.unregisterScript(scriptName);
+    });
+
     test("testFind", async () => {
         const scriptName = 'database_find';
         const filter = { "author": "$params.author" };
@@ -243,6 +262,10 @@ describe("test scripting runner function", () => {
 
     interface FindResponse {
         database_find: { total: number, items: []};
+    }
+
+    interface CountResponse {
+        database_count: { count: number};
     }
 
     interface UpdateResponse {

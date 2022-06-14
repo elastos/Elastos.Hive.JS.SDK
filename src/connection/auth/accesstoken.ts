@@ -59,14 +59,15 @@ export class AccessToken {
 		this.jwtCode = await this.restoreToken();
 		if (this.jwtCode == null) {
 			this.jwtCode = await this.authService.fetch();
-
 			if (this.jwtCode != null) {
-				await this.bridge.flush(this.jwtCode);
 				await this.saveToken(this.jwtCode);
 			}
-		} else {
+		}
+
+		if (this.jwtCode != null) {
 			await this.bridge.flush(this.jwtCode);
 		}
+
 		return Promise.resolve(this.jwtCode);
 	}
 
@@ -76,50 +77,46 @@ export class AccessToken {
 
 	private async restoreToken() : Promise<string> {
 		let endpoint = this.bridge.target() as ServiceEndpoint;
-
 		if (endpoint == null)
 			return null;
 
-		let jwtCode = null;
-		let serviceDid;
-		let address;
+		let serviceDid = endpoint.getServiceInstanceDid();
+		let address	= await endpoint.getProviderAddress();
 
-		serviceDid = endpoint.getServiceInstanceDid();
-		address	= await endpoint.getProviderAddress();
+        let jwtCode = this.storage.loadAccessTokenByAddress(address);
+        if (jwtCode == null && serviceDid) {
+            jwtCode = this.storage.loadAccessToken(serviceDid);
+        }
 
-		if (serviceDid != null)
-			jwtCode = this.storage.loadAccessToken(serviceDid);
-
-		if (jwtCode != null && this.isExpired(jwtCode)) {
-			this.storage.clearAccessTokenByAddress(address);
-			serviceDid && this.storage.clearAccessToken(serviceDid);
-		}
-
-		if (jwtCode == null)
-			jwtCode = this.storage.loadAccessTokenByAddress(address);
-
-
-		if (jwtCode != null && this.isExpired(jwtCode)) {
-			this.storage.clearAccessTokenByAddress(address);
-			serviceDid && this.storage.clearAccessToken(serviceDid);
-		}
+        if (jwtCode == null || await this.isExpired(jwtCode)) {
+            this.storage.clearAccessTokenByAddress(address);
+            serviceDid && this.storage.clearAccessToken(serviceDid);
+            return null;
+        }
 
 		return jwtCode;
 	}
 
-	private isExpired(jwtCode: string) : boolean {
-		// This validation is also disabled in the Java implementation.
-		// return System.currentTimeMillis() >= (getExpiresTime() * 1000);
-		return false;
+	private async isExpired(jwtCode: string) : Promise<boolean> {
+        let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
+        if (claims == null)
+            return true;
+
+        return claims.getExpiration() * 1000 < Date.now();
 	}
 
 	private async saveToken( jwtCode: string) : Promise<void> {
 		let endpoint = this.bridge.target() as ServiceEndpoint;
-		if (endpoint == null || !endpoint.getServiceInstanceDid())
-			return;
+		if (endpoint == null)
+		    return;
 
-		this.storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
-		this.storage.storeAccessTokenByAddress(await endpoint.getProviderAddress(), jwtCode);
+		const serviceDid = endpoint.getServiceInstanceDid();
+		if (serviceDid)
+            this.storage.storeAccessToken(serviceDid, jwtCode);
+
+		const address = await endpoint.getProviderAddress();
+        if (address)
+		    this.storage.storeAccessTokenByAddress(address, jwtCode);
 	}
 
 	private async clearToken(): Promise<void> {
