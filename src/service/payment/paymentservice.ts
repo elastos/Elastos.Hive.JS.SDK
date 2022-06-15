@@ -1,14 +1,13 @@
-import { HttpClient } from "../../connection/httpclient";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
-import { RestService } from "../restservice";
-import { Order } from  "./order";
-import { Receipt } from  "./receipt";
-import { checkNotNull } from "../../utils/utils";
-import { HttpMethod } from "../../connection/httpmethod";
-import {IllegalArgumentException, NotImplementedException} from "../../exceptions";
-import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { NetworkException, NodeRPCException } from "../../exceptions";
+import {HttpClient} from "../../connection/httpclient";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {Logger} from '../../utils/logger';
+import {RestService} from "../restservice";
+import {Order, OrderState} from "./order";
+import {Receipt} from "./receipt";
+import {checkNotNull} from "../../utils/utils";
+import {HttpMethod} from "../../connection/httpmethod";
+import {IllegalArgumentException, NetworkException, NodeRPCException, NotImplementedException} from "../../exceptions";
+import {HttpResponseParser} from "../../connection/httpresponseparser";
 
 export class PaymentService extends RestService {
 	private static LOG = new Logger("PaymentService");
@@ -41,7 +40,9 @@ export class PaymentService extends RestService {
 			},
 			<HttpResponseParser<Order>> {
 				deserialize(content: any): Order {
-                    return Object.assign(new Order(), JSON.parse(content));
+                    let json_dict = JSON.parse(content);
+                    json_dict['state'] = PaymentService.getOrderStateByStr(json_dict['state']);
+                    return Object.assign(new Order(), json_dict);
 				}
 			},
 			HttpMethod.PUT);
@@ -50,6 +51,20 @@ export class PaymentService extends RestService {
 			this.handleError(e);
 		}
 	}
+
+	private static getOrderStateByStr(value: string): OrderState {
+        if (value === 'normal') {
+            return OrderState.NORMAL;
+        } else if (value === 'expired') {
+            return OrderState.EXPIRED;
+        } else if (value === 'paid') {
+            return OrderState.PAID;
+        } else if (value === 'archive') {
+            return OrderState.ARCHIVE;
+        } else {
+            throw Error('Unknown result.');
+        }
+    }
 
     /**
      * Pay order with smart contract by wallet application.
@@ -120,7 +135,10 @@ export class PaymentService extends RestService {
 			<HttpResponseParser<Order[]>> {
 				deserialize(content: any): Order[] {
 					const jsonObjs: [] = JSON.parse(content)['orders'];
-					return jsonObjs.map(o => Object.assign(new Order(), o));
+					return jsonObjs.map((o: {[key: string]: string}) => {
+                        o['state'] = PaymentService.getOrderStateByStr(o['state']);
+                        return Object.assign(new Order(), o);
+                    });
 				}
 			},
 			HttpMethod.GET);

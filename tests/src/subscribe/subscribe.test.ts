@@ -3,8 +3,8 @@ import {
     PricingPlan,
     BackupSubscription,
     Order,
-    AlreadyExistsException
-} from "../../../src";
+    AlreadyExistsException, SubscriptionInfo
+} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
 describe("test vault subscribe function", () => {
@@ -13,7 +13,7 @@ describe("test vault subscribe function", () => {
     let vaultSubscription: VaultSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
         vaultSubscription = new VaultSubscription(
             testData.getUserAppContext(),
@@ -88,7 +88,9 @@ describe("test vault subscribe function", () => {
             vaultInfo = await vaultSubscription.subscribe();
         }
         expect(vaultInfo).not.toBeNull();
-        expect(await vaultSubscription.checkSubscription()).not.toBeNull();
+        const result: SubscriptionInfo = await vaultSubscription.checkSubscription();
+        expect(result).not.toBeNull();
+        expect(result.getEndTime()).toBeTruthy();
         let error = null;
         try {
             await vaultSubscription.unsubscribe()
@@ -106,7 +108,7 @@ describe("test backup subscribe function", () => {
     let backupsubscriptionService: BackupSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
         backupsubscriptionService = new BackupSubscription(
             testData.getUserAppContext(),
@@ -134,7 +136,9 @@ describe("test backup subscribe function", () => {
             backupInfo = await backupsubscriptionService.subscribe();
         }
         expect(backupInfo).not.toBeNull();
-        expect(await backupsubscriptionService.checkSubscription()).not.toBeNull();
+        const result: SubscriptionInfo = await backupsubscriptionService.checkSubscription();
+        expect(result).not.toBeNull();
+        expect(result.getEndTime()).toBeTruthy();
         let error = null;
         try {
             await backupsubscriptionService.unsubscribe()

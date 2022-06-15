@@ -95,7 +95,7 @@ import { DeleteOptions, DeleteIndex, DeleteOrder } from "./service/database/dele
 import { UpdateResult } from "./service/database/updateresult";
 import { CaseFirst, Strength, Alternate, Collation, MaxVariable } from "./service/database/collation";
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./service/database/sortitem";
-import { Order } from "./service/payment/order";
+import { Order, OrderState } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./connection/auth/defaultappcontextprovider";
 import { BackupContext } from "./service/backup/backupcontext";
@@ -218,6 +218,7 @@ export {
     AscendingSortItem,
     DescendingSortItem,
     Order,
+    OrderState,
     Receipt,
     UpdateResult,
     CaseFirst,

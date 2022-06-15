@@ -1,7 +1,7 @@
-import {Order, Receipt, VaultSubscription, Logger, BackupSubscription} from "@elastosfoundation/hive-js-sdk";
+import {Order, OrderState, Receipt, VaultSubscription, Logger, BackupSubscription} from "@elastosfoundation/hive-js-sdk";
 import { TestData } from "../config/testdata";
 
-describe.skip("test payment service", () => {
+describe("test payment service", () => {
     const LOG = new Logger("paymentservice.test");
 
 	const PRICING_PLAN_NAME = "Rookie";
@@ -33,7 +33,7 @@ describe.skip("test payment service", () => {
         LOG.log("Payment Service version: " + paymentVersion);
     });
 
-    test("testPlaceOrder", async () => {
+    test.skip("testPlaceOrder", async () => {
         let order: Order = await vaultSubscription.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
         expect(order.getSubscription()).toEqual('vault');
@@ -43,11 +43,12 @@ describe.skip("test payment service", () => {
         expect(order.getCreateTime()).toBeGreaterThan(0);
         expect(order.getExpirationTime()).toBeGreaterThan(0);
         expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getState()).toEqual(OrderState.NORMAL);
         expect(order.getProof()).not.toBeNull();
         console.log(`PROOF: ${order.getProof()}`);
     });
 
-    test("testPlaceOrder backup", async () => {
+    test.skip("testPlaceOrder backup", async () => {
         let order: Order = await backupSubscription.placeOrder(PRICING_PLAN_NAME);
         expect(order).not.toBeNull();
         expect(order.getSubscription()).toEqual('backup');
@@ -57,11 +58,12 @@ describe.skip("test payment service", () => {
         expect(order.getCreateTime()).toBeGreaterThan(0);
         expect(order.getExpirationTime()).toBeGreaterThan(0);
         expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getState()).toEqual(OrderState.NORMAL);
         expect(order.getProof()).not.toBeNull();
         console.log(`PROOF: ${order.getProof()}`);
     });
 
-    test("testSettleOrder", async () => {
+    test.skip("testSettleOrder", async () => {
         // payOrder from demo.
 
         let receipt: Receipt = await vaultSubscription.settleOrder(1);
@@ -77,7 +79,7 @@ describe.skip("test payment service", () => {
         expect(receipt.getReceiptProof()).not.toBeNull();
     });
 
-    test("testSettleOrder backup", async () => {
+    test.skip("testSettleOrder backup", async () => {
         // payOrder from demo.
 
         let receipt: Receipt = await backupSubscription.settleOrder(3);
@@ -93,8 +95,8 @@ describe.skip("test payment service", () => {
         expect(receipt.getReceiptProof()).not.toBeNull();
     });
 
-    test("testGetOrder", async () => {
-        let order: Order = await vaultSubscription.getOrder(1);
+    test.skip("testGetOrder", async () => {
+        const order: Order = await vaultSubscription.getOrder(1);
         expect(order).not.toBeNull();
         expect(order.getSubscription()).not.toBeNull();
         expect(order.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
@@ -103,16 +105,27 @@ describe.skip("test payment service", () => {
         expect(order.getCreateTime()).toBeGreaterThan(0);
         expect(order.getExpirationTime()).toBeGreaterThan(0);
         expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getState()).not.toBeNull();
         expect(order.getProof()).not.toBeNull();
     });
 
-    test("testGetOrders", async () => {
-        let orders: Order[] = await vaultSubscription.getOrderList();
+    test.skip("testGetOrders", async () => {
+        const orders: Order[] = await vaultSubscription.getOrderList();
         expect(orders).not.toBeNull();
         expect(orders.length).toBeGreaterThan(0);
+        const order: Order = orders[0];
+        expect(order.getSubscription()).not.toBeNull();
+        expect(order.getPricingPlan()).toEqual(PRICING_PLAN_NAME);
+        expect(order.getPayingDid()).not.toBeNull();
+        expect(order.getPaymentAmount()).toBeGreaterThan(0);
+        expect(order.getCreateTime()).toBeGreaterThan(0);
+        expect(order.getExpirationTime()).toBeGreaterThan(0);
+        expect(order.getReceivingAddress()).not.toBeNull();
+        expect(order.getState()).not.toBeNull();
+        expect(order.getProof()).not.toBeNull();
     });
 
-    test("testGetReceipt", async () => {
+    test.skip("testGetReceipt", async () => {
         const receipts: Receipt[] = await vaultSubscription.getReceipts(1);
         expect(receipts.length).toEqual(1);
         const receipt = receipts[0];
@@ -128,7 +141,7 @@ describe.skip("test payment service", () => {
         expect(receipt.getReceiptProof()).not.toBeNull();
     });
 
-    test("testGetReceipts", async () => {
+    test.skip("testGetReceipts", async () => {
         const receipts: Receipt[] = await vaultSubscription.getReceipts();
         expect(receipts.length).toBeGreaterThanOrEqual(1);
     });
