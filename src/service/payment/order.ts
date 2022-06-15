@@ -1,3 +1,10 @@
+export enum OrderState {
+    NORMAL = "normal",
+    EXPIRED = "expired",
+    PAID = "paid",
+    ARCHIVE = "archive",
+}
+
 /**
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
@@ -10,6 +17,7 @@ export class Order {
     private create_time: number;
     private expiration_time: number;
     private receiving_address: string;
+    private state: OrderState;
     private proof: string;
 
 	getOrderId(): number {
@@ -83,6 +91,14 @@ export class Order {
 		this.receiving_address = receivingAddress;
         return this;
 	}
+
+    getState(): string {
+        return this.state;
+    }
+
+	setState(state: OrderState) {
+	    this.state = state;
+    }
 
 	getProof(): string {
 		return this.proof;
