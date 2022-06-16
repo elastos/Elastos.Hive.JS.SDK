@@ -3,7 +3,7 @@ import { BridgeHandler } from './bridgehandler';
 import { ServiceEndpoint } from '../serviceendpoint';
 import { AuthService } from '../../service/auth/authservice';
 import { HttpClient } from '../httpclient';
-import { Logger } from '@dchagastelles/commons.js.tools';
+import { Logger } from '@carlduranleau/commons.js.tools';
 import { Claims, JWTParserBuilder } from '@elastosfoundation/did-js-sdk'
 
 /**

@@ -176,7 +176,8 @@ export default command => {
         input: 'src/index.ts',
         onwarn,
         external: [
-            '@elastosfoundation/did-js-sdk'
+            '@elastosfoundation/did-js-sdk',
+            '@carlduranleau/commons.js.tools'
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */

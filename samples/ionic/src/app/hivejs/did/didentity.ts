@@ -1,6 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File } from "@elastosfoundation/hive-js-sdk";
-import { Logger } from "@dchagastelles/commons.js.tools";
+import { Logger } from "@carlduranleau/commons.js.tools";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");

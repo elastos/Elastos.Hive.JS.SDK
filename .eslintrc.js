@@ -2,16 +2,22 @@ module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
     plugins: [
-      '@typescript-eslint'
+      '@typescript-eslint',
+      'jest'
     ],
     parserOptions: {
       project: "./tsconfig.json"
     },
-     extends: [
+    extends: [
       'eslint:recommended',
-     // 'plugin:node/recommended',
       'plugin:@typescript-eslint/recommended',
+      'plugin:jest/recommended',
     ],
+    env: {
+      browser: true,
+      es6: true,
+      jest: true,
+    },
     rules: {
         // Generic JS
         "space-before-function-paren": "off",
@@ -52,6 +58,15 @@ module.exports = {
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-empty-interface": "off"
+        "@typescript-eslint/no-empty-interface": "off",
+
+        // Test specific
+        "jest/expect-expect":"off",
+        "jest/no-disabled-tests":"warn",
+        "jest/no-focused-tests": "warn",
+        "jest/no-identical-title": "warn",
+        "jest/prefer-to-have-length": "warn",
+        "jest/no-commented-out-tests":"warn",
+        "jest/valid-expect": "error"
     }
 };

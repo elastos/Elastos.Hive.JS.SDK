@@ -1,6 +1,6 @@
 import { File } from './file'
 import { DataStorage } from './datastorage'
-import { Logger, SHA256 } from '@dchagastelles/commons.js.tools';
+import { Logger, SHA256 } from '@carlduranleau/commons.js.tools';
 
 export class FileStorage implements DataStorage {
 	private static LOG = new Logger("FileStorage");

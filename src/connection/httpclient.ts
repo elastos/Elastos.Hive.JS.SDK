@@ -1,4 +1,4 @@
-import { Validators, Logger, NodeRPCException, UnauthorizedException } from '@dchagastelles/commons.js.tools';
+import { Validators, Logger, NodeRPCException, UnauthorizedException } from '@carlduranleau/commons.js.tools';
 import { ServiceEndpoint } from './serviceendpoint';
 import { HttpResponseParser } from './httpresponseparser';
 import { StreamResponseParser } from './streamresponseparser';

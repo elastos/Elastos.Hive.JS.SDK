@@ -8,7 +8,7 @@ if (!existsSync("./generated"))
 writeFileSync("./generated/browserdata.json", "{}");
 
 const config: InitialOptionsTsJest = {
-  rootDir: "./src",
+  rootDir: "./tests/src",
   preset: 'ts-jest',
   transform: {
     ...tsjPreset.transform,

@@ -7,7 +7,7 @@ import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { StreamResponseParser } from '../../connection/streamresponseparser';
 import { Context } from './context';
 import { HttpMethod } from '../../connection/httpmethod';
-import { Logger, Validators, InvalidParameterException, NodeRPCException } from '@dchagastelles/commons.js.tools';
+import { Logger, Validators, InvalidParameterException, NodeRPCException } from '@carlduranleau/commons.js.tools';
 import { RestService } from '../restservice';
 
 interface HiveUrl {
@@ -81,6 +81,7 @@ export class ScriptingService extends RestService {
 			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
 			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, { "context": context, "params": params }, <HttpResponseParser<T>> {
 				deserialize(content: any): T {
+					ScriptingService.LOG.debug("CALLSCRIPT: " + content);
 					return JSON.parse(content) as T;
 				}
 			}, HttpMethod.PATCH);
@@ -115,7 +116,7 @@ export class ScriptingService extends RestService {
 	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
 		Validators.checkNotNull(transactionId, "Missing transactionId.");
 		Validators.checkNotNull(data, "data must be provided.");
-		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		Validators.checkArgument(content.length > 0, "No data to upload.");
 		try {
 			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");

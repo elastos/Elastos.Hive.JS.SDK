@@ -1,7 +1,7 @@
 import {defaults as tsjPreset} from "ts-jest/presets";
 
 module.exports = {
-    rootDir: "./src",
+    rootDir: "./tests/src",
     preset: 'ts-jest',
     transform: {
         ...tsjPreset.transform,

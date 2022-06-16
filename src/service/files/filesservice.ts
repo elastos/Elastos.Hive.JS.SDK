@@ -4,7 +4,7 @@ import { StreamResponseParser } from "../../connection/streamresponseparser";
 import {  NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger, NodeRPCException, Validators } from '@dchagastelles/commons.js.tools';
+import { Logger, NodeRPCException, Validators } from '@carlduranleau/commons.js.tools';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 
@@ -49,7 +49,7 @@ export class FilesService extends RestService {
 	public async upload(path: string, data: Buffer | string, is_public = false, script_name?: string): Promise<string> {
 		Validators.checkNotNull(path, "Remote destination path is mandatory.");
 		Validators.checkNotNull(data, "data must be provided.");
-		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
+		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		Validators.checkArgument(content.length > 0, "No data to upload.");
 		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 

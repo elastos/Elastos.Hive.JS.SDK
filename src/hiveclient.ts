@@ -8,7 +8,7 @@ import { ServiceEndpoint } from "./connection/serviceendpoint";
 import { DIDResolverAlreadySetupException  } from './exceptions';
 import { HiveContextProvider } from "./hivecontextprovider";
 
-import { Logger, CacheManager } from '@dchagastelles/commons.js.tools';
+import { Logger, CacheManager } from '@carlduranleau/commons.js.tools';
 
   
   export class HiveClientParameters {
@@ -125,7 +125,7 @@ import { Logger, CacheManager } from '@dchagastelles/commons.js.tools';
     //   hiveHost: string
     // ): Promise<HiveClient> {
     //   HiveClient.LOG.trace('createAnonymousInstance');
-    //   let hiveClient: HiveClient = CacheManager.get('HiveClient', hiveHost);
+    //   let hiveClient: HiveClient = CacheManager.get(hiveHost, 'HiveClient');
   
     //   if (!hiveClient) {
     //     HiveClient.LOG.debug('Creating new anonymous HiveClient instance...');
@@ -173,7 +173,7 @@ import { Logger, CacheManager } from '@dchagastelles/commons.js.tools';
       appContextParameters?: HiveClientParameters
     ): Promise<HiveClient> {
       HiveClient.LOG.trace('createInstance');
-      let hiveClient = CacheManager.get('HiveClient');
+      let hiveClient = CacheManager.get(appContextParameters, 'HiveClient');
   
       if (!hiveClient) {
         HiveClient.LOG.debug('Creating new HiveClient instance...');
@@ -213,9 +213,9 @@ import { Logger, CacheManager } from '@dchagastelles/commons.js.tools';
           )
         );
         HiveClient.LOG.debug('New HiveClient created.');
-        CacheManager.set('Hiveclient', appContextParameters, hiveClient);
+        CacheManager.set(appContextParameters, hiveClient, 'Hiveclient');
       }
-      return hiveClient;
+      return hiveClient as HiveClient;
     }
   
     public static async getHiveVersion(hiveHost: string): Promise<string> {

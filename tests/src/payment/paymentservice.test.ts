@@ -1,5 +1,5 @@
 import { Order, Receipt, VaultSubscription } from "../../../src";
-import { Logger } from "@dchagastelles/commons.js.tools";
+import { Logger } from "@carlduranleau/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 describe("test payment service", () => {

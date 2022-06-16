@@ -1,6 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
 import { File } from "../../../src";
-import { Logger } from "@dchagastelles/commons.js.tools";
+import { Logger } from "@carlduranleau/commons.js.tools";
 import {TestData} from "../config/testdata";
 
 export class DIDEntity {

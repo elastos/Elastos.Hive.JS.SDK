@@ -1,11 +1,11 @@
-import { Vault, VaultSubscription, DatabaseService, AlreadyExistsException, InsertOptions, FindOptions, CountOptions, UpdateOptions, NotFoundException, QueryOptions, AscendingSortItem } from "@elastosfoundation/hive-js-sdk";
+import { Vault, VaultSubscription, DatabaseService, InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions, AscendingSortItem } from "../../../src";
+import { AlreadyExistsException, NotFoundException } from "@carlduranleau/commons.js.tools/typings";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {
    
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
-    let vault: Vault;
     let databaseService: DatabaseService;
 
     let COLLECTION_NAME = "works";
@@ -25,22 +25,8 @@ describe("test database services", () => {
             console.log("vault is already subscribed");
         }
 
-        vault = new Vault(
-            testData.getAppContext(),
-            testData.getProviderAddress());
-        
-        databaseService = vault.getDatabaseService();
+        databaseService = testData.newVault().getDatabaseService();
     });
-
-    /*
-    beforeEach(() => {
-        console.log("***** Running " + expect.getState().currentTestName + " *****");
-    });
-
-    afterEach(() => {
-        console.log("***** End of " + expect.getState().currentTestName + " *****");
-    });
-    */
 
     test("testCreateCollection", async () => {
         await deleteCollectionAnyway();

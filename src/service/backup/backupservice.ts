@@ -2,7 +2,7 @@ import {
 	Logger,
 	NodeRPCException,
 	NotImplementedException
-} from "@dchagastelles/commons.js.tools";
+} from "@carlduranleau/commons.js.tools";
 import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";

@@ -4,7 +4,7 @@ import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '@dchagastelles/commons.js.tools';
+import { Logger } from '@carlduranleau/commons.js.tools';
 import { RestService } from "../restservice";
 import {NodeInfo} from "./nodeinfo";
 import {VerifiablePresentation} from "@elastosfoundation/did-js-sdk";

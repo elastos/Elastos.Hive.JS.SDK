@@ -1,4 +1,4 @@
-import { NodeRPCException } from "../../exceptions";
+import { NodeRPCException } from "@carlduranleau/commons.js.tools";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../connection/auth/codefetcher";

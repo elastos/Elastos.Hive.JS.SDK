@@ -1,7 +1,7 @@
 import { AppContext } from "../../../connection/auth/appcontext";
 import { HttpClient } from "../../../connection/httpclient";
 import { ServiceEndpoint } from "../../../connection/serviceendpoint";
-import { Logger } from '@dchagastelles/commons.js.tools';
+import { Logger } from '@carlduranleau/commons.js.tools';
 import { PaymentService } from "../../payment/paymentservice";
 import { SubscriptionService } from "../../subscription/subscriptionservice";
 import { PricingPlan } from "../pricingplan";
