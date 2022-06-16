@@ -1,14 +1,13 @@
 
 'use strict';
 
+import { Logger } from "@dchagastelles/commons.js.tools";
 import { Vault } from "./vault";
 import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
 import { FileStorage } from "./utils/storage/filestorage";
 import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
-import { SHA256 } from "./utils/sha256";
-import * as Utils from "./utils/utils";
 import { HttpClient }  from "./connection/httpclient";
 import { HttpOptions, HttpHeaders }  from "./connection/httpoptions";
 import { HttpMethod }  from "./connection/httpmethod";
@@ -19,7 +18,6 @@ import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
 import { AppContextProvider }  from "./connection/auth/appcontextprovider";
 import { BridgeHandler }  from "./connection/auth/bridgehandler";
-import { Logger }  from "./utils/logger";
 import { AboutService }  from "./service/about/aboutservice";
 import { AuthService }  from "./service/auth/authservice";
 import { BackupService }  from "./service/backup/backupservice";
@@ -42,8 +40,7 @@ import { SubscriptionService }  from "./service/subscription/subscriptionservice
 import { VaultSubscription }  from "./service/subscription/vaultsubscription/vaultsubscription";
 import { PricingPlan } from "./service/subscription/pricingplan";
 import { VaultInfo } from "./service/subscription/vaultinfo";
-import { IllegalArgumentException,
-    BackupIsInProcessingException,
+import { BackupIsInProcessingException,
     BackupNotFoundException,
     BadContextProviderException,
     DIDNotPublishedException,
@@ -52,7 +49,6 @@ import { IllegalArgumentException,
     DIDResolverAlreadySetupException,
     HiveException,
     IllegalDidFormatException,
-    NotImplementedException,
     PathNotExistException,
     PricingPlanNotFoundException,
     ProviderNotSetException,
@@ -61,18 +57,11 @@ import { IllegalArgumentException,
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
-    UnauthorizedException,
     VaultForbiddenException,
-    NotFoundException,
-    AlreadyExistsException,
-    ServerUnknownException,
-    InvalidParameterException,
-    VaultNotFoundException,
-    InsufficientStorageException } from "./exceptions";
+    VaultNotFoundException
+ } from "./exceptions";
 import { QueryHasResultCondition, QueryHasResultConditionOptions, QueryHasResultConditionBody } from "./service/scripting/queryhasresultcondition";
 import { DeleteExecutable, DeleteExecutableBody } from "./service/scripting/deleteexecutable";
 import { FindExecutable, FindExecutableBody } from "./service/scripting/findexecutable";
@@ -131,8 +120,6 @@ export type {
 }
 
 export {
-    Logger,
-    
     //initialize,
     HiveBackupContext,
     LocalResolver,
@@ -224,7 +211,6 @@ export {
     Alternate,
     Collation,
     MaxVariable,
-    IllegalArgumentException,
     BackupIsInProcessingException,
     BackupNotFoundException,
     BadContextProviderException,
@@ -234,7 +220,6 @@ export {
     DIDResolverAlreadySetupException,
     HiveException,
     IllegalDidFormatException,
-    NotImplementedException,
     PathNotExistException,
     PricingPlanNotFoundException,
     ProviderNotSetException,
@@ -243,22 +228,10 @@ export {
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
-    UnauthorizedException,
     VaultForbiddenException,
-    NotFoundException,
-    AlreadyExistsException,
-    ServerUnknownException,
-    InvalidParameterException,
     VaultNotFoundException,
-    InsufficientStorageException,
-
-    // Utilities
-    SHA256,
-    Utils,
     HiveClient,
-    HiveContextProvider, 
+    HiveContextProvider
 }

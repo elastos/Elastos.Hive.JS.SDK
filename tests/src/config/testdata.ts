@@ -1,12 +1,12 @@
+import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
+import { Logger } from '@dchagastelles/commons.js.tools';
 import {
 	HiveException,
 	Vault,
 	BackupService,
 	AppContext,
-	Logger,
 	File, Provider, Backup, ScriptRunner
-} from '@elastosfoundation/hive-js-sdk';
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
+} from '../../../src';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import {ClientConfig} from "./clientconfig";

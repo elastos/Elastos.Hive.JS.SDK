@@ -1,11 +1,11 @@
 import {
-	NetworkException,
+	Logger,
 	NodeRPCException,
 	NotImplementedException
-} from "../../exceptions";
+} from "@dchagastelles/commons.js.tools";
+import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import {BackupResult, BackupResultResult, BackupResultState} from "./backupresult";
 import { HttpMethod } from "../../connection/httpmethod";

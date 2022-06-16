@@ -1,14 +1,12 @@
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
+import { Logger, IllegalArgumentException, NodeRPCException, Validators } from '@dchagastelles/commons.js.tools';
 import { RestService } from "../restservice";
 import { Order } from  "./order";
 import { Receipt } from  "./receipt";
-import { checkNotNull } from "../../utils/utils";
 import { HttpMethod } from "../../connection/httpmethod";
-import { IllegalArgumentException } from "../../exceptions";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { NetworkException, NodeRPCException } from "../../exceptions";
+import { NetworkException } from "../../exceptions";
 
 export class PaymentService extends RestService {
 	private static LOG = new Logger("PaymentService");
@@ -30,8 +28,8 @@ export class PaymentService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	 public async placeOrder(subscription: string, pricingName: string): Promise<Order> {
-		checkNotNull(subscription, "Missing subscription.");
-		checkNotNull(pricingName, "Missing pricing name.");
+		Validators.checkNotNull(subscription, "Missing subscription.");
+		Validators.checkNotNull(pricingName, "Missing pricing name.");
 
 		try {	
 			return await this.httpClient.send<Order>(PaymentService.API_ORDER_ENDPOINT,
@@ -70,8 +68,8 @@ export class PaymentService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async payOrder(orderId: string, transactionId: string): Promise<Receipt> {
-		checkNotNull(orderId, "Missing order id.");
-		checkNotNull(transactionId, "Missing transaction id.");
+		Validators.checkNotNull(orderId, "Missing order id.");
+		Validators.checkNotNull(transactionId, "Missing transaction id.");
 
 		try {	
 			return await this.httpClient.send<Receipt>(`${PaymentService.API_ORDER_ENDPOINT}/${orderId}`, { "transaction_id": transactionId },
@@ -105,8 +103,8 @@ export class PaymentService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async getOrder(subscription: string, orderId: string): Promise<Order> {
-		checkNotNull(subscription, "Missing subscription.");
-		checkNotNull(orderId, "Missing order id.");
+		Validators.checkNotNull(subscription, "Missing subscription.");
+		Validators.checkNotNull(orderId, "Missing order id.");
 
 		if (subscription != "vault" && subscription != "backup") {
 			throw new IllegalArgumentException("Invalid subscription. Must be 'vault' or 'backup'");
@@ -123,7 +121,7 @@ export class PaymentService extends RestService {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public async getOrders(subscription: string): Promise<Order[]> {
-		checkNotNull(subscription, "Missing subscription.");
+		Validators.checkNotNull(subscription, "Missing subscription.");
 		return await this.getOrdersInternal(subscription);
 	}
 

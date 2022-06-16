@@ -1,11 +1,9 @@
-import { checkNotNull } from '../utils/utils';
+import { Validators, Logger, NodeRPCException, UnauthorizedException } from '@dchagastelles/commons.js.tools';
 import { ServiceEndpoint } from './serviceendpoint';
 import { HttpResponseParser } from './httpresponseparser';
-import { NodeRPCException, UnauthorizedException } from '../exceptions';
 import { StreamResponseParser } from './streamresponseparser';
 import { HttpMethod } from './httpmethod';
 import { HttpOptions, HttpHeaders } from './httpoptions';
-import { Logger } from '../utils/logger';
 import axios, { Method } from "axios";
 
 export class HttpClient {
@@ -110,7 +108,7 @@ export class HttpClient {
 
     public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
         let self = this;
-        checkNotNull(serviceEndpoint, "No service endpoint specified");
+        Validators.checkNotNull(serviceEndpoint, "No service endpoint specified");
 
         let payload = this.parsePayload(rawPayload, method);
         let options = await this.buildRequest(serviceEndpoint, method, payload);
@@ -232,7 +230,7 @@ export class HttpClient {
     }
 
     private async getHttpOptionsByProviderAddress(ho: HttpOptions): Promise<HttpOptions> {
-        checkNotNull(ho, "No HTTP configuration provided");
+        Validators.checkNotNull(ho, "No HTTP configuration provided");
         const providerAddress = await this.serviceContext.getProviderAddress();
         const url = new URL(providerAddress);
         return {

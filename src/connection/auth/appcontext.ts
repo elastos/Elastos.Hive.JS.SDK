@@ -1,7 +1,6 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 import { checkNotNull } from '../../utils/utils';
 import {
-     IllegalArgumentException,
      DIDResolverAlreadySetupException,
      BadContextProviderException,
      DIDResolverNotSetupException,
@@ -11,7 +10,7 @@ import {
 	 DIDResolveException,
      DIDNotPublishedException } from '../../exceptions';
 import { AppContextProvider } from './appcontextprovider';
-import { Logger } from '../../utils/logger';
+import { Logger, IllegalArgumentException } from '@dchagastelles/commons.js.tools';
 
 /**
  * The application context would contain the resources list below:

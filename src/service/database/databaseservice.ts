@@ -1,8 +1,8 @@
-import {  NetworkException,	NodeRPCException, ServerUnknownException, } from "../../exceptions";
+import {  NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
+import { Logger, NodeRPCException, ServerUnknownException } from '@dchagastelles/commons.js.tools';
 import { RestService } from "../restservice";
 import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { InsertOptions } from "./insertoptions";

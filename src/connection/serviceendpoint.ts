@@ -1,14 +1,12 @@
-import { checkNotNull } from '../utils/utils'
+import { Validators, NotImplementedException, Logger } from '@dchagastelles/commons.js.tools'
 import { File } from '../utils/storage/file'
 import { AppContext } from './auth/appcontext'
 import { AccessToken } from './auth/accesstoken'
 import { DataStorage } from '../utils/storage/datastorage'
 import { FileStorage } from '../utils/storage/filestorage'
-import { NotImplementedException } from '../exceptions'
 import { NodeVersion } from '../service/about/nodeversion'
 import { HttpClient } from './httpclient'
 import { AboutService } from '../service/about/aboutservice'
-import { Logger } from '../utils/logger'
 import {NodeInfo} from "../service/about/nodeinfo";
 
 export class ServiceEndpoint {
@@ -26,7 +24,7 @@ export class ServiceEndpoint {
     private static LOG_SERVICE_CONTEXT = new Logger("ServiceEndpoint");
 
     constructor(context: AppContext, providerAddress?: string) {
-        checkNotNull(context, "Empty context parameter");
+        Validators.checkNotNull(context, "Empty context parameter");
 
         this.context = context;
         this.providerAddress = providerAddress;

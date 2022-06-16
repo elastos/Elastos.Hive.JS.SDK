@@ -1,13 +1,10 @@
-import { Logger } from "../../utils/logger";
+import { Logger, NodeRPCException } from "@dchagastelles/commons.js.tools";
 import { AppContext } from "../../connection/auth/appcontext";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import {
-    NetworkException,
-    NodeRPCException,
-} from "../../exceptions";
+import { NetworkException } from "../../exceptions";
 import {VaultDetail} from "./vaultdetail";
 import {BackupDetail} from "./backupdetail";
 import {FilledOrderDetail} from "./filledorderdetail";

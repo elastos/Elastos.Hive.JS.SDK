@@ -1,4 +1,4 @@
-import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
+import { NetworkException } from '../../exceptions';
 import { Condition } from './condition';
 import { Executable } from './executable';
 import { ServiceEndpoint } from '../../connection/serviceendpoint';
@@ -7,8 +7,7 @@ import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { StreamResponseParser } from '../../connection/streamresponseparser';
 import { Context } from './context';
 import { HttpMethod } from '../../connection/httpmethod';
-import { Logger } from '../../utils/logger';
-import { checkNotNull, checkArgument } from '../../utils/utils';
+import { Logger, Validators, InvalidParameterException, NodeRPCException } from '@dchagastelles/commons.js.tools';
 import { RestService } from '../restservice';
 
 interface HiveUrl {
@@ -39,8 +38,8 @@ export class ScriptingService extends RestService {
 	* @return Void
 	*/
 	public async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
-		checkNotNull(name, "Missing script name.");
-		checkNotNull(executable, "Missing executable script");
+		Validators.checkNotNull(name, "Missing script name.");
+		Validators.checkNotNull(executable, "Missing executable script");
 
         try {	
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`,
@@ -73,10 +72,10 @@ export class ScriptingService extends RestService {
 	}
 
 	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
-		checkNotNull(name, "Missing script name.");
-		checkNotNull(params, "Missing parameters to run the script");
-		checkNotNull(targetDid, "Missing target user DID");
-		checkNotNull(targetAppDid, "Missing target application DID");
+		Validators.checkNotNull(name, "Missing script name.");
+		Validators.checkNotNull(params, "Missing parameters to run the script");
+		Validators.checkNotNull(targetDid, "Missing target user DID");
+		Validators.checkNotNull(targetAppDid, "Missing target application DID");
 
 		try {
 			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
@@ -94,10 +93,10 @@ export class ScriptingService extends RestService {
 	}
 
 	public async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
-		checkNotNull(name, "Missing script name.");
-		checkNotNull(params, "Missing parameters to run the script");
-		checkNotNull(targetDid, "Missing target user DID");
-		checkNotNull(targetAppDid, "Missing target application DID");
+		Validators.checkNotNull(name, "Missing script name.");
+		Validators.checkNotNull(params, "Missing parameters to run the script");
+		Validators.checkNotNull(targetDid, "Missing target user DID");
+		Validators.checkNotNull(targetAppDid, "Missing target application DID");
 		
 		try{
 			let returnValue: T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
@@ -114,10 +113,10 @@ export class ScriptingService extends RestService {
 	}
 	
 	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
-		checkNotNull(transactionId, "Missing transactionId.");
-		checkNotNull(data, "data must be provided.");
+		Validators.checkNotNull(transactionId, "Missing transactionId.");
+		Validators.checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
-		checkArgument(content.length > 0, "No data to upload.");
+		Validators.checkArgument(content.length > 0, "No data to upload.");
 		try {
 			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, content, HttpClient.NO_RESPONSE, HttpMethod.PUT);
@@ -127,7 +126,7 @@ export class ScriptingService extends RestService {
 	}
 
 	public async downloadFile(transactionId: string): Promise<Buffer> {
-		checkNotNull(transactionId, "Missing transactionId.");
+		Validators.checkNotNull(transactionId, "Missing transactionId.");
 		try {
 			let dataBuffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, 

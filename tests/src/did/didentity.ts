@@ -1,5 +1,6 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
-import { File, Logger } from "@elastosfoundation/hive-js-sdk";
+import { File } from "../../../src";
+import { Logger } from "@dchagastelles/commons.js.tools";
 import {TestData} from "../config/testdata";
 
 export class DIDEntity {

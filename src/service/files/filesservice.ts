@@ -1,13 +1,12 @@
 import { HttpMethod } from "../../connection/httpmethod";
 import { HttpResponseParser } from "../../connection/httpresponseparser";
 import { StreamResponseParser } from "../../connection/streamresponseparser";
-import {  NetworkException, NodeRPCException } from "../../exceptions";
+import {  NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
+import { Logger, NodeRPCException, Validators } from '@dchagastelles/commons.js.tools';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
-import { checkArgument, checkNotNull } from "../../utils/utils";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -19,7 +18,7 @@ export class FilesService extends RestService {
 	}
 
 	public async download(path: string): Promise<Buffer> {
-		checkNotNull(path, "Remote file path is mandatory.");
+		Validators.checkNotNull(path, "Remote file path is mandatory.");
 		try {
 			let dataBuffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
@@ -48,15 +47,15 @@ export class FilesService extends RestService {
 	 * @param script_name used when is_public is true, this will create a new downloading script with name script_name.
 	 */
 	public async upload(path: string, data: Buffer | string, is_public = false, script_name?: string): Promise<string> {
-		checkNotNull(path, "Remote destination path is mandatory.");
-		checkNotNull(data, "data must be provided.");
+		Validators.checkNotNull(path, "Remote destination path is mandatory.");
+		Validators.checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : new Buffer(data);
-		checkArgument(content.length > 0, "No data to upload.");
+		Validators.checkArgument(content.length > 0, "No data to upload.");
 		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 
 		let urlArgsStr = '';
 		if (is_public) {
-			checkArgument(!!script_name, "Script name must be provided when is_public is true.");
+			Validators.checkArgument(!!script_name, "Script name must be provided when is_public is true.");
 			urlArgsStr = `?public=true&script_name=${script_name}`
 		}
 

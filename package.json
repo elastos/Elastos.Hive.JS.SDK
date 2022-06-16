@@ -29,8 +29,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@dchagastelles/commons.js.tools": "^1.0.11",
-    "@elastosfoundation/did-js-sdk": "^2.2.4",
+    "@elastosfoundation/did-js-sdk": "^2.2.9",
+    "@dchagastelles/commons.js.tools": "^1.0.0",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",
