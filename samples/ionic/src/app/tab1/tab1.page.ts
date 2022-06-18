@@ -2,10 +2,11 @@ import {Component} from '@angular/core';
 import ClientConfig from "../hivejs/config/clientconfig";
 import {NodeVault} from "../hivejs/node_vault";
 import {
+    AlreadyExistsException,
     Executable,
     FileDownloadExecutable,
     FileUploadExecutable,
-    InsertOptions,
+    InsertOptions, Order, Receipt,
     VaultInfo
 } from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "../hivejs/browser_login";
@@ -73,7 +74,7 @@ export class Tab1Page {
         try {
             await action();
         } catch (e) {
-            console.log(`>>>>>> TAB ACTION ERROR: ${e}`);
+            this.log(`TAB ACTION ERROR: ${e}`);
             result = false;
         }
         this.message = result ? 'Succeed' : 'Failed';
@@ -92,7 +93,7 @@ export class Tab1Page {
             const vault = await this.getVault();
             const subscription = await vault.createVaultSubscription();
             const vaultInfo: VaultInfo = await subscription.checkSubscription();
-            console.log(`vault info: ${vaultInfo}`);
+            this.log(`vault info: ${JSON.stringify(vaultInfo)}`);
         });
     }
 
@@ -145,7 +146,7 @@ export class Tab1Page {
             const vault = await this.getVault();
             const filesService = await (await vault.createVault()).getFilesService();
             const content = await filesService.download(Tab1Page.FILE_NAME);
-            console.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
+            this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
             await filesService.delete(Tab1Page.FILE_NAME);
         });
     }
@@ -194,7 +195,7 @@ export class Tab1Page {
                 node.getTargetAppDid());
             // upload
             const content = await scriptingService.downloadFile(result[Tab1Page.EXECUTABLE_NAME].transaction_id);
-            console.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
+            this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
             // clean
             await filesService.delete(Tab1Page.FILE_NAME);
             await scriptingService.unregisterScript(Tab1Page.SCRIPT_NAME);
@@ -205,9 +206,9 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const nodeWalletAddress = '0x60ECEFaFA8618F4eAC7a04ba58F67f56e12750d3'; // contract owner wallet
-            const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlwVUdCUHVBZ0V4NkxlOTlmNFR5RGZOWnRYVlQyTktYUFIjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcFVHQlB1QWdFeDZMZTk5ZjRUeURmTlp0WFZUMk5LWFBSIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1MzU0MzcxMSwiZXhwIjozMzA3NjYzNDIyLCJuYmYiOjE2NTM1NDM3MTEsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOGYxMzFmM2E1NDRjOWFkODExNjkwOCIsInN1YnNjcmlwdGlvbiI6InZhdWx0IiwicHJpY2luZ19wbGFuIjoiUm9va2llIiwicGF5bWVudF9hbW91bnQiOjAuMDEsImNyZWF0ZV90aW1lIjoxNjUzNTE0OTExLCJleHBpcmF0aW9uX3RpbWUiOjE2NTQxMTk3MTEsInJlY2VpdmluZ19hZGRyZXNzIjoiMHg2MEVDRUZhRkE4NjE4RjRlQUM3YTA0YmE1OEY2N2Y1NmUxMjc1MGQzIn19.uhp2qJ1CN5jfIw3ot_dz6hXJaI66dPUP2d0BGw-ZCGLirn4rwe2VMkP6xEjTKMwEvPxW-7JleaYl9NGT3_u70Q';
-            const orderId = await this.paymentContract.payOrder("0.01", nodeWalletAddress, proof);
-            console.log(`pay order successfully: ${orderId}.`);
+            const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlqZWJKQnNTWnhKaktrU1pEODZrWlhYTTN1SmlVYlpjamgjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppamViSkJzU1p4SmpLa1NaRDg2a1pYWE0zdUppVWJaY2poIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1NDQ3OTIyOCwiZXhwIjozMzA5NTYzMjU2LCJuYmYiOjE2NTQ0NzkyMjgsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOWQ1OTdjN2MyZWY0M2FlZjYzYmM1OSIsInN1YnNjcmlwdGlvbiI6ImJhY2t1cCIsInByaWNpbmdfcGxhbiI6IlJvb2tpZSIsInBheW1lbnRfYW1vdW50IjoxLjUsImNyZWF0ZV90aW1lIjoxNjU0NDc5MjI4LCJleHBpcmF0aW9uX3RpbWUiOjE2NTUwODQwMjgsInJlY2VpdmluZ19hZGRyZXNzIjoiMHg2MEVDRUZhRkE4NjE4RjRlQUM3YTA0YmE1OEY2N2Y1NmUxMjc1MGQzIn19.w2k7nbGXPvDFlqhNG0HhPVzvliWDhx1mb68lraHFlD2KqhVtonj5qwJ7XRK97AvpgqbziyQG5zYlzcR6gVRuag';
+            const orderId = await this.paymentContract.payOrder("1", nodeWalletAddress, proof);
+            this.log(`pay order successfully: ${orderId}.`);
         });
     }
 
@@ -215,7 +216,7 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const orders = await this.paymentContract.getOrders();
-            console.log(`getOrders() successfully: ${orders}`);
+            this.log(`getOrders() successfully: ${orders}`);
         });
     }
 
@@ -223,7 +224,7 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const order = await this.paymentContract.getOrderByIndex(0);
-            console.log(`getOrderByIndex() successfully: ${order}`);
+            this.log(`getOrderByIndex() successfully: ${order}`);
         });
     }
 
@@ -231,7 +232,7 @@ export class Tab1Page {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
             const count = await this.paymentContract.getOrderCount();
-            console.log(`getOrderCount() successfully: ${count}`);
+            this.log(`getOrderCount() successfully: ${count}`);
         });
     }
 
@@ -240,7 +241,70 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const orderId = 0;
             const order = await this.paymentContract.getOrder(orderId);
-            console.log(`getOrder() successfully: ${order}`);
+            this.log(`getOrder() successfully: ${order}`);
+        });
+    }
+
+    async getPlatformFee() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const result = await this.paymentContract.getPlatformFee();
+            this.log(`getPlatformFee() successfully: ${JSON.stringify(result)}`);
+        });
+    }
+
+    private static getIncreasedDays(start: Date, end: Date): number {
+        const startTime: number = start.getTime();
+        const endTime: number = end == null ? Date.now() : end.getTime();
+        return (endTime - startTime) / 1000 / 24 / 3600; // days
+    }
+
+    private log(msg) {
+        console.log(`[tab1.page.ts] >>>>>> ${msg}`)
+    }
+
+    async upgradeVault() {
+        await this.initPaymentContract();
+        await this.updateMessage(async () => {
+            const vault = await this.getVault();
+
+            const subscription = await vault.createVaultSubscription();
+            // try subscribe
+            try {
+                const info = subscription.subscribe();
+            } catch (e) {
+                if (e instanceof AlreadyExistsException) {
+                    this.log('the vault already exists');
+                }
+            }
+
+            // vault info before upgrading
+            const vaultInfoBefore: VaultInfo = await subscription.checkSubscription();
+            this.log(`vault info before: ${JSON.stringify(vaultInfoBefore)}`);
+
+            // place order
+            const order: Order = await subscription.placeOrder('Rookie');
+            this.log(`place order: ${JSON.stringify(order)}.`);
+
+            // pay order by payment SDK
+            const amount = order.getPaymentAmount().toString();
+            const to = order.getReceivingAddress(); // wallet address
+            const memo = order.getProof();
+            const orderId = await this.paymentContract.payOrder(amount, to, memo);
+            this.log(`pay order: ${orderId}.`);
+
+            // settle order
+            const receipt: Receipt = await subscription.settleOrder(orderId);
+            this.log(`settle order: ${JSON.stringify(receipt)}.`);
+
+            // vault info after upgrading
+            const vaultInfoAfter = await subscription.checkSubscription();
+            this.log(`vault info after: ${JSON.stringify(vaultInfoAfter)}`);
+
+            const afterPlanName = vaultInfoAfter.getPricePlan();
+            const maxSize = vaultInfoAfter.getStorageQuota();
+            const increasedDays = Tab1Page.getIncreasedDays(vaultInfoBefore.getEndTime(), vaultInfoAfter.getEndTime());
+            this.log(`upgrade result: afterPlanName=${afterPlanName}, maxSize=${maxSize}, increasedDays=${increasedDays}`);
         });
     }
 }

@@ -203,7 +203,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       catch (e) {
         // Verification error?
         // Could not verify the received JWT as valid - reject the authentication request by returning a null token
-        reject("The received authentication JWT token signature cannot be verified or failed to verify: " + new String(e) + ". Is the hive back-end DID published? Are you on the right network?");
+        const msg = "The received authentication JWT token signature cannot be verified or failed to verify: " + new String(e) + ". Is the hive back-end DID published? Are you on the right network?";
+        reject(new Error(msg));
         return;
       }
     });

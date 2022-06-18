@@ -84,7 +84,7 @@ export class PaymentService extends RestService {
 		checkNotNull(orderId, "Missing order id.");
 
 		try {	
-			return await this.httpClient.send<Receipt>(`${PaymentService.API_ORDER_ENDPOINT}/${orderId}`, {},
+			return await this.httpClient.send<Receipt>(`${PaymentService.API_ORDER_ENDPOINT}/${orderId}`, HttpClient.NO_PAYLOAD,
                 <HttpResponseParser<Receipt>> {
                     deserialize(content: any): Receipt {
                         return Object.assign(new Receipt(), JSON.parse(content));
