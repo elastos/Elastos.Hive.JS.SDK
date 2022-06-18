@@ -82,9 +82,10 @@ export class SubscriptionService extends RestService {
 				return new VaultInfo().setServiceDid(jsonObj["service_did"])
                     .setStorageQuota(jsonObj["storage_quota"])
                     .setStorageUsed(jsonObj["storage_used"])
+                    .setStartTime(new Date(Number(jsonObj["start_time"]) * 1000))
+                    .setEndTime(jsonObj["end_time"] > 0 ? new Date(Number(jsonObj["end_time"]) * 1000) : null)
                     .setCreated(new Date(Number(jsonObj["created"]) * 1000))
                     .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                    .setEndTime(new Date(Number(jsonObj["end_time"]) * 1000))
                     .setPricePlan(jsonObj["pricing_plan"]);
 			}
 		}, HttpMethod.GET);
@@ -208,7 +209,14 @@ export class SubscriptionService extends RestService {
 		return await this.httpClient.send(SubscriptionService.BACKUP_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupInfo>> {
 			deserialize(content: any): BackupInfo {
 				let jsonObj = JSON.parse(content);
-				return (new BackupInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["pricing_plan"]);
+				return new BackupInfo().setServiceDid(jsonObj["service_did"])
+                    .setStorageQuota(jsonObj["storage_quota"])
+                    .setStorageUsed(jsonObj["storage_used"])
+                    .setStartTime(new Date(Number(jsonObj["start_time"]) * 1000))
+                    .setEndTime(jsonObj["start_time"] > 0 ? new Date(Number(jsonObj["start_time"]) * 1000) : null)
+                    .setCreated(new Date(Number(jsonObj["created"]) * 1000))
+                    .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
+                    .setPricePlan(jsonObj["pricing_plan"]);
 			}
 		}, HttpMethod.GET);
 	}

@@ -21,76 +21,76 @@ export class AuthService extends RestService {
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
     }
 
-	public async fetch(): Promise<string> {
-        AuthService.LOG.trace("AuthService=>fetch");
+	async fetch(): Promise<string> {
+        AuthService.LOG.trace("fetch::start fetch the access token");
 
-        let appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
-        AuthService.LOG.trace("AuthService=>appInstancedoc :" + appInstanceDoc.toString(true));
+        const appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
+        AuthService.LOG.trace("fetch::application instance document:" + appInstanceDoc.toString(true));
 
         let challenge: string = null;
 		try {
 			challenge  = await this.signIn(appInstanceDoc);
-			AuthService.LOG.debug("AuthService=>challenge :" + challenge);
+			AuthService.LOG.debug("fetch::challenge :" + challenge);
 		} catch (e) {
 			throw NodeRPCException.forHttpCode(NodeRPCException.UNAUTHORIZED,"Failed to get token with signin", -1, e);
 		}
 
         try {
             let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
-            AuthService.LOG.debug("challenge response " + challengeResponse);
-            return this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
+            AuthService.LOG.debug("fetch::challenge response " + challengeResponse);
+
+            const token = this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
+            AuthService.LOG.debug("fetch::token " + token);
+
+            return token;
         } catch (e) {
             throw NodeRPCException.forHttpCode(NodeRPCException.UNAUTHORIZED,"Failed to get token with auth", -1, e);
         }
 	}
 
-    //@POST("/api/v2/did/signin")
-	//Call<ChallengeRequest> signIn(@Body SignInRequest request);
-    public async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
-		
-		let challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, { "id": JSON.parse(appInstanceDidDoc.toString(true)) }, <HttpResponseParser<string>> {
+    async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
+        const payload = { "id": JSON.parse(appInstanceDidDoc.toString(true)) };
+		const challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, payload, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
-				AuthService.LOG.trace("return sign_in: " + content);				
+				AuthService.LOG.trace("return sign_in: " + content);
 				return JSON.parse(content)['challenge'];
 			}
 		}, HttpMethod.POST);
 
-		AuthService.LOG.trace("challenge={} appInstanceDidDoc.getSubject().toString()={}", challenge, appInstanceDidDoc.getSubject().toString());
-		if (! await this.checkValid(challenge, appInstanceDidDoc.getSubject().toString())) {
-			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid `challenge` from `signin`.");
-		}
-		return challenge;
+        return this.checkValid(challenge, appInstanceDidDoc.getSubject().toString());
     }
 
-	//@POST("/api/v2/did/auth")
-	//Call<AccessCode> auth(@Body ChallengeResponse request);
-    public async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
-		let challengeResponseRequest = {
-			"challenge_response": challengeResponse
-		};
-		let token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, challengeResponseRequest, <HttpResponseParser<string>> {
+    async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
+		const payload = {"challenge_response": challengeResponse};
+		const token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, payload, <HttpResponseParser<string>> {
 			deserialize(content: any): string {
 				return JSON.parse(content)['token'];
 			}
 		}, HttpMethod.POST);
 
-		if (! await this.checkValid(token, appInstanceDidDoc.getSubject().toString())) {
-			throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Invalid `token` from `auth`");
-		}
-		return token;
+        return this.checkValid(token, appInstanceDidDoc.getSubject().toString());
     }
 
-	private async checkValid(jwtCode: string, expectationDid: string): Promise<boolean> {
-		try {
-			let claims: Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
+	private async checkValid(jwtCode: string, expectationDid: string): Promise<string> {
+        let claims: Claims = null;
 
-			AuthService.LOG.trace("Claims->getExpiration(): " + (claims.getExpiration()*1000 > Date.now()).toString());
-			AuthService.LOG.trace("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
-			AuthService.LOG.trace("is equal:" + (claims.getAudience() === expectationDid).toString());
-			return claims.getExpiration()*1000 > Date.now() && claims.getAudience() === expectationDid;
-		} catch (e) {
-			return false;
-		}
+        try {
+            claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
+
+            AuthService.LOG.trace("Claims->getExpiration(): " + (claims.getExpiration() * 1000 > Date.now()).toString());
+            AuthService.LOG.trace("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
+            AuthService.LOG.trace("is equal:" + (claims.getAudience() === expectationDid).toString());
+        } catch (e) {
+            throw new Error(`failed to parse jwt string: ${JSON.stringify(e)}`);
+        }
+
+        if (claims.getExpiration() * 1000 < Date.now()) {
+            throw new Error('jwt string expired');
+        }
+        if (claims.getAudience() !== expectationDid) {
+            throw new Error(`jwt string with invalid audience: ${claims.getAudience()}, expected: ${expectationDid}`);
+        }
+
+        return jwtCode;
 	}
-
 }
