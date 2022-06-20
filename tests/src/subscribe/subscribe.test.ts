@@ -4,7 +4,7 @@ import {
     BackupSubscription,
     Order
 } from "../../../src";
-import { AlreadyExistsException } from "@carlduranleau/commons.js.tools";
+import { AlreadyExistsException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 describe("test vault subscribe function", () => {

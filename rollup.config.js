@@ -16,12 +16,12 @@ import { visualizer } from 'rollup-plugin-visualizer';
 const production = !process.env.ROLLUP_WATCH;
 
 export function emitModulePackageFile() {
-	return {
-		name: 'emit-module-package-file',
-		generateBundle() {
-			this.emitFile({ type: 'asset', fileName: 'package.json', source: `{"type":"module"}` });
-		}
-	};
+    return {
+        name: 'emit-module-package-file',
+        generateBundle() {
+            this.emitFile({ type: 'asset', fileName: 'package.json', source: `{"type":"module"}` });
+        }
+    };
 }
 
 // const commitHash = (function () {
@@ -177,7 +177,7 @@ export default command => {
         onwarn,
         external: [
             '@elastosfoundation/did-js-sdk',
-            '@carlduranleau/commons.js.tools'
+            '@tuum-tech/commons.js.tools'
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */
@@ -194,7 +194,7 @@ export default command => {
                     'src/utils/storage/file.ts'
                 ],
                 values: {
-                    'fs from "./fs"' : 'fs from "./fs.browser.ts"'
+                    'fs from "./fs"': 'fs from "./fs.browser.ts"'
                 }
             }),
             // Dirty circular dependency removal atttempt
@@ -300,7 +300,7 @@ export default command => {
         ]
     };
 
-    
 
-    return [ commonJSBuild, esmBuild, browserBuilds];
+
+    return [commonJSBuild, esmBuild, browserBuilds];
 };

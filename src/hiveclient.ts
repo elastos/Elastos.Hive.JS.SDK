@@ -8,7 +8,7 @@ import { ServiceEndpoint } from "./connection/serviceendpoint";
 import { DIDResolverAlreadySetupException  } from './exceptions';
 import { HiveContextProvider } from "./hivecontextprovider";
 
-import { Logger, CacheManager } from '@carlduranleau/commons.js.tools';
+import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
 
   
   export class HiveClientParameters {
@@ -325,10 +325,10 @@ import { Logger, CacheManager } from '@carlduranleau/commons.js.tools';
       // return this.isConnected() || this.getAccessToken() ? true : false;
     }
   
-    public getAccessToken(): string | null {
+    public async getAccessToken(): Promise<string | null> {
       HiveClient.LOG.trace('getAccessToken');
       try {
-        return this.Vault.getAccessToken().getJwtCode();
+        return await this.Vault.getAccessToken().fetch();
       } catch (e) {
         HiveClient.LOG.error(e);
       }

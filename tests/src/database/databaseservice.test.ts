@@ -1,5 +1,5 @@
 import { Vault, VaultSubscription, DatabaseService, InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions, AscendingSortItem } from "../../../src";
-import { AlreadyExistsException, NotFoundException } from "@carlduranleau/commons.js.tools/typings";
+import { AlreadyExistsException, NotFoundException } from "@tuum-tech/commons.js.tools/typings";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {

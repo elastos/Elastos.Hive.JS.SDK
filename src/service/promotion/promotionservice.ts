@@ -2,7 +2,7 @@ import { HttpMethod } from "../../connection/httpmethod";
 import { NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger, NodeRPCException } from '@carlduranleau/commons.js.tools';
+import { Logger, NodeRPCException } from '@tuum-tech/commons.js.tools';
 import { RestService } from "../restservice";
 
 export class PromotionService extends RestService {

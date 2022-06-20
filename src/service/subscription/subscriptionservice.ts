@@ -1,7 +1,7 @@
 import { PricingPlan } from "./pricingplan";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '@carlduranleau/commons.js.tools';
+import { Logger } from '@tuum-tech/commons.js.tools';
 import { RestService } from "../restservice";
 import { VaultInfo } from "./vaultinfo";
 import { BackupInfo } from "./backupinfo";

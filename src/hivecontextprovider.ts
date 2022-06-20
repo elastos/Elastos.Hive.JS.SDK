@@ -19,7 +19,7 @@ import { AppContextParameters } from "./connection/auth/defaultappcontextprovide
 
   import dayjs from 'dayjs';
   import { DID as CNDID } from '@elastosfoundation/elastos-connectivity-sdk-js';
-import { Logger } from '@carlduranleau/commons.js.tools';
+import { Logger } from '@tuum-tech/commons.js.tools';
 
   
   export class HiveContextProvider implements AppContextProvider {

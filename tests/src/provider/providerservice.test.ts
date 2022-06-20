@@ -1,6 +1,6 @@
 import {BackupSubscription, VaultSubscription,
     Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "../../../src";
-import { NotFoundException } from "@carlduranleau/commons.js.tools";
+import { NotFoundException } from "@tuum-tech/commons.js.tools";
 import {TestData} from "../config/testdata";
 
 describe("test provider service", () => {

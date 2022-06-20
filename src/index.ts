@@ -1,7 +1,7 @@
 
 'use strict';
 
-import { Logger } from "@carlduranleau/commons.js.tools";
+import { Logger } from "@tuum-tech/commons.js.tools";
 import { Vault } from "./vault";
 import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";

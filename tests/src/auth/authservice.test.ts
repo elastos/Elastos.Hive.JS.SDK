@@ -1,5 +1,5 @@
 import { VaultSubscription, ServiceEndpoint, AuthService } from "../../../src";
-import { NodeRPCException, UnauthorizedException, ServerUnknownException } from "@carlduranleau/commons.js.tools";
+import { NodeRPCException, UnauthorizedException, ServerUnknownException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 describe("test auth service", () => {

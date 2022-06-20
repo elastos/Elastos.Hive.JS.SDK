@@ -1,5 +1,5 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
-import { Logger } from '@carlduranleau/commons.js.tools';
+import { Logger } from '@tuum-tech/commons.js.tools';
 import {
 	HiveException,
 	Vault,

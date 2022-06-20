@@ -2,7 +2,7 @@ import { Claims, DID, DIDBackend, DIDDocument, DIDStore, DIDURL, Issuer, JWTHead
 import { HiveException } from "../../exceptions";
 import { AppContextProvider } from "./appcontextprovider";
 import dayjs from "dayjs";
-import { Logger } from "@carlduranleau/commons.js.tools";
+import { Logger } from "@tuum-tech/commons.js.tools";
 //import { ShorthandPropertyAssignment } from "typescript";
 
 

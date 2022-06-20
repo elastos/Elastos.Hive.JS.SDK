@@ -9,7 +9,7 @@ import {
 	 DIDResolveException,
      DIDNotPublishedException } from '../../exceptions';
 import { AppContextProvider } from './appcontextprovider';
-import { Logger, IllegalArgumentException } from '@carlduranleau/commons.js.tools';
+import { Logger, IllegalArgumentException } from '@tuum-tech/commons.js.tools';
 
 /**
  * The application context would contain the resources list below:

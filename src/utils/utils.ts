@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Base64, SHA256 } from "@carlduranleau/commons.js.tools";
+import { Base64, SHA256 } from "@tuum-tech/commons.js.tools";
 
 export function uint8ArrayCopy(src: Uint8Array, srcIndex: number, dest: Uint8Array, destIndex: number, length: number): void {
     let values = [...src.slice(srcIndex, srcIndex + length)];

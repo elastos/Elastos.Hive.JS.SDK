@@ -7,7 +7,7 @@ import { HttpResponseParser } from '../../connection/httpresponseparser';
 import { StreamResponseParser } from '../../connection/streamresponseparser';
 import { Context } from './context';
 import { HttpMethod } from '../../connection/httpmethod';
-import { Logger, Validators, InvalidParameterException, NodeRPCException } from '@carlduranleau/commons.js.tools';
+import { Logger, Validators, InvalidParameterException, NodeRPCException } from '@tuum-tech/commons.js.tools';
 import { RestService } from '../restservice';
 
 interface HiveUrl {
