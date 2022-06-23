@@ -1,5 +1,5 @@
-import { Vault, VaultSubscription, DatabaseService, InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions, AscendingSortItem } from "../../../src";
-import { AlreadyExistsException, NotFoundException } from "@tuum-tech/commons.js.tools/typings";
+import { VaultSubscription, DatabaseService, InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions, AscendingSortItem } from "../../../src";
+import { AlreadyExistsException, NotFoundException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {
@@ -13,7 +13,7 @@ describe("test database services", () => {
 
     beforeAll(async () => {
 
-        let testData = await TestData.getInstance("databaseservice.tests");
+        testData = await TestData.getInstance("databaseservice.tests");
 
         vaultSubscription = new VaultSubscription(
             testData.getAppContext(),
