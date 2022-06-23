@@ -9,6 +9,7 @@ import { DIDResolverAlreadySetupException  } from './exceptions';
 import { HiveContextProvider } from "./hivecontextprovider";
 
 import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
+import { AppContextProvider } from "./connection/auth/appcontextprovider";
 
   
   export class HiveClientParameters {
@@ -170,7 +171,8 @@ import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
     // }
   
     public static async createInstance(
-      appContextParameters?: HiveClientParameters
+      appContextProvider: AppContextProvider,
+      appContextParameters: HiveClientParameters
     ): Promise<HiveClient> {
       HiveClient.LOG.trace('createInstance');
       let hiveClient = CacheManager.get(appContextParameters, 'HiveClient');
@@ -199,9 +201,8 @@ import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
           'Building Hive context with {} ...',
           JSON.stringify(instanceAppContextParameters)
         );
-        let appContext = await HiveClient.buildAppContext(
-          instanceAppContextParameters
-        );
+
+        let appContext = await AppContext.build(appContextProvider, appContextParameters.context.userDID as string);
         hiveClient = new HiveClient(
           false,
           appContext,
@@ -218,12 +219,12 @@ import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
       return hiveClient as HiveClient;
     }
   
-    public static async getHiveVersion(hiveHost: string): Promise<string> {
+    public static async getHiveVersion(appContextProvider: AppContextProvider, hiveHost: string): Promise<string> {
       HiveClient.LOG.trace('getHiveVersion');
   
       let params = appParameters;
       params.hiveHost = hiveHost;
-      let hiveClient = await HiveClient.createInstance(params);
+      let hiveClient = await HiveClient.createInstance(appContextProvider, params);
   
       let serviceEndpoint = new ServiceEndpoint(
         hiveClient.appContext,
@@ -308,7 +309,8 @@ import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
     //     appContextParameters.context.userDID as string
     //   );
     // }
-  
+
+    /*
     private static async buildAppContext(
       appContextParameters: HiveClientParameters
     ): Promise<AppContext> {
@@ -318,17 +320,18 @@ import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
         appContextParameters.context.userDID as string
       );
     }
-  
+    */
+
     public isConnected(): boolean {
       return true;
       // HiveClient.LOG.trace('isConnected');
       // return this.isConnected() || this.getAccessToken() ? true : false;
     }
   
-    public getAccessToken(): string | null {
+    public async getAccessToken(): Promise<string | null> {
       HiveClient.LOG.trace('getAccessToken');
       try {
-        return this.Vault.getAccessToken().getJwtCode();
+        return await this.Vault.getAccessToken().fetch();
       } catch (e) {
         HiveClient.LOG.error(e);
       }

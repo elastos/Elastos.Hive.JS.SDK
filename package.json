@@ -1,5 +1,5 @@
 {
-  "name": "@dchagastelles/hive-js-sdk",
+  "name": "@elastosfoundation/hive-js-sdk",
   "version": "2.7.13",
   "description": "Elastos Hive JS SDK",
   "exports": {
@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@elastosfoundation/did-js-sdk": "^2.2.9",
-    "@tuum-tech/commons.js.tools": "^0.0.1",
+    "@tuum-tech/commons.js.tools": "^0.0.3",
+    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.20",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",
