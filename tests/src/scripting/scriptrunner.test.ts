@@ -13,7 +13,7 @@ import {
     QueryHasResultCondition,
     Executable
 } from "../../../src";
-import { InvalidParameterException, NotFoundException } from "@carlduranleau/commons.js.tools";
+import { InvalidParameterException, NotFoundException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 interface DatabaseDeleteResponse {

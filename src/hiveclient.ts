@@ -8,7 +8,7 @@ import { ServiceEndpoint } from "./connection/serviceendpoint";
 import { DIDResolverAlreadySetupException  } from './exceptions';
 import { HiveContextProvider } from "./hivecontextprovider";
 
-import { Logger, CacheManager } from '@carlduranleau/commons.js.tools';
+import { Logger, CacheManager } from '@tuum-tech/commons.js.tools';
 
   
   export class HiveClientParameters {

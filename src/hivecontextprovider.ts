@@ -9,17 +9,13 @@ import {
     JWTParserBuilder,
     RootIdentity,
     VerifiableCredential,
-    VerifiablePresentation,
-    JWT
+    VerifiablePresentation
   } from '@elastosfoundation/did-js-sdk';
-
 import { HiveException } from "./exceptions";
 import { AppContextProvider }  from "./connection/auth/appcontextprovider";
 import { AppContextParameters } from "./connection/auth/defaultappcontextprovider";  
-
-  import dayjs from 'dayjs';
-  import { DID as CNDID } from '@elastosfoundation/elastos-connectivity-sdk-js';
-import { Logger } from '@carlduranleau/commons.js.tools';
+import dayjs from 'dayjs';
+import { Logger } from '@tuum-tech/commons.js.tools';
 
   
   export class HiveContextProvider implements AppContextProvider {

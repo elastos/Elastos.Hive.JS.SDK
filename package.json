@@ -36,8 +36,7 @@
   },
   "dependencies": {
     "@elastosfoundation/did-js-sdk": "^2.2.9",
-    "@carlduranleau/commons.js.tools": "^1.0.0",
-    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.20",
+    "@tuum-tech/commons.js.tools": "^0.0.1",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",

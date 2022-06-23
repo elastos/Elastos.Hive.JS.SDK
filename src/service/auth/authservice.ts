@@ -3,7 +3,7 @@ import { AppContextProvider } from '../../connection/auth/appcontextprovider';
 import { HttpClient } from '../../connection/httpclient';
 import { ServiceEndpoint } from '../../connection/serviceendpoint';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { Logger, NodeRPCException, ServerUnknownException } from '@carlduranleau/commons.js.tools';
+import { Logger, NodeRPCException, ServerUnknownException } from '@tuum-tech/commons.js.tools';
 import { RestService } from '../restservice';
 import { HttpMethod } from '../../connection/httpmethod';
 

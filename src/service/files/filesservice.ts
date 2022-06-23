@@ -4,7 +4,7 @@ import { StreamResponseParser } from "../../connection/streamresponseparser";
 import {  NetworkException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger, NodeRPCException, Validators } from '@carlduranleau/commons.js.tools';
+import { Logger, NodeRPCException, Validators } from '@tuum-tech/commons.js.tools';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 

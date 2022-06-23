@@ -1,6 +1,6 @@
 import {TestData} from "./config/testdata";
 import {VaultSubscription} from "../../src";
-import { AlreadyExistsException } from "@carlduranleau/commons.js.tools";
+import { AlreadyExistsException } from "@tuum-tech/commons.js.tools";
 import {ClientConfig} from "./config/clientconfig";
 
 /**

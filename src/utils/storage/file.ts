@@ -24,7 +24,7 @@ import path from "path";
 
 //import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs";
 import * as fs from "./fs";
-import { Logger } from "@carlduranleau/commons.js.tools";
+import { Logger } from "@tuum-tech/commons.js.tools";
 
 
 

@@ -177,7 +177,7 @@ export default command => {
         onwarn,
         external: [
             '@elastosfoundation/did-js-sdk',
-            '@carlduranleau/commons.js.tools'
+            '@tuum-tech/commons.js.tools'
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */

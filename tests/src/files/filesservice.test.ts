@@ -4,7 +4,7 @@ import {
 	ScriptRunner,
 	VaultSubscription
 } from "../../../src";
-import { AlreadyExistsException, NotFoundException } from "@carlduranleau/commons.js.tools";
+import { AlreadyExistsException, NotFoundException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 describe("test files service", () => {

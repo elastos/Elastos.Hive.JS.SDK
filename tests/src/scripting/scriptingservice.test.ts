@@ -12,7 +12,7 @@ import {
     Vault,
     QueryHasResultCondition, 
     Executable } from "../../../src";
-import { InvalidParameterException } from "@carlduranleau/commons.js.tools";
+import { InvalidParameterException } from "@tuum-tech/commons.js.tools";
 import { TestData } from "../config/testdata";
 
 interface DatabaseDeleteResponse {

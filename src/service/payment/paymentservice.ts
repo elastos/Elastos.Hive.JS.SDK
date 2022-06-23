@@ -1,6 +1,6 @@
 import { HttpClient } from "../../connection/httpclient";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger, IllegalArgumentException, NodeRPCException, Validators } from '@carlduranleau/commons.js.tools';
+import { Logger, IllegalArgumentException, NodeRPCException, Validators } from '@tuum-tech/commons.js.tools';
 import { RestService } from "../restservice";
 import { Order } from  "./order";
 import { Receipt } from  "./receipt";
