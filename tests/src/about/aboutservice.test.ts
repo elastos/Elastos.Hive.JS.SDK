@@ -13,13 +13,9 @@ describe("test about service", () => {
 	});
 
     test("testGetNodeVersion", async () => {
-        try {
-            let nodeVersion: NodeVersion = await serviceEndpoint.getNodeVersion();
-            expect(nodeVersion).not.toBeNull();
-            LOG.info("Hive Node version: {}", nodeVersion.toString());
-        } catch (e) {
-            LOG.info(`failed to testGetNodeVersion: ${e.stack}`);
-        }
+        let nodeVersion: NodeVersion = await serviceEndpoint.getNodeVersion();
+        expect(nodeVersion).not.toBeNull();
+        LOG.info("Hive Node version: {}", nodeVersion.toString());
     });
 
     test("testGetCommitId", async () => {
