@@ -12,7 +12,6 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 //import { writeFileSync } from "fs";
 
-
 const production = !process.env.ROLLUP_WATCH;
 
 export function emitModulePackageFile() {
@@ -101,11 +100,17 @@ const nodePlugins = [
     size()
 ];
 
+/**
+ * main building routine here
+ */
+
+const rollupSourceFile = 'src/index.ts';
+
 export default command => {
     //const { collectLicenses, writeLicense } = getLicenseHandler();
     const commonJSBuild = {
         input: {
-            'hive.js': 'src/index.ts'
+            'hive.js': rollupSourceFile
         },
         onwarn,
         plugins: [
@@ -146,7 +151,7 @@ export default command => {
                 }
                 return 'default';
             },
-            manualChunks: { did: ['src/index.ts'] },
+            manualChunks: { did: [rollupSourceFile] },
             sourcemap: !prodBuild
         }
     };
@@ -157,7 +162,7 @@ export default command => {
 
     const esmBuild = {
         ...commonJSBuild,
-        input: { 'hive.js': 'src/index.ts' },
+        input: { 'hive.js': rollupSourceFile },
         plugins: [
             ...nodePlugins,
             emitModulePackageFile(),
@@ -173,7 +178,7 @@ export default command => {
     };
 
     const browserBuilds = {
-        input: 'src/index.ts',
+        input: rollupSourceFile,
         onwarn,
         external: [
             '@elastosfoundation/did-js-sdk'
@@ -298,8 +303,6 @@ export default command => {
             },
         ]
     };
-
-    
 
     return [ commonJSBuild, esmBuild, browserBuilds];
 };

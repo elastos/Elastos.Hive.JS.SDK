@@ -236,7 +236,7 @@ describe("test scripting runner function", () => {
             try {
                 await getScriptRunner(anonymous).downloadFile(invalidTransactionId);
             } catch (e) {
-                // expect(e).toBeInstanceOf(InvalidParameterException);
+                expect(e).toBeInstanceOf(InvalidParameterException);
             }
         }
 

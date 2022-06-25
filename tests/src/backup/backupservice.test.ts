@@ -31,13 +31,9 @@ describe("test backup services", () => {
     });
 
     test("testCheckResult", async () => {
-        try {
-            let result = await backupService.checkResult();
-            expect(result.getState()).not.toBeNull();
-            expect(result.getResult()).not.toBeNull();
-        } catch (e) {
-            LOG.info(`failed to testCheckResult: ${e.stack}`);
-        }
+        let result = await backupService.checkResult();
+        expect(result.getState()).not.toBeNull();
+        expect(result.getResult()).not.toBeNull();
     });
 
 });
