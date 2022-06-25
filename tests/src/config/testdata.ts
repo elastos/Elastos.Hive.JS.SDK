@@ -1,5 +1,5 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
-import { HiveException, Vault, BackupService, AppContext, Logger, Provider, Backup, ScriptRunner } from '@elastosfoundation/hive-js-sdk';
+import { HiveException, Vault, BackupService, AppContext, Logger, Provider, Backup, ScriptRunner } from '../../../src';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { ClientConfig } from "./clientconfig";
@@ -84,7 +84,7 @@ export class TestData {
         }
 
         // absolute path for tokens cache dir.
-        const testsDir = __dirname + '/../..';
+        const testsDir = __dirname + '/../../..';
         return `${testsDir}/data/${network}/localCache`;
     }
 

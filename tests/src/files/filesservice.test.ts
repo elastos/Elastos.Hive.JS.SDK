@@ -4,7 +4,7 @@ import {
 	FilesService, IpfsRunner,
 	NotFoundException, ScriptRunner,
 	VaultSubscription
-} from "@elastosfoundation/hive-js-sdk";
+} from "../../../src";
 import { TestData } from "../config/testdata";
 import { Blob } from 'buffer';
 

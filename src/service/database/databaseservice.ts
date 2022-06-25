@@ -56,9 +56,9 @@ export class DatabaseService extends RestService {
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
-	public async deleteCollection(collectionName: string) : Promise<void>{
+	public async deleteCollection(name: string) : Promise<void>{
 		try {
-			await this.httpClient.send(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
+			await this.httpClient.send(`${DatabaseService.API_DB_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} catch (e){
 			this.handleError(e);
 		}

@@ -6,7 +6,7 @@
     "module": "es2015",
     "lib": ["es2017", "es7", "es6", "dom"],
     "moduleResolution": "node",
-    //"outDir": "dist",
+    "outDir": "out-tsc",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "emitDeclarationOnly": false,

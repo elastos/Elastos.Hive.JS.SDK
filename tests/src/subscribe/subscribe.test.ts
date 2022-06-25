@@ -4,7 +4,7 @@ import {
     BackupSubscription,
     Order,
     AlreadyExistsException, SubscriptionInfo
-} from "@elastosfoundation/hive-js-sdk";
+} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test vault subscribe function", () => {

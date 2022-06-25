@@ -1,4 +1,4 @@
-import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "@elastosfoundation/hive-js-sdk";
+import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test auth service", () => {
@@ -8,7 +8,7 @@ describe("test auth service", () => {
 
 	beforeAll(async () => {
 		testData = await TestData.getInstance("authservice.test (auth test)");
-        serviceEndpoint = new ServiceEndpoint(testData.getAppContext(), testData.getProviderAddress());
+        serviceEndpoint = new ServiceEndpoint(testData.getUserAppContext(), testData.getProviderAddress());
 	});
 
 	afterAll(async () => { await serviceEndpoint.getAccessToken().invalidate(); });
@@ -31,7 +31,7 @@ describe.skip("authentication fail test", () => {
     beforeEach(async () => {
         testData = await TestData.getInstance("authservice.test (fail test)");
         vaultSubscription = new VaultSubscription(
-            testData.getAppContext(),
+            testData.getUserAppContext(),
             testData.getProviderAddress());
     });
 
