@@ -19,7 +19,7 @@ describe("test auth service", () => {
     });
 });
 
-describe("authentication fail test", () => {
+describe.skip("authentication fail test", () => {
 
 	let testData: TestData;
     let vaultSubscription: VaultSubscription;
