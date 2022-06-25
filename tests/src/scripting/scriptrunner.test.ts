@@ -46,7 +46,7 @@ describe("test scripting runner function", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e){
-            console.log("vault is already subscribed");
+            // console.log("vault is already subscribed");
         }
 
         scriptingService = vault.getScriptingService();
@@ -78,7 +78,7 @@ describe("test scripting runner function", () => {
         try { // remove vault to remove file
             await vaultSubscription.unsubscribe();
         } catch (e) {
-            console.log("vault is already subscribed");
+            // console.log("vault is already subscribed");
         }
     });
 

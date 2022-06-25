@@ -59,7 +59,7 @@ describe.skip("test scripting function", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e){
-            console.log("vault is already subscribed");
+            // console.log("vault is already subscribed");
         }
 
         vault = new Vault(

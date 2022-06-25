@@ -3,7 +3,7 @@ import {TestData} from "../config/testdata";
 
 
 
-describe("test default appcontext provider", () => {
+describe.skip("test default appcontext provider", () => {
    
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
@@ -40,7 +40,7 @@ describe("test default appcontext provider", () => {
         }
     });
 
-    test.skip("testValidProvider", async () => {
+    test("testValidProvider", async () => {
         await vaultSubscription.subscribe();
     });
 
