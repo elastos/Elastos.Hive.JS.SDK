@@ -24,6 +24,9 @@ export class TestData {
     private anonymousContext: AppContext;
 
     static async getInstance(testName: string): Promise<TestData> {
+        if (process.env.HIVE_DEBUG !== 'True')
+            Logger.setDefaultLevel(Logger.ERROR);
+
         if (!TestData.INSTANCE) {
             TestData.INSTANCE = await new TestData().init();
             TestData.LOG.log(`TestData.INSTANCE for test: ${testName}, provider, ${TestData.INSTANCE.getProviderAddress()}`);
