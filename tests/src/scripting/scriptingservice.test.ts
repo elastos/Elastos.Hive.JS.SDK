@@ -13,7 +13,7 @@ import {
     Vault,
     QueryHasResultCondition, 
     FilesService,
-    Executable } from "@elastosfoundation/hive-js-sdk";
+    Executable } from "../../../src";
 import { TestData } from "../config/testdata";
 
 // @deprecated
@@ -313,7 +313,7 @@ describe.skip("test scripting function", () => {
         expect(result).not.toBeNull();
         expect(result[scriptName]).not.toBeNull();
         expect(result[scriptName].size).not.toBeNull();
-        expect(Number(result[scriptName].size) > 0);
+        // expect(Number(result[scriptName].size) > 0);
     }
         
     async function registerScriptFileHash(scriptName: string) {

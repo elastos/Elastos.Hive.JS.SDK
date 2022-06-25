@@ -1,6 +1,5 @@
 import {TestData} from "./config/testdata";
-import {AlreadyExistsException, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
-import {ClientConfig} from "./config/clientconfig";
+import {AlreadyExistsException, VaultSubscription} from "../../src";
 
 /**
  * Please run this file in mainnet
@@ -9,8 +8,10 @@ import {ClientConfig} from "./config/clientconfig";
 
 describe.skip("test service without provider address", () => {
     test("testDatabaseServiceWithoutProviderAddress", async () => {
-        const testData = await TestData.getInstance("noprovideraddress.test", ClientConfig.CUSTOM);
-        const vaultSubscription = new VaultSubscription(testData.getAppContext());
+        const testData = await TestData.getInstance("vault subscribe.test");
+        const vaultSubscription = new VaultSubscription(
+            testData.getUserAppContext(),
+            testData.getProviderAddress());
         try {
             await vaultSubscription.subscribe();
         } catch (e) {

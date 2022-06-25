@@ -1,4 +1,4 @@
-import {Order, OrderState, Receipt, VaultSubscription, Logger, BackupSubscription} from "@elastosfoundation/hive-js-sdk";
+import {Order, OrderState, Receipt, VaultSubscription, Logger, BackupSubscription} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test payment service", () => {
