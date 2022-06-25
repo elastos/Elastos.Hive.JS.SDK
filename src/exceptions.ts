@@ -7,9 +7,9 @@ export class ParentException extends Error{
         super(message + (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : ""));
         this.causedBy = causedBy;
         Object.setPrototypeOf(this, new.target.prototype);
-        let logger = new Logger(this.constructor.name);
-        let stack = (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : "");
-        logger.error(message + stack);
+        // let logger = new Logger(this.constructor.name);
+        // let stack = (causedBy ? "\nCaused by: " + causedBy.message + (causedBy.stack ? "\nCaused by: " + causedBy.stack : "") : "");
+        // logger.error(message + stack);
     }
 
     public from(e:any) {

@@ -16,14 +16,14 @@ describe("test payment service", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e){
-            LOG.log("vault is already subscribed");
+            // LOG.log("vault is already subscribed");
         }
 
         backupSubscription = new BackupSubscription(testData.getUserAppContext(), testData.getProviderAddress());
         try {
             await backupSubscription.subscribe();
         } catch (e){
-            LOG.log("vault is already subscribed");
+            // LOG.log("vault is already subscribed");
         }
 	});
 

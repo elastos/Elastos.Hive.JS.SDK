@@ -23,7 +23,7 @@ describe("test database services", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e){
-            console.log("vault is already subscribed");
+            // console.log("vault is already subscribed");
         }
 
         databaseService = testData.newVault().getDatabaseService();
