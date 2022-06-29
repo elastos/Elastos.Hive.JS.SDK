@@ -18,7 +18,7 @@ export class AppDID extends DIDEntity {
     }
 
 	public getAppDid(): string {
-		return this.getDid().toString();
+		return AppDID.APP_DID;
 	}
 
 	public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
