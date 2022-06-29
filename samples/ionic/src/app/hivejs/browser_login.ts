@@ -2,6 +2,15 @@ import {EssentialsConnector} from "@elastosfoundation/essentials-connector-clien
 import {connectivity, DID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 import {AppDID} from "./did/appdid";
 
+/**
+ * Used to login with essential app, this is the first step for web app.
+ *
+ * Usage:
+ *
+ *      // this will invoke essentials app to login with user DID.
+ *      await browserLogin.initAndLogin();
+ *
+ */
 class BrowserLogin {
     private static readonly KEY_USER_DID = 'user_did';
     private readonly essentialsConnector: EssentialsConnector;

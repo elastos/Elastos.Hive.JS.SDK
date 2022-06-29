@@ -237,4 +237,10 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       resolve(appIdCredential);
     });
   }
+
+  async getBackupCredential(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
+      const credential = await this.didAccess.generateHiveBackupCredential(srcDid, targetDid, targetHost);
+      console.log(`backup credential: ${credential.toString(true)}`);
+      return credential.toString(true);
+  }
 }

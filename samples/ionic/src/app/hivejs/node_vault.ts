@@ -1,4 +1,4 @@
-import {AppContext, HiveException} from "@elastosfoundation/hive-js-sdk";
+import {AppContext, BackupService, HiveException, Vault} from "@elastosfoundation/hive-js-sdk";
 import {Claims, DIDDocument, JWTParserBuilder} from "@elastosfoundation/did-js-sdk";
 import {AppDID} from "./did/appdid";
 import {UserDID} from "./did/userdid";
@@ -50,7 +50,7 @@ export class NodeVault extends VaultBase {
         return this;
     }
 
-    public static async create(): Promise<NodeVault> {
+    static async create(): Promise<NodeVault> {
         return await new NodeVault().init();
     }
 
@@ -81,7 +81,11 @@ export class NodeVault extends VaultBase {
         }, owner.userDid.getDid().toString());
     }
 
-    public getTargetUserDid(): string {
+    getTargetUserDid(): string {
         return this.userDid.toString();
+    }
+
+    getBackupService(vault: Vault): BackupService {
+        throw new Error('Not implemented.')
     }
 }
