@@ -16,58 +16,66 @@ export class VaultSubscription extends ServiceEndpoint {
     private paymentService: PaymentService;
     private subscriptionService: SubscriptionService;
 
-    public constructor(context: AppContext, providerAddress?: string) {
+    constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
         let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
         this.paymentService = new PaymentService(this, httpClient);
         this.subscriptionService = new SubscriptionService(this, httpClient);
 	}
 
-	public async getPricingPlanList(): Promise<PricingPlan[]> {
+	async getPricingPlanList(): Promise<PricingPlan[]> {
 		return await this.subscriptionService.getVaultPricingPlanList();
 	}
 
-	public async getPricingPlan(planName: string): Promise<PricingPlan> {
+	async getPricingPlan(planName: string): Promise<PricingPlan> {
 		return await this.subscriptionService.getVaultPricingPlan(planName);
 	}
 
-	public async subscribe(): Promise<VaultInfo> {
+	async subscribe(): Promise<VaultInfo> {
 		return await this.subscriptionService.subscribeToVault();
 	}
 
-	public async unsubscribe(): Promise<void> {
-		return await this.subscriptionService.unsubscribeVault();
-	}
+    async activate(): Promise<void> {
+        return await this.subscriptionService.activateVault();
+    }
 
-	public async checkSubscription(): Promise<VaultInfo> {
+    async deactivate(): Promise<void> {
+        return await this.subscriptionService.deactivateVault();
+    }
+
+	async checkSubscription(): Promise<VaultInfo> {
 		return await this.subscriptionService.getVaultInfo();
 	}
 
-	public async getAppStats(): Promise<AppInfo[]> {
+	async getAppStats(): Promise<AppInfo[]> {
 		return await this.subscriptionService.getAppStats();
 	}
 
-	public async placeOrder(planName: string): Promise<Order> {
+    async unsubscribe(): Promise<void> {
+        return await this.subscriptionService.unsubscribeVault();
+    }
+
+	async placeOrder(planName: string): Promise<Order> {
 		return await this.paymentService.placeOrder("vault", planName);
 	}
 
-	public async getOrder(orderId: number): Promise<Order> {
+	async getOrder(orderId: number): Promise<Order> {
 		return await this.paymentService.getOrder("vault", orderId);
 	}
 
-	public async settleOrder(orderId: number): Promise<Receipt> {
+	async settleOrder(orderId: number): Promise<Receipt> {
 		return await this.paymentService.settleOrder(orderId);
 	}
 
-	public async getOrderList(): Promise<Order[]> {
+	async getOrderList(): Promise<Order[]> {
 		return await this.paymentService.getOrders("vault");
 	}
 
-	public async getReceipts(orderId?: number): Promise<Receipt[]> {
+	async getReceipts(orderId?: number): Promise<Receipt[]> {
 		return await this.paymentService.getReceipts(orderId);
 	}
 
-	public async getVersion(): Promise<string> {
+	async getVersion(): Promise<string> {
 		return await this.paymentService.getVersion();
 	}
 }

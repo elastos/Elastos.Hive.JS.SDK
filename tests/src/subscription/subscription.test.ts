@@ -52,14 +52,6 @@ describe("test vault subscribe function", () => {
         expect(order2).toEqual(order);
     });
 
-    // void () {
-	// 	Assertions.assertDoesNotThrow(()->{
-	// 		Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
-	// 		Assertions.assertNotNull(order);
-	// 		Assertions.assertNotNull(order.getOrderId());
-	// 	});
-	// }
-
     test.skip("testGetAppStats", async () => {
         try {
             await vaultSubscription.subscribe();
@@ -80,24 +72,24 @@ describe("test vault subscribe function", () => {
     });
 
     test("testSubscribeCheckUnsubscribe", async () => {
-        let vaultInfo;
         try {
-            vaultInfo = await vaultSubscription.subscribe();
+            const vaultInfo = await vaultSubscription.subscribe();
+            expect(vaultInfo).not.toBeNull();
         } catch (e) {
-            await vaultSubscription.unsubscribe();
-            vaultInfo = await vaultSubscription.subscribe();
+            if (!(e instanceof AlreadyExistsException)) {
+                throw e;
+            }
         }
-        expect(vaultInfo).not.toBeNull();
+
+        // await vaultSubscription.activate();
+
         const result: SubscriptionInfo = await vaultSubscription.checkSubscription();
         expect(result).not.toBeNull();
         // expect(result.getEndTime()).toBeTruthy();
-        let error = null;
-        try {
-            await vaultSubscription.unsubscribe()
-        } catch (e) {
-            error = e;
-        }
-        expect(error).toBeNull();
+
+        // await vaultSubscription.deactivate();
+
+        await vaultSubscription.unsubscribe();
     });
 });
 
@@ -105,24 +97,24 @@ describe("test vault subscribe function", () => {
 describe("test backup subscribe function", () => {
 
     let testData: TestData;
-    let backupsubscriptionService: BackupSubscription;
+    let backupSubscription: BackupSubscription;
     let PRICING_PLAN_NAME = "Rookie";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
-        backupsubscriptionService = new BackupSubscription(
+        backupSubscription = new BackupSubscription(
             testData.getUserAppContext(),
             testData.getProviderAddress());
     });
 
     test("testGetPricingPlanList", async() => {
-        let plans: PricingPlan[] = await backupsubscriptionService.getPricingPlanList();
+        let plans: PricingPlan[] = await backupSubscription.getPricingPlanList();
         expect(plans).not.toBeNull();
         expect(plans.length).toBeGreaterThan(0);
     });
 
     test("testGetPricingPlan", async() => {
-        let plan: PricingPlan = await backupsubscriptionService.getPricingPlan(PRICING_PLAN_NAME);
+        let plan: PricingPlan = await backupSubscription.getPricingPlan(PRICING_PLAN_NAME);
         expect(plan).not.toBeNull();
         expect(plan.getName()).toBe(PRICING_PLAN_NAME);
     });
@@ -130,18 +122,18 @@ describe("test backup subscribe function", () => {
     test("testSubscribeCheckUnsubscribe", async () => {
         let backupInfo;
         try {
-            backupInfo = await backupsubscriptionService.subscribe();
+            backupInfo = await backupSubscription.subscribe();
         } catch (e) {
-            await backupsubscriptionService.unsubscribe();
-            backupInfo = await backupsubscriptionService.subscribe();
+            await backupSubscription.unsubscribe();
+            backupInfo = await backupSubscription.subscribe();
         }
         expect(backupInfo).not.toBeNull();
-        const result: SubscriptionInfo = await backupsubscriptionService.checkSubscription();
+        const result: SubscriptionInfo = await backupSubscription.checkSubscription();
         expect(result).not.toBeNull();
         expect(result.getEndTime()).toBeTruthy();
         let error = null;
         try {
-            await backupsubscriptionService.unsubscribe()
+            await backupSubscription.unsubscribe()
         } catch (e) {
             error = e;
         }

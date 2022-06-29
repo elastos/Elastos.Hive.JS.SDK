@@ -58,7 +58,7 @@ export class TestData {
             userConfig.storepass,
             storeRoot, userConfig.did);
 
-        TestData.LOG.trace("UserDid created");
+        TestData.LOG.info(`user_did: ${this.userDid.toString()}, app_did: ${this.appInstanceDid.getAppDid()}, app_ins_did: ${this.appInstanceDid.toString()}`);
 
         let userConfigCaller = this.clientConfig.cross.user;
         this.callerDid = await UserDID.create(userConfigCaller.name,
