@@ -69,7 +69,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
   /* public async getSubscriptionService(targetDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultSubscriptionService> {
     let appContext = await this.getAppContext(targetDid, onAuthError);
     if (!providerAddress)
-      providerAddress = await AppContext.getProviderAddress(targetDid); // TODO: cache, don't resolve every time
+      providerAddress = await AppContext.getProviderAddressByUserDid(targetDid); // TODO: cache, don't resolve every time
     return new VaultSubscriptionService(appContext, providerAddress);
   } */
 
