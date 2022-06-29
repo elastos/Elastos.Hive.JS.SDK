@@ -1,9 +1,7 @@
-import {DefaultDIDAdapter, DIDBackend} from "@elastosfoundation/did-js-sdk";
-import {AppContext} from "../../src";
+import {TestData} from "./config/testdata";
 
 /**
  * Please run this file with a prod hive node.
- * TODO: move initialize to getProviderAddress before run.
  */
 
 describe.skip("test appcontext", () => {
@@ -11,10 +9,10 @@ describe.skip("test appcontext", () => {
     });
 
     test("testGetProviderAddress", async () => {
-        DIDBackend.initialize(new DefaultDIDAdapter('mainnet'));
-        const providerAddress = await AppContext.getProviderAddress("did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm4");
+        let testData = await TestData.getInstance("databaseservice.tests");
+        const providerAddress = await testData.getUserAppContext().setUserDidForceResolveFlag(true).getProviderAddress();
         console.log(`Provider address: ${providerAddress}`);
         expect(providerAddress).not.toBeUndefined();
-        expect(providerAddress).not.toBe('https://hive1.trinity-tech.io');
+        expect(providerAddress).toEqual<string>('https://hive1.trinity-tech.io');
     });
 });

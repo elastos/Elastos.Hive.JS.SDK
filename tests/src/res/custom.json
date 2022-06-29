@@ -5,6 +5,7 @@
   "application": {
     "name": "developApp",
     "mnemonic": "curious push water point border mutual install govern message ordinary fish small",
+    "__comment__": "please add any string to 'passPhrase', or it will cause start error",
     "passPhrase": "",
     "storepass": "password",
     "did": "did:elastos:iag8qwq1xPBpLsGv4zR4CmzLpLUkBNfPHX"

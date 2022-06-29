@@ -25,15 +25,17 @@ import { Logger } from '../../utils/logger';
 export class AppContext {
 	private static LOG = new Logger("AppContext");
 	
-	public static debug = false;
+	static debug = false;
     private static resolverHasSetup = false;
 
-    private contextProvider: AppContextProvider;
-    private userDid: string;
+    private readonly contextProvider: AppContextProvider;
+    private readonly userDid: string;
+    private forceResolve: boolean;
 
     private constructor(provider: AppContextProvider, userDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
+        this.forceResolve = false;
     }
 
 	/**
@@ -41,7 +43,7 @@ export class AppContext {
 	 *
 	 * @return The provider of the application context.
 	 */
-    public getAppContextProvider(): AppContextProvider {
+    getAppContextProvider(): AppContextProvider {
 		return this.contextProvider;
 	}
 
@@ -50,7 +52,7 @@ export class AppContext {
 	 *
 	 * @return The user DID.
 	 */
-    public getUserDid(): string {
+    getUserDid(): string {
 		return this.userDid;
 	}
 
@@ -59,8 +61,8 @@ export class AppContext {
 	 *
 	 * @return The provider address.
 	 */
-	public async getProviderAddress(): Promise<string> {
-		return await AppContext.getProviderAddress(this.userDid, null);
+	async getProviderAddress(): Promise<string> {
+		return await this.getProviderAddressByUserDid(this.userDid, null);
 	}
 
 	/**
@@ -70,7 +72,7 @@ export class AppContext {
 	 * @param cacheDir The local directory for DID cache.
 	 * @throws HiveException See {@link HiveException}
 	 */
-	public static setupResolver(resolver: string, cacheDir: string): void {
+	static setupResolver(resolver: string, cacheDir: string): void {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
 
@@ -89,7 +91,7 @@ export class AppContext {
 	 * @param userDid The user DID.
 	 * @return The application context.
 	 */
-	public static async build(provider: AppContextProvider, userDid: string): Promise<AppContext> {
+	static async build(provider: AppContextProvider, userDid: string): Promise<AppContext> {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
@@ -105,6 +107,11 @@ export class AppContext {
 		return new AppContext(provider, userDid);
 	}
 
+	setUserDidForceResolveFlag(force: boolean) {
+        this.forceResolve = force;
+        return this;
+    }
+
 	/**
 	 * Get the URL address of the provider by the user DID.
 	 * The will access the property of the user DID.
@@ -113,7 +120,7 @@ export class AppContext {
 	 * @param preferredProviderAddress The preferred URL address of the provider.
 	 * @return The URL address of the provider
 	 */
-	public static async getProviderAddress(targetDid: string, preferredProviderAddress?: string): Promise<string> {
+	private async getProviderAddressByUserDid(targetDid: string, preferredProviderAddress?: string): Promise<string> {
         if (targetDid == null)
             throw new IllegalArgumentException("Missing input parameter for target Did");
 
@@ -124,7 +131,7 @@ export class AppContext {
         try {
             let services: Array<DIDDocument.Service> = null;
             let did: DID = new DID(targetDid);
-            let doc: DIDDocument = await did.resolve();
+            let doc: DIDDocument = await did.resolve(this.forceResolve);
             if (doc == null)
                 throw (new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain"));
 
@@ -133,9 +140,9 @@ export class AppContext {
                 throw (new ProviderNotSetException("No 'HiveVault' services declared on DID document " + targetDid));
 
             /*
-                * Should we throw special exception when it has more than one end-point
-                * of service "HiveVault";
-                */
+             * Should we throw special exception when it has more than one end-point
+             * of service "HiveVault";
+             */
             return services[0].getServiceEndpoint();
 
         } catch (e) {
