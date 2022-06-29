@@ -2,11 +2,11 @@ import {Component} from '@angular/core';
 import ClientConfig from "../hivejs/config/clientconfig";
 import {NodeVault} from "../hivejs/node_vault";
 import {
-    AlreadyExistsException,
+    AlreadyExistsException, BackupResultResult,
     Executable,
     FileDownloadExecutable,
     FileUploadExecutable,
-    InsertOptions, Order, Receipt,
+    InsertOptions, NotFoundException, Order, Receipt,
     VaultInfo
 } from "@elastosfoundation/hive-js-sdk";
 import {browserLogin} from "../hivejs/browser_login";
@@ -84,7 +84,16 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const vault = await this.getVault();
             const subscription = await vault.createVaultSubscription();
-            await subscription.subscribe();
+            try {
+                await subscription.subscribe();
+                this.log('subscribe done');
+            } catch (e) {
+                if (e instanceof AlreadyExistsException) {
+                    this.log('already exists')
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 
@@ -101,7 +110,16 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const vault = await this.getVault();
             const subscription = await vault.createVaultSubscription();
-            await subscription.unsubscribe();
+            try {
+                await subscription.unsubscribe();
+                this.log('unsubscribe done');
+            } catch (e) {
+                if (e instanceof NotFoundException) {
+                    this.log('the vault does not exist, skip');
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 
@@ -202,6 +220,122 @@ export class Tab1Page {
         });
     }
 
+    private sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    /**
+     * This example shows how to migrate the vault to another node,
+     * here two nodes are same.
+     *
+     * The process of migration:
+     *
+     *      1. create a vault (migration source) and input some data and files on node A.
+     *      2. subscribe a backup service on node B.
+     *      3. deactivate the vault, then execute backup on node A to node B.
+     *      4. make sure no vault on node B and promote the backup data to a new vault.
+     *      5. update the user DID info. on chain with node B url.
+     *      6. unsubscribe the vault on node A.
+     *      7. all done. the vault can be used on node B.
+     *
+     */
+    async migration() {
+        await this.updateMessage(async () => {
+            const baseVault = await this.getVault();
+            const vault = await baseVault.createVault();
+            const subscription = await baseVault.createVaultSubscription();
+            const subscriptionBackup = await baseVault.createBackupSubscription();
+
+            // try to remove the exist vault and backup service, clean start.
+            try {
+                await subscription.unsubscribe();
+            } catch (e) {
+                if (!(e instanceof NotFoundException)) {
+                    throw e;
+                }
+            }
+            try {
+                await subscriptionBackup.unsubscribe();
+            } catch (e) {
+                if (!(e instanceof NotFoundException)) {
+                    throw e;
+                }
+            }
+
+            // 1. create a new vault as the source of the migration operation.
+            await subscription.subscribe();
+            this.log('a clean vault created.')
+
+            // insert document
+            const databaseService = await vault.getDatabaseService();
+            try {
+                await databaseService.createCollection(Tab1Page.COLLECTION_NAME);
+            } catch (e) {}
+            const doc = {"author": "john doe1", "title": "Eve for Dummies1"};
+            await databaseService.insertOne(
+                Tab1Page.COLLECTION_NAME, doc,
+                new InsertOptions(false, false)
+            );
+            this.log('a new document is been inserted.')
+
+            // upload file
+            const filesService = await vault.getFilesService();
+            const buffer = Buffer.from(Tab1Page.FILE_CONTENT, 'utf8');
+            await filesService.upload(Tab1Page.FILE_NAME, buffer);
+            this.log('a new file is been uploaded.')
+
+            // 2. subscribe the backup service
+            await subscriptionBackup.subscribe();
+            this.log('subscribe a backup service.')
+
+            // 3. deactivate the vault to a void data changes in the backup process.
+            await subscription.deactivate();
+            this.log('deactivate the source vault.')
+
+            // 4. backup the vault data.
+            const backupService = await baseVault.getBackupService(vault);
+            await backupService.startBackup();
+
+            // wait backup end.
+            let count = 0;
+            while (count < 30) {
+                const info = await backupService.checkResult();
+                if (info.getResult() == BackupResultResult.RESULT_PROCESS) {
+                    // go on.
+                } else if (info.getResult() == BackupResultResult.RESULT_SUCCESS) {
+                    break;
+                } else {
+                    throw new Error(`failed to backup: ${info.getMessage()}`)
+                }
+                count++;
+                this.log('backup in process, try to wait.');
+                await this.sleep(1000);
+            }
+            this.log('backup done.');
+
+            // 5. promotion, same vault, so need remove vault first.
+            await subscription.unsubscribe();
+
+            // promote
+            const backup = await baseVault.createBackup();
+            await backup.getPromotionService().promote();
+            this.log('promotion over from backup data to a new vault.');
+
+            this.log('TODO: public user DID with backup node url here');
+            this.log('remove the vault on vault node here, same node, skip');
+
+            // check the data of the new vault.
+            const obj = await databaseService.findOne(Tab1Page.COLLECTION_NAME, doc);
+            this.log(`find doc: ${JSON.stringify(obj)}`);
+
+            // check the file
+            const content = await filesService.download(Tab1Page.FILE_NAME);
+            this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
+        });
+    }
+
     async payOrder() {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
@@ -254,7 +388,7 @@ export class Tab1Page {
     }
 
     private static getIncreasedDays(start: Date, end: Date): number {
-        const startTime: number = start.getTime();
+        const startTime: number = start == null ? Date.now() : start.getTime();
         const endTime: number = end == null ? Date.now() : end.getTime();
         return (endTime - startTime) / 1000 / 24 / 3600; // days
     }
@@ -263,6 +397,17 @@ export class Tab1Page {
         console.log(`[tab1.page.ts] >>>>>> ${msg}`)
     }
 
+    /**
+     * This example shows how to upgrade a vault by payment service.
+     *
+     * The process is like this:
+     *
+     *      1. create a new vault or keep the exist one.
+     *      2. place order and get the payment info.
+     *      3. pay order by wallet app (essentials or metamask) with hive payment js sdk and get order id.
+     *      4. setter order by the order id and the vault will be upgrade (more max storage size and duration time)
+     *      5. all done. The upgraded vault can be used now.
+     */
     async upgradeVault() {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
@@ -271,10 +416,13 @@ export class Tab1Page {
             const subscription = await vault.createVaultSubscription();
             // try subscribe
             try {
-                const info = subscription.subscribe();
+                const info = await subscription.subscribe();
+                this.log(`subscribe done: ${JSON.stringify(info)}`);
             } catch (e) {
                 if (e instanceof AlreadyExistsException) {
                     this.log('the vault already exists');
+                } else {
+                    throw e;
                 }
             }
 
@@ -304,7 +452,7 @@ export class Tab1Page {
             const afterPlanName = vaultInfoAfter.getPricePlan();
             const maxSize = vaultInfoAfter.getStorageQuota();
             const increasedDays = Tab1Page.getIncreasedDays(vaultInfoBefore.getEndTime(), vaultInfoAfter.getEndTime());
-            this.log(`upgrade result: afterPlanName=${afterPlanName}, maxSize=${maxSize}, increasedDays=${increasedDays}`);
+            this.log(`upgrade result: afterPlanName=${afterPlanName}, maxSize=${maxSize}(Bytes), increasedDays=${increasedDays}(days)`);
         });
     }
 }
