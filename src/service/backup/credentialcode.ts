@@ -7,7 +7,7 @@ import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { DataStorage } from "../../utils/storage/datastorage";
 
 export class CredentialCode {
-	private targetServiceDid: string;
+	private readonly targetServiceDid: string;
 	private jwtCode: string;
 	private remoteResolver: CodeFetcher;
 	private storage: DataStorage;
@@ -20,7 +20,7 @@ export class CredentialCode {
 		this.storage = endpoint.getStorage();
     }
     
-    public async getToken(): Promise<string> {
+    async getToken(): Promise<string> {
 		if (this.jwtCode != null)
 			return this.jwtCode;
 
@@ -39,7 +39,7 @@ export class CredentialCode {
 		return this.jwtCode;
 	}
 
-	private  restoreToken(): string {
+	private restoreToken(): string {
 		return this.storage.loadBackupCredential(this.targetServiceDid);
 	}
 

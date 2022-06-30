@@ -333,6 +333,8 @@ export class Tab1Page {
             // check the file
             const content = await filesService.download(Tab1Page.FILE_NAME);
             this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
+
+            this.log('migration is done !!!')
         });
     }
 
@@ -452,7 +454,9 @@ export class Tab1Page {
             const afterPlanName = vaultInfoAfter.getPricePlan();
             const maxSize = vaultInfoAfter.getStorageQuota();
             const increasedDays = Tab1Page.getIncreasedDays(vaultInfoBefore.getEndTime(), vaultInfoAfter.getEndTime());
-            this.log(`upgrade result: afterPlanName=${afterPlanName}, maxSize=${maxSize}(Bytes), increasedDays=${increasedDays}(days)`);
+            this.log(`upgrade with result: afterPlanName=${afterPlanName}, maxSize=${maxSize}(Bytes), increasedDays=${increasedDays}(days)`);
+
+            this.log('upgrade is done !!!')
         });
     }
 }
