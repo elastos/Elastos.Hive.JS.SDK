@@ -46,9 +46,9 @@ export class UserDID extends DIDEntity {
 
 	public async issueBackupDiplomaFor(sourceDID: string, targetHost: string, targetDID: string): Promise<VerifiableCredential> {
 		let subject = {};
-		subject["sourceDID"] = sourceDID;
-		subject["targetHost"] = targetHost;
-		subject["targetDID"] = targetDID;
+		subject["sourceHiveNodeDID"] = sourceDID;
+		subject["targetHiveNodeDID"] = targetDID;
+		subject["targetNodeURL"] = targetHost;
 
         let cal = dayjs();
         cal = cal.add(5, 'year');
@@ -57,8 +57,8 @@ export class UserDID extends DIDEntity {
 		this.setIssuer(new Issuer(await this.getDocument()));
 
 		let cb = this.issuer.issueFor(sourceDID);
-		let vc = await cb.id("backupId")
-				.type("BackupCredential")
+		let vc = await cb.id("hive-backup-credential")
+				.types("HiveBackupCredential", "VerifiableCredential")
 				.properties(subject)
 				.expirationDate(cal.toDate())
 				.seal(this.getStorePassword());

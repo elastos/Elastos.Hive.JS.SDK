@@ -5,10 +5,10 @@ import { CodeFetcher } from "../../connection/auth/codefetcher";
 
 
 export class RemoteResolver implements CodeFetcher {
-	private serviceContext: ServiceEndpoint;
-	private backupContext: BackupContext;
-	private targetDid: string;
-	private targetHost: string;
+    private readonly targetDid: string;
+    private readonly targetHost: string;
+    private serviceContext: ServiceEndpoint;
+    private backupContext: BackupContext;
 
 	constructor(serviceEndpoint: ServiceEndpoint, backupContext: BackupContext,
 				targetServiceDid: string, targetAddress: string) {
@@ -18,7 +18,7 @@ export class RemoteResolver implements CodeFetcher {
 		this.targetHost = targetAddress;
 	}
 
-	public async fetch(): Promise<string> {
+	async fetch(): Promise<string> {
 		if (this.serviceContext.getServiceInstanceDid() == null) {
 			await this.serviceContext.refreshAccessToken();
 		}
@@ -31,7 +31,7 @@ export class RemoteResolver implements CodeFetcher {
 	}
 
 
-	public invalidate(): void {
+	invalidate(): void {
 
     }
 }
