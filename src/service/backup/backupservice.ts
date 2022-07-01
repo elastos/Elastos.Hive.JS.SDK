@@ -1,15 +1,11 @@
-import {
-	NetworkException,
-	NodeRPCException,
-	NotImplementedException
-} from "../../exceptions";
-import { HttpClient } from "../../connection/httpclient";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
-import { RestService } from "../restservice";
+import {NetworkException, NodeRPCException, NotImplementedException} from "../../exceptions";
+import {HttpClient} from "../../connection/httpclient";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {Logger} from '../../utils/logger';
+import {RestService} from "../restservice";
 import {BackupResult, BackupResultResult, BackupResultState} from "./backupresult";
-import { HttpMethod } from "../../connection/httpmethod";
-import { HttpResponseParser } from '../../connection/httpresponseparser';
+import {HttpMethod} from "../../connection/httpmethod";
+import {HttpResponseParser} from '../../connection/httpresponseparser';
 import {CredentialCode} from "./credentialcode";
 import {BackupContext} from "./backupcontext";
 
@@ -23,27 +19,62 @@ export class BackupService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
-	public setBackupContext(backupContext: BackupContext) {
+	setBackupContext(backupContext: BackupContext) {
 		this.credentialCode = new CredentialCode(this.serviceContext, backupContext);
 	}
 
-	public async startBackup() : Promise<void>{
+    /**
+     * Start backup and wait until finish.
+     *
+     * @param callback :(state: BackupResultResult, message: string, e: HiveException)
+     *                 If 'process', the message is the percent progress, and it will be called many times.
+     */
+	async startBackup(callback?) : Promise<void>{
 		try {
 			await this.httpClient.send<void>(`${BackupService.API_BACKUP_ENDPOINT}?to=hive_node`,
 				{ "credential": await this.credentialCode.getToken() },
 				HttpClient.NO_RESPONSE, HttpMethod.POST);
 		} catch (e){
+		    if (callback) callback(BackupResultResult.RESULT_FAILED, 'failed send backup request.', e);
 			this.handleError(e);
 		}
+
+        await this.waitByCheckResult(callback);
 	}
 
-	public async stopBackup(): Promise<void> {
+	private async waitByCheckResult(callback?): Promise<void> {
+        try {
+            while (true) {
+                const result = await this.checkResult();
+
+                if (callback) callback(result.getResult(), result.getMessage());
+
+                if (result.getResult() != BackupResultResult.RESULT_PROCESS) {
+                    break;
+                }
+            }
+
+            await new Promise(f => setTimeout(f, 1000));
+        } catch (e) {
+            if (callback) callback(BackupResultResult.RESULT_FAILED, 'failed get the status of backup.', e);
+            this.handleError(e);
+        }
+    }
+
+	async stopBackup(): Promise<void> {
 		return await new Promise<void>((resolve, reject) => {
 			reject(new NotImplementedException());
 		});
 	}
 
-	public async restoreFrom() : Promise<void>{
+    /**
+     * Start restore and wait until finish.
+     *
+     * @param callback :(state: BackupResultResult, message: string, e: HiveException)
+     *                 If 'process', the message is the percent progress, and it will be called many times.
+     *
+     */
+	async restoreFrom(callback?) : Promise<void>{
 		try {
 			await this.httpClient.send<void>(`${BackupService.API_BACKUP_ENDPOINT}?from=hive_node`,
 				{ "credential": await this.credentialCode.getToken() },
@@ -51,9 +82,11 @@ export class BackupService extends RestService {
 		} catch (e){
 			this.handleError(e);
 		}
+
+        await this.waitByCheckResult(callback);
 	}
 
-	public async stopRestore(): Promise<void> {
+	async stopRestore(): Promise<void> {
 		return await new Promise<void>((resolve, reject) => {
 			reject(new NotImplementedException());
 		});
@@ -83,7 +116,7 @@ export class BackupService extends RestService {
 		}
 	}
 
-	public async checkResult() : Promise<BackupResult> {
+	async checkResult() : Promise<BackupResult> {
 		try {
 			return await this.httpClient.send<BackupResult>(BackupService.API_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD,
 					<HttpResponseParser<BackupResult>> {

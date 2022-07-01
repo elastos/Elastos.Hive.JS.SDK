@@ -95,6 +95,9 @@ export class AppContext {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
+        if (userDid == null)
+            throw new IllegalArgumentException("Missing user DID");
+
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");
 
