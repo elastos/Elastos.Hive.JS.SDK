@@ -26,8 +26,16 @@ describe("test backup services", () => {
         await backupService.startBackup();
     });
 
+    test.skip("testStartBackupWithCallback", async () => {
+        await backupService.startBackup(function (state, message, e) {
+            console.log('backup callback: {}, {}, {}', state, message, e);
+        });
+    });
+
     test.skip("testRestoreFrom", async () => {
-        await backupService.restoreFrom();
+        await backupService.restoreFrom(function (state, message, e) {
+            console.log('restore callback: {}, {}, {}', state, message, e);
+        });
     });
 
     test("testCheckResult", async () => {
