@@ -44,19 +44,19 @@ export class BackupService extends RestService {
 
 	private async waitByCheckResult(callback?): Promise<void> {
         try {
-            while (true) {
-                const result = await this.checkResult();
+            const sleep = (waitTimeInMs) => new Promise(resolve => {setTimeout(resolve, waitTimeInMs);});
+            let result = null;
+            do {
+                result = await this.checkResult();
 
                 if (callback) callback(result.getResult(), result.getMessage());
 
-                if (result.getResult() != BackupResultResult.RESULT_PROCESS) {
-                    break;
-                }
-            }
+                await sleep(1000);
 
-            await new Promise(f => setTimeout(f, 1000));
+            } while (result.getResult() == BackupResultResult.RESULT_PROCESS);
         } catch (e) {
             if (callback) callback(BackupResultResult.RESULT_FAILED, 'failed get the status of backup.', e);
+
             this.handleError(e);
         }
     }

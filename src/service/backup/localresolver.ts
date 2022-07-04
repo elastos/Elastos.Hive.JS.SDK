@@ -3,7 +3,7 @@ import { CodeFetcher } from "../../connection/auth/codefetcher";
 import {BackupContext} from "./backupcontext";
 import {NotImplementedException} from "../../exceptions";
 import {VerifiableCredential} from "@elastosfoundation/did-js-sdk";
-import * as crypto from 'crypto';
+import {SHA256} from "../..";
 
 export class LocalResolver implements CodeFetcher {
 	private endpoint: ServiceEndpoint;
@@ -21,12 +21,12 @@ export class LocalResolver implements CodeFetcher {
 	    const key = await this.getStorageKey();
 
 	    // restore backup credential and check expired.
-		let token = this.restoreToken(key);
+		let token = this.endpoint.getStorage().loadBackupCredential(key);
 		if (token) {
             const credential = VerifiableCredential.parse(token);
             const expire_time: Date = await credential.getExpirationDate();
             if (expire_time.getTime() < Date.now()) {
-                this.clearToken(key);
+                this.endpoint.getStorage().clearBackupCredential(key);
                 token = null;
             }
         }
@@ -34,13 +34,13 @@ export class LocalResolver implements CodeFetcher {
 		// if not get from local, try to get from remote.
 		if (token == null) {
 			token = await this.nextFetcher.fetch();
-			this.saveToken(key, token);
+            this.endpoint.getStorage().storeBackupCredential(key, token);
 		}
 
 		return token;
 	}
 
-	invalidate(): void {
+	invalidate(): Promise<void> {
 		throw new NotImplementedException();
 	}
 
@@ -55,20 +55,9 @@ export class LocalResolver implements CodeFetcher {
             }
             const sourceDid = this.endpoint.getServiceInstanceDid();
 
-            this.storageKey = crypto.createHash('md5').update('some_string').digest("hex")
+            const keySource = `${userDid};${sourceDid};${targetDid}`;
+            this.storageKey = SHA256.encodeToStr(keySource);
         }
         return this.storageKey;
     }
-
-	private restoreToken(key: string): string {
-		return this.endpoint.getStorage().loadBackupCredential(key);
-	}
-
-	private saveToken(key: string, token: string): void {
-	    this.endpoint.getStorage().storeBackupCredential(key, token);
-	}
-
-	private clearToken(key: string): void {
-        this.endpoint.getStorage().clearBackupCredential(key);
-	}
 }

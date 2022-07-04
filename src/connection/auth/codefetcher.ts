@@ -13,5 +13,5 @@ export interface CodeFetcher {
 	/**
 	 * Invalidate the code for getting the code from remote server.
 	 */
-	invalidate(): void;
+	invalidate(): Promise<void>;
 }
