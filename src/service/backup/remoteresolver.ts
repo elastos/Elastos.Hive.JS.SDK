@@ -1,4 +1,4 @@
-import { NodeRPCException } from "../../exceptions";
+import {NodeRPCException, NotImplementedException} from "../../exceptions";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { BackupContext } from "./backupcontext";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
@@ -30,9 +30,8 @@ export class RemoteResolver implements CodeFetcher {
 		}
 	}
 
-
-	invalidate(): void {
-
+	invalidate(): Promise<void> {
+        throw new NotImplementedException();
     }
 }
 

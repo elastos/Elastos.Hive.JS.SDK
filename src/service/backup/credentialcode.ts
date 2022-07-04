@@ -9,7 +9,7 @@ import { ServiceEndpoint } from "../../connection/serviceendpoint";
  */
 export class CredentialCode {
     private readonly endpoint: ServiceEndpoint;
-    private codeFetcher: CodeFetcher;
+    private credentialFetcher: CodeFetcher;
 	private jwtCode: string;
 
     constructor(endpoint: ServiceEndpoint, context: BackupContext) {
@@ -18,14 +18,14 @@ export class CredentialCode {
         		endpoint, context,
                 context.getParameter("targetServiceDid"),
                 context.getParameter("targetAddress"));
-		this.codeFetcher = new LocalResolver(endpoint, context, remoteResolver);
+		this.credentialFetcher = new LocalResolver(endpoint, context, remoteResolver);
     }
 
     async getToken(): Promise<string> {
 		if (this.jwtCode != null)
 			return this.jwtCode;
 
-        this.jwtCode = await this.codeFetcher.fetch();
+        this.jwtCode = await this.credentialFetcher.fetch();
 		return this.jwtCode;
 	}
 }

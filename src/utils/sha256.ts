@@ -21,25 +21,34 @@
  */
 
 import createHash  from 'create-hash';
-export class SHA256 {
+import * as crypto from 'crypto';
 
-    public static hashTwice(buffer: Buffer): Buffer{
+export class SHA256 {
+    static hashTwice(buffer: Buffer): Buffer{
         let firstHash = createHash('sha256').update(buffer).digest();
         return createHash('sha256').update(firstHash).digest()
     }
 
-    public static sha256ripemd160(buffer: Buffer): Buffer{
+    static sha256ripemd160(buffer: Buffer): Buffer{
         let firstHash = createHash('sha256').update(buffer).digest();
         return createHash('ripemd160').update(firstHash).digest()
     }
 
-    public static encodeToString(...inputs: Buffer[]): string {
+    static encodeToString(...inputs: Buffer[]): string {
         let fullInput = inputs.reduce((acc, curr) => Buffer.concat([acc, curr]), Buffer.from(""));
         return createHash("sha256").update(fullInput).digest().toString();
     }
 
-    public static encodeToBuffer(...inputs: Buffer[]): Buffer {
+    static encodeToBuffer(...inputs: Buffer[]): Buffer {
         let fullInput = inputs.reduce((acc, curr) => Buffer.concat([acc, curr]), Buffer.from(""));
         return createHash("sha256").update(fullInput).digest();
+    }
+
+    /**
+     * encode a string to sha256 string.
+     * @param source
+     */
+    static encodeToStr(source: string) {
+        return crypto.createHmac("sha256", 'hive node sha256 secret').update(source).digest("hex");
     }
 }

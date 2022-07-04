@@ -4,38 +4,41 @@ import { ServiceEndpoint } from '../serviceendpoint';
 import { AuthService } from '../../service/auth/authservice';
 import { HttpClient } from '../httpclient';
 import { Logger } from '../../utils/logger';
-import { Claims, JWTParserBuilder } from '@elastosfoundation/did-js-sdk'
+import {Claims, JSONObject, JWTParserBuilder} from '@elastosfoundation/did-js-sdk'
 import PromiseQueue from "promise-queue";
-import {SHA256} from "../..";
+import {CodeFetcher, SHA256} from "../..";
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
  *
  * <p>Some of the node APIs requires access token when handling request.</p>
  */
-export class AccessToken {
+export class AccessToken implements CodeFetcher {
 	private static LOG = new Logger("AccessToken");
-	private jwtCode: string;
-	private authService: AuthService;
-	private storage: DataStorage;
+
+    private endpoint: ServiceEndpoint;
+    private authService: AuthService;
 	private bridge: BridgeHandler;
 
-	private serviceContext: ServiceEndpoint;
-	private tokenQueues: {[key: string]: PromiseQueue};
+	// queue to make sure no multiple access token from hive node at the same time.
+	private readonly tokenQueues: {[key: string]: PromiseQueue};
+
+    private jwtCode: string;
+    private storageKey: string;
 
 	/**
 	 * Create the access token by service end point, data storage, and bridge handler.
 	 *
 	 * @param endpoint The service end point.
 	 * @param storage The data storage which is used to save the access token.
-	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
-	constructor(serviceContext: ServiceEndpoint, storage: DataStorage) {
-	    this.serviceContext = serviceContext;
-		this.authService = new AuthService(serviceContext, new HttpClient(serviceContext, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
-		this.storage = storage;
-		this.bridge = new BridgeHandlerImpl(serviceContext);
+	constructor(endpoint: ServiceEndpoint, storage: DataStorage) {
+	    this.endpoint = endpoint;
+		this.authService = new AuthService(endpoint, new HttpClient(endpoint, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+		this.bridge = new BridgeHandlerImpl(endpoint);
 		this.tokenQueues = {};
+		this.jwtCode = null;
+        this.storageKey = null;
 	}
 
 	// TEMPORARY DEBUG METHOD
@@ -43,14 +46,19 @@ export class AccessToken {
 		return this.jwtCode;
 	}
 
-	private async getTokenQueueDictKey(): Promise<string> {
-        const userDid = this.serviceContext.getUserDid();
-        const providerAddress = await this.serviceContext.getProviderAddress();
-        return SHA256.encodeToString(Buffer.from(`${userDid};${providerAddress}`));
+    private async getStorageKey(): Promise<string> {
+        if (!this.storageKey) {
+            const userDid = this.endpoint.getUserDid();
+            const appDid = this.endpoint.getAppDid();
+            const nodeDid = this.endpoint.getServiceInstanceDid();
+
+            this.storageKey = SHA256.encodeToStr(`${userDid};${appDid};${nodeDid}`);
+        }
+        return this.storageKey;
     }
 
 	private async getTokenQueue(): Promise<PromiseQueue> {
-	    const key = await this.getTokenQueueDictKey();
+	    const key = await this.getStorageKey();
 	    if (!(key in this.tokenQueues)) {
 	        this.tokenQueues[key] = new PromiseQueue(1);
         }
@@ -78,36 +86,47 @@ export class AccessToken {
 			return this.jwtCode;
 		}
 
-		this.jwtCode = await this.restoreToken();
-		if (this.jwtCode == null) {
-			this.jwtCode = await this.authService.fetch();
-			await this.saveToken(this.jwtCode);
-		}
+        // try to refresh source node did, etc. to generate storage key.
+        if (!this.endpoint.getServiceInstanceDid() || !this.endpoint.getAppDid()) {
+            this.jwtCode = await this.fetchFromRemote();
+            return this.jwtCode;
+        }
 
-		await this.bridge.flush(this.jwtCode);
-		return Promise.resolve(this.jwtCode);
+        // restore from local
+		this.jwtCode = await this.restoreToken();
+        if (this.jwtCode != null) {
+            return this.jwtCode;
+        }
+
+        // restore from remote.
+        this.jwtCode = await this.fetchFromRemote();
+        return this.jwtCode;
 	}
 
 	async invalidate(): Promise<void> {
 		await this.clearToken();
 	}
 
+	private async fetchFromRemote(): Promise<string> {
+        const jwtCode = await this.authService.fetch();
+
+        const key = await this.getStorageKey();
+        this.endpoint.getStorage().storeAccessToken(key, jwtCode);
+
+        await this.bridge.flush(jwtCode);
+        return jwtCode;
+    }
+
 	private async restoreToken() : Promise<string> {
-		let endpoint = this.bridge.target() as ServiceEndpoint;
-		if (endpoint == null)
-			return null;
+        const key = await this.getStorageKey();
 
-		let serviceDid = endpoint.getServiceInstanceDid();
-		let address	= await endpoint.getProviderAddress();
-
-        let jwtCode = this.storage.loadAccessTokenByAddress(address);
-        if (jwtCode == null && serviceDid) {
-            jwtCode = this.storage.loadAccessToken(serviceDid);
+        const jwtCode = this.endpoint.getStorage().loadAccessToken(key);
+        if (jwtCode != null) {
+            await this.bridge.flush(this.jwtCode);
         }
 
         if (jwtCode == null || await this.isExpired(jwtCode)) {
-            this.storage.clearAccessTokenByAddress(address);
-            serviceDid && this.storage.clearAccessToken(serviceDid);
+            this.endpoint.getStorage().clearAccessToken(key);
             return null;
         }
 
@@ -122,46 +141,30 @@ export class AccessToken {
         return claims.getExpiration() * 1000 < Date.now();
 	}
 
-	private async saveToken( jwtCode: string) : Promise<void> {
-		let endpoint = this.bridge.target() as ServiceEndpoint;
-		if (endpoint == null)
-		    return;
-
-		const serviceDid = endpoint.getServiceInstanceDid();
-		if (serviceDid)
-            this.storage.storeAccessToken(serviceDid, jwtCode);
-
-		const address = await endpoint.getProviderAddress();
-        if (address)
-		    this.storage.storeAccessTokenByAddress(address, jwtCode);
-	}
-
 	private async clearToken(): Promise<void> {
-		let endpoint = this.bridge.target() as ServiceEndpoint;
-		if (endpoint == null)
-			return;
-
-		if (endpoint.getServiceInstanceDid()) {
-			this.storage.clearAccessToken(endpoint.getServiceInstanceDid());
-		}
-		this.storage.clearAccessTokenByAddress(await endpoint.getProviderAddress());
+        const key = await this.getStorageKey();
+        this.endpoint.getStorage().clearAccessToken(key);
 	}
 }
 
 class BridgeHandlerImpl implements BridgeHandler {
 	private static LOG = new Logger("BridgeHandler");
 
-    private ref: ServiceEndpoint;
+    private readonly endpoint: ServiceEndpoint;
 
     constructor(endpoint: ServiceEndpoint) {
-		this.ref = endpoint;
+		this.endpoint = endpoint;
     }
 
-    async flush(value: string): Promise<void> {
+    /**
+     * Flash access token
+     * @param accessToken
+     */
+    async flush(accessToken: string): Promise<void> {
         try {
-            let claims: Claims;
-            claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(value)).getBody();
-			this.ref.flushDids(claims.getAudience(), claims.getIssuer());
+            const claims: Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(accessToken)).getBody();
+            const props: JSONObject = claims.getAsObject('props');
+			this.endpoint.flushDids(claims.getAudience(), props['appDid'] as string, claims.getIssuer());
         } catch (e) {
             BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
             throw e;
@@ -169,6 +172,6 @@ class BridgeHandlerImpl implements BridgeHandler {
     }
 
     target(): any {
-        return this.ref;
+        return this.endpoint;
     }
 }
