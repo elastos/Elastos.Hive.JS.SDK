@@ -75,8 +75,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
 
   public async getVaultServices(userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<Vault> {
     let appContext = await this.getAppContext(userDid, onAuthError);
-    if (!providerAddress)
-      providerAddress = await AppContext.getProviderAddress(userDid); // TODO: cache, don't resolve every time
+    // if (!providerAddress)
+    //   providerAddress = await AppContext.build(appContextProvider, userDid).getProviderAddress(userDid); // TODO: cache, don't resolve every time
     return new Vault(appContext, providerAddress);
   }
 

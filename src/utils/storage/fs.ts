@@ -32,6 +32,7 @@ export {
     existsSync,
     statSync,
     renameSync,
+    appendFileSync,
 
     Stats
 } from "fs";

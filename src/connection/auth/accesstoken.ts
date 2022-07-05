@@ -46,7 +46,7 @@ export class AccessToken implements CodeFetcher {
 		return this.jwtCode;
 	}
 
-    private async getStorageKey(): Promise<string> {
+    private getStorageKey(): string {
         if (!this.storageKey) {
             const userDid = this.endpoint.getUserDid();
             const appDid = this.endpoint.getAppDid();
@@ -57,8 +57,8 @@ export class AccessToken implements CodeFetcher {
         return this.storageKey;
     }
 
-	private async getTokenQueue(): Promise<PromiseQueue> {
-	    const key = await this.getStorageKey();
+	private getTokenQueue(): PromiseQueue {
+	    const key = this.getStorageKey();
 	    if (!(key in this.tokenQueues)) {
 	        this.tokenQueues[key] = new PromiseQueue(1);
         }
@@ -72,7 +72,7 @@ export class AccessToken implements CodeFetcher {
 	 */
 	async getCanonicalizedAccessToken(): Promise<string> {
 		try {
-		    const queue: PromiseQueue = await this.getTokenQueue();
+		    const queue: PromiseQueue = this.getTokenQueue();
             const token = await queue.add(async () => {return await this.fetch();});
 		    return "token " + token;
 		} catch (e) {
@@ -103,14 +103,17 @@ export class AccessToken implements CodeFetcher {
         return this.jwtCode;
 	}
 
-	async invalidate(): Promise<void> {
-		await this.clearToken();
+	invalidate(): Promise<void> {
+		return new Promise(resolve => {
+            this.clearToken();
+            resolve();
+        });
 	}
 
 	private async fetchFromRemote(): Promise<string> {
         const jwtCode = await this.authService.fetch();
 
-        const key = await this.getStorageKey();
+        const key = this.getStorageKey();
         this.endpoint.getStorage().storeAccessToken(key, jwtCode);
 
         await this.bridge.flush(jwtCode);
@@ -118,7 +121,7 @@ export class AccessToken implements CodeFetcher {
     }
 
 	private async restoreToken() : Promise<string> {
-        const key = await this.getStorageKey();
+        const key = this.getStorageKey();
 
         const jwtCode = this.endpoint.getStorage().loadAccessToken(key);
         if (jwtCode != null) {
@@ -141,8 +144,8 @@ export class AccessToken implements CodeFetcher {
         return claims.getExpiration() * 1000 < Date.now();
 	}
 
-	private async clearToken(): Promise<void> {
-        const key = await this.getStorageKey();
+	private clearToken() {
+        const key = this.getStorageKey();
         this.endpoint.getStorage().clearAccessToken(key);
 	}
 }

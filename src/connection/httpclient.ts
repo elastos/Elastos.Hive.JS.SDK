@@ -11,16 +11,16 @@ import axios, {Method} from "axios";
 export class HttpClient {
     private static LOG = new Logger("HttpClient");
 
-    public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>> {
-			deserialize(content: any): string {
-				return JSON.stringify(content);
-			}
-		};
-    public static NO_RESPONSE = <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		};
+    public static DEFAULT_RESPONSE_PARSER = <HttpResponseParser<any>>{
+        deserialize(content: any): string {
+            return JSON.stringify(content);
+        }
+    };
+    public static NO_RESPONSE = <HttpResponseParser<void>>{
+        deserialize(content: any): void {
+            return;
+        }
+    };
     public static NO_PAYLOAD = "";
     public static WITH_AUTHORIZATION = true;
     public static NO_AUTHORIZATION = false;
@@ -77,32 +77,32 @@ export class HttpClient {
 
     private async handleResponse(statusCode: number, content?: string): Promise<void> {
 
-      if (statusCode >= 300) {
+        if (statusCode >= 300) {
 
-        if (this.serviceContext.hasAppContext() && this.withAuthorization && statusCode == 401) {
-          await this.serviceContext.getAccessToken().invalidate();
+            if (this.serviceContext.hasAppContext() && this.withAuthorization && statusCode == 401) {
+                await this.serviceContext.getAccessToken().invalidate();
+            }
+            if (!content) {
+                throw NodeRPCException.forHttpCode(statusCode);
+            }
+            let errorCode = -1;
+            let errorMessage = "";
+            try {
+                let jsonObj = JSON.parse(content);
+                if (!jsonObj["error"]) {
+                    throw NodeRPCException.forHttpCode(statusCode, content);
+                }
+                let httpError = jsonObj["error"];
+                errorCode = httpError['internal_code'];
+                errorMessage = httpError['message'];
+            } catch (e) {
+                errorMessage = "Unparseable content: " + content;
+            }
+            throw NodeRPCException.forHttpCode(statusCode, errorMessage, errorCode ? errorCode : -1);
         }
-        if (!content) {
-          throw NodeRPCException.forHttpCode(statusCode);
-        }
-        let errorCode = -1;
-        let errorMessage = "";
-        try {
-          let jsonObj = JSON.parse(content);
-          if (!jsonObj["error"]) {
-            throw NodeRPCException.forHttpCode(statusCode, content);
-          }
-          let httpError = jsonObj["error"];
-          errorCode = httpError['internal_code'];
-          errorMessage = httpError['message'];
-        } catch(e) {
-          errorMessage = "Unparseable content: " + content;
-        }
-        throw NodeRPCException.forHttpCode(statusCode, errorMessage, errorCode ? errorCode : -1);
-      }
     }
 
-    private getMethod(method: string): Method{
+    private getMethod(method: string): Method {
         if (method.toUpperCase() === "POST") return "POST";
         if (method.toUpperCase() === "GET") return "GET";
         if (method.toUpperCase() === "DELETE") return "DELETE";
@@ -111,7 +111,12 @@ export class HttpClient {
         return HttpClient.DEFAULT_METHOD;
     }
 
-    public async send<T>(serviceEndpoint: string, rawPayload: any, responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER, method?: HttpMethod): Promise<T> {
+    public async send<T>(serviceEndpoint: string,
+                         rawPayload: any,
+                         responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER,
+                         method?: HttpMethod,
+                         callback_upload?: (number) => void,
+                         callback_download?: (number) => void): Promise<T> {
         let self = this;
         checkNotNull(serviceEndpoint, "No service endpoint specified");
 
@@ -120,56 +125,73 @@ export class HttpClient {
 
         // Remove payload for GET requests.
         if (options.method === HttpMethod.GET) {
-          payload = "";
+            payload = "";
         }
         if (payload && typeof payload === 'string' && payload.includes("\\\"")) {
-          HttpClient.LOG.warn("Possible double payload escaping detected.");
+            HttpClient.LOG.warn("Possible double payload escaping detected.");
         }
         let isStream = ('onData' in responseParser);
         let streamParser: StreamResponseParser;
         if (isStream) {
-          streamParser = (responseParser as unknown) as StreamResponseParser;
-          streamParser.deserialize = HttpClient.NO_RESPONSE.deserialize;
-          options.headers['Accept'] = "application/octet-stream";
+            streamParser = (responseParser as unknown) as StreamResponseParser;
+            streamParser.deserialize = HttpClient.NO_RESPONSE.deserialize;
+            options.headers['Accept'] = "application/octet-stream";
         }
 
         HttpClient.LOG.initializeCID();
-        HttpClient.LOG.info("HTTP Request URL: " + options.method + " " +  options.protocol + "//" + options.host + ":" + options.port + options.path + ", token: " + this.withAuthorization + (payload && options.method != HttpMethod.GET ? ", payload: " + payload.toString() : ""));
+        HttpClient.LOG.info(`HTTP Request URL: ${options.method}, ${options.protocol}//${options.host}:${options.port}${options.path}, `
+            + `token: ${this.withAuthorization}`
+            + (payload && options.method != HttpMethod.GET ? ", payload: " + payload.toString().substring(0, 500) : ""));
+
         if (options.headers['Authorization']) {
-          HttpClient.LOG.debug("HTTP Request Header: " + options.headers['Authorization']);
+            HttpClient.LOG.debug("HTTP Request Header: " + options.headers['Authorization']);
         }
 
         return new Promise<T>((resolve, reject) => {
-          void axios({
-              method: this.getMethod(options.method),
-              url: options.protocol + "//" + options.host + ":" + options.port + options.path,
-              headers: options.headers,
-              responseType: isStream ? "arraybuffer" : "text",
-              data: payload,
-              validateStatus: (status) => { return true; },
-              transitional: {
-                forcedJSONParsing: false
-              }
+            void axios({
+                method: this.getMethod(options.method),
+                url: options.protocol + "//" + options.host + ":" + options.port + options.path,
+                headers: options.headers,
+                responseType: isStream ? "arraybuffer" : "text",
+                data: payload,
+                validateStatus: (status) => {
+                    return true;
+                },
+                transitional: {
+                    forcedJSONParsing: false
+                },
+                onUploadProgress: function (progressEvent) {
+                    if (callback_upload) {
+                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        callback_upload(percent);
+                    }
+                },
+                onDownloadProgress: function (progressEvent) {
+                    if (callback_download) {
+                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        callback_download(percent);
+                    }
+                },
             }).then(async (response) => {
                 if (isStream) {
-                  HttpClient.LOG.info("HTTP Response Status: " + response.status + " (\"STREAM\")");
-                  HttpClient.LOG.debug("HTTP Response Size: " + response.data.byteLength + " (\"STREAM\")");
-                  streamParser.onData(Buffer.from(response.data, 'binary'));
-                  await self.handleResponse(response.status);
-                  streamParser.onEnd();
-                  resolve(null as T);
+                    HttpClient.LOG.info("HTTP Response Status: " + response.status + " (\"STREAM\")");
+                    HttpClient.LOG.debug("HTTP Response Size: " + response.data.byteLength + " (\"STREAM\")");
+                    streamParser.onData(Buffer.from(response.data, 'binary'));
+                    await self.handleResponse(response.status);
+                    streamParser.onEnd();
+                    resolve(null as T);
                 } else {
-                  const rawContent = response.data;
-                  HttpClient.LOG.info("HTTP Response Status: " + response.status);
-                  if (rawContent) {
-                    HttpClient.LOG.debug("HTTP Response Content: " + rawContent);
-                  }
+                    const rawContent = response.data;
+                    HttpClient.LOG.info("HTTP Response Status: " + response.status);
+                    if (rawContent) {
+                        HttpClient.LOG.debug("HTTP Response Content: " + rawContent);
+                    }
                     await self.handleResponse(response.status, rawContent);
-                  let deserialized = responseParser.deserialize(rawContent);
-                  resolve(deserialized);
+                    let deserialized = responseParser.deserialize(rawContent);
+                    resolve(deserialized);
                 }
             }).catch((error) => {
-              reject(error);
+                reject(error);
             });
         });
     }
@@ -182,23 +204,23 @@ export class HttpClient {
         //Clone httpOptions
         let requestOptions: HttpOptions = JSON.parse(JSON.stringify(await this.getHttpOptions()));
         if (method) {
-          requestOptions.method = method;
+            requestOptions.method = method;
         }
         requestOptions.path = serviceEndpoint;
 
         if (payload && method === HttpMethod.GET) {
-          let delimiter = serviceEndpoint.includes("?") ? "&" :"?";
-          requestOptions.path += (delimiter + payload);
+            let delimiter = serviceEndpoint.includes("?") ? "&" : "?";
+            requestOptions.path += (delimiter + payload);
         }
 
         if (this.withAuthorization) {
-          try {
-            const accessToken = this.serviceContext.getAccessToken();
-            requestOptions.headers['Authorization'] = await accessToken.getCanonicalizedAccessToken();
-          } catch(e) {
-            HttpClient.LOG.error("Authentication error: {}", e);
-            throw new UnauthorizedException("Authentication error", e);
-          }
+            try {
+                const accessToken = this.serviceContext.getAccessToken();
+                requestOptions.headers['Authorization'] = await accessToken.getCanonicalizedAccessToken();
+            } catch (e) {
+                HttpClient.LOG.error("Authentication error: {}", e);
+                throw new UnauthorizedException("Authentication error", e);
+            }
         }
 
         return requestOptions;
@@ -211,24 +233,24 @@ export class HttpClient {
     private parsePayload(payload: any, method: HttpMethod): any {
         // No transformation needed when the payload is empty or already a string
         if (!payload || typeof payload === 'string' || Buffer.isBuffer(payload)) {
-          return payload;
+            return payload;
         }
         // Convert payload object properties to URL parameters
         if (method === HttpMethod.GET) {
-          let query = "";
-          for (let prop of Object.keys(payload)) {
-            let value = payload[prop];
-            if (value) {
-              if (query) {
-                query += "&";
-              }
-              query += (prop + "=" + value);
+            let query = "";
+            for (let prop of Object.keys(payload)) {
+                let value = payload[prop];
+                if (value) {
+                    if (query) {
+                        query += "&";
+                    }
+                    query += (prop + "=" + value);
+                }
             }
-          }
-          return query;
+            return query;
         }
         return JSON.stringify(payload, (key, value) => {
-          if (value !== null) return value
+            if (value !== null) return value
         });
     }
 

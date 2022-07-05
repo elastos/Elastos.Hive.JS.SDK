@@ -39,7 +39,7 @@ export class AuthService extends RestService {
             let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
             AuthService.LOG.debug("fetch::challenge response " + challengeResponse);
 
-            const token = this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
+            const token = await this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
             AuthService.LOG.debug("fetch::token " + token);
 
             return token;
