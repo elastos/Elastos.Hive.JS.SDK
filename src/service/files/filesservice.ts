@@ -18,8 +18,15 @@ export class FilesService extends RestService {
 		super(serviceContext, httpClient);
 	}
 
-	public async download(path: string): Promise<Buffer> {
+    /**
+     * Download the file content by the remote file path.
+     *
+     * @param path Relative remote file path.
+     * @param callback Callback for the progress of downloading with percent value. Only supported on browser side.
+     */
+	async download(path: string, callback?: (process: number) => void): Promise<Buffer> {
 		checkNotNull(path, "Remote file path is mandatory.");
+
 		try {
 			let dataBuffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
@@ -31,8 +38,10 @@ export class FilesService extends RestService {
 					// Process end.
 				}
       		} as StreamResponseParser,
-			HttpMethod.GET);
+			HttpMethod.GET, null, callback);
+
 			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
+
 			return dataBuffer;
 		} catch (e) {
 			this.handleError(e);
@@ -46,8 +55,10 @@ export class FilesService extends RestService {
 	 * @param data file's content.
 	 * @param is_public 'true' will return the cid of the file which can be used to access from global ipfs gateway.
 	 * @param script_name used when is_public is true, this will create a new downloading script with name script_name.
+	 * @param callback callback for the process of uploading with percent value. Only supported on browser side.
 	 */
-	public async upload(path: string, data: Buffer | string, is_public = false, script_name?: string): Promise<string> {
+	async upload(path: string, data: Buffer | string, is_public = false,
+                        script_name?: string, callback?: (process: number) => void): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
@@ -66,7 +77,7 @@ export class FilesService extends RestService {
 					deserialize(content: any): string {
 						return JSON.parse(content)["cid"];
 					}
-				}, HttpMethod.PUT);
+				}, HttpMethod.PUT, callback);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -78,7 +89,7 @@ export class FilesService extends RestService {
 	 * @param path the path for the remote folder
 	 * @return the new CompletionStage, the result is List if success; null otherwise
 	 */
-	public async list(path: string): Promise<FileInfo[]> {
+	async list(path: string): Promise<FileInfo[]> {
 		try {
 			let fileInfos: FileInfo[] = await this.httpClient.send<FileInfo[]>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=children`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo[]>> {
 				deserialize(content: any): FileInfo[] {
@@ -110,7 +121,7 @@ export class FilesService extends RestService {
 	 * @return the new CompletionStage, the result is FileInfo
 	 *		 if success; null otherwise
 	 */
-	public async stat(path: string): Promise<FileInfo> {
+	async stat(path: string): Promise<FileInfo> {
 		try {
 			let fileInfo: FileInfo = await this.httpClient.send<FileInfo>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
 				deserialize(content: any): FileInfo {
@@ -137,7 +148,7 @@ export class FilesService extends RestService {
 	 * @return the new CompletionStage, the result is the base64 hash string
 	 *		 if the hash successfully calculated; null otherwise
 	 */
-	public async hash(path: string): Promise<string> {
+	async hash(path: string): Promise<string> {
 		try {
 			let hash: string = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
 				deserialize(content: any): string {
@@ -161,7 +172,7 @@ export class FilesService extends RestService {
 	 *  	   been moved to target path in success. Otherwise, it will return
 	 *  	   result with false.
 	 */
-	 public async move(source: string, target: string): Promise<string> {
+	 async move(source: string, target: string): Promise<string> {
 		try {
 			let result = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?to=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
 				deserialize(content: any): string {
@@ -183,7 +194,7 @@ export class FilesService extends RestService {
 	 * @return the new CompletionStage, the result is true if the file or folder
 	 *		 successfully copied; false otherwise
 	 */
-	public async copy(source: string, target: string): Promise<string> {
+	async copy(source: string, target: string): Promise<string> {
 		try {
 			let result = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?dest=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
 				deserialize(content: any): string {
@@ -205,7 +216,7 @@ export class FilesService extends RestService {
 	 * @return the new CompletionStage, the result is true if the file or folder
 	 *		 successfully deleted; false otherwise
 	 */
-	public async delete(path: string): Promise<void> {
+	async delete(path: string): Promise<void> {
 		try {
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} catch (e) {

@@ -154,8 +154,19 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const vault = await this.getVault();
             const filesService = await (await vault.createVault()).getFilesService();
-            const buffer = Buffer.from(Tab1Page.FILE_CONTENT, 'utf8');
-            await filesService.upload(Tab1Page.FILE_NAME, buffer);
+
+            // const buffer = Buffer.from(Tab1Page.FILE_CONTENT, 'utf8');
+            // big file content
+            const bufferSize = 100000000;
+            let buffer = Buffer.alloc(bufferSize, Tab1Page.FILE_CONTENT, 'utf8');
+            for (let i = 0; i < bufferSize; i++) {
+                buffer.writeUInt8(48, i);
+            }
+
+            await filesService.upload(Tab1Page.FILE_NAME, buffer, false, null, process => {
+                this.log('uploading process: ' + process);
+            });
+            this.log('uploading file done !');
         });
     }
 
@@ -163,7 +174,9 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const vault = await this.getVault();
             const filesService = await (await vault.createVault()).getFilesService();
-            const content = await filesService.download(Tab1Page.FILE_NAME);
+            const content = await filesService.download(Tab1Page.FILE_NAME, process => {
+                this.log('downloading process: ' + process);
+            });
             this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
             await filesService.delete(Tab1Page.FILE_NAME);
         });
@@ -186,9 +199,20 @@ export class Tab1Page {
                 Executable.createRunFileParams(Tab1Page.FILE_NAME),
                 vault.getTargetUserDid(),
                 vault.getTargetAppDid());
+
             // upload
-            const buffer = Buffer.from(Tab1Page.FILE_CONTENT, 'utf8');
-            await scriptingService.uploadFile(result[Tab1Page.EXECUTABLE_NAME].transaction_id, buffer);
+            // const buffer = Buffer.from(Tab1Page.FILE_CONTENT, 'utf8');
+
+            // big file content
+            const bufferSize = 100000000;
+            let buffer = Buffer.alloc(bufferSize, Tab1Page.FILE_CONTENT, 'utf8');
+            for (let i = 0; i < bufferSize; i++) {
+                buffer.writeUInt8(48, i);
+            }
+
+            await scriptingService.uploadFile(result[Tab1Page.EXECUTABLE_NAME].transaction_id, buffer, process => {
+                this.log('uploading process: ' + process);
+            });
             // clean
             await scriptingService.unregisterScript(Tab1Page.SCRIPT_NAME);
         });
@@ -203,7 +227,7 @@ export class Tab1Page {
             // register
             await scriptingService.registerScript(
                 Tab1Page.SCRIPT_NAME,
-                new FileDownloadExecutable(Tab1Page.SCRIPT_NAME).setOutput(true),
+                new FileDownloadExecutable(Tab1Page.EXECUTABLE_NAME).setOutput(true),
                 undefined, false, false);
             // call
             const result = await scriptingService.callScript(
@@ -212,7 +236,9 @@ export class Tab1Page {
                 node.getTargetUserDid(),
                 node.getTargetAppDid());
             // upload
-            const content = await scriptingService.downloadFile(result[Tab1Page.EXECUTABLE_NAME].transaction_id);
+            const content = await scriptingService.downloadFile(result[Tab1Page.EXECUTABLE_NAME].transaction_id, process => {
+                this.log('downloading process: ' + process);
+            });
             this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
             // clean
             await filesService.delete(Tab1Page.FILE_NAME);

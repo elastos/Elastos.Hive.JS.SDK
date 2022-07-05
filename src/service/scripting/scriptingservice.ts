@@ -38,7 +38,7 @@ export class ScriptingService extends RestService {
 	* @param allowAnonymousApp whether allows anonymous application.
 	* @return Void
 	*/
-	public async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
+	async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
@@ -63,7 +63,7 @@ export class ScriptingService extends RestService {
 	// 	this.registerScript(name, executable, undefined, allowAnonymousUser, allowAnonymousApp);
 	// }
 		
-	public async unregisterScript(name: string) : Promise<void>{
+	async unregisterScript(name: string) : Promise<void>{
 		try {	
 			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} 
@@ -72,7 +72,7 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
+	async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
@@ -94,7 +94,7 @@ export class ScriptingService extends RestService {
 		}
 	}
 
-	public async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
+	async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
 		checkNotNull(name, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
@@ -113,21 +113,36 @@ export class ScriptingService extends RestService {
 			this.handleError(e);
 		}
 	}
-	
-	public async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
+
+    /**
+     * Upload file by transaction ID
+     *
+     * @param transactionId Transaction ID which can be got by the calling of the script 'fileUpload'.
+     * @param data File content.
+     * @param callback The callback to get the progress of uploading with percent value. Only supported on browser side.
+     */
+	async uploadFile(transactionId: string, data: Buffer | string,
+                            callback?: (process: number) => void): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
 		try {
 			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, content, HttpClient.NO_RESPONSE, HttpMethod.PUT);
+			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`,
+                                             content, HttpClient.NO_RESPONSE, HttpMethod.PUT, callback);
 		} catch (e) {
 			this.handleError(e);
 		}		
 	}
 
-	public async downloadFile(transactionId: string): Promise<Buffer> {
+    /**
+     * Download file by transaction ID
+     *
+     * @param transactionId Transaction ID which can be got by the calling of the script 'fileDownload'.
+     * @param callback The callback to get the progress of downloading with percent value. Only supported on browser side.
+     */
+	async downloadFile(transactionId: string, callback?: (process: number) => void): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		try {
 			let dataBuffer = Buffer.alloc(0);
@@ -140,7 +155,7 @@ export class ScriptingService extends RestService {
 					// Process end.
 				}
       		} as StreamResponseParser,
-			HttpMethod.GET);
+			HttpMethod.GET, null, callback);
 
 			ScriptingService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 			return dataBuffer;
@@ -181,7 +196,7 @@ export class ScriptingService extends RestService {
 	 *
 	 * @param hiveUrl
 	 */
-	public async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+	async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
 		const params = this.parseHiveUrl(hiveUrl);
 		const result = await this.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
 		return await this.downloadFile(Object.values(result)[0]['transaction_id']);
