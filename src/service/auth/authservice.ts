@@ -3,7 +3,7 @@ import { AppContextProvider } from '../../connection/auth/appcontextprovider';
 import { HttpClient } from '../../connection/httpclient';
 import { ServiceEndpoint } from '../../connection/serviceendpoint';
 import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { NodeRPCException, ServerUnknownException } from '../../exceptions';
+import { UnauthorizedException} from '../../exceptions';
 import { Logger } from '../../utils/logger';
 import { RestService } from '../restservice';
 import { HttpMethod } from '../../connection/httpmethod';
@@ -32,7 +32,7 @@ export class AuthService extends RestService {
 			challenge  = await this.signIn(appInstanceDoc);
 			AuthService.LOG.debug("fetch::challenge :" + challenge);
 		} catch (e) {
-			throw NodeRPCException.forHttpCode(NodeRPCException.UNAUTHORIZED,"Failed to get token with signin", -1, e);
+            throw new UnauthorizedException('Failed to get token with signin()', e);
 		}
 
         try {
@@ -44,7 +44,7 @@ export class AuthService extends RestService {
 
             return token;
         } catch (e) {
-            throw NodeRPCException.forHttpCode(NodeRPCException.UNAUTHORIZED,"Failed to get token with auth", -1, e);
+            throw new UnauthorizedException('Failed to get token with auth()', e);
         }
 	}
 
