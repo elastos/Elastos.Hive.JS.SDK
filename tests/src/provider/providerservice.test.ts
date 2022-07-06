@@ -2,7 +2,7 @@ import {BackupSubscription, NotFoundException, VaultSubscription,
     Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "../../../src";
 import {TestData} from "../config/testdata";
 
-describe("test provider service", () => {
+describe.skip("test provider service", () => {
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
     let backupSubscription: BackupSubscription;
@@ -37,7 +37,7 @@ describe("test provider service", () => {
         expect(backups).not.toEqual([]);
     });
 
-    test.skip("testGetProviderFilledOrders", async () => {
+    test("testGetProviderFilledOrders", async () => {
         let expectedException;
         try {
             let orders: FilledOrderDetail[] = await provider.getFilledOrders();

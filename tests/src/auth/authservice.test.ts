@@ -1,4 +1,10 @@
-import { NodeRPCException, UnauthorizedException, ServerUnknownException, VaultSubscription, ServiceEndpoint, AuthService } from "../../../src";
+import {
+    UnauthorizedException,
+    VaultSubscription,
+    ServiceEndpoint,
+    AuthService,
+    ServerException
+} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test auth service", () => {
@@ -25,7 +31,9 @@ describe.skip("authentication fail test", () => {
     let vaultSubscription: VaultSubscription;
 
     beforeAll(() => {
-        let spy = jest.spyOn(AuthService.prototype, 'auth').mockImplementation(() => {throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Expected error");});
+        let spy = jest.spyOn(AuthService.prototype, 'auth').mockImplementation(() => {
+            throw new ServerException("Expected error");
+        });
     });
 
     beforeEach(async () => {

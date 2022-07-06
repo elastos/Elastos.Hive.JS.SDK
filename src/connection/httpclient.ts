@@ -186,8 +186,11 @@ export class HttpClient {
                 if (isStream) {
                     HttpClient.LOG.info("HTTP Response Status: " + response.status + " (\"STREAM\")");
                     HttpClient.LOG.debug("HTTP Response Size: " + response.data.byteLength + " (\"STREAM\")");
+                    if (response.status >= 300 && response.data) {
+                        HttpClient.LOG.debug("HTTP Response Content: " + response.data);
+                    }
                     streamParser.onData(Buffer.from(response.data, 'binary'));
-                    await self.handleResponse(response.status);
+                    await self.handleResponse(response.status, response.data);
                     streamParser.onEnd();
                     resolve(null as T);
                 } else {
