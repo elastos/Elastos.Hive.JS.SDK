@@ -12,7 +12,7 @@ describe("test about service", () => {
         serviceEndpoint = new ServiceEndpoint(testData.getUserAppContext(), testData.getProviderAddress());
 	});
 
-    test("testGetNodeVersion", async () => {
+    test.skip("testGetNodeVersion", async () => {
         let nodeVersion: NodeVersion = await serviceEndpoint.getNodeVersion();
         expect(nodeVersion).not.toBeNull();
         LOG.info("Hive Node version: {}", nodeVersion.toString());
