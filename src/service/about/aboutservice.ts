@@ -1,11 +1,11 @@
-import { NodeVersion } from "./nodeversion";
-import { NetworkException } from "../../exceptions";
-import { HttpClient } from "../../connection/httpclient";
-import { HttpMethod } from "../../connection/httpmethod";
-import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
-import { RestService } from "../restservice";
+import {NodeVersion} from "./nodeversion";
+import {NetworkException} from "../../exceptions";
+import {HttpClient} from "../../connection/httpclient";
+import {HttpMethod} from "../../connection/httpmethod";
+import {HttpResponseParser} from "../../connection/httpresponseparser";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {Logger} from '../../utils/logger';
+import {RestService} from "../restservice";
 import {NodeInfo} from "./nodeinfo";
 import {VerifiablePresentation} from "@elastosfoundation/did-js-sdk";
 
