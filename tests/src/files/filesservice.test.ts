@@ -1,9 +1,9 @@
 import {
-	AlreadyExistsException,
-	File,
-	FilesService, IpfsRunner,
-	NotFoundException, ScriptRunner,
-	VaultSubscription
+    AlreadyExistsException,
+    File, FileNotFoundException,
+    FilesService, IpfsRunner,
+    ScriptRunner,
+    VaultSubscription
 } from "../../../src";
 import { TestData } from "../config/testdata";
 import { Blob } from 'buffer';
@@ -97,7 +97,7 @@ describe("test files service", () => {
 		} catch (e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
+		expect(expectedException).toBeInstanceOf(FileNotFoundException);
 	}
 
 	test("testUploadText", async () => {
@@ -183,14 +183,14 @@ describe("test files service", () => {
     });
 
 	test("testDownloadBin4NotFoundException", async () => {
-		let expectedException;
-		try {
+		let expectedException = null;
+        try {
 			await filesService.download(FILE_NAME_NOT_EXISTS);
 		} catch(e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
-	 });
+        expect(expectedException).toBeInstanceOf(FileNotFoundException);
+    });
 
 	test("testList", async () => {
 		let files = await filesService.list(REMOTE_DIR);
@@ -217,7 +217,7 @@ describe("test files service", () => {
 		} catch (e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
+		expect(expectedException).toBeInstanceOf(FileNotFoundException);
 	});
 
 	test("testHash", async () => {
@@ -231,7 +231,7 @@ describe("test files service", () => {
 		} catch (e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
+		expect(expectedException).toBeInstanceOf(FileNotFoundException);
 	});
 
 	test("testMove", async () => {
@@ -247,7 +247,7 @@ describe("test files service", () => {
 		} catch (e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
+		expect(expectedException).toBeInstanceOf(FileNotFoundException);
 	});
 
 	test("testCopy", async () => {
@@ -264,7 +264,7 @@ describe("test files service", () => {
 		} catch (e) {
 			expectedException = e;
 		}
-		expect(expectedException).toBeInstanceOf(NotFoundException);
+		expect(expectedException).toBeInstanceOf(FileNotFoundException);
 	});
 
 	test("testDeleteFile", async () => {

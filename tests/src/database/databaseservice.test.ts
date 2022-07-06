@@ -1,6 +1,8 @@
-import { Vault, VaultSubscription, DatabaseService, AlreadyExistsException,
-    InsertOptions, FindOptions, CountOptions, UpdateOptions, NotFoundException, QueryOptions,
-    AscendingSortItem } from "../../../src";
+import {
+    VaultSubscription, DatabaseService, AlreadyExistsException,
+    InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions,
+    AscendingSortItem, CollectionNotFoundException
+} from "../../../src";
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {
@@ -51,7 +53,7 @@ describe("test database services", () => {
     test("testInsertOne4NotFoundException", async () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
         await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode, new InsertOptions(false, false)))
-            .rejects.toThrow(NotFoundException);
+            .rejects.toThrow(CollectionNotFoundException);
  	});
 
      test("testInsertMany", async () => {
@@ -65,7 +67,8 @@ describe("test database services", () => {
     test("testInsertMany4NotFoundException", async () => {
         let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
                      {"author": "john doe3", "title": "Eve for Dummies3"}];
-        await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes, new InsertOptions(false, false))).rejects.toThrow(NotFoundException); 
+        await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes, new InsertOptions(false, false)))
+            .rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testFindOne", async () => {
@@ -82,7 +85,8 @@ describe("test database services", () => {
 
     test("testFindOne4NotFoundException", async () => {
 		let query = {"author": "john doe1"};
-        await expect(databaseService.findOne(getUniqueName("testFindOne4NotFoundException"), query)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.findOne(getUniqueName("testFindOne4NotFoundException"), query))
+            .rejects.toThrow(CollectionNotFoundException);
 	});
    
     test("testFindMany", async () => {
@@ -92,7 +96,7 @@ describe("test database services", () => {
 
     test("testFindMany4NotFoundException", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.findMany(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.findMany(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testQuery", async () => {
@@ -102,7 +106,7 @@ describe("test database services", () => {
 
     test("testQuery4NotFoundException", async () => {
         let query = {"author": "john doe1"};
-        await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.query(COLLECTION_NAME_NOT_EXIST, query)).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testQueryWithOptions", async () => {
@@ -127,7 +131,8 @@ describe("test database services", () => {
         countOptions.skip = 0;
         countOptions.limit = 1;
         countOptions.maxTimeMS = 1000000000;
-        await expect(databaseService.countDocuments(COLLECTION_NAME_NOT_EXIST, filter, countOptions)).rejects.toThrow(NotFoundException);
+        await expect(databaseService.countDocuments(COLLECTION_NAME_NOT_EXIST, filter, countOptions))
+            .rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testUpdateOne", async () => {
@@ -161,7 +166,8 @@ describe("test database services", () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateOne(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true))).rejects.toThrow(NotFoundException);
+        await expect(databaseService.updateOne(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true)))
+            .rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testUpdateMany", async () => {
@@ -175,7 +181,7 @@ describe("test database services", () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_2" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateMany(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true))).rejects.toThrow(NotFoundException);
+        await expect(databaseService.updateMany(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true))).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testDeleteOne", async () => {
@@ -183,7 +189,7 @@ describe("test database services", () => {
     });
 
     test("testDeleteOne4NotFoundException", async () => {
-        await expect(databaseService.deleteOne(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(NotFoundException);
+        await expect(databaseService.deleteOne(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testDeleteMany", async () => {
@@ -191,7 +197,7 @@ describe("test database services", () => {
     });
 
     test("testDeleteMany4NotFoundException", async () => {
-        await expect(databaseService.deleteMany(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(NotFoundException);
+        await expect(databaseService.deleteMany(COLLECTION_NAME_NOT_EXIST, { "author": "john doe2" })).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testDeleteCollection", async () => {

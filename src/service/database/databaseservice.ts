@@ -33,21 +33,17 @@ export class DatabaseService extends RestService {
 	 * @return fail(false) or success(true)
 	 */
 	public async createCollection(collectionName: string) : Promise<void>{
-		try {
-			let result = 
-			await this.httpClient.send<string>(`${DatabaseService.API_COLLECTIONS_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD,
-			<HttpResponseParser<string>> {
-				deserialize(content: any): string {
-					return JSON.parse(content)['name'];
-			}},
-			HttpMethod.PUT);
-
-			if (collectionName !== result)
-				throw new ServerUnknownException(NodeRPCException.SERVER_EXCEPTION, "Different collection created, impossible to happen");
-		}
-		catch (e){
-			this.handleError(e);
-		}
+        try {
+            await this.httpClient.send<string>(`${DatabaseService.API_COLLECTIONS_ENDPOINT}/${collectionName}`, HttpClient.NO_PAYLOAD,
+                <HttpResponseParser<string>>{
+                    deserialize(content: any): string {
+                        return JSON.parse(content)['name'];
+                    }
+                },
+                HttpMethod.PUT);
+        } catch (e) {
+            this.handleError(e);
+        }
 	}
 
 	/**
