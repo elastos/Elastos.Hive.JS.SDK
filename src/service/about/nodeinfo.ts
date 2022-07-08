@@ -9,36 +9,51 @@ export class NodeInfo {
     private description: string;
     private version: string;
     private last_commit_id: string;
+    private user_count: number;
+    private vault_count: number;
+    private backup_count: number;
 
-    public getServiceDid(): string {
+    getServiceDid(): string {
         return this.service_did;
     }
 
-    public getOwnerDid(): string {
+    getOwnerDid(): string {
         return this.owner_did;
     }
 
-    public getOwnershipPresentation(): VerifiablePresentation {
+    getOwnershipPresentation(): VerifiablePresentation {
         return this.ownership_presentation;
     }
 
-    public getName(): string {
+    getName(): string {
         return this.name;
     }
 
-    public getEmail(): string {
+    getEmail(): string {
         return this.email;
     }
 
-    public getDescription(): string {
+    getDescription(): string {
         return this.description;
     }
 
-    public getVersion(): string {
+    getVersion(): string {
         return this.version;
     }
 
-    public getLastCommitId(): string {
+    getLastCommitId(): string {
         return this.last_commit_id;
+    }
+
+    getUserCount() {
+        return this.user_count;
+    }
+
+    getVaultCount() {
+        return this.vault_count;
+    }
+
+    getBackupCount() {
+        return this.backup_count;
     }
 }
