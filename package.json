@@ -1,6 +1,6 @@
 {
   "name": "@elastosfoundation/hive-js-sdk",
-  "version": "2.6.3",
+  "version": "2.7.2",
   "description": "Elastos Hive JS SDK",
   "exports": {
     "node": "./dist/hive.js",
@@ -37,6 +37,7 @@
     "jsrsasign-util": "^1.0.2",
     "postcss": "^8.4.4",
     "pretend": "^3.1.0",
+    "promise-queue": "^2.2.5",
     "tslib": "^2.3.1",
     "@elastosfoundation/did-js-sdk": "^2.2.4"
   },

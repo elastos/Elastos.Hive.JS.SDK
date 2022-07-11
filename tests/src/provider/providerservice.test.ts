@@ -2,7 +2,7 @@ import {BackupSubscription, NotFoundException, VaultSubscription,
     Provider, VaultDetail, BackupDetail, FilledOrderDetail} from "@elastosfoundation/hive-js-sdk";
 import {TestData} from "../config/testdata";
 
-describe("test provider service", () => {
+describe.skip("test provider service", () => {
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
     let backupSubscription: BackupSubscription;
@@ -41,7 +41,7 @@ describe("test provider service", () => {
         }
     });
 
-    test.skip("test get filled orders", async () => {
+    test("test get filled orders", async () => {
         try {
             let orders: FilledOrderDetail[] = await provider.getFilledOrders();
             expect(orders).not.toBeNull();

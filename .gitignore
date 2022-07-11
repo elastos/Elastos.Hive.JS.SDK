@@ -50,3 +50,4 @@ src/**/*.js
 src/**/*.map
 tests/src/**/*.js
 tests/src/**/*.map
+data/

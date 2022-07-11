@@ -1,50 +1,63 @@
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
 import { CodeFetcher } from "../../connection/auth/codefetcher";
-
+import {BackupContext} from "./backupcontext";
+import {NotImplementedException} from "../../exceptions";
+import {VerifiableCredential} from "@elastosfoundation/did-js-sdk";
+import {SHA256} from "../..";
 
 export class LocalResolver implements CodeFetcher {
-	private serviceContext: ServiceEndpoint;
-	private nextResolver: CodeFetcher;
+	private endpoint: ServiceEndpoint;
+	private backupContext: BackupContext;
+	private nextFetcher: CodeFetcher;
+    private storageKey: string;
 
-	constructor(serviceContext: ServiceEndpoint, next: CodeFetcher) {
-		this.serviceContext = serviceContext;
-		this.nextResolver = next;
+	constructor(endpoint: ServiceEndpoint, backupContext: BackupContext, nextFetcher: CodeFetcher) {
+		this.endpoint = endpoint;
+		this.backupContext = backupContext;
+		this.nextFetcher = nextFetcher;
 	}
 
-	public async fetch(): Promise<string> {
-		let token = this.restoreToken();
+	async fetch(): Promise<string> {
+	    const key = await this.getStorageKey();
+
+	    // restore backup credential and check expired.
+		let token = this.endpoint.getStorage().loadBackupCredential(key);
+		if (token) {
+            const credential = VerifiableCredential.parse(token);
+            const expire_time: Date = await credential.getExpirationDate();
+            if (expire_time.getTime() < Date.now()) {
+                this.endpoint.getStorage().clearBackupCredential(key);
+                token = null;
+            }
+        }
+
+		// if not get from local, try to get from remote.
 		if (token == null) {
-			token = await this.nextResolver.fetch();
-			this.saveToken(token);
+			token = await this.nextFetcher.fetch();
+            this.endpoint.getStorage().storeBackupCredential(key, token);
 		}
 
 		return token;
 	}
 
-	public  invalidate(): void {
-		this.clearToken();
+	invalidate(): Promise<void> {
+		throw new NotImplementedException();
 	}
 
-	private  restoreToken(): string {
-		let storage = this.serviceContext.getStorage();
+    private async getStorageKey(): Promise<string> {
+        if (!this.storageKey) {
+            const userDid = this.endpoint.getUserDid();
+            const targetDid = this.backupContext.getParameter("targetServiceDid");
 
-		if (this.serviceContext.getServiceInstanceDid() == null)
-			return null;
+            // try to refresh source node did
+            if (!this.endpoint.getServiceInstanceDid()) {
+                await this.endpoint.refreshAccessToken();
+            }
+            const sourceDid = this.endpoint.getServiceInstanceDid();
 
-		return storage.loadBackupCredential(this.serviceContext.getServiceInstanceDid());
-	}
-
-	private saveToken(token: string): void {
-		let storage = this.serviceContext.getStorage();
-
-		if (this.serviceContext.getServiceInstanceDid() != null)
-			storage.storeBackupCredential(this.serviceContext.getServiceInstanceDid(), token);
-	}
-
-	private clearToken(): void {
-		let storage = this.serviceContext.getStorage();
-
-		if (this.serviceContext.getServiceInstanceDid() != null)
-			storage.clearBackupCredential(this.serviceContext.getServiceInstanceDid());
-	}
+            const keySource = `${userDid};${sourceDid};${targetDid}`;
+            this.storageKey = SHA256.encodeToStr(keySource);
+        }
+        return this.storageKey;
+    }
 }

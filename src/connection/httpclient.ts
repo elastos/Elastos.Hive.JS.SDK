@@ -35,7 +35,7 @@ export class HttpClient {
     public static DEFAULT_HEADERS: HttpHeaders = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Connection": "Keep-Alive",
+        // "Connection": "Keep-Alive",
 
         // We don't handle chunked payloads for now since Axios doesn't support it when running in a browser.
         // We would need to add specific code to handle chunked payloads in the Node environment only. It means that, for now, download services
