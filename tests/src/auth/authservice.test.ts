@@ -23,6 +23,24 @@ describe("test auth service", () => {
 		let token = await serviceEndpoint.getAccessToken().fetch();
 		expect(token).not.toBeNull();
     });
+
+    test("testAuthParallel", async () => {
+        const token1 = serviceEndpoint.getAccessToken().fetch().then(value => {
+            console.log(`got token1: ${value}`);
+        });
+        const token2 = serviceEndpoint.getAccessToken().fetch().then(value => {
+            console.log(`got token2: ${value}`);
+        });
+        const token3 = serviceEndpoint.getAccessToken().fetch().then(value => {
+            console.log(`got token3: ${value}`);
+        });
+        const token4 = serviceEndpoint.getAccessToken().fetch().then(value => {
+            console.log(`got token4: ${value}`);
+        });
+
+        const sleep = (waitTimeInMs) => new Promise(resolve => {setTimeout(resolve, waitTimeInMs);});
+        await sleep(30000);
+    });
 });
 
 describe.skip("authentication fail test", () => {

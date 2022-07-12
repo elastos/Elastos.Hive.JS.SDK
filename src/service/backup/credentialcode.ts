@@ -1,8 +1,8 @@
-import { BackupContext } from "./backupcontext";
-import { CodeFetcher } from "../../connection/auth/codefetcher";
-import { LocalResolver } from "./localresolver";
-import { RemoteResolver } from "./remoteresolver";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
+import {BackupContext} from "./backupcontext";
+import {CodeFetcher} from "../../connection/auth/codefetcher";
+import {LocalResolver} from "./localresolver";
+import {RemoteResolver} from "./remoteresolver";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
 
 /**
  * Used to fetch backup credential and keep it in local storage.
