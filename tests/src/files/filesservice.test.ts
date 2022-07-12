@@ -109,7 +109,7 @@ describe("test files service", () => {
 	test("testUploadTextPublic", async () => {
 		const fileName = REMOTE_DIR + FILE_PUBLIC_NAME;
 		const scriptName = FILE_PUBLIC_NAME.split('.')[0]
-		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), true, scriptName);
+		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), null, true, scriptName);
 		expect(cid).not.toBeUndefined();
 		expect(cid).not.toBeNull();
 		expect(cid).not.toEqual('');

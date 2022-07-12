@@ -21,7 +21,7 @@
   "node": {
     "provider": "https://hive-testnet1.trinity-tech.io",
     "__comment__": "target is for backup",
-    "targetDid": "did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW",
+    "targetDid": "did:elastos:ijebJBsSZxJjKkSZD86kZXXM3uJiUbZcjh",
     "targetHost": "https://hive-testnet2.trinity-tech.io",
     "storePath": "develop"
   },

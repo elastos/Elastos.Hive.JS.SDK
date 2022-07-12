@@ -57,8 +57,8 @@ export class FilesService extends RestService {
 	 * @param script_name used when is_public is true, this will create a new downloading script with name script_name.
 	 * @param callback callback for the process of uploading with percent value. Only supported on browser side.
 	 */
-	async upload(path: string, data: Buffer | string, is_public = false,
-                        script_name?: string, callback?: (process: number) => void): Promise<string> {
+	async upload(path: string, data: Buffer | string, callback?: (process: number) => void,
+                 is_public = false, script_name?: string): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);

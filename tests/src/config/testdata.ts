@@ -156,7 +156,7 @@ export class TestData {
 					throw e;
 				}
 			}
-		}, userDid.getDid().toString());
+		}, userDid.getDid().toString(), appDid);
 	}
 
 	getAppDid(): string {
@@ -167,7 +167,7 @@ export class TestData {
 		return this.userDid.toString();
 	}
 
-	private getTargetProviderAddress(): string {
+	getTargetProviderAddress(): string {
 		return this.clientConfig.node.targetHost;
 	}
 

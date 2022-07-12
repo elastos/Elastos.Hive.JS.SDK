@@ -30,11 +30,13 @@ export class AppContext {
 
     private readonly contextProvider: AppContextProvider;
     private readonly userDid: string;
+    private readonly appDid: string;
     private forceResolve: boolean;
 
-    private constructor(provider: AppContextProvider, userDid: string) {
+    private constructor(provider: AppContextProvider, userDid: string, appDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
+        this.appDid = appDid;
         this.forceResolve = false;
     }
 
@@ -55,6 +57,15 @@ export class AppContext {
     getUserDid(): string {
 		return this.userDid;
 	}
+
+    /**
+     * Get the application DID.
+     *
+     * @return The application DID.
+     */
+    getAppDid(): string {
+        return this.appDid;
+    }
 
 	/**
 	 * Get the provider address from user DID document.
@@ -89,14 +100,18 @@ export class AppContext {
 	 *
 	 * @param provider The provider of the application context.
 	 * @param userDid The user DID.
+	 * @param appDid The application DID.
 	 * @return The application context.
 	 */
-	static async build(provider: AppContextProvider, userDid: string): Promise<AppContext> {
+	static async build(provider: AppContextProvider, userDid: string, appDid: string): Promise<AppContext> {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
         if (userDid == null)
             throw new IllegalArgumentException("Missing user DID");
+
+        if (appDid == null)
+            throw new IllegalArgumentException("Missing application DID");
 
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");
@@ -107,7 +122,7 @@ export class AppContext {
 		if (!AppContext.resolverHasSetup)
 			throw new DIDResolverNotSetupException();
 
-		return new AppContext(provider, userDid);
+		return new AppContext(provider, userDid, appDid);
 	}
 
 	setUserDidForceResolveFlag(force: boolean) {
