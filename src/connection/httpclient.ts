@@ -147,7 +147,6 @@ export class HttpClient {
             options.headers['Accept'] = "application/octet-stream";
         }
 
-        // HttpClient.LOG.initializeCID();
         HttpClient.LOG.info(`HTTP Request URL: ${options.method}, ${options.protocol}//${options.host}:${options.port}${options.path}, `
             + `token: ${this.withAuthorization}`
             + (payload && options.method != HttpMethod.GET ? ", payload: " + payload.toString().substring(0, 500) : ""));

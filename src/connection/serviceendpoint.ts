@@ -91,7 +91,10 @@ export class ServiceEndpoint {
      * @return application did
      */
     public getAppDid(): string {
-        return this.appDid;
+        if (!this.context)
+            throw new Error('AppContext not setup');
+
+        return this.context.getAppDid();
     }
 
     /**
@@ -121,9 +124,8 @@ export class ServiceEndpoint {
         return this.serviceInstanceDid;
     }
 
-    public flushDids(appInstanceDId: string, appDid: string, serviceInstanceDid: string): void {
+    public flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
         this.appInstanceDid = appInstanceDId;
-        this.appDid = appDid;
         this.serviceInstanceDid = serviceInstanceDid;
     }
 
