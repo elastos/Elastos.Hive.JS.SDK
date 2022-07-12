@@ -48,12 +48,7 @@ export class LocalResolver implements CodeFetcher {
         if (!this.storageKey) {
             const userDid = this.endpoint.getUserDid();
             const targetDid = this.backupContext.getParameter("targetServiceDid");
-
-            // try to refresh source node did
-            if (!this.endpoint.getServiceInstanceDid()) {
-                await this.endpoint.refreshAccessToken();
-            }
-            const sourceDid = this.endpoint.getServiceInstanceDid();
+            const sourceDid = await this.endpoint.getServiceInstanceDid();
 
             const keySource = `${userDid};${sourceDid};${targetDid}`;
             this.storageKey = SHA256.encodeToStr(keySource);

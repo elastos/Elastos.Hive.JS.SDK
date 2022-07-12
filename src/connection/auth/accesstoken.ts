@@ -1,10 +1,10 @@
-import { DataStorage } from '../../utils/storage/datastorage';
-import { BridgeHandler } from './bridgehandler';
-import { ServiceEndpoint } from '../serviceendpoint';
-import { AuthService } from '../../service/auth/authservice';
-import { HttpClient } from '../httpclient';
-import { Logger } from '../../utils/logger';
-import {Claims, JSONObject, JWTParserBuilder} from '@elastosfoundation/did-js-sdk'
+import {DataStorage} from '../../utils/storage/datastorage';
+import {BridgeHandler} from './bridgehandler';
+import {ServiceEndpoint} from '../serviceendpoint';
+import {AuthService} from '../../service/auth/authservice';
+import {HttpClient} from '../httpclient';
+import {Logger} from '../../utils/logger';
+import {Claims, JWTParserBuilder} from '@elastosfoundation/did-js-sdk'
 import PromiseQueue from "promise-queue";
 import {CodeFetcher, SHA256} from "../..";
 
@@ -20,8 +20,15 @@ export class AccessToken implements CodeFetcher {
     private authService: AuthService;
 	private bridge: BridgeHandler;
 
-	// queue to make sure no multiple access token from hive node at the same time.
-	private readonly tokenQueues: {[key: string]: PromiseQueue};
+    /**
+     * Queue to make sure no multiple access token from hive node at the same time.
+     *
+     * /signin can only handle specific appInsDid linearly,
+     * so the queue set globally.
+     *
+     * @private
+     */
+    private readonly tokenQueue: PromiseQueue;
 
     private jwtCode: string;
     private storageKey: string;
@@ -36,14 +43,9 @@ export class AccessToken implements CodeFetcher {
 	    this.endpoint = endpoint;
 		this.authService = new AuthService(endpoint, new HttpClient(endpoint, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.bridge = new BridgeHandlerImpl(endpoint);
-		this.tokenQueues = {};
+		this.tokenQueue = new PromiseQueue(1);
 		this.jwtCode = null;
         this.storageKey = null;
-	}
-
-	// TEMPORARY DEBUG METHOD
-	getJwtCode(): string {
-		return this.jwtCode;
 	}
 
     private async getStorageKey(): Promise<string> {
@@ -57,43 +59,22 @@ export class AccessToken implements CodeFetcher {
         return this.storageKey;
     }
 
-	private async getTokenQueue(): Promise<PromiseQueue> {
-	    const key = await this.getStorageKey();
-	    if (!(key in this.tokenQueues)) {
-	        this.tokenQueues[key] = new PromiseQueue(1);
-        }
-	    return this.tokenQueues[key];
-    }
-
-	/**
-	 * Get the access token without exception.
-	 *
-	 * @return null if not exists.
-	 */
-	async getCanonicalizedAccessToken(): Promise<string> {
-		try {
-		    const queue: PromiseQueue = await this.getTokenQueue();
-            const token = await queue.add(async () => {return await this.fetch();});
-		    return "token " + token;
-		} catch (e) {
-			AccessToken.LOG.error("error on getCanonicalizedAccessToken: " + e);
-			throw e;
-		}
-	}
-
 	async fetch(): Promise<string> {
 		if (this.jwtCode != null) {
 			return this.jwtCode;
 		}
 
-        // restore from local
-		this.jwtCode = await this.restoreToken();
-        if (this.jwtCode != null) {
-            return this.jwtCode;
-        }
+        this.jwtCode = await this.tokenQueue.add(async () => {
+            // restore from local
+            let code = await this.restoreToken();
+            if (code != null) {
+                return code;
+            }
 
-        // restore from remote.
-        this.jwtCode = await this.fetchFromRemote();
+            // restore from remote.
+            code = await this.fetchFromRemote();
+            return code;
+        });
         return this.jwtCode;
 	}
 

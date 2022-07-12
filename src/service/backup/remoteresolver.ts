@@ -18,11 +18,9 @@ export class RemoteResolver implements CodeFetcher {
     }
 
     async fetch(): Promise<string> {
-        if (this.serviceContext.getServiceInstanceDid() == null) {
-            await this.serviceContext.refreshAccessToken();
-        }
         try {
-            return await this.backupContext.getAuthorization(this.serviceContext.getServiceInstanceDid(), this.targetDid, this.targetHost);
+            const serviceDid = await this.serviceContext.getServiceInstanceDid();
+            return await this.backupContext.getAuthorization(serviceDid, this.targetDid, this.targetHost);
         } catch (e) {
             throw new UnauthorizedException('Failed to create backup credential.', e);
         }

@@ -1,13 +1,12 @@
-import { File } from '../utils/storage/file'
-import { AppContext } from './auth/appcontext'
-import { AccessToken } from './auth/accesstoken'
-import { DataStorage } from '../utils/storage/datastorage'
-import { FileStorage } from '../utils/storage/filestorage'
-import { NotImplementedException } from '../exceptions'
-import { NodeVersion } from '../service/about/nodeversion'
-import { HttpClient } from './httpclient'
-import { AboutService } from '../service/about/aboutservice'
-import { Logger } from '../utils/logger'
+import {File} from '../utils/storage/file'
+import {AppContext} from './auth/appcontext'
+import {AccessToken} from './auth/accesstoken'
+import {DataStorage} from '../utils/storage/datastorage'
+import {FileStorage} from '../utils/storage/filestorage'
+import {NodeVersion} from '../service/about/nodeversion'
+import {HttpClient} from './httpclient'
+import {AboutService} from '../service/about/aboutservice'
+import {Logger} from '../utils/logger'
 import {NodeInfo} from "../service/about/nodeinfo";
 
 export class ServiceEndpoint {
@@ -15,7 +14,6 @@ export class ServiceEndpoint {
     private providerAddress: string;
     private aboutService: AboutService;
     private aboutServiceAuth: AboutService;
-    private appDid: string;
     private appInstanceDid: string;
     private serviceInstanceDid: string;
 
@@ -52,21 +50,21 @@ export class ServiceEndpoint {
         return this.context != null;
     }
 
-    public getAccessToken(): AccessToken {
+    getAccessToken(): AccessToken {
         if (!this.context)
             throw new Error('AppContext not setup');
 
         return this.accessToken;
     }
 
-    public async getProviderAddress(): Promise<string> {
+    async getProviderAddress(): Promise<string> {
         if (!this.providerAddress) {
             this.providerAddress = await this.context.getProviderAddress();
         }
         return this.providerAddress;
     }
 
-    public getAppContext(): AppContext {
+    getAppContext(): AppContext {
         if (!this.context)
             throw new Error('AppContext not setup');
 
@@ -78,7 +76,7 @@ export class ServiceEndpoint {
      *
      * @return user did
      */
-    public getUserDid(): string {
+    getUserDid(): string {
         if (!this.context)
             throw new Error('AppContext not setup');
 
@@ -90,7 +88,7 @@ export class ServiceEndpoint {
      *
      * @return application did
      */
-    public getAppDid(): string {
+    getAppDid(): string {
         if (!this.context)
             throw new Error('AppContext not setup');
 
@@ -102,7 +100,7 @@ export class ServiceEndpoint {
      *
      * @return application instance did
      */
-    public getAppInstanceDid(): string {
+    getAppInstanceDid(): string {
         return this.appInstanceDid;
     }
 
@@ -111,7 +109,7 @@ export class ServiceEndpoint {
      *
      * @return node service did
      */
-    public getServiceDid(): string {
+    getServiceDid(): string {
         return this.serviceInstanceDid;
     }
 
@@ -120,38 +118,37 @@ export class ServiceEndpoint {
      *
      * @return node service instance did
      */
-    public getServiceInstanceDid(): string {
+    async getServiceInstanceDid(): Promise<string> {
+        if (!this.serviceInstanceDid) {
+            if (!this.context)
+                throw new Error('AppContext not setup');
+
+            await this.accessToken.fetch();
+        }
         return this.serviceInstanceDid;
     }
 
-    public flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
+    flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
         this.appInstanceDid = appInstanceDId;
         this.serviceInstanceDid = serviceInstanceDid;
     }
 
-    public getStorage(): DataStorage {
+    getStorage(): DataStorage {
         if (!this.context)
             throw new Error('AppContext not setup');
 
         return this.dataStorage;
     }
 
-    public async refreshAccessToken(): Promise<void> {
-        if (!this.context)
-            throw new Error('AppContext not setup');
-
-        await this.accessToken.fetch();
-    }
-
-    public async getNodeVersion(): Promise<NodeVersion> {
+    async getNodeVersion(): Promise<NodeVersion> {
         return await this.aboutService.getNodeVersion();
     }
 
-    public async getLatestCommitId(): Promise<string> {
+    async getLatestCommitId(): Promise<string> {
         return await this.aboutService.getCommitId();
     }
 
-    public async getNodeInfo(): Promise<NodeInfo> {
+    async getNodeInfo(): Promise<NodeInfo> {
         if (!this.context)
             throw new Error('AppContext not setup');
 

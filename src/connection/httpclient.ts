@@ -228,7 +228,7 @@ export class HttpClient {
         if (this.withAuthorization) {
             try {
                 const accessToken = this.serviceContext.getAccessToken();
-                requestOptions.headers['Authorization'] = await accessToken.getCanonicalizedAccessToken();
+                requestOptions.headers['Authorization'] = await accessToken.fetch();
             } catch (e) {
                 HttpClient.LOG.error("Authentication error: {}", e);
                 throw new UnauthorizedException("Authentication error", e);
