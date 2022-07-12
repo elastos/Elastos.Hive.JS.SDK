@@ -46,19 +46,21 @@ export class AccessToken {
 		return this.jwtCode;
 	}
 
-    private getStorageKey(): string {
+    private async getStorageKey(): Promise<string> {
         if (!this.storageKey) {
             const userDid = this.endpoint.getUserDid();
             const appDid = this.endpoint.getAppDid();
-            const nodeDid = this.endpoint.getServiceInstanceDid();
+            const providerAddress = await this.endpoint.getProviderAddress();
 
-            this.storageKey = SHA256.encodeToStr(`${userDid};${appDid};${nodeDid}`);
+            this.storageKey = SHA256.encodeToStr(`${userDid};${appDid};${providerAddress}`);
         }
         return this.storageKey;
     }
 
-	private getTokenQueue(): PromiseQueue {
-	    const key = this.getStorageKey();
+	private getTokenQueue(): Promise<PromiseQueue> {
+	    // use application instance did as key to queue on /signin
+        // which means global queue for token.
+	    const key = 'appInsDid';
 	    if (!(key in this.tokenQueues)) {
 	        this.tokenQueues[key] = new PromiseQueue(1);
         }
@@ -72,7 +74,7 @@ export class AccessToken {
 	 */
 	async getCanonicalizedAccessToken(): Promise<string> {
 		try {
-		    const queue: PromiseQueue = this.getTokenQueue();
+		    const queue: PromiseQueue = await this.getTokenQueue();
             const token = await queue.add(async () => {return await this.fetch();});
 		    return "token " + token;
 		} catch (e) {
@@ -86,12 +88,6 @@ export class AccessToken {
 			return this.jwtCode;
 		}
 
-        // try to refresh source node did, etc. to generate storage key.
-        if (!this.endpoint.getServiceInstanceDid() || !this.endpoint.getAppDid()) {
-            this.jwtCode = await this.fetchFromRemote();
-            return this.jwtCode;
-        }
-
         // restore from local
 		this.jwtCode = await this.restoreToken();
         if (this.jwtCode != null) {
@@ -104,16 +100,13 @@ export class AccessToken {
 	}
 
 	invalidate(): Promise<void> {
-		return new Promise(resolve => {
-            this.clearToken();
-            resolve();
-        });
+		return this.clearToken();
 	}
 
 	private async fetchFromRemote(): Promise<string> {
         const jwtCode = await this.authService.fetch();
 
-        const key = this.getStorageKey();
+        const key = await this.getStorageKey();
         this.endpoint.getStorage().storeAccessToken(key, jwtCode);
 
         await this.bridge.flush(jwtCode);
@@ -121,18 +114,19 @@ export class AccessToken {
     }
 
 	private async restoreToken() : Promise<string> {
-        const key = this.getStorageKey();
+        const key = await this.getStorageKey();
 
         const jwtCode = this.endpoint.getStorage().loadAccessToken(key);
-        if (jwtCode != null) {
-            await this.bridge.flush(this.jwtCode);
-        }
-
-        if (jwtCode == null || await this.isExpired(jwtCode)) {
-            this.endpoint.getStorage().clearAccessToken(key);
+        if (jwtCode == null) {
             return null;
         }
 
+        if (await this.isExpired(jwtCode)) {
+            await this.clearToken(key);
+            return null;
+        }
+
+        await this.bridge.flush(jwtCode);
 		return jwtCode;
 	}
 
@@ -144,9 +138,9 @@ export class AccessToken {
         return claims.getExpiration() * 1000 < Date.now();
 	}
 
-	private clearToken() {
-        const key = this.getStorageKey();
-        this.endpoint.getStorage().clearAccessToken(key);
+	private async clearToken(key?: string) {
+        const key_ = key ? key : await this.getStorageKey();
+        this.endpoint.getStorage().clearAccessToken(key_);
 	}
 }
 
@@ -166,8 +160,8 @@ class BridgeHandlerImpl implements BridgeHandler {
     async flush(accessToken: string): Promise<void> {
         try {
             const claims: Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(accessToken)).getBody();
-            const props: JSONObject = claims.getAsObject('props');
-			this.endpoint.flushDids(claims.getAudience(), props['appDid'] as string, claims.getIssuer());
+            // const props: JSONObject = claims.getAsObject('props');
+			this.endpoint.flushDids(claims.getAudience(), claims.getIssuer());
         } catch (e) {
             BridgeHandlerImpl.LOG.error("An error occured in the BridgeHandler");
             throw e;

@@ -147,7 +147,7 @@ export class TestData {
 					TestData.LOG.error(e.stack);
 				}
 			}
-		}, userDid.getDid().toString());
+		}, userDid.getDid().toString(), appDid);
 	}
 
 	public getAppDid(): string {

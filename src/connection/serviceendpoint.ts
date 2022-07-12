@@ -77,7 +77,7 @@ export class ServiceEndpoint {
      * @return application did
      */
     public getAppDid(): string {
-        return this.appDid;
+        return this.context.getAppDid();
     }
 
     /**
@@ -107,9 +107,8 @@ export class ServiceEndpoint {
         return this.serviceInstanceDid;
     }
 
-    public flushDids(appInstanceDId: string, appDid: string, serviceInstanceDid: string): void {
+    public flushDids(appInstanceDId: string, serviceInstanceDid: string): void {
         this.appInstanceDid = appInstanceDId;
-        this.appDid = appDid;
         this.serviceInstanceDid = serviceInstanceDid;
     }
 

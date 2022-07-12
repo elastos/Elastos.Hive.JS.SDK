@@ -1,4 +1,4 @@
-import {AppContext, VaultServices, VaultSubscriptionService} from "@elastosfoundation/hive-js-sdk";
+import {AppContext, Vault, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
 import ClientConfig from "./config/clientconfig";
 import {AppDID} from "./did/appdid";
 
@@ -10,12 +10,12 @@ export abstract class VaultBase {
         this.config = ClientConfig.getCurrent();
     }
 
-    public async createVault(): Promise<VaultServices> {
-        return new VaultServices(await this.createAppContext(), this.config['node']['provider']);
+    public async createVault(): Promise<Vault> {
+        return new Vault(await this.createAppContext(), this.config['node']['provider']);
     }
 
-    public async createVaultSubscription(): Promise<VaultSubscriptionService> {
-        return new VaultSubscriptionService(await this.createAppContext(), this.config['node']['provider']);
+    public async createVaultSubscription(): Promise<VaultSubscription> {
+        return new VaultSubscription(await this.createAppContext(), this.config['node']['provider']);
     }
 
     protected async createAppContext(): Promise<AppContext> {

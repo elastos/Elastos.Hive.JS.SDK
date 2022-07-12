@@ -1,5 +1,4 @@
 import { DID, DIDDocument, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
-import { checkNotNull } from '../../utils/utils';
 import {
      IllegalArgumentException,
      DIDResolverAlreadySetupException,
@@ -26,15 +25,17 @@ import { Logger } from '../../utils/logger';
 export class AppContext {
 	private static LOG = new Logger("AppContext");
 	
-	public static debug = false;
+	static debug = false;
     private static resolverHasSetup = false;
 
     private contextProvider: AppContextProvider;
     private userDid: string;
+	private readonly appDid: string;
 
-    private constructor(provider: AppContextProvider, userDid: string) {
+    private constructor(provider: AppContextProvider, userDid: string, appDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
+		this.appDid = appDid;
     }
 
 	/**
@@ -42,7 +43,7 @@ export class AppContext {
 	 *
 	 * @return The provider of the application context.
 	 */
-    public getAppContextProvider(): AppContextProvider {
+    getAppContextProvider(): AppContextProvider {
 		return this.contextProvider;
 	}
 
@@ -51,16 +52,25 @@ export class AppContext {
 	 *
 	 * @return The user DID.
 	 */
-    public getUserDid(): string {
+    getUserDid(): string {
 		return this.userDid;
 	}
+
+    /**
+     * Get the application DID.
+     *
+     * @return The application DID.
+     */
+    getAppDid(): string {
+        return this.appDid;
+    }
 
 	/**
 	 * Get the provider address from user DID document.
 	 *
 	 * @return The provider address.
 	 */
-	public async getProviderAddress(): Promise<string> {
+	async getProviderAddress(): Promise<string> {
 		return await AppContext.getProviderAddress(this.userDid, null);
 	}
 
@@ -71,7 +81,7 @@ export class AppContext {
 	 * @param cacheDir The local directory for DID cache.
 	 * @throws HiveException See {@link HiveException}
 	 */
-	public static setupResolver(resolver: string, cacheDir: string): void {
+	static setupResolver(resolver: string, cacheDir: string): void {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
 
@@ -88,11 +98,18 @@ export class AppContext {
 	 *
 	 * @param provider The provider of the application context.
 	 * @param userDid The user DID.
+	 * @param appDid The application DID.
 	 * @return The application context.
 	 */
-	public static async build(provider: AppContextProvider, userDid: string): Promise<AppContext> {
+	static async build(provider: AppContextProvider, userDid: string, appDid: string): Promise<AppContext> {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
+
+        if (userDid == null)
+            throw new IllegalArgumentException("Missing user DID");
+
+        if (appDid == null)
+            throw new IllegalArgumentException("Missing application DID");
 
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");
@@ -103,7 +120,7 @@ export class AppContext {
 		if (!AppContext.resolverHasSetup)
 			throw new DIDResolverNotSetupException();
 
-		return new AppContext(provider, userDid);
+		return new AppContext(provider, userDid, appDid);
 	}
 
 	/**
