@@ -112,8 +112,10 @@ export class TestData {
 		return this;
 	}
 
-	private async createContext(userDid: UserDID, appDid: string): Promise<AppContext> {
+	async createContext(userDid?: UserDID, appDid?: string): Promise<AppContext> {
     	const self = this;
+    	userDid = userDid ? userDid : this.userDid;
+        appDid = appDid ? appDid : AppDID.APP_DID;
 		return await AppContext.build({
 
 			getLocalDataDir() : string {

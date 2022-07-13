@@ -191,7 +191,7 @@ export class HttpClient {
         if (this.withAuthorization) {
           try {
             let accessToken = this.serviceContext.getAccessToken();
-            let canonicalAccessToken = await accessToken.getCanonicalizedAccessToken();
+            let canonicalAccessToken = 'token ' + await accessToken.fetch();
             HttpClient.LOG.debug("Canonical Access Token: " + canonicalAccessToken);
             requestOptions.headers['Authorization'] = canonicalAccessToken;
           } catch(e) {
