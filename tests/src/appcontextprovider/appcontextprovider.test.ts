@@ -1,9 +1,8 @@
 import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "@elastosfoundation/hive-js-sdk";
 import {TestData} from "../config/testdata";
+import {AppDID} from "../did/appdid";
 
-
-
-describe("test default appcontext provider", () => {
+describe.skip("test default appcontext provider", () => {
    
     let vaultSubscription: VaultSubscription;
     
@@ -25,7 +24,7 @@ describe("test default appcontext provider", () => {
 
         try{
             let appProvider = await DefaultAppContextProvider.create(appContextParameters);
-            let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string);
+            let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string, AppDID.APP_DID);
             vaultSubscription = new VaultSubscription(appContext, clientConfig.node.targetHost);
         } catch(e){
             console.debug(e);
