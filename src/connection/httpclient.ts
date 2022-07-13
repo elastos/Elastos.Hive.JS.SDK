@@ -181,6 +181,8 @@ export class HttpClient {
                         callback_download(percent);
                     }
                 },
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
             }).then(async (response) => {
                 if (isStream) {
                     HttpClient.LOG.info("HTTP Response Status: " + response.status + " (\"STREAM\")");
@@ -228,7 +230,7 @@ export class HttpClient {
         if (this.withAuthorization) {
             try {
                 const accessToken = this.serviceContext.getAccessToken();
-                requestOptions.headers['Authorization'] = await accessToken.fetch();
+                requestOptions.headers['Authorization'] = 'token ' + await accessToken.fetch();
             } catch (e) {
                 HttpClient.LOG.error("Authentication error: {}", e);
                 throw new UnauthorizedException("Authentication error", e);
