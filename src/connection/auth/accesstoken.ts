@@ -15,12 +15,8 @@ import {CodeFetcher, SHA256} from "../..";
  */
 export class AccessToken implements CodeFetcher {
 	private static LOG = new Logger("AccessToken");
-
-    private endpoint: ServiceEndpoint;
-    private authService: AuthService;
-	private bridge: BridgeHandler;
-
-    /**
+	
+	/**
      * Queue to make sure no multiple access token from hive node at the same time.
      *
      * /signin can only handle specific appInsDid linearly,
@@ -28,7 +24,11 @@ export class AccessToken implements CodeFetcher {
      *
      * @private
      */
-    private readonly tokenQueue: PromiseQueue;
+    private static readonly tokenQueue: PromiseQueue = new PromiseQueue(1);
+
+    private endpoint: ServiceEndpoint;
+    private authService: AuthService;
+	private bridge: BridgeHandler;
 
     private jwtCode: string;
     private storageKey: string;
@@ -43,7 +43,6 @@ export class AccessToken implements CodeFetcher {
 	    this.endpoint = endpoint;
 		this.authService = new AuthService(endpoint, new HttpClient(endpoint, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
 		this.bridge = new BridgeHandlerImpl(endpoint);
-		this.tokenQueue = new PromiseQueue(1);
 		this.jwtCode = null;
         this.storageKey = null;
 	}
@@ -64,7 +63,7 @@ export class AccessToken implements CodeFetcher {
 			return this.jwtCode;
 		}
 
-        this.jwtCode = await this.tokenQueue.add(async () => {
+        this.jwtCode = await AccessToken.tokenQueue.add(async () => {
             // restore from local
             let code = await this.restoreToken();
             if (code != null) {

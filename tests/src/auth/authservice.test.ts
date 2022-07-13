@@ -24,7 +24,7 @@ describe("test auth service", () => {
 		expect(token).not.toBeNull();
     });
 
-    test("testAuthParallel", async () => {
+    test.skip("testAuthParallel", async () => {
         const token1 = serviceEndpoint.getAccessToken().fetch().then(value => {
             console.log(`got token1: ${value}`);
         });
@@ -40,6 +40,26 @@ describe("test auth service", () => {
 
         const sleep = (waitTimeInMs) => new Promise(resolve => {setTimeout(resolve, waitTimeInMs);});
         await sleep(30000);
+    });
+
+    async function getVersion(appDid: string) {
+        const version = new VaultSubscription(await testData.createContext(null, appDid), testData.getProviderAddress())
+            .getVersion().then(value => {
+                console.log(`got token1: ${value}`);
+            });
+    }
+
+    test.skip("testAuthParallel2", async () => {
+        // TODO: please clean token cache before run this.
+
+        await getVersion('applicationDid1');
+        await getVersion('applicationDid2');
+        await getVersion('applicationDid3');
+        await getVersion('applicationDid4');
+        await getVersion('applicationDid5');
+
+        const sleep = (waitTimeInMs) => new Promise(resolve => {setTimeout(resolve, waitTimeInMs);});
+        await sleep(300000);
     });
 });
 

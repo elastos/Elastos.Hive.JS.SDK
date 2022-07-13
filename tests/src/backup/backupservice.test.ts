@@ -7,7 +7,7 @@ import {
     FilesService, BackupSubscription, BackupNotFoundException
 } from "../../../src";
 import { TestData } from "../config/testdata"
-import {randomBytes, randomFill} from "crypto";
+import { randomBytes } from "crypto";
 
 
 jest.setTimeout(30 * 60 * 1000);
@@ -74,15 +74,14 @@ describe("test backup services", () => {
     });
 
     async function uploadManyFiles(count) {  // count * 10MB
-        const buffer: Buffer = randomBytes(10 * 1024 * 1024);
         const fileNamePrefix = 'backup_file_';
-
         const uploadStart = new Date().getTime();
 
         for (let i = 0; i < count; i++) {
+            const buffer: Buffer = randomBytes(10 * 1024 * 1024 + i + 1);
             await filesService.upload(`${fileNamePrefix}${i}.bin`, buffer, (process => {
                 console.log(`uploading file ${fileNamePrefix}${i}.bin: ${process}`)
-            }));
+            }), true, `public_file_${i}`);
         }
 
         const uploadEnd = new Date().getTime();
@@ -100,7 +99,7 @@ describe("test backup services", () => {
         console.log(`cost of backup: ${end - start}ms`);
     }
 
-    test("testWithDifferentUsage", async () => {
+    test.skip("testWithDifferentUsage", async () => {
         // backup with different file sizes, every file is 10MB.
         await uploadManyFiles(10);
         await backupManyFiles();
