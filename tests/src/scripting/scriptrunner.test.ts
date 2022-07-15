@@ -146,7 +146,7 @@ describe("test scripting runner function", () => {
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
 
-    test("testDownloadFileByHiveUrl", async () => {
+    test.skip("testDownloadFileByHiveUrl", async () => {
         const fileName = "testDownloadUploadByHiveUrl.txt";
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
