@@ -129,9 +129,10 @@ export class AppContext {
 	 *
 	 * @param targetDid The user DID.
 	 * @param preferredProviderAddress The preferred URL address of the provider.
+	 * @param isForce Whether forcing resolve provider url from chain.
 	 * @return The URL address of the provider
 	 */
-	public static async getProviderAddress(targetDid: string, preferredProviderAddress?: string): Promise<string> {
+	public static async getProviderAddress(targetDid: string, preferredProviderAddress?: string, isForce?: boolean): Promise<string> {
         if (targetDid == null)
             throw new IllegalArgumentException("Missing input parameter for target Did");
 
@@ -142,7 +143,7 @@ export class AppContext {
         try {
             let services: Array<DIDDocument.Service> = null;
             let did: DID = new DID(targetDid);
-            let doc: DIDDocument = await did.resolve();
+            let doc: DIDDocument = await did.resolve(!!isForce);
             if (doc == null)
                 throw (new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain"));
 

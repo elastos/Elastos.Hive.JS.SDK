@@ -158,6 +158,13 @@ describe("test scripting runner function", () => {
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
     });
 
+    test.skip("testDownloadFileByHiveUrl on mainnet", async () => {
+        // INFO: the hive url of did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT is in hive1, so please test with hive1.
+        const hiveUrl = `hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty": 0}`;
+        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
+        expect(buffer).not.toBeNull();
+    });
+
     test("testDownloadAndUploadAnonymous", async () => {
         await registerScriptFileUpload(UPLOAD_FILE_NAME);
         let uploadTransactionId = await callScriptFileUpload(UPLOAD_FILE_NAME, "testDownloadUploadAnonymous.txt");

@@ -10,6 +10,7 @@ import { HttpMethod } from '../../connection/httpmethod';
 import { Logger } from '../../utils/logger';
 import { checkNotNull, checkArgument } from '../../utils/utils';
 import { RestService } from '../restservice';
+import {AppContext} from "../..";
 
 interface HiveUrl {
 	targetUsrDid: string,
@@ -182,8 +183,19 @@ export class ScriptingService extends RestService {
 	 */
 	public async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
 		const params = this.parseHiveUrl(hiveUrl);
-		const result = await this.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
-		return await this.downloadFile(Object.values(result)[0]['transaction_id']);
+
+		// Get the provider address for targetDid.
+		const targetUrl = await AppContext.getProviderAddress(params.targetUsrDid, null, true);
+		ScriptingService.LOG.info(`Got the hive url for targetDid: ${targetUrl}`);
+
+		// Prepare the new scripting service for targetDid with current user's appContext.
+		const endpoint = new ServiceEndpoint(this.getServiceContext().getAppContext(), targetUrl);
+        const httpClient = new HttpClient(endpoint, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
+        const scriptingService = new ScriptingService(endpoint, httpClient);
+
+        // Call on the node contains targetDid vault.
+		const result = await scriptingService.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
+		return await scriptingService.downloadFile(Object.values(result)[0]['transaction_id']);
 	}
 
 	private handleError(e: Error): unknown {
