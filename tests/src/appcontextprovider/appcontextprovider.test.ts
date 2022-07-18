@@ -1,5 +1,6 @@
 import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubscription} from "../../../src";
 import {TestData} from "../config/testdata";
+import {AppDID} from "../did/appdid";
 
 
 
@@ -26,7 +27,7 @@ describe.skip("test default appcontext provider", () => {
 
         try{
             let appProvider = await DefaultAppContextProvider.create(appContextParameters);
-            let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string);
+            let appContext = await AppContext.build(appProvider, appContextParameters.userDID as string, AppDID.APP_DID);
             vaultSubscription = new VaultSubscription(appContext, clientConfig.node.targetHost);
         } catch(e){
             console.debug(e);
