@@ -163,9 +163,9 @@ export class Tab1Page {
                 buffer.writeUInt8(48, i);
             }
 
-            await filesService.upload(Tab1Page.FILE_NAME, buffer, false, null, process => {
+            await filesService.upload(Tab1Page.FILE_NAME, buffer, process => {
                 this.log('uploading process: ' + process);
-            });
+            }, false, null);
             this.log('uploading file done !');
         });
     }
@@ -367,7 +367,7 @@ export class Tab1Page {
     async payOrder() {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
-            const nodeWalletAddress = '0x60ECEFaFA8618F4eAC7a04ba58F67f56e12750d3'; // contract owner wallet
+            const nodeWalletAddress = '0x60ECEFaFA8618F4eAC7a04ba58F67f56e12750d3'; // any wallet address, ee
             const proof = 'eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlqZWJKQnNTWnhKaktrU1pEODZrWlhYTTN1SmlVYlpjamgjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppamViSkJzU1p4SmpLa1NaRDg2a1pYWE0zdUppVWJaY2poIiwic3ViIjoiSGl2ZSBQYXltZW50IiwiYXVkIjoiZGlkOmVsYXN0b3M6aXBCYUJyNkhRNmg5MlQxZmg1ZkZRUzE0eGhUY3l0M0F6cSIsImlhdCI6MTY1NDQ3OTIyOCwiZXhwIjozMzA5NTYzMjU2LCJuYmYiOjE2NTQ0NzkyMjgsIm9yZGVyIjp7ImludGVyaW1fb3JkZXJpZCI6IjYyOWQ1OTdjN2MyZWY0M2FlZjYzYmM1OSIsInN1YnNjcmlwdGlvbiI6ImJhY2t1cCIsInByaWNpbmdfcGxhbiI6IlJvb2tpZSIsInBheW1lbnRfYW1vdW50IjoxLjUsImNyZWF0ZV90aW1lIjoxNjU0NDc5MjI4LCJleHBpcmF0aW9uX3RpbWUiOjE2NTUwODQwMjgsInJlY2VpdmluZ19hZGRyZXNzIjoiMHg2MEVDRUZhRkE4NjE4RjRlQUM3YTA0YmE1OEY2N2Y1NmUxMjc1MGQzIn19.w2k7nbGXPvDFlqhNG0HhPVzvliWDhx1mb68lraHFlD2KqhVtonj5qwJ7XRK97AvpgqbziyQG5zYlzcR6gVRuag';
             const orderId = await this.paymentContract.payOrder("1", nodeWalletAddress, proof);
             this.log(`pay order successfully: ${orderId}.`);

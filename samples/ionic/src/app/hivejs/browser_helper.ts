@@ -2,6 +2,7 @@ import { Claims, DIDDocument, JWTHeader, JWTParserBuilder, VerifiableCredential,
 import { DID as ConnDID, DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { AppContext, AppContextProvider, DIDResolverAlreadySetupException, Vault } from "@elastosfoundation/hive-js-sdk";
 import dayjs from "dayjs";
+import {AppDID} from "./did/appdid";
 
 /**
  * This is a sample hive auth helper that makes everything automatic for apps using hive to
@@ -62,7 +63,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       }
     }
 
-    let appContext = await AppContext.build(appContextProvider, userDid);
+    let appContext = await AppContext.build(appContextProvider, userDid, AppDID.APP_DID);
     return appContext;
   }
 
