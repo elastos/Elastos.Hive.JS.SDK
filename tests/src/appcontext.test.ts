@@ -1,4 +1,4 @@
-import {TestData} from "./config/testdata";
+import {AppContext} from "../../src";
 
 /**
  * Please run this file with a prod hive node.
@@ -9,10 +9,10 @@ describe.skip("test appcontext", () => {
     });
 
     test("testGetProviderAddress", async () => {
-        let testData = await TestData.getInstance("databaseservice.tests");
-        const providerAddress = await testData.getUserAppContext().setUserDidForceResolveFlag(true).getProviderAddress();
+        const userDid = 'did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm4';
+        const providerAddress = await AppContext.getProviderAddressByUserDid(userDid, null, true);
         console.log(`Provider address: ${providerAddress}`);
         expect(providerAddress).not.toBeUndefined();
-        expect(providerAddress).toEqual<string>('https://hive1.trinity-tech.io');
+        expect(providerAddress).not.toBe('https://hive1.trinity-tech.io');
     });
 });
