@@ -1,11 +1,11 @@
-import devConfig from "../res/developing.json";
-import customConfig from "../res/custom.json";
+import testnet from "../res/testnet.json";
+import mainnet from "../res/mainnet.json";
 
 export class ClientConfig {
-    public static DEV = devConfig;
-    public static CUSTOM = customConfig;
+    public static TESTNET = testnet;
+    public static MAINNET = mainnet;
 
-    private static CURRENT_CONFIG = ClientConfig.DEV;
+    private static CURRENT_CONFIG = ClientConfig.TESTNET;
 
     public static setConfiguration(config: any): void {
         ClientConfig.CURRENT_CONFIG = config;

@@ -93,7 +93,7 @@ describe("pricing plans", () => {
   beforeEach(async () => {
     testData = await TestData.getInstance(
       "pricingplans.test",
-      ClientConfig.DEV
+      ClientConfig.TESTNET
     );
     vaultsubscriptionService = new VaultSubscriptionService(
       testData.getAppContext(),
