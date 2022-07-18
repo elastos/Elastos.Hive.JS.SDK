@@ -230,10 +230,16 @@ describe("test scripting runner function", () => {
         await downloadFileByHiveUrl(true);
     });
 
-    test.skip("testDownloadFileByHiveUrl on mainnet", async () => {
-        // TODO: should not skip this.
-        // INFO: the hive url of did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT is in hive1, so please test with hive2.
-        const hiveUrl = `hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty": 0}`;
+    test("testDownloadFileByHiveUrl on mainnet", async () => {
+        // INFO: only for EE to get the avatar image from user did related vault.
+        let hiveUrl = null;
+        if (testData.isTestnet()) {
+            // avatar is on hive2 testnet node.
+            hiveUrl = 'hive://did:elastos:iWVsBA12QrDcp4UBjuys1tykHD2u6XWVYq@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1658145105312?params={"empty":0}'
+        } else {
+            // avatar is on hive2 mainnet node.
+            hiveUrl = 'hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty":0}';
+        }
         const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expect(buffer).not.toBeNull();
     });

@@ -185,6 +185,10 @@ export class TestData {
 		return this.clientConfig.ipfsGateUrl;
 	}
 
+	isTestnet(): boolean {
+        return this.clientConfig.resolverUrl === 'testnet';
+    }
+
 	getBackupService(): BackupService {
 		const backupService = this.newVault().getBackupService();
 		const self = this;
