@@ -78,7 +78,7 @@ export class NodeVault extends VaultBase {
 
                 return await owner.appInstanceDid.createToken(presentation,  claims.getIssuer());
             }
-        }, owner.userDid.getDid().toString());
+        }, owner.userDid.getDid().toString(), AppDID.APP_DID);
     }
 
     getTargetUserDid(): string {
