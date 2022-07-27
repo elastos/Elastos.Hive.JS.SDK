@@ -111,7 +111,7 @@ export class AppContext {
             throw new IllegalArgumentException("Missing user DID");
 
         if (appDid == null)
-            throw new IllegalArgumentException("Missing application DID");
+            throw new IllegalArgumentException("Missing an application DID when creating AppContext instance");
 
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");

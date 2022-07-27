@@ -234,10 +234,10 @@ describe("test scripting runner function", () => {
         // INFO: only for EE to get the avatar image from user did related vault.
         let hiveUrl = null;
         if (testData.isTestnet()) {
-            // avatar is on hive2 testnet node.
-            hiveUrl = 'hive://did:elastos:iWVsBA12QrDcp4UBjuys1tykHD2u6XWVYq@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1658145105312?params={"empty":0}'
+            // avatar is on hive1 testnet node.
+            hiveUrl = 'hive://did:elastos:iT6mGBL8nATPhLGowgi2PRRRG85X4TKVYc@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1658844232162?params={"empty":0}'
         } else {
-            // avatar is on hive2 mainnet node.
+            // avatar is on hive1 mainnet node.
             hiveUrl = 'hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty":0}';
         }
         const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
