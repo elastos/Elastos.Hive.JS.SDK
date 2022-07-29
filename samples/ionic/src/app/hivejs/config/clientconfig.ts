@@ -11,4 +11,8 @@ export default class ClientConfig {
     public static getCurrent(): any {
         return ClientConfig.CURRENT_CONFIG;
     }
+
+    public static isTestNet(): boolean {
+        return ClientConfig.CURRENT_CONFIG == ClientConfig.DEV;
+    }
 }

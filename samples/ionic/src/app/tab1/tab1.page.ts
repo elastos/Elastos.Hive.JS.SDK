@@ -37,13 +37,14 @@ export class Tab1Page {
     constructor() {
         this.message = 'Tab 1 Page';
 
-        // TODO: This used to switch between mainnet and testnet.
+        // TODO: This used to switch between mainnet(CUSTOM) and testnet(DEV).
+        //       Please also swith the AppDID.APP_DID
         ClientConfig.setCurrent(ClientConfig.DEV);
 
         // TODO: This used to run in node style or browser style which will work with essentials application.
         this.isBrowser = true;
 
-        this.paymentContract = new PaymentContract(true);
+        this.paymentContract = new PaymentContract(ClientConfig.isTestNet());
     }
 
     async initPaymentContract() {
