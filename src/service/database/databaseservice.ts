@@ -1,4 +1,4 @@
-import {  NetworkException,	NodeRPCException, ServerUnknownException, } from "../../exceptions";
+import { NetworkException, NodeRPCException } from "../../exceptions";
 import { HttpClient } from "../../connection/httpclient";
 import { HttpMethod } from "../../connection/httpmethod";
 import { ServiceEndpoint } from "../../connection/serviceendpoint";
@@ -14,7 +14,15 @@ import { QueryOptions } from "./queryoptions";
 import { UpdateOptions } from "./updateoptions";
 import { UpdateResult } from "./updateresult";
 import { DeleteOptions } from "./deleteoptions";
+import {DatabaseEncrypt} from "./database_encrypt";
 
+/**
+ * Database service is for save JSON data on the mongo database on hive node.
+ *
+ * It also support the encryption of the fields of documents.
+ *
+ * If wants encryptDoc the document, please make sure the document is Object or Map.
+ */
 export class DatabaseService extends RestService {
 	private static LOG = new Logger("DatabaseService");
 
@@ -22,8 +30,13 @@ export class DatabaseService extends RestService {
 	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
 	private static API_DB_ENDPOINT = "/api/v2/vault/db";
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
+	private readonly encrypt: boolean;
+	private readonly databaseEncrypt: DatabaseEncrypt;
+
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
 		super(serviceContext, httpClient);
+        this.encrypt = encrypt;
+        this.databaseEncrypt = new DatabaseEncrypt();
 	}
 
 	/**
@@ -70,8 +83,12 @@ export class DatabaseService extends RestService {
 	*				the write to opt-out of document level validation. Default is False.
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
-	public async insertOne( collection: string, doc: any, options?: InsertOptions) : Promise<InsertResult>{
-		return await this.insertMany(collection, [doc], options);
+	public async insertOne( collection: string, doc: any, options?: InsertOptions) : Promise<InsertResult> {
+	    let edoc = doc;
+	    if (this.encrypt) { // only for dict document
+            edoc = this.databaseEncrypt.encryptDoc(doc);
+        }
+		return await this.insertMany(collection, [edoc], options);
 	}
 
 	/**
@@ -88,9 +105,14 @@ export class DatabaseService extends RestService {
 	*/
 	public async insertMany(collection: string, docs: any[], options?: InsertOptions) : Promise<InsertResult>{
 		try {
+		    let edocs = docs;
+		    if (this.encrypt) {
+		        edocs = this.databaseEncrypt.encryptDocs(docs);
+            }
+
 			let result = await this.httpClient.send<InsertResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}`,
 			{
-				"document": docs,
+				"document": edocs,
 				"options": options 
 			},
 			<HttpResponseParser<InsertResult>> {
@@ -124,9 +146,14 @@ export class DatabaseService extends RestService {
  	 */
  	public async countDocuments(collection: string, filter: JSONObject, options?: CountOptions): Promise<number> {
 		try {
+		    let efilter = filter;
+		    if (this.encrypt) {
+                efilter = this.databaseEncrypt.encryptFilter(filter);
+            }
+
 			let result = await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?op=count`,
 			{
-				"filter": filter,
+				"filter": efilter,
 				"options": options
 			},
 			<HttpResponseParser<number>> {
@@ -150,7 +177,12 @@ export class DatabaseService extends RestService {
 	 * @return a JSON object document result
 	 */
 	public async findOne(collection: string, filter: JSONObject, options?: FindOptions): Promise<JSONObject> {
-		let docs = await this.findMany(collection, filter, options);
+        let efilter = filter;
+        if (this.encrypt) {
+            efilter = this.databaseEncrypt.encryptFilter(filter);
+        }
+
+		let docs = await this.findMany(collection, efilter, options);
 
 		DatabaseService.LOG.debug(JSON.stringify(docs));
 		return docs !== undefined && !(docs.length === 0) ? docs[0] : null;
@@ -167,7 +199,12 @@ export class DatabaseService extends RestService {
 
 	public async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
 		try {
-			let filterStr = filter === null ? "" : encodeURIComponent(JSON.stringify(filter));
+            let efilter = filter;
+            if (this.encrypt) {
+                efilter = this.databaseEncrypt.encryptFilter(filter);
+            }
+
+			let filterStr = efilter === null ? "" : encodeURIComponent(JSON.stringify(efilter));
 			DatabaseService.LOG.debug("FILTER_STR: " + filterStr);
 			let skip = options !== undefined ? options.skip.toString() : 0;
 			let limit = options !== undefined ? options.limit.toString() : 0;
@@ -201,10 +238,15 @@ export class DatabaseService extends RestService {
  	 */
 	public async query(collection: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
 		try {
+            let efilter = filter;
+            if (this.encrypt) {
+                efilter = this.databaseEncrypt.encryptFilter(filter);
+            }
+
 			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
 			{
 					"collection": collection,
-					"filter": filter,
+					"filter": efilter,
 					"options": this.normalizeSortQueryOptions(options)
 			},
 			<HttpResponseParser<JSONObject[]>> {
@@ -219,65 +261,6 @@ export class DatabaseService extends RestService {
 			this.handleError(e);
 		}
 	}
-
-	/*
-	public async query(collection: string, filter: JSONObject, options: QueryOptions): Promise<JSONObject[]> {
-		try {
-			let textPayload = "{\"collection\":\"" + collection + "\",\"filter\":" + JSON.stringify(filter);
-			if (options) {
-				if (options.sort) {
-					let textOptions = "";
-					textOptions += (options.skip !== null ? "\"skip\":" + options.skip : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.limit !== null ? "\"limit\":" + options.limit : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.batch_size !== null ? "\"batch_size\":" + options.batch_size : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.allow_partial_results !== null ? "\"allow_partial_results\":" + options.allow_partial_results : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.return_key !== null ? "\"return_key\":" + options.return_key : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.show_record_id !== null ? "\"show_record_id\":" + options.show_record_id : "");
-
-					textOptions += (textOptions ? ",":"");
-					textOptions += (options.projection !== null ? "\"projection\":" + JSON.stringify(options.projection) : "");
-
-					let sortOptions = "";
-					for (let field of options.sort) {
-						sortOptions += (sortOptions ? ",":"");
-						//sortOptions += "(\"" + field.key + "\"," + field.order + ")"
-						sortOptions += "{\"" + field.key + "\":" + field.order + "}"
-					}
-					if (sortOptions) {
-						textOptions += (textOptions ? ",":"");
-						textOptions += ("\"sort\":[" + sortOptions + "]");
-					}
-					if (textOptions) {
-						textPayload += (",\"options\":{" + textOptions + "}");
-					}
-				} else {
-					textPayload += (",\"options\":" + JSON.stringify(options));
-				}
-			}
-			textPayload += "}";
-			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`, textPayload,
-			<HttpResponseParser<JSONObject[]>> {
-				deserialize(content: any): JSONObject[] {
-					return JSON.parse(content)["items"];
-				}
-			}, HttpMethod.POST);
-			
-			return result;
-		} catch (e){
-			this.handleError(e);
-		}
-	}
-	*/
 
 	/**
  	 * Update an existing document in a given collection.
@@ -344,10 +327,17 @@ export class DatabaseService extends RestService {
 
 	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		try {
+            let efilter = filter;
+            let eupdate = update;
+            if (this.encrypt) {
+                efilter = this.databaseEncrypt.encryptFilter(filter);
+                update = this.databaseEncrypt.encryptFilter(update);
+            }
+
 			let result = await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
 			{
-				"filter": filter,
-				"update": update,
+				"filter": efilter,
+				"update": eupdate,
 				"options": options 
 			},
 			<HttpResponseParser<UpdateResult>> {
@@ -372,9 +362,14 @@ export class DatabaseService extends RestService {
 
 	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<void> {
 		try {
+            let efilter = filter;
+            if (this.encrypt) {
+                efilter = this.databaseEncrypt.encryptFilter(filter);
+            }
+
 			return await this.httpClient.send<void>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
 			{
-				"filter": filter,
+				"filter": efilter,
 				"options": options 
 			},
 			HttpClient.NO_RESPONSE,
@@ -390,4 +385,5 @@ export class DatabaseService extends RestService {
 		}
 		throw new NetworkException(e.message, e);
 	}
+
 }

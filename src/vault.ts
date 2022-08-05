@@ -9,19 +9,21 @@ import { BackupService } from "./service/backup/backupservice";
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
- export class Vault extends ServiceEndpoint {
-	private filesService: FilesService;
-	private database: DatabaseService;
-	private scripting: ScriptingService;
-	private backupService: BackupService;
+export class Vault extends ServiceEndpoint {
+	private readonly filesService: FilesService;
+	private readonly database: DatabaseService;
+	private readonly encryptDatabase: DatabaseService;
+	private readonly scripting: ScriptingService;
+	private readonly backupService: BackupService;
 
 	public constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
 		let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-		this.filesService	= new FilesService(this, httpClient);
-		this.database		= new DatabaseService(this, httpClient);
-		this.scripting	 	= new ScriptingService(this, httpClient);
-		this.backupService  = new BackupService(this, httpClient);
+		this.filesService	    = new FilesService(this, httpClient);
+		this.database		    = new DatabaseService(this, httpClient);
+		this.encryptDatabase    = new DatabaseService(this, httpClient, true);
+		this.scripting	 	    = new ScriptingService(this, httpClient);
+		this.backupService      = new BackupService(this, httpClient);
 	}
 
 	public getFilesService(): FilesService {
@@ -31,6 +33,10 @@ import { BackupService } from "./service/backup/backupservice";
 	public getDatabaseService(): DatabaseService {
 		return this.database;
 	}
+
+    public getEncryptDatabaseService(): DatabaseService {
+        return this.encryptDatabase;
+    }
 
 	public getScriptingService(): ScriptingService {
 		return this.scripting;

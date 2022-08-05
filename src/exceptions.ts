@@ -213,7 +213,7 @@ export class NotFoundException extends NodeRPCException {
 
 export class VaultNotFoundException extends NodeRPCException {
     constructor(message: string, causedBy?: Error) {
-        super(NodeRPCException.NOT_FOUND, NodeRPCException.IC_COLLECTION_NOT_FOUND, message, causedBy);
+        super(NodeRPCException.NOT_FOUND, NodeRPCException.IC_VAULT_NOT_FOUND, message, causedBy);
     }
 }
 
