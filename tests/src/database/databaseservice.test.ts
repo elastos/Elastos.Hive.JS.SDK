@@ -1,7 +1,7 @@
 import {
     VaultSubscription, DatabaseService, AlreadyExistsException,
     InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions,
-    AscendingSortItem, CollectionNotFoundException
+    AscendingSortItem, CollectionNotFoundException, NodeRPCException
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -24,8 +24,17 @@ describe("test database services", () => {
         
         try {
             await vaultSubscription.subscribe();
-        } catch (e){
-            // console.log("vault is already subscribed");
+        } catch (e) {
+            if (e instanceof NodeRPCException) {
+                if (e instanceof AlreadyExistsException) {
+                    console.log("vault is already subscribed");
+                } else {
+                    console.log("unexpected hive js exception");
+                    throw e;
+                }
+            } else {
+                console.log("not got a hive js exception");
+            }
         }
 
         databaseService = testData.newVault().getDatabaseService();
@@ -44,7 +53,10 @@ describe("test database services", () => {
     });   
 
     test("testInsertOne", async () => {
-        let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
+        let docNode = new Map();
+        docNode['author'] = 'john doe1';
+        docNode['title'] = 'Eve for Dummies1';
+
         let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds().length).toEqual(1);
