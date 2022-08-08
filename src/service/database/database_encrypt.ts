@@ -1,6 +1,7 @@
 import {InvalidParameterException, NotImplementedException} from "../../exceptions";
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
 import {Logger} from "../..";
+import * as sodium from 'libsodium-wrappers';
 
 /**
  * Json types: object(dict), string, number, boolean, null, array.
@@ -13,10 +14,13 @@ class EncryptJsonValue {
     private static readonly TYPE_NUMBER = 16;
     private static readonly TYPE_OTHER = -1; // can not be encrypted
 
+    private readonly secretKey: Uint8Array;
     private readonly value: any;
 
     constructor(value: any) {
         this.value = value;
+        // TODO: get the secret key from current DID document.
+        this.secretKey = sodium.from_hex('724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed');
     }
 
     isBasicType() {
@@ -29,8 +33,14 @@ class EncryptJsonValue {
     }
 
     getEncryptData() {
-        // TODO:
-        throw new NotImplementedException();
+        if (!this.isBasicType()) {
+            return this.value;
+        }
+
+        const strVal = this.value.toString();
+
+        let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+        return new Uint8Array([...nonce, ...sodium.crypto_secretbox_easy(strVal, nonce, this.secretKey)]);
     }
 
     getType(): number {
@@ -66,15 +76,15 @@ class EncryptJsonValue {
                 return retVal;
             }
 
-            const val = new EncryptJsonValue(value);
-            if (!val.isBasicType()) {
-                EncryptJsonValue.LOG.info(`The value should be basic type, but ${val.getOriginalType()}`);
+            const enval = new EncryptJsonValue(value);
+            if (!enval.isBasicType()) {
+                EncryptJsonValue.LOG.info(`The value should be basic type, but ${enval.getOriginalType()}`);
                 return value;
             }
 
             return {
-                '__binary__': val.getEncryptData(),
-                '__type__': val.getType(),
+                '__binary__': enval.getEncryptData(),
+                '__type__': enval.getType(),
             }
         };
 
@@ -96,10 +106,10 @@ class EncryptJsonValue {
         const isReservedKey = (v) => v.startsWith('$');
 
         for (const [k, v] of Object.entries(value)) {
-            const val = new EncryptJsonValue(v);
-            if (!isReservedKey(k) && val.isBasicType()) { // query field with value.
-                result[`${k}.__binary__`] = val.getEncryptData();
-                result[`${k}.__type__`] = val.getType();
+            const enval = new EncryptJsonValue(v);
+            if (!isReservedKey(k) && enval.isBasicType()) { // query field with value.
+                result[`${k}.__binary__`] = enval.getEncryptData();
+                result[`${k}.__type__`] = enval.getType();
             } else {
                 result[k] = v;
             }

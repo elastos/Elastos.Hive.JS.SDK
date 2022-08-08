@@ -75,6 +75,7 @@
     "@types/jest": "^26.0.24",
     "@types/node": "^14.18.2",
     "@types/promise-queue": "^2.2.0",
+    "@types/libsodium-wrappers": "^0.7.9",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "antlr4ts-cli": "^0.5.0-alpha.4",
