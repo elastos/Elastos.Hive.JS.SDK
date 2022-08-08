@@ -1,13 +1,15 @@
 import {InvalidParameterException, NotImplementedException} from "../../exceptions";
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
-import {Logger} from "../..";
-import * as sodium from 'libsodium-wrappers';
+import {Logger} from "../../utils/logger";
+// import * as sodium from 'libsodium-wrappers';
+
+const sodium = require('libsodium-wrappers'); // TODO:
 
 /**
  * Json types: object(dict), string, number, boolean, null, array.
  */
 class EncryptedJsonValue {
-    private static LOG = new Logger("DatabaseEncrypt");
+    private static LOG = new Logger("DatabaseEncryption");
 
     private static readonly TYPE_STRING = 2;
     private static readonly TYPE_BOOLEAN = 8;
@@ -97,10 +99,11 @@ class EncryptedJsonValue {
                     return new EncryptedJsonValue(value['__binary__'], false).getDecryptedValue(value['__type__']);
                 }
 
+                let retVal = {};
                 for (const [k, v] of Object.entries(value)) {
-                    value[k] = encryptRecursive(v);
+                    retVal[k] = encryptRecursive(v);
                 }
-                return value;
+                return retVal;
             }
 
             if (Array.isArray(value)) { // array
@@ -173,7 +176,7 @@ class EncryptedJsonValue {
     }
 }
 
-export class DatabaseEncrypt {
+export class DatabaseEncryption {
     /**
      * Encrypt the document fields when insert.
      *
@@ -181,7 +184,7 @@ export class DatabaseEncrypt {
      * @param isEncrypt
      */
     encryptDoc(doc: any, isEncrypt=true) {
-        const json = DatabaseEncrypt.getGeneralJsonDict(doc, 'The document must be dictionary.');
+        const json = DatabaseEncryption.getGeneralJsonDict(doc, 'The document must be dictionary.');
         if (Object.keys(json).length == 0) {
             return {};
         }
@@ -212,7 +215,7 @@ export class DatabaseEncrypt {
      * @param isEncrypt
      */
     encryptFilter(filter: JSONObject) {
-        const json = DatabaseEncrypt.getGeneralJsonDict(filter, 'The filter must be dictionary.');
+        const json = DatabaseEncryption.getGeneralJsonDict(filter, 'The filter must be dictionary.');
         if (Object.keys(json).length == 0) {
             return {};
         }
@@ -229,7 +232,7 @@ export class DatabaseEncrypt {
      * @param isEncrypt
      */
     encryptUpdate(update: JSONObject) {
-        const json = DatabaseEncrypt.getGeneralJsonDict(update, 'The update must be dictionary.');
+        const json = DatabaseEncryption.getGeneralJsonDict(update, 'The update must be dictionary.');
         if (Object.keys(json).length == 0) {
             return {};
         }
@@ -243,9 +246,6 @@ export class DatabaseEncrypt {
         if (json.constructor != Object) { // not dictionary
             throw new InvalidParameterException(message);
         }
-
-        if (Object.keys(json).length == 0) {
-            return {};
-        }
+        return json;
     }
 }

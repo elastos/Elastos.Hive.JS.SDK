@@ -34,7 +34,7 @@ export class Vault extends ServiceEndpoint {
 		return this.database;
 	}
 
-    public getEncryptDatabaseService(): DatabaseService {
+    public getDatabaseEncryptionService(): DatabaseService {
         return this.encryptDatabase;
     }
 
