@@ -184,8 +184,12 @@ export class DatabaseService extends RestService {
 
 		let docs = await this.findMany(collection, efilter, options);
 
-		DatabaseService.LOG.debug(JSON.stringify(docs));
-		return docs !== undefined && !(docs.length === 0) ? docs[0] : null;
+		DatabaseService.LOG.debug(`fine docs: ${JSON.stringify(docs)}`);
+		if (!docs || docs.length === 0) {
+		    return null;
+        }
+
+		return this.databaseEncrypt.encryptDoc(docs[0], false);
 	}
 
 	/**
@@ -222,7 +226,7 @@ export class DatabaseService extends RestService {
 				HttpMethod.GET
 			);
 
-			return ret;
+			return this.databaseEncrypt.encryptDocs(ret, false);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -256,7 +260,7 @@ export class DatabaseService extends RestService {
 			},
 			HttpMethod.POST);
 			
-			return result;
+			return this.databaseEncrypt.encryptDocs(result);
 		} catch (e){
 			this.handleError(e);
 		}
