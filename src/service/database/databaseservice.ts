@@ -14,7 +14,7 @@ import { QueryOptions } from "./queryoptions";
 import { UpdateOptions } from "./updateoptions";
 import { UpdateResult } from "./updateresult";
 import { DeleteOptions } from "./deleteoptions";
-import {DatabaseEncrypt} from "./database_encrypt";
+import { DatabaseEncryption } from "./database_encryption";
 
 /**
  * Database service is for save JSON data on the mongo database on hive node.
@@ -31,12 +31,12 @@ export class DatabaseService extends RestService {
 	private static API_DB_ENDPOINT = "/api/v2/vault/db";
 
 	private readonly encrypt: boolean;
-	private readonly databaseEncrypt: DatabaseEncrypt;
+	private readonly databaseEncrypt: DatabaseEncryption;
 
     constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
 		super(serviceContext, httpClient);
         this.encrypt = encrypt;
-        this.databaseEncrypt = new DatabaseEncrypt();
+        this.databaseEncrypt = new DatabaseEncryption();
 	}
 
 	/**
@@ -84,11 +84,7 @@ export class DatabaseService extends RestService {
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
 	public async insertOne( collection: string, doc: any, options?: InsertOptions) : Promise<InsertResult> {
-	    let edoc = doc;
-	    if (this.encrypt) { // only for dict document
-            edoc = this.databaseEncrypt.encryptDoc(doc);
-        }
-		return await this.insertMany(collection, [edoc], options);
+		return await this.insertMany(collection, [doc], options);
 	}
 
 	/**
