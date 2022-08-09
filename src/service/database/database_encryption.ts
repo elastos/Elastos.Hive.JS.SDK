@@ -17,12 +17,21 @@ class EncryptedJsonValue {
     private static readonly TYPE_OTHER = -1; // can not be encrypted
 
     private readonly secretKey: Uint8Array;
+    private readonly nonce: Uint8Array;
     private readonly value: any;
     private readonly isEncrypt: boolean;
 
     constructor(value: any, isEncrypt: boolean) {
         // TODO: get the secret key from current DID document.
         this.secretKey = sodium.from_hex('724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed');
+
+        // fixed nonce value.
+        let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+        for (let i = 0; i < nonce.length; i++) {
+            nonce[i] = 123;
+        }
+        this.nonce = nonce;
+
         this.value = value;
         this.isEncrypt = isEncrypt;
     }
@@ -42,19 +51,21 @@ class EncryptedJsonValue {
             return this.value;
         }
 
-        if (this.value.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+        const arrData = Uint8Array.from(Buffer.from(this.value, "hex"))
+        if (arrData.length < sodium.crypto_secretbox_NONCEBYTES) {
             throw new InvalidParameterException('Invalid document value, please make sure it is encrypted');
         }
-        let nonce = this.value.slice(0, sodium.crypto_secretbox_NONCEBYTES),
-            ciphertext = this.value.slice(sodium.crypto_secretbox_NONCEBYTES);
-        const originalValue = sodium.crypto_secretbox_open_easy(ciphertext, nonce, this.secretKey, 'text');
 
-        switch (this.getOriginalType()) {
-            case "string":
+        let nonce = arrData.slice(0, sodium.crypto_secretbox_NONCEBYTES),
+            ciphertext = arrData.slice(sodium.crypto_secretbox_NONCEBYTES);
+        const originalValue = sodium.crypto_secretbox_open_easy(ciphertext, this.nonce, this.secretKey, 'text');
+
+        switch (type) {
+            case EncryptedJsonValue.TYPE_STRING:
                 return originalValue;
-            case "boolean":
+            case EncryptedJsonValue.TYPE_BOOLEAN:
                 return originalValue === 'true';
-            case "number":
+            case EncryptedJsonValue.TYPE_NUMBER:
                 return Number(originalValue);
         }
 
@@ -70,7 +81,8 @@ class EncryptedJsonValue {
             const strVal = this.value.toString();
 
             let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-            return new Uint8Array([...nonce, ...sodium.crypto_secretbox_easy(strVal, nonce, this.secretKey)]);
+            const arrData = new Uint8Array([...this.nonce, ...sodium.crypto_secretbox_easy(strVal, this.nonce, this.secretKey)]);
+            return Buffer.from(arrData).toString("hex");
         } else {
 
         }
@@ -114,17 +126,27 @@ class EncryptedJsonValue {
                 return retVal;
             }
 
-            const enval = new EncryptedJsonValue(value, this.isEncrypt);
-            if (!enval.isBasicType()) {
-                EncryptedJsonValue.LOG.info(`The value should be basic type, but ${enval.getOriginalType()}`);
-                return value;
+            if (this.isEncrypt) {
+                const enval = new EncryptedJsonValue(value, this.isEncrypt);
+                if (!enval.isBasicType()) {
+                    EncryptedJsonValue.LOG.info(`The value should be basic type, but ${enval.getOriginalType()}`);
+                    return value;
+                }
+
+                return {
+                    '__binary__': enval.getEncryptData(),
+                    '__type__': enval.getType(),
+                }
             }
 
-            return {
-                '__binary__': enval.getEncryptData(),
-                '__type__': enval.getType(),
-            }
+            return value;
         };
+
+        if (!this.isEncrypt && '__encrypt__' in this.value) {
+            delete this.value['__encrypt__'];
+            let retVal = encryptRecursive(this.value);
+            return JSON.parse(JSON.stringify(retVal)); // JSONObject
+        }
 
         let retVal = encryptRecursive(this.value);
         retVal['__encrypt__'] = 'user_did'; // record encrypt way

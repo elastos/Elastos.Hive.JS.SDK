@@ -3,6 +3,7 @@ import {
     InsertOptions, CollectionNotFoundException, NodeRPCException
 } from "../../../src";
 import { TestData } from "../config/testdata";
+import {JSONObject} from "@elastosfoundation/did-js-sdk";
 
 describe("test database services", () => {
     let COLLECTION_NAME = "encrypt_works";
@@ -13,7 +14,7 @@ describe("test database services", () => {
     beforeAll(async () => {
         let testData = await TestData.getInstance("databaseservice.tests");
         vaultSubscription = new VaultSubscription(testData.getUserAppContext(), testData.getProviderAddress());
-        databaseService = testData.newVault().getDatabaseEncryptionService();
+        databaseService = testData.newVault().getEncryptionDatabaseService();
 
         // try to subscribe a vault if not exists.
         try {
@@ -47,6 +48,15 @@ describe("test database services", () => {
         let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds().length).toEqual(1);
+    });
+
+    test("testFindMany", async () => {
+        let query = {"author": "john doe1"};
+        let docs: JSONObject[] = await databaseService.findMany(COLLECTION_NAME, query);
+        expect(docs).toBeTruthy();
+        expect(docs).not.toBeUndefined();
+        expect(docs).not.toBeNull();
+        expect(docs.length).toBe(1);
     });
 
     async function deleteCollectionAnyway() {
