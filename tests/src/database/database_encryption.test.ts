@@ -57,6 +57,10 @@ describe("test database services", () => {
         expect(docs).not.toBeUndefined();
         expect(docs).not.toBeNull();
         expect(docs.length).toBe(1);
+        expect(docs[0]['author']).toEqual('john doe1');
+        expect(docs[0]['title']).toEqual('Eve for Dummies1');
+        expect(docs[0]['words_count']).toEqual(10000);
+        expect(docs[0]['published']).toEqual(true);
     });
 
     async function deleteCollectionAnyway() {
