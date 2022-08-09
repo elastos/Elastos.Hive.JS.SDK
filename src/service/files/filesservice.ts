@@ -8,7 +8,7 @@ import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 import { checkArgument, checkNotNull } from "../../utils/utils";
-import {DatabaseEncryption} from "../database/database_encryption";
+import { EncryptionFile } from "./encryption_file";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
@@ -16,12 +16,10 @@ export class FilesService extends RestService {
 	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
 	private readonly encrypt: boolean;
-    private readonly databaseEncrypt: DatabaseEncryption;
 
     constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
 		super(serviceContext, httpClient);
 		this.encrypt = encrypt;
-        this.databaseEncrypt = new DatabaseEncryption();
 	}
 
     /**
@@ -34,7 +32,7 @@ export class FilesService extends RestService {
 		checkNotNull(path, "Remote file path is mandatory.");
 
 		try {
-			let dataBuffer = Buffer.alloc(0);
+			let dataBuffer: Buffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
 			{
 				onData(chunk: Buffer): void {
@@ -48,7 +46,7 @@ export class FilesService extends RestService {
 
 			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 
-			return Buffer.from(this.databaseEncrypt.decryptFileContent(dataBuffer));
+			return Buffer.from(new EncryptionFile(dataBuffer).decrypt());
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -79,7 +77,7 @@ export class FilesService extends RestService {
 
 		let edata = content;
 		if (this.encrypt) {
-		    edata = Buffer.from(this.databaseEncrypt.encryptFileContent(data));
+		    edata = Buffer.from(new EncryptionFile(content).encrypt());
         }
 
 		try {
