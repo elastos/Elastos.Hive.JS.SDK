@@ -41,6 +41,7 @@ module.exports = {
         "no-async-promise-executor": "error",
         "no-promise-executor-return": "error",
         "no-non-null-assertion": "off",
+        "@typescript-eslint/no-var-requires": "off",
 
         // Node
         "node/no-unsupported-features/es-syntax": "off",
