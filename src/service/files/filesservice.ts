@@ -8,14 +8,20 @@ import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 import { checkArgument, checkNotNull } from "../../utils/utils";
+import {DatabaseEncryption} from "../database/database_encryption";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
 
 	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
+	private readonly encrypt: boolean;
+    private readonly databaseEncrypt: DatabaseEncryption;
+
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
 		super(serviceContext, httpClient);
+		this.encrypt = encrypt;
+        this.databaseEncrypt = new DatabaseEncryption();
 	}
 
     /**
@@ -42,7 +48,7 @@ export class FilesService extends RestService {
 
 			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 
-			return dataBuffer;
+			return Buffer.from(this.databaseEncrypt.decryptFileContent(dataBuffer));
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -71,8 +77,13 @@ export class FilesService extends RestService {
 			urlArgsStr = `?public=true&script_name=${script_name}`
 		}
 
+		let edata = content;
+		if (this.encrypt) {
+		    edata = Buffer.from(this.databaseEncrypt.encryptFileContent(data));
+        }
+
 		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, content,
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, edata,
 				<HttpResponseParser<string>> {
 					deserialize(content: any): string {
 						return JSON.parse(content)["cid"];
