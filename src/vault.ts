@@ -12,7 +12,7 @@ import { BackupService } from "./service/backup/backupservice";
 export class Vault extends ServiceEndpoint {
 	private readonly filesService: FilesService;
 	private readonly database: DatabaseService;
-	private readonly encryptDatabase: DatabaseService;
+	private readonly encryptionDatabase: DatabaseService;
 	private readonly scripting: ScriptingService;
 	private readonly backupService: BackupService;
 
@@ -21,7 +21,7 @@ export class Vault extends ServiceEndpoint {
 		let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
 		this.filesService	    = new FilesService(this, httpClient);
 		this.database		    = new DatabaseService(this, httpClient);
-		this.encryptDatabase    = new DatabaseService(this, httpClient, true);
+		this.encryptionDatabase = new DatabaseService(this, httpClient, true);
 		this.scripting	 	    = new ScriptingService(this, httpClient);
 		this.backupService      = new BackupService(this, httpClient);
 	}
@@ -34,8 +34,8 @@ export class Vault extends ServiceEndpoint {
 		return this.database;
 	}
 
-    public getDatabaseEncryptionService(): DatabaseService {
-        return this.encryptDatabase;
+    public getEncryptionDatabaseService(): DatabaseService {
+        return this.encryptionDatabase;
     }
 
 	public getScriptingService(): ScriptingService {
