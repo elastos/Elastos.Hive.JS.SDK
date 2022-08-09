@@ -11,6 +11,7 @@ import { BackupService } from "./service/backup/backupservice";
  */
 export class Vault extends ServiceEndpoint {
 	private readonly filesService: FilesService;
+	private readonly encryptionFilesService: FilesService;
 	private readonly database: DatabaseService;
 	private readonly encryptionDatabase: DatabaseService;
 	private readonly scripting: ScriptingService;
@@ -19,16 +20,21 @@ export class Vault extends ServiceEndpoint {
 	public constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
 		let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-		this.filesService	    = new FilesService(this, httpClient);
-		this.database		    = new DatabaseService(this, httpClient);
-		this.encryptionDatabase = new DatabaseService(this, httpClient, true);
-		this.scripting	 	    = new ScriptingService(this, httpClient);
-		this.backupService      = new BackupService(this, httpClient);
+		this.filesService	        = new FilesService(this, httpClient);
+		this.encryptionFilesService = new FilesService(this, httpClient, true);
+		this.database		        = new DatabaseService(this, httpClient);
+		this.encryptionDatabase     = new DatabaseService(this, httpClient, true);
+		this.scripting	 	        = new ScriptingService(this, httpClient);
+		this.backupService          = new BackupService(this, httpClient);
 	}
 
 	public getFilesService(): FilesService {
 		return this.filesService;
 	}
+
+    public getEncryptionFilesService(): FilesService {
+        return this.encryptionFilesService;
+    }
 
 	public getDatabaseService(): DatabaseService {
 		return this.database;

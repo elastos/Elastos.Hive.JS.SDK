@@ -8,10 +8,10 @@ const sodium = require('libsodium-wrappers'); // TODO:
 /**
  * Json types: object(dict), string, number, boolean, null, array.
  */
-class EncryptedJsonValue {
+export class EncryptedJsonValue {
     private static LOG = new Logger("DatabaseEncryption");
 
-    private static readonly TYPE_STRING = 2;
+    public static readonly TYPE_STRING = 2;
     private static readonly TYPE_BOOLEAN = 8;
     private static readonly TYPE_NUMBER = 16;
     private static readonly TYPE_OTHER = -1; // can not be encrypted
@@ -269,5 +269,14 @@ export class DatabaseEncryption {
             throw new InvalidParameterException(message);
         }
         return json;
+    }
+
+    encryptFileContent(content: Buffer | string) {
+        let data = content instanceof Buffer ? content.toString('utf8') : content;
+        return new EncryptedJsonValue(data, true).getEncryptData();
+    }
+
+    decryptFileContent(content: Buffer) {
+        return new EncryptedJsonValue(content.toString('utf8'), false).getDecryptedValue(EncryptedJsonValue.TYPE_STRING);
     }
 }
