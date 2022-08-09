@@ -1,6 +1,6 @@
 import {
     VaultSubscription, DatabaseService, AlreadyExistsException,
-    InsertOptions, CollectionNotFoundException, NodeRPCException
+    InsertOptions, CollectionNotFoundException, NodeRPCException, UpdateOptions
 } from "../../../src";
 import { TestData } from "../config/testdata";
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
@@ -51,14 +51,17 @@ describe("test database services", () => {
     });
 
     test("testFindMany", async () => {
-        let query = {"author": "john doe1"};
-        let docs: JSONObject[] = await databaseService.findMany(COLLECTION_NAME, query);
+        const filter = { "author": "john doe1" };
+        const updateNode = { "$set": { "title": "Eve for Dummies2" } };
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
+
+        const docs: JSONObject[] = await databaseService.findMany(COLLECTION_NAME, filter);
         expect(docs).toBeTruthy();
         expect(docs).not.toBeUndefined();
         expect(docs).not.toBeNull();
         expect(docs.length).toBe(1);
         expect(docs[0]['author']).toEqual('john doe1');
-        expect(docs[0]['title']).toEqual('Eve for Dummies1');
+        expect(docs[0]['title']).toEqual('Eve for Dummies2');
         expect(docs[0]['words_count']).toEqual(10000);
         expect(docs[0]['published']).toEqual(true);
     });
