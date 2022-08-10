@@ -101,29 +101,23 @@ export class DatabaseService extends RestService {
 	*/
 	public async insertMany(collection: string, docs: any[], options?: InsertOptions) : Promise<InsertResult>{
 		try {
-		    let edocs = docs;
-		    if (this.encrypt) {
-		        edocs = this.databaseEncrypt.encryptDocs(docs);
-            }
+		    const encryptedDocs = this.encrypt ? this.databaseEncrypt.encryptDocs(docs) : docs;
+			return await this.httpClient.send<InsertResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}`,
+                {
+                    "document": encryptedDocs,
+                    "options": options
+                },
+                <HttpResponseParser<InsertResult>> {
+                    deserialize(content: any): InsertResult {
+                        let jsonObj = JSON.parse(content);
+                        let result = new InsertResult();
+                        result.setAcknowledge(jsonObj['acknowledge']);
+                        result.setInsertedIds(jsonObj['inserted_ids']);
 
-			let result = await this.httpClient.send<InsertResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}`,
-			{
-				"document": edocs,
-				"options": options 
-			},
-			<HttpResponseParser<InsertResult>> {
-				deserialize(content: any): InsertResult {
-					let jsonObj = JSON.parse(content);
-					let result = new InsertResult();
-					result.setAcknowledge(jsonObj['acknowledge']);
-					result.setInsertedIds(jsonObj['inserted_ids']);
-
-					return result;
-				}
-			},
-			HttpMethod.POST);
-			
-			return result;
+                        return result;
+                    }
+                },
+                HttpMethod.POST);
 		} catch (e){
 			this.handleError(e);
 		}
@@ -142,23 +136,17 @@ export class DatabaseService extends RestService {
  	 */
  	public async countDocuments(collection: string, filter: JSONObject, options?: CountOptions): Promise<number> {
 		try {
-		    let efilter = filter;
-		    if (this.encrypt) {
-                efilter = this.databaseEncrypt.encryptFilter(filter);
-            }
-
-			let result = await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?op=count`,
-			{
-				"filter": efilter,
-				"options": options
-			},
-			<HttpResponseParser<number>> {
-				deserialize(content: any): number {
-					return JSON.parse(content)["count"];
-				}
-			}, HttpMethod.POST);
-			
-			return result;
+		    const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+			return await this.httpClient.send<number>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?op=count`,
+                {
+                    "filter": encryptedFilter,
+                    "options": options
+                },
+                <HttpResponseParser<number>> {
+                    deserialize(content: any): number {
+                        return JSON.parse(content)["count"];
+                    }
+                }, HttpMethod.POST);
 		} catch (e){
 			this.handleError(e);
 		}
@@ -173,14 +161,10 @@ export class DatabaseService extends RestService {
 	 * @return a JSON object document result
 	 */
 	public async findOne(collection: string, filter: JSONObject, options?: FindOptions): Promise<JSONObject> {
-        let efilter = filter;
-        if (this.encrypt) {
-            efilter = this.databaseEncrypt.encryptFilter(filter);
-        }
-
-		let docs = await this.findMany(collection, efilter, options);
-
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+		const docs = await this.findMany(collection, encryptedFilter, options);
 		DatabaseService.LOG.debug(`fine docs: ${JSON.stringify(docs)}`);
+
 		if (!docs || docs.length === 0) {
 		    return null;
         }
@@ -199,30 +183,28 @@ export class DatabaseService extends RestService {
 
 	public async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
 		try {
-            let efilter = filter;
-            if (this.encrypt) {
-                efilter = this.databaseEncrypt.encryptFilter(filter);
-            }
-
-			let filterStr = efilter === null ? "" : encodeURIComponent(JSON.stringify(efilter));
+            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+            const filterStr = encryptedFilter === null ? "" : encodeURIComponent(JSON.stringify(encryptedFilter));
 			DatabaseService.LOG.debug("FILTER_STR: " + filterStr);
-			let skip = options !== undefined ? options.skip.toString() : 0;
-			let limit = options !== undefined ? options.limit.toString() : 0;
-			let ret = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}`, 
-				{
-					"skip": skip,
-					"limit": limit,
-					"filter": filterStr
-				},
-				<HttpResponseParser<JSONObject[]>> {
-					deserialize(content: any): JSONObject[] {
-						return JSON.parse(content)["items"];
-					}
-				},
-				HttpMethod.GET
-			);
 
-			return this.databaseEncrypt.encryptDocs(ret, false);
+            const skip = options !== undefined ? options.skip.toString() : 0;
+            const limit = options !== undefined ? options.limit.toString() : 0;
+
+			const result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/${collectionName}`,
+                    {
+                        "skip": skip,
+                        "limit": limit,
+                        "filter": filterStr
+                    },
+                    <HttpResponseParser<JSONObject[]>> {
+                        deserialize(content: any): JSONObject[] {
+                            return JSON.parse(content)["items"];
+                        }
+                    },
+                    HttpMethod.GET
+                );
+
+			return this.databaseEncrypt.encryptDocs(result, false);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -238,23 +220,19 @@ export class DatabaseService extends RestService {
  	 */
 	public async query(collection: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
 		try {
-            let efilter = filter;
-            if (this.encrypt) {
-                efilter = this.databaseEncrypt.encryptFilter(filter);
-            }
-
-			let result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
-			{
-					"collection": collection,
-					"filter": efilter,
-					"options": this.normalizeSortQueryOptions(options)
-			},
-			<HttpResponseParser<JSONObject[]>> {
-				deserialize(content: any): JSONObject[] {
-					return JSON.parse(content)["items"];
-				}
-			},
-			HttpMethod.POST);
+            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+			const result = await this.httpClient.send<JSONObject[]>(`${DatabaseService.API_DB_ENDPOINT}/query`,
+                {
+                        "collection": collection,
+                        "filter": encryptedFilter,
+                        "options": this.normalizeSortQueryOptions(options)
+                },
+                <HttpResponseParser<JSONObject[]>> {
+                    deserialize(content: any): JSONObject[] {
+                        return JSON.parse(content)["items"];
+                    }
+                },
+                HttpMethod.POST);
 			
 			return this.databaseEncrypt.encryptDocs(result);
 		} catch (e){
@@ -327,34 +305,27 @@ export class DatabaseService extends RestService {
 
 	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		try {
-            let efilter = filter;
-            let eupdate = update;
-            if (this.encrypt) {
-                efilter = this.databaseEncrypt.encryptFilter(filter);
-                update = this.databaseEncrypt.encryptFilter(update);
-            }
+            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+            const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptFilter(update) : update;
+			return await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
+                {
+                    "filter": encryptedFilter,
+                    "update": encryptedUpdate,
+                    "options": options
+                },
+                <HttpResponseParser<UpdateResult>> {
+                    deserialize(content: any): UpdateResult {
+                        let jsonObj = JSON.parse(content);
+                        let result = new UpdateResult();
 
-			let result = await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
-			{
-				"filter": efilter,
-				"update": eupdate,
-				"options": options 
-			},
-			<HttpResponseParser<UpdateResult>> {
-				deserialize(content: any): UpdateResult {
-					let jsonObj = JSON.parse(content);
-					let result = new UpdateResult();
-
-					result.setAcknowledged(jsonObj['acknowledged']);
-					result.setMatchedCount(jsonObj['matched_count']);
-					result.setModifiedCount(jsonObj['modified_count']);
-					result.setUpsertedId(jsonObj['upserted_id']);
-					return result;
-				}
-			},
-			HttpMethod.PATCH);
-			
-			return result;
+                        result.setAcknowledged(jsonObj['acknowledged']);
+                        result.setMatchedCount(jsonObj['matched_count']);
+                        result.setModifiedCount(jsonObj['modified_count']);
+                        result.setUpsertedId(jsonObj['upserted_id']);
+                        return result;
+                    }
+                },
+                HttpMethod.PATCH);
 		} catch (e){
 			this.handleError(e);
 		}
@@ -362,18 +333,14 @@ export class DatabaseService extends RestService {
 
 	private async deleteInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, options?: DeleteOptions): Promise<void> {
 		try {
-            let efilter = filter;
-            if (this.encrypt) {
-                efilter = this.databaseEncrypt.encryptFilter(filter);
-            }
-
+            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
 			return await this.httpClient.send<void>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?deleteone=${isOnlyOne}`,
-			{
-				"filter": efilter,
-				"options": options 
-			},
-			HttpClient.NO_RESPONSE,
-			HttpMethod.DELETE);
+                {
+                    "filter": encryptedFilter,
+                    "options": options
+                },
+                HttpClient.NO_RESPONSE,
+                HttpMethod.DELETE);
 		} catch (e){
 			this.handleError(e);
 		}
