@@ -47,7 +47,7 @@ describe("test files service", () => {
 			}
 		}
 
-		anonymousScriptRunner = testData.newAnonymousCallerScriptRunner();
+		anonymousScriptRunner = new ScriptRunner(null, testData.getProviderAddress());
 		targetDid = testData.getUserDid();
 		appDid = testData.getAppDid();
 	});
@@ -67,9 +67,9 @@ describe("test files service", () => {
 	}
 
 	function cleanTestFile(): void {
-		let testFile = new File("testfile.txt");
+		let testFile = new File(FILE_NAME_TXT);
 		testFile.delete();
-		let binTestFile = new File("testfile.txt");
+		let binTestFile = new File(FILE_NAME_BIN);
 		binTestFile.delete();
 	}
 
