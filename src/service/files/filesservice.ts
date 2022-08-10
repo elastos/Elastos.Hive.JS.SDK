@@ -34,19 +34,19 @@ export class FilesService extends RestService {
 		try {
 			let dataBuffer: Buffer = Buffer.alloc(0);
 			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
-			{
-				onData(chunk: Buffer): void {
-					dataBuffer = Buffer.concat([dataBuffer, chunk]);
-				},
-				onEnd(): void {
-					// Process end.
-				}
-      		} as StreamResponseParser,
-			HttpMethod.GET, null, callback);
+                {
+                    onData(chunk: Buffer): void {
+                        dataBuffer = Buffer.concat([dataBuffer, chunk]);
+                    },
+                    onEnd(): void {
+                        // Process end.
+                    }
+                } as StreamResponseParser,
+                HttpMethod.GET, null, callback);
 
 			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 
-			return Buffer.from(new EncryptionFile(dataBuffer).decrypt());
+			return this.encrypt ? Buffer.from(new EncryptionFile(dataBuffer).decrypt()) : dataBuffer;
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -75,13 +75,10 @@ export class FilesService extends RestService {
 			urlArgsStr = `?public=true&script_name=${script_name}`
 		}
 
-		let edata = content;
-		if (this.encrypt) {
-		    edata = Buffer.from(new EncryptionFile(content).encrypt());
-        }
+		const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(content).encrypt()) : content;
 
 		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, edata,
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, encryptData,
 				<HttpResponseParser<string>> {
 					deserialize(content: any): string {
 						return JSON.parse(content)["cid"];
@@ -100,24 +97,23 @@ export class FilesService extends RestService {
 	 */
 	async list(path: string): Promise<FileInfo[]> {
 		try {
-			let fileInfos: FileInfo[] = await this.httpClient.send<FileInfo[]>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=children`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo[]>> {
-				deserialize(content: any): FileInfo[] {
-					let rawFiles = JSON.parse(content)["value"];
-					let files = [];
-					for (let file of rawFiles) {
-						let fileInfo = new FileInfo();
-						fileInfo.setCreated(file["created"]);
-						fileInfo.setUpdated(file["updated"]);
-						fileInfo.setName(file["name"]);
-						fileInfo.setAsFile(file["is_file"]);
-						fileInfo.setSize(file["size"]);
-						files.push(fileInfo);
-					}
-					return files;
-				}
-			}, HttpMethod.GET);
-
-			return fileInfos;
+			return await this.httpClient.send<FileInfo[]>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=children`,
+                HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo[]>> {
+                    deserialize(content: any): FileInfo[] {
+                        let rawFiles = JSON.parse(content)["value"];
+                        let files = [];
+                        for (let file of rawFiles) {
+                            let fileInfo = new FileInfo();
+                            fileInfo.setCreated(file["created"]);
+                            fileInfo.setUpdated(file["updated"]);
+                            fileInfo.setName(file["name"]);
+                            fileInfo.setAsFile(file["is_file"]);
+                            fileInfo.setSize(file["size"]);
+                            files.push(fileInfo);
+                        }
+                        return files;
+                    }
+                }, HttpMethod.GET);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -132,19 +128,18 @@ export class FilesService extends RestService {
 	 */
 	async stat(path: string): Promise<FileInfo> {
 		try {
-			let fileInfo: FileInfo = await this.httpClient.send<FileInfo>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
-				deserialize(content: any): FileInfo {
-					let file = JSON.parse(content);
-					let newFileInfo = new FileInfo();
-					newFileInfo.setCreated(file["created"]);
-					newFileInfo.setUpdated(file["updated"]);
-					newFileInfo.setName(file["name"]);
-					newFileInfo.setAsFile(file["is_file"]);
-					return newFileInfo;
-				}
-			}, HttpMethod.GET);
-
-			return fileInfo;
+			return await this.httpClient.send<FileInfo>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`,
+                HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
+                    deserialize(content: any): FileInfo {
+                        let file = JSON.parse(content);
+                        let newFileInfo = new FileInfo();
+                        newFileInfo.setCreated(file["created"]);
+                        newFileInfo.setUpdated(file["updated"]);
+                        newFileInfo.setName(file["name"]);
+                        newFileInfo.setAsFile(file["is_file"]);
+                        return newFileInfo;
+                    }
+                }, HttpMethod.GET);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -159,13 +154,12 @@ export class FilesService extends RestService {
 	 */
 	async hash(path: string): Promise<string> {
 		try {
-			let hash: string = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-				deserialize(content: any): string {
-					return JSON.parse(content)['hash'];
-				}
-			}, HttpMethod.GET);
-
-			return hash;
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`,
+                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+                    deserialize(content: any): string {
+                        return JSON.parse(content)['hash'];
+                    }
+                }, HttpMethod.GET);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -183,13 +177,12 @@ export class FilesService extends RestService {
 	 */
 	 async move(source: string, target: string): Promise<string> {
 		try {
-			let result = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?to=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-				deserialize(content: any): string {
-					return JSON.parse(content)['name'];
-				}
-			}, HttpMethod.PATCH);
-
-			return result;
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?to=${target}`,
+                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+                    deserialize(content: any): string {
+                        return JSON.parse(content)['name'];
+                    }
+                }, HttpMethod.PATCH);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -205,13 +198,12 @@ export class FilesService extends RestService {
 	 */
 	async copy(source: string, target: string): Promise<string> {
 		try {
-			let result = await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?dest=${target}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-				deserialize(content: any): string {
-					return JSON.parse(content)['name'];
-				}
-			}, HttpMethod.PUT);
-
-			return result;
+			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?dest=${target}`,
+                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
+                    deserialize(content: any): string {
+                        return JSON.parse(content)['name'];
+                    }
+                }, HttpMethod.PUT);
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -227,7 +219,8 @@ export class FilesService extends RestService {
 	 */
 	async delete(path: string): Promise<void> {
 		try {
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
+			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`,
+                HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
 		} catch (e) {
 			this.handleError(e);
 		}
