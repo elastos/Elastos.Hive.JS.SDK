@@ -76,6 +76,10 @@ export class FilesService extends RestService {
 		}
 
 		const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(content).encrypt()) : content;
+		if (this.encrypt) {
+            urlArgsStr = urlArgsStr === '' ? '?' : "&";
+            urlArgsStr += 'is_encrypt=true&encrypt_method=user_did';
+        }
 
 		try {
 			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, encryptData,

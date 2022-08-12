@@ -5,10 +5,9 @@
   "application": {
     "name": "developApp",
     "mnemonic": "curious push water point border mutual install govern message ordinary fish small",
-    "__comment__": "please add any string to 'passPhrase', like '123456', or it will cause start error",
-    "passPhrase": "",
+    "passPhrase": "password",
     "storepass": "password",
-    "did": "did:elastos:iag8qwq1xPBpLsGv4zR4CmzLpLUkBNfPHX"
+    "did": "did:elastos:iYz6EqxJc72BjRPnEZoTn1mjiWsWTgRh6U"
   },
 
   "user": {
@@ -21,27 +20,19 @@
 
   "node": {
     "provider": "https://hive1.trinity-tech.io",
+	"__comment__": "target is for backup",
     "targetDid": "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J",
-    "targetHost": "https://hive2.trinity-tech.io",
-    "storePath": "custom"
+    "targetHost": "https://hive2.trinity-tech.io"
   },
 
   "cross": {
-    "application": {
-      "name": "crossApp",
-      "mnemonic": "hammer knock again pet curious promote guard mixed give can margin kiwi",
-      "passPhrase": "",
-      "storepass": "password"
-    },
-
     "user": {
+      "__comment__": "the caller for the scripting service",
       "name": "crossUser",
       "mnemonic": "earth surface exotic absent key divert sun ten engage sadness nasty lyrics",
       "passPhrase": "",
       "storepass": "password",
       "did": "did:elastos:iTGfs68mWLJuEcZ6Fibm7yoeBFaNfFQugi"
-    },
-
-    "crossDid": "did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n"
+    }
   }
 }
