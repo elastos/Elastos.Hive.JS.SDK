@@ -1,9 +1,9 @@
 {
-  "resolverUrl": "mainnet",
+  "resolverUrl": "testnet",
   "ipfsGateUrl": "https://ipfs-test.trinity-feeds.app",
 
   "application": {
-    "name": "developAppT",
+    "name": "developAppTestnet",
     "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
     "passPhrase": "password",
     "storepass": "password",
@@ -12,16 +12,16 @@
 
   "user": {
     "name": "developUser",
-    "mnemonic": "aisle invest solar duck push romance laundry can chimney parade goose gaze",
-    "passPhrase": "",
-    "storepass": "password",
-    "did": "did:elastos:ifJkpmsjykgzT7XDyFo9cqwWYJiaWeTSxL"
+    "mnemonic": "decrease eagle devote evoke dragon dignity affair fame honey tourist shrug divorce",
+    "passPhrase": "123456",
+    "storepass": "123456",
+    "did": "did:elastos:ipBaBr6HQ6h92T1fh5fFQS14xhTcyt3Azq"
   },
 
   "node": {
     "provider": "https://hive-testnet1.trinity-tech.io",
     "__comment__": "target is for backup",
-    "targetDid": "did:elastos:iZapsJk6FjPoXi6jHpx7RywhieJfw8gXV5",
+    "targetDid": "did:elastos:ijebJBsSZxJjKkSZD86kZXXM3uJiUbZcjh",
     "targetHost": "https://hive-testnet2.trinity-tech.io"
   },
 
@@ -29,10 +29,10 @@
     "user": {
       "__comment__": "the caller for the scripting service",
       "name": "crossUser",
-      "mnemonic": "earth surface exotic absent key divert sun ten engage sadness nasty lyrics",
-      "passPhrase": "",
+      "mnemonic": "stage west lava group genre ten farm pony small family february drink",
+      "passPhrase": "secret",
       "storepass": "password",
-      "did": "did:elastos:iTGfs68mWLJuEcZ6Fibm7yoeBFaNfFQugi"
+      "did": "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7"
     }
   }
 }
