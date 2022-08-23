@@ -152,11 +152,11 @@ export class AppContext {
             let did: DID = new DID(targetDid);
             let doc: DIDDocument = await did.resolve(!!isForce);
             if (doc == null)
-                throw (new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain"));
+                throw new DIDNotPublishedException("The DID " + targetDid + " has not published onto sideChain");
 
             services = doc.selectServices(null, "HiveVault");
             if (services == null || services.length == 0)
-                throw (new ProviderNotSetException("No 'HiveVault' services declared on DID document " + targetDid));
+                throw new ProviderNotSetException("No 'HiveVault' services declared on DID document " + targetDid);
 
             /*
              * Should we throw special exception when it has more than one end-point
@@ -165,12 +165,13 @@ export class AppContext {
             return services[0].getServiceEndpoint();
 
         } catch (e) {
+            AppContext.LOG.error(`Resolve the hive url from did ${targetDid} failed: ${e}, ${e.stack}`);
             if (e instanceof MalformedDIDException) {
-                AppContext.LOG.error("Malformed target did " + targetDid + " with error: " + e.message);
                 throw new IllegalArgumentException("Malformed did string: " + targetDid, e);
             } else if (e instanceof DIDResolveException) {
-                AppContext.LOG.error("Resolving the target DID " + targetDid + " failed: " + e.message);
                 throw new NetworkException("Resolving DID failed: " + e.message, e);
+            } else {
+                throw e;
             }
         }
 	}
