@@ -109,11 +109,16 @@ export class AccessToken implements CodeFetcher {
 	}
 
 	private async isExpired(jwtCode: string) : Promise<boolean> {
-        let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
-        if (claims == null)
-            return true;
+	    try {
+            let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(jwtCode)).getBody();
+            if (claims == null)
+                return true;
 
-        return claims.getExpiration() * 1000 < Date.now();
+            return claims.getExpiration() * 1000 < Date.now();
+        } catch (e) {
+            AccessToken.LOG.info(`Got an error when checking token expired: ${e}, ${e.stack}`);
+            return true;
+        }
 	}
 
 	private async clearToken(key?: string) {
