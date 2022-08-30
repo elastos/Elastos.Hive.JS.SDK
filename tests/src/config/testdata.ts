@@ -1,5 +1,15 @@
 import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
-import { HiveException, Vault, BackupService, AppContext, Logger, Provider, Backup, ScriptRunner } from '../../../src';
+import {
+    HiveException,
+    Vault,
+    BackupService,
+    AppContext,
+    Logger,
+    Provider,
+    Backup,
+    ScriptRunner,
+    DatabaseService, FilesService
+} from '../../../src';
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { ClientConfig } from "./clientconfig";
@@ -108,6 +118,25 @@ export class TestData {
 		return new Vault(this.userAppContext, this.getProviderAddress());
 	}
 
+	getNonce() {
+        return Buffer.from('404142434445464748494a4b4c4d4e4f5051525354555657', 'hex');
+    }
+
+	async getEncryptionCipher() {
+        const doc = await this.appInstanceDid.getDocument();
+        return doc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
+    }
+
+	async getEncryptionDatabaseService(): Promise<DatabaseService> {
+        return await this.newVault().getEncryptionDatabaseService(this.getAppDid(), 6,
+            this.clientConfig.application.storepass, this.getNonce());
+    }
+
+    async getEncryptionFileService(): Promise<FilesService> {
+        return await this.newVault().getEncryptionFilesService(this.getAppDid(), 6,
+            this.clientConfig.application.storepass);
+    }
+
 	newAnonymousCallerScriptRunner(): ScriptRunner {
 		return new ScriptRunner(this.anonymousContext, this.getProviderAddress());
 	}
@@ -164,6 +193,10 @@ export class TestData {
 	getAppDid(): string {
 		return AppDID.APP_DID;
 	}
+
+	async getAppInstanceDid(): Promise<DIDDocument> {
+        return this.appInstanceDid.getDocument();
+    }
 
 	getUserDid(): string {
 		return this.userDid.toString();
