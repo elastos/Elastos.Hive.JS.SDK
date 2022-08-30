@@ -14,7 +14,7 @@ describe("test database services", () => {
     beforeAll(async () => {
         let testData = await TestData.getInstance("databaseservice.tests");
         vaultSubscription = new VaultSubscription(testData.getUserAppContext(), testData.getProviderAddress());
-        databaseService = testData.newVault().getEncryptionDatabaseService();
+        databaseService = await testData.getEncryptionDatabaseService();
 
         // try to subscribe a vault if not exists.
         try {
@@ -50,7 +50,7 @@ describe("test database services", () => {
         expect(result.getInsertedIds().length).toEqual(1);
     });
 
-    test("testFindMany", async () => {
+    test("testUpdateAndFindMany", async () => {
         const filter = { "author": "john doe1" };
         const updateNode = { "$set": { "title": "Eve for Dummies2" } };
         await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();

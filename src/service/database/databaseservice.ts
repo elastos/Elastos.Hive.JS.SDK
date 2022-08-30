@@ -14,7 +14,7 @@ import { QueryOptions } from "./queryoptions";
 import { UpdateOptions } from "./updateoptions";
 import { UpdateResult } from "./updateresult";
 import { DeleteOptions } from "./deleteoptions";
-import { DatabaseEncryption } from "./database_encryption";
+import { DatabaseEncryption } from "./databaseencryption";
 
 /**
  * Database service is for save JSON data on the mongo database on hive node.
@@ -30,14 +30,21 @@ export class DatabaseService extends RestService {
 	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
 	private static API_DB_ENDPOINT = "/api/v2/vault/db";
 
-	private readonly encrypt: boolean;
-	private readonly databaseEncrypt: DatabaseEncryption;
+	private encrypt: boolean;
+	private databaseEncrypt: DatabaseEncryption;
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
-        this.encrypt = encrypt;
-        this.databaseEncrypt = new DatabaseEncryption();
+        this.encrypt = false;
+        this.databaseEncrypt = null;
 	}
+
+	public async encryptionInit(identifier: string, secureCode: number, storepass: string, nonce: Buffer) {
+        this.encrypt = true;
+        const cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
+        this.databaseEncrypt = new DatabaseEncryption(cipher, nonce);
+        // this.nonce = nonce;
+    }
 
 	/**
 	 * Lets the vault owner create a collection on database.
@@ -306,7 +313,7 @@ export class DatabaseService extends RestService {
 	private async updateInternal(collection: string, isOnlyOne:boolean, filter: JSONObject, update: JSONObject, options?: UpdateOptions): Promise<UpdateResult> {
 		try {
             const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptFilter(update) : update;
+            const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptUpdate(update) : update;
 			return await this.httpClient.send<UpdateResult>(`${DatabaseService.API_COLLECTION_ENDPOINT}/${collection}?updateone=${isOnlyOne}`,
                 {
                     "filter": encryptedFilter,
