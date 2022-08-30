@@ -17,7 +17,7 @@ describe("test files service", () => {
 
     beforeAll(async () => {
         const testData = await TestData.getInstance("filesservice.test");
-        filesService = testData.newVault().getEncryptionFilesService();
+        filesService = await testData.getEncryptionFileService();
         prepareTestFile();
 
         // try to subscribe the vault if not exists.

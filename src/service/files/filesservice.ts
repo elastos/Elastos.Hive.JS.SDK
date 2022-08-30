@@ -8,19 +8,26 @@ import { Logger } from '../../utils/logger';
 import { RestService } from "../restservice";
 import { FileInfo } from "./fileinfo";
 import { checkArgument, checkNotNull } from "../../utils/utils";
-import { EncryptionFile } from "./encryption_file";
+import { EncryptionFile } from "./encryptionfile";
+import { Cipher } from "@elastosfoundation/did-js-sdk";
 
 export class FilesService extends RestService {
 	private static LOG = new Logger("FilesService");
 
 	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
-	private readonly encrypt: boolean;
+	private encrypt: boolean;
+	private cipher: Cipher;
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient, encrypt: boolean = false) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
-		this.encrypt = encrypt;
+		this.encrypt = false;
 	}
+
+    public async encryptionInit(identifier: string, secureCode: number, storepass: string) {
+        this.encrypt = true;
+        this.cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
+    }
 
     /**
      * Download the file content by the remote file path.
@@ -46,7 +53,7 @@ export class FilesService extends RestService {
 
 			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
 
-			return this.encrypt ? Buffer.from(new EncryptionFile(dataBuffer).decrypt()) : dataBuffer;
+			return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, dataBuffer).decrypt()) : dataBuffer;
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -75,7 +82,7 @@ export class FilesService extends RestService {
 			urlArgsStr = `?public=true&script_name=${script_name}`
 		}
 
-		const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(content).encrypt()) : content;
+		const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, content).encrypt()) : content;
 		if (this.encrypt) {
             urlArgsStr = urlArgsStr === '' ? '?' : "&";
             urlArgsStr += 'is_encrypt=true&encrypt_method=user_did';
