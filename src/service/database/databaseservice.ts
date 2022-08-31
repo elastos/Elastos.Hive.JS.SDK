@@ -176,7 +176,7 @@ export class DatabaseService extends RestService {
 		    return null;
         }
 
-		return this.databaseEncrypt.encryptDoc(docs[0], false);
+		return this.encrypt ? this.databaseEncrypt.encryptDoc(docs[0], false) : docs[0];
 	}
 
 	/**
@@ -211,7 +211,7 @@ export class DatabaseService extends RestService {
                     HttpMethod.GET
                 );
 
-			return this.databaseEncrypt.encryptDocs(result, false);
+			return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
 		} catch (e) {
 			this.handleError(e);
 		}
@@ -241,7 +241,7 @@ export class DatabaseService extends RestService {
                 },
                 HttpMethod.POST);
 			
-			return this.databaseEncrypt.encryptDocs(result);
+			return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
 		} catch (e){
 			this.handleError(e);
 		}
