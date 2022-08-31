@@ -35,7 +35,7 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "@elastosfoundation/did-js-sdk": "^2.2.9",
+    "@elastosfoundation/did-js-sdk": "^2.2.10",
     "@types/bs58": "^4.0.1",
     "@types/fs-extra": "^9.0.13",
     "axios": "^0.24.0",
