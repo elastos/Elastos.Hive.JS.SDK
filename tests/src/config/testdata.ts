@@ -124,7 +124,7 @@ export class TestData {
 
 	async getEncryptionCipher() {
         const doc = await this.appInstanceDid.getDocument();
-        return doc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
+        return await doc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
     }
 
 	async getEncryptionDatabaseService(): Promise<DatabaseService> {
@@ -195,7 +195,7 @@ export class TestData {
 	}
 
 	async getAppInstanceDid(): Promise<DIDDocument> {
-        return this.appInstanceDid.getDocument();
+        return await this.appInstanceDid.getDocument();
     }
 
 	getUserDid(): string {
