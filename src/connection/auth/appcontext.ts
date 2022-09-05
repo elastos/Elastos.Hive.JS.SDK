@@ -171,6 +171,8 @@ export class AppContext {
             } else if (e instanceof DIDResolveException) {
                 AppContext.LOG.error("Resolving the target DID " + targetDid + " failed: " + e.message);
                 throw new NetworkException("Resolving DID failed: " + e.message, e);
+            } else {
+                throw e;
             }
         }
 	}
