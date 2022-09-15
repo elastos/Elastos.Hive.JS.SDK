@@ -1,4 +1,4 @@
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
+import {Cipher, Claims, DIDDocument, JWTParserBuilder} from '@elastosfoundation/did-js-sdk';
 import {
     HiveException,
     Vault,
@@ -134,6 +134,12 @@ export class TestData {
 
     async getEncryptionFileService(): Promise<FilesService> {
         return await this.newVault().getEncryptionFilesService(this.getAppDid(), 6,
+            this.clientConfig.application.storepass);
+    }
+
+    async getCipher(): Promise<Cipher> {
+        const fileService = await this.getEncryptionFileService();
+        return await fileService.getEncryptionCipher(this.getAppDid(), 6,
             this.clientConfig.application.storepass);
     }
 
