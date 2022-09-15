@@ -5,6 +5,9 @@ import {
     VaultSubscription
 } from "../../../src";
 import { TestData } from "../config/testdata";
+import {Cipher} from "@elastosfoundation/did-js-sdk";
+import {EncryptionFile} from "../../../src/service/files/encryptionfile";
+import {randomBytes} from "crypto";
 
 describe("test files service", () => {
     const FILE_NAME_TXT = "test_encryption.txt";
@@ -14,10 +17,12 @@ describe("test files service", () => {
     const REMOTE_DIR = "hive/";
 
     let filesService: FilesService;
+    let cipher: Cipher;
 
     beforeAll(async () => {
         const testData = await TestData.getInstance("filesservice.test");
         filesService = await testData.getEncryptionFileService();
+        cipher = await testData.getEncryptionCipher();
         prepareTestFile();
 
         // try to subscribe the vault if not exists.
@@ -80,5 +85,17 @@ describe("test files service", () => {
     test("testDownloadText", async () => {
         let dataBuffer = await filesService.download(REMOTE_DIR + FILE_NAME_TXT);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT_TXT), dataBuffer);
+    });
+
+    /**
+     * Used to check the time-consuming of the encryption of different file size.
+     */
+    test.skip('testFileEncryptDecrypt', async () => {
+        const content: Buffer = randomBytes(1 * 1024 * 1024);
+        console.log(`start: ${Date.now()}`);
+        const cipherData = new EncryptionFile(cipher, content).encrypt();
+        console.log(`encrypt over: ${Date.now()}`);
+        const clearData = new EncryptionFile(cipher, cipherData).decrypt();
+        console.log(`decrypt over: ${Date.now()}`);
     });
 });
