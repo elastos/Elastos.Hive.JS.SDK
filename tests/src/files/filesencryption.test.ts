@@ -90,7 +90,7 @@ describe("test files service", () => {
     /**
      * Used to check the time-consuming of the encryption of different file size.
      */
-    test.skip('testFileEncryptDecrypt', async () => {
+    test.skip('testFileEncryptDecrypt', () => {
         const content: Buffer = randomBytes(1 * 1024 * 1024);
         console.log(`start: ${Date.now()}`);
         const cipherData = new EncryptionFile(cipher, content).encrypt();
