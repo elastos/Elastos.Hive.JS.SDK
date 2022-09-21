@@ -49,7 +49,7 @@ export class DatabaseService extends RestService {
 	/**
 	 * Lets the vault owner create a collection on database.
 	 *
-	 * @param name the collection name
+	 * @param collectionName the collection name
 	 * @return fail(false) or success(true)
 	 */
 	public async createCollection(collectionName: string) : Promise<void>{
