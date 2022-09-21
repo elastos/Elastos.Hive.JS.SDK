@@ -69,7 +69,7 @@ describe("test backup services", () => {
 
     test("testStartBackupWithCallback", async () => {
         await backupService.startBackup(function (state, message, e) {
-            console.log('backup callback: {}, {}, {}', state, message, e);
+            LOG.info('backup callback: {}, {}, {}', state, message, e);
         });
     });
 
@@ -80,23 +80,23 @@ describe("test backup services", () => {
         for (let i = 0; i < count; i++) {
             const buffer: Buffer = randomBytes(10 * 1024 * 1024 + i + 1);
             await filesService.upload(`${fileNamePrefix}${i}.bin`, buffer, (process => {
-                console.log(`uploading file ${fileNamePrefix}${i}.bin: ${process}`)
+                LOG.info(`uploading file ${fileNamePrefix}${i}.bin: ${process}`)
             }), true, `public_file_${i}`);
         }
 
         const uploadEnd = new Date().getTime();
-        console.log(`cost of uploading: ${uploadEnd - uploadStart}ms`);
+        LOG.info(`cost of uploading: ${uploadEnd - uploadStart}ms`);
     }
 
     async function backupManyFiles() {
         const start = new Date().getTime();
 
         await backupService.startBackup(function (state, message, e) {
-            console.log('backup callback: {}, {}, {}', state, message, e);
+            LOG.info('backup callback: {}, {}, {}', state, message, e);
         });
 
         const end = new Date().getTime();
-        console.log(`cost of backup: ${end - start}ms`);
+        LOG.info(`cost of backup: ${end - start}ms`);
     }
 
     test.skip("testWithDifferentUsage", async () => {
@@ -107,7 +107,7 @@ describe("test backup services", () => {
 
     test.skip("testRestoreFrom", async () => {
         await backupService.restoreFrom(function (state, message, e) {
-            console.log('restore callback: {}, {}, {}', state, message, e);
+            LOG.info('restore callback: {}, {}, {}', state, message, e);
         });
     });
 
