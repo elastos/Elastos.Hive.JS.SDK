@@ -1,21 +1,14 @@
 import {NodeVersion} from "./nodeversion";
-import {NetworkException} from "../../exceptions";
+import {HiveException, NetworkException} from "../../exceptions";
 import {HttpClient} from "../../connection/httpclient";
-import {HttpMethod} from "../../connection/httpmethod";
 import {HttpResponseParser} from "../../connection/httpresponseparser";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
-import {Logger} from '../../utils/logger';
-import {RestService} from "../restservice";
+import {APIResponse, RestServiceT} from "../restservice";
 import {NodeInfo} from "./nodeinfo";
 import {VerifiablePresentation} from "@elastosfoundation/did-js-sdk";
+import {AboutAPI} from "./aboutapi";
 
-export class AboutService extends RestService {
-	private static LOG = new Logger("AboutService");
-
-	private static API_VERSION_ENDPOINT = "/api/v2/node/version";
-	private static API_COMMIT_ENDPOINT = "/api/v2/node/commit_id";
-	private static API_INFO_ENDPOINT = "/api/v2/node/info";
-
+export class AboutService extends RestServiceT<AboutAPI> {
     constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
     }
@@ -27,14 +20,12 @@ export class AboutService extends RestService {
 	 */
     public async getNodeVersion(): Promise<NodeVersion> {
 		try {
-			return await this.httpClient.send<NodeVersion>(AboutService.API_VERSION_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<NodeVersion>>{
-				deserialize(content: any): NodeVersion {
-					let jsonObj = JSON.parse(content);
-					return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
-				}
-			},HttpMethod.GET);
-		}
-		catch (e) {
+            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).version();
+            return new APIResponse<NodeVersion>(response).get(<HttpResponseParser<NodeVersion>>{
+                	deserialize(jsonObj: any): NodeVersion {
+                		return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
+                	}});
+		} catch (e) {
 			throw new NetworkException("Error getting node version", e);
 		}
 	}
@@ -47,11 +38,11 @@ export class AboutService extends RestService {
 	 */
 	public async getCommitId(): Promise<string> {
 		try {
-			return await this.httpClient.send<string>(AboutService.API_COMMIT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<string>>{
-				deserialize(content: any): string {
-					return JSON.parse(content)['commit_id'];
-				}
-			},HttpMethod.GET);
+            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).commitId();
+            return new APIResponse<string>(response).get(<HttpResponseParser<string>>{
+                    deserialize(jsonObj: any): string {
+                        return jsonObj['commit_id'];
+                    }});
 		} catch (e) {
 			throw new NetworkException("Error getting node commit id", e);
 		}
@@ -65,15 +56,15 @@ export class AboutService extends RestService {
 	 */
 	public async getInfo(): Promise<NodeInfo> {
 		try {
-			return await this.httpClient.send<NodeInfo>(AboutService.API_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<NodeInfo>>{
-				deserialize(content: any): NodeInfo {
-					let json_dict = JSON.parse(content);
-					json_dict['ownership_presentation'] = VerifiablePresentation.parse(JSON.stringify(json_dict['ownership_presentation']));
-					return Object.assign(new NodeInfo(), json_dict);
-				}
-			},HttpMethod.GET);
+            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).info(await this.getAccessToken());
+            return new APIResponse<NodeInfo>(response).get(<HttpResponseParser<NodeInfo>>{
+                deserialize(jsonObj: any): NodeInfo {
+                    jsonObj['ownership_presentation'] = VerifiablePresentation.parse(JSON.stringify(jsonObj['ownership_presentation']));
+                    return Object.assign(new NodeInfo(), jsonObj);
+                }});
 		} catch (e) {
-			throw new NetworkException("Error getting node information.", e);
+		    await this.tryHandleResponseError(e);
+		    throw new NetworkException("Error getting node information.", e);
 		}
 	}
 
