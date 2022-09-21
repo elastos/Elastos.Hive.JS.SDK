@@ -67,6 +67,10 @@ export class HttpClient {
         this.httpOptions = httpOptions;
     }
 
+    public hasAuthorization() {
+        return this.withAuthorization;
+    }
+
     private async getHttpOptions(): Promise<HttpOptions> {
         if (!this.httpOptionsInitialized) {
             this.httpOptions = await this.getHttpOptionsByProviderAddress(this.httpOptions);
