@@ -185,7 +185,8 @@ export class ScriptingService extends RestService {
 			targetUsrDid: dids[0],
 			targetAppDid: dids[1],
 			scriptName: values[0],
-			params: values[1]
+			// params: values[1]
+            params: '{}' // INFO: compatible with wrong params string, such as {empty:0} [miss "" around empty]
 		}
 	}
 
