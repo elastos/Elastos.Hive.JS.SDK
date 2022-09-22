@@ -18,7 +18,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 *
 	 * @return The version of the hive node.
 	 */
-    public async getNodeVersion(): Promise<NodeVersion> {
+    async getNodeVersion(): Promise<NodeVersion> {
 		try {
             const response = await (await this.getAPI<AboutAPI>(AboutAPI)).version();
             return new APIResponse<NodeVersion>(response).get(<HttpResponseParser<NodeVersion>>{
@@ -26,7 +26,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
                 		return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
                 	}});
 		} catch (e) {
-			throw new NetworkException("Error getting node version", e);
+			throw new NetworkException(e.message, e);
 		}
 	}
 
@@ -36,7 +36,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 * @return The commit id.
 	 * @throws HiveException The exception shows the error from the request.
 	 */
-	public async getCommitId(): Promise<string> {
+	async getCommitId(): Promise<string> {
 		try {
             const response = await (await this.getAPI<AboutAPI>(AboutAPI)).commitId();
             return new APIResponse<string>(response).get(<HttpResponseParser<string>>{
@@ -44,7 +44,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
                         return jsonObj['commit_id'];
                     }});
 		} catch (e) {
-			throw new NetworkException("Error getting node commit id", e);
+			throw new NetworkException(e.message, e);
 		}
 	}
 
@@ -54,7 +54,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 * @return The information details.
 	 * @throws HiveException The exception shows the error from the request.
 	 */
-	public async getInfo(): Promise<NodeInfo> {
+	async getInfo(): Promise<NodeInfo> {
 		try {
             const response = await (await this.getAPI<AboutAPI>(AboutAPI)).info(await this.getAccessToken());
             return new APIResponse<NodeInfo>(response).get(<HttpResponseParser<NodeInfo>>{
@@ -63,8 +63,7 @@ export class AboutService extends RestServiceT<AboutAPI> {
                     return Object.assign(new NodeInfo(), jsonObj);
                 }});
 		} catch (e) {
-		    await this.tryHandleResponseError(e);
-		    throw new NetworkException("Error getting node information.", e);
+            await this.handleResponseError(e);
 		}
 	}
 
