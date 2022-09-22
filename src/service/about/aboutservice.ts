@@ -20,9 +20,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 */
     async getNodeVersion(): Promise<NodeVersion> {
 		try {
-            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).version();
-            return new APIResponse<NodeVersion>(response).get(<HttpResponseParser<NodeVersion>>{
-                	deserialize(jsonObj: any): NodeVersion {
+            const response = await (await this.getAPI(AboutAPI)).version();
+            return new APIResponse(response).get(<HttpResponseParser<NodeVersion>>{
+                	deserialize(jsonObj: any) {
                 		return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
                 	}});
 		} catch (e) {
@@ -38,9 +38,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 */
 	async getCommitId(): Promise<string> {
 		try {
-            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).commitId();
-            return new APIResponse<string>(response).get(<HttpResponseParser<string>>{
-                    deserialize(jsonObj: any): string {
+            const response = await (await this.getAPI(AboutAPI)).commitId();
+            return new APIResponse(response).get(<HttpResponseParser<string>>{
+                    deserialize(jsonObj: any) {
                         return jsonObj['commit_id'];
                     }});
 		} catch (e) {
@@ -56,9 +56,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 */
 	async getInfo(): Promise<NodeInfo> {
 		try {
-            const response = await (await this.getAPI<AboutAPI>(AboutAPI)).info(await this.getAccessToken());
-            return new APIResponse<NodeInfo>(response).get(<HttpResponseParser<NodeInfo>>{
-                deserialize(jsonObj: any): NodeInfo {
+            const response = await (await this.getAPI(AboutAPI)).info(await this.getAccessToken());
+            return new APIResponse(response).get(<HttpResponseParser<NodeInfo>>{
+                deserialize(jsonObj: any) {
                     jsonObj['ownership_presentation'] = VerifiablePresentation.parse(JSON.stringify(jsonObj['ownership_presentation']));
                     return Object.assign(new NodeInfo(), jsonObj);
                 }});
