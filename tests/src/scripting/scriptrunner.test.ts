@@ -230,7 +230,12 @@ describe("test scripting runner function", () => {
         await downloadFileByHiveUrl(true);
     });
 
-    test("testDownloadFileByHiveUrl on mainnet", async () => {
+    test("testDownloadFileByHiveUrlWithReal", async () => {
+        const checkHiveUrl = async (url) => {
+            const buffer = await scriptRunner.downloadFileByHiveUrl(url);
+            expect(buffer).not.toBeNull();
+        }
+
         // INFO: only for EE to get the avatar image from user did related vault.
         let hiveUrl = null;
         if (testData.isTestnet()) {
@@ -240,8 +245,10 @@ describe("test scripting runner function", () => {
             // avatar is on hive1 mainnet node.
             hiveUrl = 'hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty":0}';
         }
-        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
-        expect(buffer).not.toBeNull();
+        await checkHiveUrl(hiveUrl);
+        // compatible check.
+        hiveUrl = hiveUrl.replace('{"empty":0}', '{empty:0}');
+        await checkHiveUrl(hiveUrl);
     });
 
     test.skip("testDownloadWithInvalidTransactionId", async () => {
