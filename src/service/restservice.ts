@@ -1,7 +1,13 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {ServiceBuilder} from "ts-retrofit";
-import {HttpClient, HttpResponseParser, NodeRPCException, ServiceEndpoint, UnauthorizedException} from "..";
-import { Logger } from '../utils/logger';
+import {
+    HttpClient,
+    HttpResponseParser,
+    NetworkException,
+    NodeRPCException,
+    ServiceEndpoint
+} from "..";
+import {Logger} from '../utils/logger';
 
 /**
  * Wrapper class to get the response body as a result object.
@@ -40,7 +46,7 @@ export class RestService {
  * Base class for all services.
  */
 export class RestServiceT<T> extends RestService {
-    private static LOG = new Logger("RestServiceT");
+    private static _LOG = new Logger("RestServiceT");
 
     private api;
 
@@ -54,14 +60,14 @@ export class RestServiceT<T> extends RestService {
                 .setEndpoint(await this.serviceContext.getProviderAddress())
                 .setRequestInterceptors((config) => {
                     // TODO: body
-                    RestServiceT.LOG.info(`REQUEST: URL={}, METHOD={}, TOKEN={}`,
+                    RestServiceT._LOG.info(`REQUEST: URL={}, METHOD={}, TOKEN={}`,
                         config['url'],
                         config['method'],
                         'Authorization' in config['headers'] ? config['headers']['Authorization'] : '[NO TOKEN]');
                     return config;
                 })
                 .setResponseInterceptors((response) => {
-                    RestServiceT.LOG.info(`RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}`,
+                    RestServiceT._LOG.info(`RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}`,
                         response['config']['url'],
                         response['config']['method'],
                         response.status,
@@ -78,13 +84,13 @@ export class RestServiceT<T> extends RestService {
         return 'token ' + await accessToken.fetch();
     }
 
-    protected async tryHandleResponseError(e): Promise<void> {
-        if (!(e instanceof Error) || !('response' in e) || !e['response'] || typeof e['response'] != 'object') {
+    private async tryHandleResponseError(e: Error): Promise<void> {
+        if (!('response' in e) || !e['response'] || typeof e['response'] != 'object') {
             return;
         }
 
         if ('config' in e && 'url' in e['config'] && e['config']['url']) {
-            RestServiceT.LOG.info('ERROR RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}',
+            RestServiceT._LOG.info('ERROR RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}',
                 e['config']['url'],
                 e['config']['method'],
                 // @ts-ignore
@@ -108,6 +114,19 @@ export class RestServiceT<T> extends RestService {
             }
             throw NodeRPCException.forHttpCode(status, errorMessage, errorCode);
         }
+    }
+
+    /**
+     * Handle response error if need get a specify error.
+     *
+     * @param e from catch clause.
+     * @protected
+     */
+    protected async handleResponseError(e): Promise<void> {
+        if (e instanceof Error) {
+            await this.tryHandleResponseError(e);
+        }
+        throw new NetworkException(e.message, e);
     }
 }
 
