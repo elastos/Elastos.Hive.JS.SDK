@@ -1,5 +1,5 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
-import {ServiceBuilder} from "ts-retrofit";
+import {BaseService, ServiceBuilder} from "ts-retrofit";
 import {
     HttpClient,
     HttpResponseParser,
@@ -12,10 +12,10 @@ import {Logger} from '../utils/logger';
 /**
  * Wrapper class to get the response body as a result object.
  */
-export class APIResponse<T> {
+export class APIResponse {
     constructor(private response) {}
 
-    get(responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER): T {
+    get<T>(responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER): T {
         return responseParser.deserialize(this.response.data); // data is an Object.
     }
 }
@@ -54,7 +54,7 @@ export class RestServiceT<T> extends RestService {
         super(serviceContext, httpClient);
     }
 
-    protected async getAPI<T>(api): Promise<T> {
+    protected async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T): Promise<T> {
         if (this.api == null) {
             this.api = new ServiceBuilder()
                 .setEndpoint(await this.serviceContext.getProviderAddress())
