@@ -25,10 +25,6 @@ import {DatabaseAPI} from "./databaseapi";
 export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	private static LOG = new Logger("DatabaseService");
 
-	private static API_COLLECTION_ENDPOINT = "/api/v2/vault/db/collection";
-	private static API_COLLECTIONS_ENDPOINT = "/api/v2/vault/db/collections";
-	private static API_DB_ENDPOINT = "/api/v2/vault/db";
-
 	private encrypt: boolean;
 	private databaseEncrypt: DatabaseEncryption;
 
@@ -42,7 +38,6 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         this.encrypt = true;
         const cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
         this.databaseEncrypt = new DatabaseEncryption(cipher, nonce);
-        // this.nonce = nonce;
     }
 
 	/**
@@ -53,7 +48,7 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 */
 	async createCollection(collectionName: string): Promise<void>{
         try {
-            await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            await (await this.getAPI(DatabaseAPI))
                 .createCollection(await this.getAccessToken(), collectionName);
         } catch (e) {
             await this.handleResponseError(e);
@@ -68,7 +63,7 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 */
 	async deleteCollection(collectionName: string): Promise<void>{
 		try {
-            await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            await (await this.getAPI(DatabaseAPI))
                 .deleteCollection(await this.getAccessToken(), collectionName);
 		} catch (e){
 			await this.handleResponseError(e);
@@ -104,13 +99,13 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	async insertMany(collectionName: string, docs: any[], options?: InsertOptions): Promise<InsertResult>{
 		try {
 		    const encryptedDocs = this.encrypt ? this.databaseEncrypt.encryptDocs(docs) : docs;
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .insert(await this.getAccessToken(), collectionName, {
                     "document": encryptedDocs,
                     "options": options
                 });
-            return new APIResponse<InsertResult>(response).get(<HttpResponseParser<InsertResult>>{
-                deserialize(jsonObj: any): InsertResult {
+            return new APIResponse(response).get(<HttpResponseParser<InsertResult>>{
+                deserialize(jsonObj: any) {
                     let result = new InsertResult();
                     result.setAcknowledge(jsonObj['acknowledge']);
                     result.setInsertedIds(jsonObj['inserted_ids']);
@@ -135,13 +130,13 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
  	async countDocuments(collectionName: string, filter: JSONObject, options?: CountOptions): Promise<number> {
 		try {
 		    const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .count(await this.getAccessToken(), collectionName, {
                     "filter": encryptedFilter,
                     "options": options
                 });
-            return new APIResponse<number>(response).get(<HttpResponseParser<number>>{
-                deserialize(jsonObj: any): number {
+            return new APIResponse(response).get(<HttpResponseParser<number>>{
+                deserialize(jsonObj: any) {
                     return jsonObj["count"];
                 }});
 		} catch (e){
@@ -187,10 +182,10 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
             const skip = options ? options.skip : 0;
             const limit = options ? options.limit : 0;
 
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .find(await this.getAccessToken(), collectionName, filterStr, skip, limit);
-            const result = new APIResponse<JSONObject[]>(response).get(<HttpResponseParser<JSONObject[]>>{
-                deserialize(jsonObj: any): JSONObject[] {
+            const result = new APIResponse(response).get(<HttpResponseParser<JSONObject[]>>{
+                deserialize(jsonObj: any) {
                     return jsonObj["items"];
                 }});
 
@@ -211,14 +206,14 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
 		try {
             const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .query(await this.getAccessToken(), collectionName, {
                     "collection": collectionName,
                     "filter": encryptedFilter,
                     "options": DatabaseService.normalizeSortQueryOptions(options)
                 });
-            const result = new APIResponse<JSONObject[]>(response).get(<HttpResponseParser<JSONObject[]>>{
-                deserialize(jsonObj: any): JSONObject[] {
+            const result = new APIResponse(response).get(<HttpResponseParser<JSONObject[]>>{
+                deserialize(jsonObj: any) {
                     return jsonObj["items"];
                 }});
 			
@@ -297,14 +292,14 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 		try {
             const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
             const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptUpdate(update) : update;
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .update(await this.getAccessToken(), collectionName, isOnlyOne, {
                     "filter": encryptedFilter,
                     "update": encryptedUpdate,
                     "options": options
                 });
-            return new APIResponse<UpdateResult>(response).get(<HttpResponseParser<UpdateResult>>{
-                deserialize(jsonObj: any): UpdateResult {
+            return new APIResponse(response).get(<HttpResponseParser<UpdateResult>>{
+                deserialize(jsonObj: any) {
                     const result = new UpdateResult();
                     result.setAcknowledged(jsonObj['acknowledged']);
                     result.setMatchedCount(jsonObj['matched_count']);
@@ -321,12 +316,12 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
                                  options?: DeleteOptions): Promise<void> {
 		try {
             const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const response = await (await this.getAPI<DatabaseAPI>(DatabaseAPI))
+            const response = await (await this.getAPI(DatabaseAPI))
                 .delete(await this.getAccessToken(), collectionName, isOnlyOne, {
                     "filter": encryptedFilter,
                     "options": options
                 });
-            return new APIResponse<void>(response).get();
+            return new APIResponse(response).get();
 		} catch (e){
 			await this.handleResponseError(e);
 		}
