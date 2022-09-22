@@ -37,7 +37,8 @@ module.exports = {
         "no-mixed-spaces-and-tabs": "off",
         "no-constant-condition": "warn",
         "no-class-assign": "warn",
-        "require-await": "error",
+        "require-await": "off",
+        "require-yield": "off",
         "no-async-promise-executor": "error",
         "no-promise-executor-return": "error",
         "no-non-null-assertion": "off",
@@ -61,6 +62,7 @@ module.exports = {
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/require-await": "off",
 
         // Test specific
         "jest/expect-expect":"off",
