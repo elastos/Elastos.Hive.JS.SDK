@@ -59,11 +59,12 @@ export class RestServiceT<T> extends RestService {
             this.api = new ServiceBuilder()
                 .setEndpoint(await this.serviceContext.getProviderAddress())
                 .setRequestInterceptors((config) => {
-                    // TODO: body
-                    RestServiceT._LOG.info(`REQUEST: URL={}, METHOD={}, TOKEN={}`,
+                    RestServiceT._LOG.info(`REQUEST: URL={}, METHOD={}, TOKEN={}, {}`,
                         config['url'],
                         config['method'],
-                        'Authorization' in config['headers'] ? config['headers']['Authorization'] : '[NO TOKEN]');
+                        'Authorization' in config['headers'] ? config['headers']['Authorization'] : 'null',
+                        // BUGBUG: consider the bug of replace with {} on logger.
+                        `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
                     return config;
                 })
                 .setResponseInterceptors((response) => {
