@@ -68,7 +68,7 @@ describe("test database services", () => {
             .rejects.toThrow(CollectionNotFoundException);
  	});
 
-     test("testInsertMany", async () => {
+    test("testInsertMany", async () => {
         let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
                      {"author": "john doe3", "title": "Eve for Dummies3"}];
         let result = await databaseService.insertMany(COLLECTION_NAME, nodes, new InsertOptions(false, true)); 
@@ -114,6 +114,7 @@ describe("test database services", () => {
     test("testQuery", async () => {
         let query = {"author": "john doe1"};
         await expect(databaseService.query(COLLECTION_NAME, query, null)).resolves.not.toBeNull();
+        await expect(databaseService.query(COLLECTION_NAME, query)).resolves.not.toBeNull();
     });
 
     test("testQuery4NotFoundException", async () => {
