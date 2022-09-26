@@ -46,13 +46,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @return void
 	 */
 	async createCollection(collectionName: string): Promise<void>{
-        try {
-            await this.callAPI(DatabaseAPI, async (api) => {
-                await api.createCollection(await this.getAccessToken(), collectionName);
-            });
-        } catch (e) {
-            await this.handleResponseError(e);
-        }
+        await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.createCollection(await this.getAccessToken(), collectionName);
+        });
 	}
 
 	/**
@@ -62,13 +58,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @return void
 	 */
 	async deleteCollection(collectionName: string): Promise<void>{
-		try {
-            await this.callAPI(DatabaseAPI, async (api) => {
-                await api.deleteCollection(await this.getAccessToken(), collectionName);
-            })
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.deleteCollection(await this.getAccessToken(), collectionName);
+        })
 	}
 
 	/**
@@ -98,21 +90,17 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
 	async insertMany(collectionName: string, docs: any[], options?: InsertOptions): Promise<InsertResult>{
-		try {
-		    const encryptedDocs = this.encrypt ? this.databaseEncrypt.encryptDocs(docs) : docs;
-		    let body = {
-                "document": encryptedDocs
-            };
-		    if (options) {
-		        body['options'] = options;
-            }
+        const encryptedDocs = this.encrypt ? this.databaseEncrypt.encryptDocs(docs) : docs;
+        let body = {
+            "document": encryptedDocs
+        };
+        if (options) {
+            body['options'] = options;
+        }
 
-            return await this.callAPI(DatabaseAPI, async (api) => {
-                return await api.insert(await this.getAccessToken(), collectionName, body);
-            });
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.insert(await this.getAccessToken(), collectionName, body);
+        });
 	}
 
  	/**
@@ -127,21 +115,17 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
  	 * @return count size
  	 */
  	async countDocuments(collectionName: string, filter: JSONObject, options?: CountOptions): Promise<number> {
-		try {
-		    const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-		    let body = {
-                "filter": encryptedFilter
-            };
-		    if (options) {
-                body['options'] = options;
-            }
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+        let body = {
+            "filter": encryptedFilter
+        };
+        if (options) {
+            body['options'] = options;
+        }
 
-            return await this.callAPI(DatabaseAPI, async (api) => {
-                return await api.count(await this.getAccessToken(), collectionName, body);
-            });
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.count(await this.getAccessToken(), collectionName, body);
+        });
 	}
 
 	/**
@@ -155,6 +139,7 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	async findOne(collectionName: string, filter: JSONObject, options?: FindOptions): Promise<JSONObject> {
         const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
 		const docs = await this.findMany(collectionName, encryptedFilter, options);
+
 		DatabaseService.LOG.debug(`fine docs: ${JSON.stringify(docs)}`);
 
 		if (!docs || docs.length === 0) {
@@ -174,22 +159,19 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 */
 
 	async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
-		try {
-            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const filterJson = encryptedFilter === null ? {} : encryptedFilter;
-			DatabaseService.LOG.debug("FILTER_STR: " + filterJson);
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+        const filterJson = encryptedFilter === null ? {} : encryptedFilter;
 
-            const skip = options ? options.skip : 0;
-            const limit = options ? options.limit : 0;
+        DatabaseService.LOG.debug("FILTER_STR: " + filterJson);
 
-            const result = await this.callAPI(DatabaseAPI, async (api) => {
-                return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
-            });
+        const skip = options ? options.skip : 0;
+        const limit = options ? options.limit : 0;
 
-			return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
-		} catch (e) {
-			await this.handleResponseError(e);
-		}
+        const result = await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
+        });
+
+        return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
 	}
 
  	/**
@@ -201,25 +183,21 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
  	 * @return a JsonNode array result of document
  	 */
 	async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
-		try {
-            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            let body = {
-                "collection": collectionName,
-                "filter": encryptedFilter
-            };
-            const optionsJson = DatabaseService.normalizeSortQueryOptions(options);
-            if (optionsJson) {
-                body['options'] = optionsJson;
-            }
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+        let body = {
+            "collection": collectionName,
+            "filter": encryptedFilter
+        };
+        const optionsJson = DatabaseService.normalizeSortQueryOptions(options);
+        if (optionsJson) {
+            body['options'] = optionsJson;
+        }
 
-            const result = await this.callAPI(DatabaseAPI, async (api) => {
-                return await api.query(await this.getAccessToken(), collectionName, body);
-            });
-			
-			return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        const result = await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.query(await this.getAccessToken(), collectionName, body);
+        });
+
+        return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
 	}
 
 	/**
@@ -288,44 +266,36 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 
 	private async updateInternal(collectionName: string, isOnlyOne: boolean, filter: JSONObject, update: JSONObject,
                                  options?: UpdateOptions): Promise<UpdateResult> {
-		try {
-            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptUpdate(update) : update;
-            let body = {
-                "filter": encryptedFilter,
-                "update": encryptedUpdate
-            };
-            if (options) {
-                body['options'] = options;
-            }
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+        const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptUpdate(update) : update;
+        let body = {
+            "filter": encryptedFilter,
+            "update": encryptedUpdate
+        };
+        if (options) {
+            body['options'] = options;
+        }
 
-            return await this.callAPI(DatabaseAPI, async (api) => {
-                return await api.update(await this.getAccessToken(), collectionName, isOnlyOne, body);
-            });
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.update(await this.getAccessToken(), collectionName, isOnlyOne, body);
+        });
 	}
 
 	private async deleteInternal(collectionName: string, isOnlyOne:boolean, filter: JSONObject,
                                  options?: DeleteOptions): Promise<void> {
-		try {
-            const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-            let body = {
-                "filter": encryptedFilter
-            };
-            if (options) {
-                body['options'] = options;
-            }
+        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+        let body = {
+            "filter": encryptedFilter
+        };
+        if (options) {
+            body['options'] = options;
+        }
 
-            await this.callAPI(DatabaseAPI, async (api) => {
-                await api.delete(await this.getAccessToken(), collectionName, isOnlyOne, {
-                    "filter": encryptedFilter,
-                    "options": options
-                });
+        await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.delete(await this.getAccessToken(), collectionName, isOnlyOne, {
+                "filter": encryptedFilter,
+                "options": options
             });
-		} catch (e){
-			await this.handleResponseError(e);
-		}
+        });
 	}
 }

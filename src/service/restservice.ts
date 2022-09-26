@@ -8,6 +8,7 @@ import {
     ServiceEndpoint
 } from "..";
 import {Logger} from '../utils/logger';
+import {assertTrue} from "../../tests/src/util";
 
 /**
  * Wrapper class to get the response body as a result object.
@@ -110,11 +111,17 @@ export class RestServiceT<T> extends RestService {
     }
 
     protected async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
-                                                   onRun: (a: T) => Promise<any>, // return Response
+                                                   callback: (a: T) => Promise<any>, // MUST return Response
                                                    extraConfig?): Promise<any> {
         const serviceApi = await this.getAPI(api, extraConfig);
-        const response = await onRun(serviceApi);
-        return response ? response.data : null;
+        try {
+            // do real api call
+            const response = await callback(serviceApi);
+            assertTrue(response);
+            return response.data;
+        } catch (e) {
+            await this.handleResponseError(e);
+        }
     }
 
     protected async getAccessToken(): Promise<string> {

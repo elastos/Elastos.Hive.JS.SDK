@@ -1,5 +1,5 @@
 import {NodeVersion} from "./nodeversion";
-import {HiveException, NetworkException} from "../../exceptions";
+import {HiveException} from "../../exceptions";
 import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
@@ -17,13 +17,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 * @return The version of the hive node.
 	 */
     async getNodeVersion(): Promise<NodeVersion> {
-		try {
-            return await this.callAPI(AboutAPI, async (api) => {
-                return await api.version();
-            });
-		} catch (e) {
-			throw new NetworkException(e.message, e);
-		}
+        return await this.callAPI(AboutAPI, async (api) => {
+            return await api.version();
+        });
 	}
 
 	/**
@@ -33,13 +29,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 * @throws HiveException The exception shows the error from the request.
 	 */
 	async getCommitId(): Promise<string> {
-		try {
-            return await this.callAPI(AboutAPI, async (api) => {
-                return await api.commitId();
-            });
-		} catch (e) {
-			throw new NetworkException(e.message, e);
-		}
+        return await this.callAPI(AboutAPI, async (api) => {
+            return await api.commitId();
+        });
 	}
 
 	/**
@@ -49,13 +41,9 @@ export class AboutService extends RestServiceT<AboutAPI> {
 	 * @throws HiveException The exception shows the error from the request.
 	 */
 	async getInfo(): Promise<NodeInfo> {
-		try {
-            return await this.callAPI(AboutAPI, async (api) => {
-                return await api.info(await this.getAccessToken());
-            });
-		} catch (e) {
-            await this.handleResponseError(e);
-		}
+        return await this.callAPI(AboutAPI, async (api) => {
+            return await api.info(await this.getAccessToken());
+        });
 	}
 
 }
