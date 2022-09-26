@@ -6,8 +6,6 @@ import {
 import { TestData } from "../config/testdata";
 
 describe("test database services", () => {
-   
-    let testData: TestData;
     let vaultSubscription: VaultSubscription;
     let databaseService: DatabaseService;
 
@@ -15,8 +13,7 @@ describe("test database services", () => {
     let COLLECTION_NAME_NOT_EXIST = "works_not_exists";
 
     beforeAll(async () => {
-
-        let testData = await TestData.getInstance("databaseservice.tests");
+        const testData = await TestData.getInstance("databaseservice.tests");
 
         vaultSubscription = new VaultSubscription(
             testData.getUserAppContext(),
