@@ -16,6 +16,11 @@ export class HttpClient {
             return JSON.stringify(content);
         }
     };
+    static DO_NOTHING_RESPONSE_PARSER = <HttpResponseParser<any>>{
+        deserialize(data: any): string {
+            return data;
+        }
+    };
     static NO_RESPONSE = <HttpResponseParser<void>>{
         deserialize(content: any): void {
             return;

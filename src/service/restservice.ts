@@ -15,8 +15,36 @@ import {Logger} from '../utils/logger';
 export class APIResponse {
     constructor(private response) {}
 
-    get<T>(responseParser: HttpResponseParser<T> = HttpClient.DEFAULT_RESPONSE_PARSER): T {
-        return responseParser.deserialize(this.response.data); // data is an Object.
+    get<T>(responseParser: HttpResponseParser<T> = HttpClient.DO_NOTHING_RESPONSE_PARSER): T {
+        // Here is 'object' which is different with @ResponseTransformer (raw 'string').
+        return responseParser.deserialize(this.response.data);
+    }
+
+    getStream(): Buffer {
+        return Buffer.from(this.response.data, 'binary');
+    }
+
+    /**
+     * Transform the data on @ResponseTransformer to json object.
+     *
+     * @param data
+     * @param callback
+     */
+    static handleResponseData(data: any, callback: (jsonObj) => any) {
+        if (!data) {
+            return data;
+        }
+        try {
+            const jsonObj = JSON.parse(data);
+            if ('error' in jsonObj && jsonObj['error'] && 'message' in jsonObj['error']) {
+                // error response data.
+                return jsonObj;
+            }
+            // success response data.
+            return callback(jsonObj);
+        } catch (e) {
+            return data;
+        }
     }
 }
 
@@ -54,7 +82,7 @@ export class RestServiceT<T> extends RestService {
         super(serviceContext, httpClient);
     }
 
-    protected async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T): Promise<T> {
+    protected async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
         if (this.api == null) {
             this.api = new ServiceBuilder()
                 .setEndpoint(await this.serviceContext.getProviderAddress())
@@ -65,7 +93,8 @@ export class RestServiceT<T> extends RestService {
                         'Authorization' in config['headers'] ? config['headers']['Authorization'] : 'null',
                         // BUGBUG: consider the bug of replace with {} on logger.
                         `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
-                    return config;
+
+                    return extraConfig ? {...config, ...extraConfig} : config;
                 })
                 .setResponseInterceptors((response) => {
                     RestServiceT._LOG.info(`RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}`,
@@ -78,6 +107,14 @@ export class RestServiceT<T> extends RestService {
                 .build<T>(api);
         }
         return this.api;
+    }
+
+    protected async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
+                                                   onRun: (a: T) => Promise<any>, // return Response
+                                                   extraConfig?): Promise<any> {
+        const serviceApi = await this.getAPI(api, extraConfig);
+        const response = await onRun(serviceApi);
+        return response ? response.data : null;
     }
 
     protected async getAccessToken(): Promise<string> {
