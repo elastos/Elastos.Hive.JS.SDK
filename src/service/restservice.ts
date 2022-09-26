@@ -60,9 +60,7 @@ export class APIResponse {
             return data;
         }
 
-        const result = callback(jsonObj);
-        assertTrue(result); // MUST return something if call this method.
-        return result;
+        return callback(jsonObj);
     }
 }
 
