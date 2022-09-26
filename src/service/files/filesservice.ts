@@ -1,5 +1,4 @@
 import {Cipher} from "@elastosfoundation/did-js-sdk";
-import {NetworkException, NodeRPCException} from "../../exceptions";
 import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {Logger} from '../../utils/logger';
@@ -11,8 +10,6 @@ import {FilesAPI} from "./filesapi";
 
 export class FilesService extends RestServiceT<FilesAPI> {
 	private static LOG = new Logger("FilesService");
-
-	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
 
 	private encrypt: boolean;
 	private cipher: Cipher;
@@ -85,7 +82,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
         return await this.callAPI(FilesAPI, async (api) => {
             return await api.upload(await this.getAccessToken(),
                 isPublic_, scriptName_, isEncrypt, encryptMethod, path, {
-                    'data': encryptData.toString('hex')
+                    'data': encryptData
                 });
         }, {
             onUploadProgress: function (progressEvent) {
