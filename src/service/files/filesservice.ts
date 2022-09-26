@@ -1,17 +1,17 @@
-import { HttpMethod } from "../../connection/httpmethod";
-import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { StreamResponseParser } from "../../connection/streamresponseparser";
-import {  NetworkException, NodeRPCException } from "../../exceptions";
-import { HttpClient } from "../../connection/httpclient";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
-import { RestService } from "../restservice";
-import { FileInfo } from "./fileinfo";
-import { checkArgument, checkNotNull } from "../../utils/utils";
-import { EncryptionFile } from "./encryptionfile";
-import { Cipher } from "@elastosfoundation/did-js-sdk";
+import {Cipher} from "@elastosfoundation/did-js-sdk";
+import {HttpMethod} from "../../connection/httpmethod";
+import {HttpResponseParser} from "../../connection/httpresponseparser";
+import {NetworkException, NodeRPCException} from "../../exceptions";
+import {HttpClient} from "../../connection/httpclient";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {Logger} from '../../utils/logger';
+import {APIResponse, RestServiceT} from "../restservice";
+import {FileInfo} from "./fileinfo";
+import {checkArgument, checkNotNull} from "../../utils/utils";
+import {EncryptionFile} from "./encryptionfile";
+import {FilesAPI} from "./filesapi";
 
-export class FilesService extends RestService {
+export class FilesService extends RestServiceT<FilesAPI> {
 	private static LOG = new Logger("FilesService");
 
 	private static API_FILES_ENDPOINT = "/api/v2/vault/files";
@@ -39,23 +39,21 @@ export class FilesService extends RestService {
 		checkNotNull(path, "Remote file path is mandatory.");
 
 		try {
-			let dataBuffer: Buffer = Buffer.alloc(0);
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`, HttpClient.NO_PAYLOAD,
-                {
-                    onData(chunk: Buffer): void {
-                        dataBuffer = Buffer.concat([dataBuffer, chunk]);
-                    },
-                    onEnd(): void {
-                        // Process end.
+            const response = await (await this.getAPI(FilesAPI, {
+                    onDownloadProgress: function (progressEvent) {
+                        if (callback) {
+                            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            callback(percent);
+                        }
                     }
-                } as StreamResponseParser,
-                HttpMethod.GET, null, callback);
+                })).download(await this.getAccessToken(), path);
+            const result = new APIResponse(response).getStream();
 
-			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
+			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(result) + " byte(s).");
 
-			return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, dataBuffer).decrypt()) : dataBuffer;
+			return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, result).decrypt()) : result;
 		} catch (e) {
-			this.handleError(e);
+			await this.handleResponseError(e);
 		}
 	}
 
@@ -64,39 +62,47 @@ export class FilesService extends RestService {
 	 *
 	 * @param path the path in files service.
 	 * @param data file's content.
-	 * @param is_public 'true' will return the cid of the file which can be used to access from global ipfs gateway.
-	 * @param script_name used when is_public is true, this will create a new downloading script with name script_name.
+	 * @param isPublic 'true' will return the cid of the file which can be used to access from global ipfs gateway.
+	 * @param scriptName used when is_public is true, this will create a new downloading script with name script_name.
 	 * @param callback callback for the process of uploading with percent value. Only supported on browser side.
 	 */
 	async upload(path: string, data: Buffer | string, callback?: (process: number) => void,
-                 is_public = false, script_name?: string): Promise<string> {
+                 isPublic = false, scriptName?: string): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
+        const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, content).encrypt()) : content;
+
 		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 
-		let urlArgsStr = '';
-		if (is_public) {
-			checkArgument(!!script_name, "Script name must be provided when is_public is true.");
-			urlArgsStr = `?public=true&script_name=${script_name}`
+        let [isPublic_, scriptName_, isEncrypt, encryptMethod] = [null, null, null, null];
+        if (isPublic) {
+            checkArgument(!!scriptName, "Script name must be provided when is_public is true.");
+            isPublic_ = true;
+            scriptName_ = scriptName;
 		}
-
-		const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, content).encrypt()) : content;
 		if (this.encrypt) {
-            urlArgsStr = urlArgsStr === '' ? '?' : "&";
-            urlArgsStr += 'is_encrypt=true&encrypt_method=user_did';
+            isEncrypt = true;
+            encryptMethod = 'user_did';
         }
 
 		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}${urlArgsStr}`, encryptData,
-				<HttpResponseParser<string>> {
-					deserialize(content: any): string {
-						return JSON.parse(content)["cid"];
-					}
-				}, HttpMethod.PUT, callback);
+            const response = await (await this.getAPI(FilesAPI, {
+                    onUploadProgress: function (progressEvent) {
+                        if (callback) {
+                            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            callback(percent);
+                        }
+                    }
+                })).upload(await this.getAccessToken(),
+                           isPublic_, scriptName_, isEncrypt, encryptMethod, path, encryptData);
+            return new APIResponse(response).get(<HttpResponseParser<string>>{
+                deserialize(jsonObj: any) {
+                    return jsonObj["cid"];
+                }});
 		} catch (e) {
-			this.handleError(e);
+			await this.handleResponseError(e);
 		}
 	}
 

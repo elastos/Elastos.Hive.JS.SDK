@@ -1,12 +1,11 @@
+import {JSONObject} from "@elastosfoundation/did-js-sdk";
 import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {Logger} from '../../utils/logger';
-import {APIResponse, RestServiceT} from "../restservice";
-import {HttpResponseParser} from '../../connection/httpresponseparser';
+import {RestServiceT} from "../restservice";
 import {InsertOptions} from "./insertoptions";
 import {InsertResult} from "./insertresult";
 import {FindOptions} from "./findoptions";
-import {JSONObject} from "@elastosfoundation/did-js-sdk";
 import {CountOptions} from "./countoptions";
 import {QueryOptions} from "./queryoptions";
 import {UpdateOptions} from "./updateoptions";
@@ -48,8 +47,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 */
 	async createCollection(collectionName: string): Promise<void>{
         try {
-            await (await this.getAPI(DatabaseAPI))
-                .createCollection(await this.getAccessToken(), collectionName);
+            await this.callAPI(DatabaseAPI, async (api) => {
+                await api.createCollection(await this.getAccessToken(), collectionName);
+            });
         } catch (e) {
             await this.handleResponseError(e);
         }
@@ -63,8 +63,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 */
 	async deleteCollection(collectionName: string): Promise<void>{
 		try {
-            await (await this.getAPI(DatabaseAPI))
-                .deleteCollection(await this.getAccessToken(), collectionName);
+            await this.callAPI(DatabaseAPI, async (api) => {
+                await api.deleteCollection(await this.getAccessToken(), collectionName);
+            })
 		} catch (e){
 			await this.handleResponseError(e);
 		}
@@ -106,15 +107,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 		        body['options'] = options;
             }
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .insert(await this.getAccessToken(), collectionName, body);
-            return new APIResponse(response).get(<HttpResponseParser<InsertResult>>{
-                deserialize(jsonObj: any) {
-                    let result = new InsertResult();
-                    result.setAcknowledge(jsonObj['acknowledge']);
-                    result.setInsertedIds(jsonObj['inserted_ids']);
-                    return result;
-                }});
+            return await this.callAPI(DatabaseAPI, async (api) => {
+                return await api.insert(await this.getAccessToken(), collectionName, body);
+            });
 		} catch (e){
 			await this.handleResponseError(e);
 		}
@@ -141,12 +136,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
                 body['options'] = options;
             }
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .count(await this.getAccessToken(), collectionName, body);
-            return new APIResponse(response).get(<HttpResponseParser<number>>{
-                deserialize(jsonObj: any) {
-                    return jsonObj["count"];
-                }});
+            return await this.callAPI(DatabaseAPI, async (api) => {
+                return await api.count(await this.getAccessToken(), collectionName, body);
+            });
 		} catch (e){
 			await this.handleResponseError(e);
 		}
@@ -190,12 +182,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
             const skip = options ? options.skip : 0;
             const limit = options ? options.limit : 0;
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
-            const result = new APIResponse(response).get(<HttpResponseParser<JSONObject[]>>{
-                deserialize(jsonObj: any) {
-                    return jsonObj["items"];
-                }});
+            const result = await this.callAPI(DatabaseAPI, async (api) => {
+                return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
+            });
 
 			return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
 		} catch (e) {
@@ -223,12 +212,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
                 body['options'] = optionsJson;
             }
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .query(await this.getAccessToken(), collectionName, body);
-            const result = new APIResponse(response).get(<HttpResponseParser<JSONObject[]>>{
-                deserialize(jsonObj: any) {
-                    return jsonObj["items"];
-                }});
+            const result = await this.callAPI(DatabaseAPI, async (api) => {
+                return await api.query(await this.getAccessToken(), collectionName, body);
+            });
 			
 			return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
 		} catch (e){
@@ -313,17 +299,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
                 body['options'] = options;
             }
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .update(await this.getAccessToken(), collectionName, isOnlyOne, body);
-            return new APIResponse(response).get(<HttpResponseParser<UpdateResult>>{
-                deserialize(jsonObj: any) {
-                    const result = new UpdateResult();
-                    result.setAcknowledged(jsonObj['acknowledged']);
-                    result.setMatchedCount(jsonObj['matched_count']);
-                    result.setModifiedCount(jsonObj['modified_count']);
-                    result.setUpsertedId(jsonObj['upserted_id']);
-                    return result;
-                }});
+            return await this.callAPI(DatabaseAPI, async (api) => {
+                return await api.update(await this.getAccessToken(), collectionName, isOnlyOne, body);
+            });
 		} catch (e){
 			await this.handleResponseError(e);
 		}
@@ -340,12 +318,12 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
                 body['options'] = options;
             }
 
-            const response = await (await this.getAPI(DatabaseAPI))
-                .delete(await this.getAccessToken(), collectionName, isOnlyOne, {
+            await this.callAPI(DatabaseAPI, async (api) => {
+                await api.delete(await this.getAccessToken(), collectionName, isOnlyOne, {
                     "filter": encryptedFilter,
                     "options": options
                 });
-            return new APIResponse(response).get();
+            });
 		} catch (e){
 			await this.handleResponseError(e);
 		}
