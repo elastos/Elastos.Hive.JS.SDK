@@ -27,25 +27,42 @@ export class APIResponse {
 
     /**
      * Transform the data on @ResponseTransformer to json object.
+     * Do not use @ResponseTransformer if just want to get error dict
+     *      which will be converted to dict by axios internal.
      *
-     * @param data
-     * @param callback
+     * @param data response.data (raw string)
+     * @param callback Whether the data is JSON format string. Or raw data, such as file content.
      */
-    static handleResponseData(data: any, callback: (jsonObj) => any) {
+    static handleResponseData(data: any, callback?: (jsonObj) => any) {
         if (!data) {
             return data;
         }
+
+        let jsonObj = null;
         try {
-            const jsonObj = JSON.parse(data);
+            // try to convert error.
+            jsonObj = JSON.parse(data);
             if ('error' in jsonObj && jsonObj['error'] && 'message' in jsonObj['error']) {
                 // error response data.
                 return jsonObj;
             }
-            // success response data.
-            return callback(jsonObj);
         } catch (e) {
+            // no error, skip.
+        }
+
+        // success response
+
+        if (!callback) {
+            return Buffer.from(data, 'binary');
+        }
+
+        if (!jsonObj) {
             return data;
         }
+
+        const result = callback(jsonObj);
+        assertTrue(result); // MUST return something if call this method.
+        return result;
     }
 }
 
@@ -102,7 +119,7 @@ export class RestServiceT<T> extends RestService {
                         response['config']['url'],
                         response['config']['method'],
                         response.status,
-                        JSON.stringify(response.data));
+                        response.data);
                     return response;
                 })
                 .build<T>(api);

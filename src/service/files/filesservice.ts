@@ -1,11 +1,9 @@
 import {Cipher} from "@elastosfoundation/did-js-sdk";
-import {HttpMethod} from "../../connection/httpmethod";
-import {HttpResponseParser} from "../../connection/httpresponseparser";
 import {NetworkException, NodeRPCException} from "../../exceptions";
 import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {Logger} from '../../utils/logger';
-import {APIResponse, RestServiceT} from "../restservice";
+import {RestServiceT} from "../restservice";
 import {FileInfo} from "./fileinfo";
 import {checkArgument, checkNotNull} from "../../utils/utils";
 import {EncryptionFile} from "./encryptionfile";
@@ -38,23 +36,20 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	async download(path: string, callback?: (process: number) => void): Promise<Buffer> {
 		checkNotNull(path, "Remote file path is mandatory.");
 
-		try {
-            const response = await (await this.getAPI(FilesAPI, {
-                    onDownloadProgress: function (progressEvent) {
-                        if (callback) {
-                            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            callback(percent);
-                        }
-                    }
-                })).download(await this.getAccessToken(), path);
-            const result = new APIResponse(response).getStream();
+        const result = await this.callAPI(FilesAPI, async (api) => {
+            return api.download(await this.getAccessToken(), path);
+        }, {
+            onDownloadProgress: function (progressEvent) {
+                if (callback) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    callback(percent);
+                }
+            }
+        });
 
-			FilesService.LOG.debug("Downloaded " + Buffer.byteLength(result) + " byte(s).");
+        FilesService.LOG.debug("Downloaded " + Buffer.byteLength(result) + " byte(s).");
 
-			return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, result).decrypt()) : result;
-		} catch (e) {
-			await this.handleResponseError(e);
-		}
+        return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, result).decrypt()) : result;
 	}
 
 	/**
@@ -87,23 +82,19 @@ export class FilesService extends RestServiceT<FilesAPI> {
             encryptMethod = 'user_did';
         }
 
-		try {
-            const response = await (await this.getAPI(FilesAPI, {
-                    onUploadProgress: function (progressEvent) {
-                        if (callback) {
-                            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            callback(percent);
-                        }
-                    }
-                })).upload(await this.getAccessToken(),
-                           isPublic_, scriptName_, isEncrypt, encryptMethod, path, encryptData);
-            return new APIResponse(response).get(<HttpResponseParser<string>>{
-                deserialize(jsonObj: any) {
-                    return jsonObj["cid"];
-                }});
-		} catch (e) {
-			await this.handleResponseError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return await api.upload(await this.getAccessToken(),
+                isPublic_, scriptName_, isEncrypt, encryptMethod, path, {
+                    'data': encryptData.toString('hex')
+                });
+        }, {
+            onUploadProgress: function (progressEvent) {
+                if (callback) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    callback(percent);
+                }
+            }
+        });
 	}
 
 	/**
@@ -113,27 +104,9 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 * @return the new CompletionStage, the result is List if success; null otherwise
 	 */
 	async list(path: string): Promise<FileInfo[]> {
-		try {
-			return await this.httpClient.send<FileInfo[]>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=children`,
-                HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo[]>> {
-                    deserialize(content: any): FileInfo[] {
-                        let rawFiles = JSON.parse(content)["value"];
-                        let files = [];
-                        for (let file of rawFiles) {
-                            let fileInfo = new FileInfo();
-                            fileInfo.setCreated(file["created"]);
-                            fileInfo.setUpdated(file["updated"]);
-                            fileInfo.setName(file["name"]);
-                            fileInfo.setAsFile(file["is_file"]);
-                            fileInfo.setSize(file["size"]);
-                            files.push(fileInfo);
-                        }
-                        return files;
-                    }
-                }, HttpMethod.GET);
-		} catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return api.listChildren(await this.getAccessToken(), path);
+        });
 	}
 
 	/**
@@ -144,22 +117,9 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *		 if success; null otherwise
 	 */
 	async stat(path: string): Promise<FileInfo> {
-		try {
-			return await this.httpClient.send<FileInfo>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=metadata`,
-                HttpClient.NO_PAYLOAD, <HttpResponseParser<FileInfo>> {
-                    deserialize(content: any): FileInfo {
-                        let file = JSON.parse(content);
-                        let newFileInfo = new FileInfo();
-                        newFileInfo.setCreated(file["created"]);
-                        newFileInfo.setUpdated(file["updated"]);
-                        newFileInfo.setName(file["name"]);
-                        newFileInfo.setAsFile(file["is_file"]);
-                        return newFileInfo;
-                    }
-                }, HttpMethod.GET);
-		} catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return api.getMetadata(await this.getAccessToken(), path);
+        });
 	}
  
 	/**
@@ -170,16 +130,9 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *		 if the hash successfully calculated; null otherwise
 	 */
 	async hash(path: string): Promise<string> {
-		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${path}?comp=hash`,
-                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-                    deserialize(content: any): string {
-                        return JSON.parse(content)['hash'];
-                    }
-                }, HttpMethod.GET);
-		} catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return api.getHash(await this.getAccessToken(), path);
+        });
 	}
  
 	/**
@@ -193,16 +146,9 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *  	   result with false.
 	 */
 	 async move(source: string, target: string): Promise<string> {
-		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?to=${target}`,
-                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-                    deserialize(content: any): string {
-                        return JSON.parse(content)['name'];
-                    }
-                }, HttpMethod.PATCH);
-		} catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return api.move(await this.getAccessToken(), source, target);
+        });
 	}
  
 	/**
@@ -214,16 +160,9 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *		 successfully copied; false otherwise
 	 */
 	async copy(source: string, target: string): Promise<string> {
-		try {
-			return await this.httpClient.send<string>(`${FilesService.API_FILES_ENDPOINT}/${source}?dest=${target}`,
-                HttpClient.NO_PAYLOAD, <HttpResponseParser<string>> {
-                    deserialize(content: any): string {
-                        return JSON.parse(content)['name'];
-                    }
-                }, HttpMethod.PUT);
-		} catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(FilesAPI, async (api) => {
+            return api.copy(await this.getAccessToken(), source, target);
+        });
 	}
  
 	/**
@@ -235,18 +174,8 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *		 successfully deleted; false otherwise
 	 */
 	async delete(path: string): Promise<void> {
-		try {
-			await this.httpClient.send<void>(`${FilesService.API_FILES_ENDPOINT}/${path}`,
-                HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
-		} catch (e) {
-			this.handleError(e);
-		}
-	}
-	
-	private handleError(e: Error): unknown {
-		if (e instanceof NodeRPCException) {
-			throw e;
-		}
-		throw new NetworkException(e.message, e);
+        await this.callAPI(FilesAPI, async (api) => {
+            return api.delete(await this.getAccessToken(), path);
+        });
 	}
 }
