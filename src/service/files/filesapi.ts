@@ -29,7 +29,8 @@ export class FilesAPI extends BaseService {
 
     @PUT("/files/{path}")
     @RequestTransformer((data: any, headers?: any) => {
-        return Buffer.from(data['data'], 'hex');
+        // INFO: Compatible with ts-retrofit style.
+        return data['data'];
     })
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
