@@ -1,18 +1,15 @@
-import { AppContext } from "../../../connection/auth/appcontext";
-import { HttpClient } from "../../../connection/httpclient";
-import { ServiceEndpoint } from "../../../connection/serviceendpoint";
-import { Logger } from '../../../utils/logger';
-import { PaymentService } from "../../payment/paymentservice";
-import { SubscriptionService } from "../../subscription/subscriptionservice";
-import { PricingPlan } from "../pricingplan";
-import { VaultInfo } from "../vaultinfo";
-import { Receipt } from "../../payment/receipt";
-import { Order } from "../../payment/order";
+import {AppContext} from "../../../connection/auth/appcontext";
+import {HttpClient} from "../../../connection/httpclient";
+import {ServiceEndpoint} from "../../../connection/serviceendpoint";
+import {PaymentService} from "../../payment/paymentservice";
+import {SubscriptionService} from "../../subscription/subscriptionservice";
+import {PricingPlan} from "../pricingplan";
+import {VaultInfo} from "../vaultinfo";
+import {Receipt} from "../../payment/receipt";
+import {Order} from "../../payment/order";
 import {AppInfo} from "../appinfo";
 
 export class VaultSubscription extends ServiceEndpoint {
-	private static LOG = new Logger("VaultSubscription");
-
     private paymentService: PaymentService;
     private subscriptionService: SubscriptionService;
 

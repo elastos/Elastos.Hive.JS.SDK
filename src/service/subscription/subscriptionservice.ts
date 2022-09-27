@@ -1,30 +1,14 @@
-import { PricingPlan } from "./pricingplan";
-import { HttpClient } from "../../connection/httpclient";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { Logger } from '../../utils/logger';
-import { RestService } from "../restservice";
-import { VaultInfo } from "./vaultinfo";
-import { BackupInfo } from "./backupinfo";
-import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { HttpMethod } from "../../connection/httpmethod";
+import {PricingPlan} from "./pricingplan";
+import {HttpClient} from "../../connection/httpclient";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {RestServiceT} from "../restservice";
+import {VaultInfo} from "./vaultinfo";
+import {BackupInfo} from "./backupinfo";
 import {AppInfo} from "./appinfo";
+import {SubscriptionAPI} from "./subscriptionapi";
+import {checkArgument} from "../../utils/utils";
 
-export class SubscriptionService extends RestService {
-	private static LOG = new Logger("SubscriptionService");
-
-	private static PRICE_PLANS_ENDPOINT = "/api/v2/subscription/pricing_plan";
-	private static SUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
-	private static ACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=activation";
-	private static DEACTIVATE_VAULT_ENDPOINT = "/api/v2/subscription/vault?op=deactivation";
-	private static UNSUBSCRIBE_VAULT_ENDPOINT = "/api/v2/subscription/vault";
-	private static VAULT_INFO_ENDPOINT = "/api/v2/subscription/vault";
-	private static APP_INFO_ENDPOINT = "/api/v2/subscription/vault/app_stats";
-	private static SUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
-	private static ACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=activation";
-	private static DEACTIVATE_BACKUP_ENDPOINT = "/api/v2/subscription/backup?op=deactivation";
-	private static UNSUBSCRIBE_BACKUP_ENDPOINT = "/api/v2/subscription/backup";
-	private static BACKUP_INFO_ENDPOINT = "/api/v2/subscription/backup";
-
+export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
     constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
 	}
@@ -35,20 +19,10 @@ export class SubscriptionService extends RestService {
 	 * @return The price plan list.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	 public async getVaultPricingPlanList(): Promise<PricingPlan[]>  {
-		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"vault", "name":"" }, <HttpResponseParser<PricingPlan[]>> {
-			deserialize(content: any): PricingPlan[] {
-				let jsonObj = JSON.parse(content)['pricingPlans'];
-				let pricingPlans = [];
-				if (!Array.isArray(jsonObj)) {
-					return [];
-				}
-				for (let plan of jsonObj) {
-					pricingPlans.push((new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]));
-				}
-				return pricingPlans;
-			}
-		}, HttpMethod.GET);
+	 async getVaultPricingPlanList(): Promise<PricingPlan[]>  {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getPricePlans(await this.getAccessToken(), 'vault');
+        });
 	}
 
 	/**
@@ -58,14 +32,11 @@ export class SubscriptionService extends RestService {
 	 * @return The pricing plan
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getVaultPricingPlan(planName: string): Promise<PricingPlan> {
-		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"vault", "name": planName }, <HttpResponseParser<PricingPlan>> {
-			deserialize(content: any): PricingPlan {
-				let jsonObj = JSON.parse(content)['pricingPlans'];
-				let plan = jsonObj[0];
-				return (new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]);
-			}
-		}, HttpMethod.GET);
+	async getVaultPricingPlan(planName: string): Promise<PricingPlan> {
+	    checkArgument(!!planName, 'Invalid plan name.');
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getPricePlans(await this.getAccessToken(), 'vault', planName);
+        });
 	}
 
 	/**
@@ -74,21 +45,10 @@ export class SubscriptionService extends RestService {
 	 * @return The details of the vault.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getVaultInfo(): Promise<VaultInfo> {
-
-		return await this.httpClient.send(SubscriptionService.VAULT_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
-			deserialize(content: any): VaultInfo {
-				let jsonObj = JSON.parse(content);
-				return new VaultInfo().setServiceDid(jsonObj["service_did"])
-                    .setStorageQuota(jsonObj["storage_quota"])
-                    .setStorageUsed(jsonObj["storage_used"])
-                    .setStartTime(new Date(Number(jsonObj["start_time"]) * 1000))
-                    .setEndTime(jsonObj["end_time"] > 0 ? new Date(Number(jsonObj["end_time"]) * 1000) : null)
-                    .setCreated(new Date(Number(jsonObj["created"]) * 1000))
-                    .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                    .setPricePlan(jsonObj["pricing_plan"]);
-			}
-		}, HttpMethod.GET);
+	async getVaultInfo(): Promise<VaultInfo> {
+	    return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getVaultInfo(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -97,12 +57,10 @@ export class SubscriptionService extends RestService {
 	 * @return The details of the vault applications.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getAppStats(): Promise<AppInfo[]> {
-		return await this.httpClient.send(SubscriptionService.APP_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<AppInfo[]>> {
-			deserialize(content: any): AppInfo[] {
-				return JSON.parse(content)["apps"].map(v => Object.assign(new AppInfo(), v));
-			}
-		}, HttpMethod.GET);
+	async getAppStats(): Promise<AppInfo[]> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getVaultAppStats(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -113,15 +71,10 @@ export class SubscriptionService extends RestService {
 	 * @return The details of the new created vault.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async subscribeToVault(): Promise<VaultInfo> {
-		SubscriptionService.LOG.trace("Subscribe to vault");
-		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultInfo>> {
-			deserialize(content: any): VaultInfo {
-				let jsonObj = JSON.parse(content);
-				SubscriptionService.LOG.trace(JSON.stringify(jsonObj));
-				return (new VaultInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["pricing_plan"]);
-			}
-		}, HttpMethod.PUT);
+	async subscribeToVault(): Promise<VaultInfo> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.subscribeToVault(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -129,12 +82,10 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async unsubscribeVault(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.UNSUBSCRIBE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.DELETE);
+	async unsubscribeVault(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.unsubscribeVault(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -142,12 +93,10 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async activateVault(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.ACTIVATE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.POST);
+	async activateVault(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.activateVault(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -155,12 +104,10 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async deactivateVault(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.DEACTIVATE_VAULT_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.POST);
+	async deactivateVault(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.deactivateVault(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -169,17 +116,10 @@ export class SubscriptionService extends RestService {
 	 * @return The price plan list.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getBackupPricingPlanList(): Promise<PricingPlan[]>  {
-		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"backup", "name":"" }, <HttpResponseParser<PricingPlan[]>> {
-			deserialize(content: any): PricingPlan[] {
-				let jsonObj = JSON.parse(content)['backupPlans'];
-				let pricingPlans = [];
-				for (let plan of jsonObj) {
-					pricingPlans.push((new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]));
-				}
-				return pricingPlans;
-			}
-		}, HttpMethod.GET);
+	async getBackupPricingPlanList(): Promise<PricingPlan[]>  {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getPricePlans(await this.getAccessToken(), 'backup');
+        });
 	}
 
 	/**
@@ -189,14 +129,10 @@ export class SubscriptionService extends RestService {
 	 * @return The pricing plan
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getBackupPricingPlan(planName: string): Promise<PricingPlan> {
-		return await this.httpClient.send(SubscriptionService.PRICE_PLANS_ENDPOINT, { "subscription":"backup", "name": planName }, <HttpResponseParser<PricingPlan>> {
-			deserialize(content: any): PricingPlan {
-				let jsonObj = JSON.parse(content)['backupPlans'];
-				let plan = jsonObj[0];
-				return (new PricingPlan()).setAmount(plan["amount"]).setCurrency(plan["currency"]).setMaxStorage(plan["maxStorage"]).setName(plan["name"]).setServiceDays(plan["serviceDays"]);
-			}
-		}, HttpMethod.GET);
+	async getBackupPricingPlan(planName: string): Promise<PricingPlan> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getPricePlans(await this.getAccessToken(), 'backup', planName);
+        });
 	}
 
 	/**
@@ -205,20 +141,10 @@ export class SubscriptionService extends RestService {
 	 * @return The details of the backup service.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async getBackupInfo(): Promise<BackupInfo> {
-		return await this.httpClient.send(SubscriptionService.BACKUP_INFO_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupInfo>> {
-			deserialize(content: any): BackupInfo {
-				let jsonObj = JSON.parse(content);
-				return new BackupInfo().setServiceDid(jsonObj["service_did"])
-                    .setStorageQuota(jsonObj["storage_quota"])
-                    .setStorageUsed(jsonObj["storage_used"])
-                    .setStartTime(new Date(Number(jsonObj["start_time"]) * 1000))
-                    .setEndTime(jsonObj["start_time"] > 0 ? new Date(Number(jsonObj["start_time"]) * 1000) : null)
-                    .setCreated(new Date(Number(jsonObj["created"]) * 1000))
-                    .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                    .setPricePlan(jsonObj["pricing_plan"]);
-			}
-		}, HttpMethod.GET);
+	async getBackupInfo(): Promise<BackupInfo> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.getBackupInfo(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -227,14 +153,10 @@ export class SubscriptionService extends RestService {
 	 * @return The details of the new created backup service.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async subscribeToBackup(): Promise<BackupInfo> {
-		return await this.httpClient.send(SubscriptionService.SUBSCRIBE_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupInfo>> {
-			deserialize(content: any): BackupInfo {
-				let jsonObj = JSON.parse(content);
-				SubscriptionService.LOG.trace(JSON.stringify(jsonObj));
-				return (new BackupInfo()).setServiceDid(jsonObj["service_did"]).setStorageQuota(jsonObj["storage_quota"]).setStorageUsed(jsonObj["storage_used"]).setCreated(new Date(Number(jsonObj["created"]) * 1000)).setUpdated(new Date(Number(jsonObj["updated"]) * 1000)).setPricePlan(jsonObj["pricing_plan"]);
-			}
-		}, HttpMethod.PUT);
+	async subscribeToBackup(): Promise<BackupInfo> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.subscribeToBackup(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -242,12 +164,10 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async unsubscribeBackup(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.UNSUBSCRIBE_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.DELETE);
+	async unsubscribeBackup(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.unsubscribeBackup(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -255,12 +175,10 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async activateBackup(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.ACTIVATE_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.POST);
+	async activateBackup(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.activateBackup(await this.getAccessToken());
+        });
 	}
 
 	/**
@@ -268,11 +186,9 @@ export class SubscriptionService extends RestService {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public async deactivateBackup(): Promise<void> {
-		return await this.httpClient.send(SubscriptionService.DEACTIVATE_BACKUP_ENDPOINT, HttpClient.NO_PAYLOAD, <HttpResponseParser<void>> {
-			deserialize(content: any): void {
-				return;
-			}
-		}, HttpMethod.POST);
+	async deactivateBackup(): Promise<void> {
+        return this.callAPI(SubscriptionAPI, async api => {
+            return await api.deactivateBackup(await this.getAccessToken());
+        });
 	}
 }

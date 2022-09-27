@@ -19,7 +19,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 		this.encrypt = false;
 	}
 
-    public async encryptionInit(identifier: string, secureCode: number, storepass: string) {
+    async encryptionInit(identifier: string, secureCode: number, storepass: string) {
         this.encrypt = true;
         this.cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
     }
