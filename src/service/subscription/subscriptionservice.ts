@@ -34,9 +34,10 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 */
 	async getVaultPricingPlan(planName: string): Promise<PricingPlan> {
 	    checkArgument(!!planName, 'Invalid plan name.');
-        return this.callAPI(SubscriptionAPI, async api => {
+        const plans = await this.callAPI(SubscriptionAPI, async api => {
             return await api.getPricePlans(await this.getAccessToken(), 'vault', planName);
         });
+        return plans ? plans[0] : null;
 	}
 
 	/**
@@ -46,7 +47,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async getVaultInfo(): Promise<VaultInfo> {
-	    return this.callAPI(SubscriptionAPI, async api => {
+	    return await this.callAPI(SubscriptionAPI, async api => {
             return await api.getVaultInfo(await this.getAccessToken());
         });
 	}
@@ -58,7 +59,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async getAppStats(): Promise<AppInfo[]> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.getVaultAppStats(await this.getAccessToken());
         });
 	}
@@ -72,7 +73,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async subscribeToVault(): Promise<VaultInfo> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.subscribeToVault(await this.getAccessToken());
         });
 	}
@@ -83,7 +84,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async unsubscribeVault(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.unsubscribeVault(await this.getAccessToken());
         });
 	}
@@ -94,7 +95,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async activateVault(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.activateVault(await this.getAccessToken());
         });
 	}
@@ -105,7 +106,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async deactivateVault(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.deactivateVault(await this.getAccessToken());
         });
 	}
@@ -117,7 +118,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async getBackupPricingPlanList(): Promise<PricingPlan[]>  {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.getPricePlans(await this.getAccessToken(), 'backup');
         });
 	}
@@ -130,9 +131,11 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async getBackupPricingPlan(planName: string): Promise<PricingPlan> {
-        return this.callAPI(SubscriptionAPI, async api => {
+	    checkArgument(!!planName, 'Invalid plan name.');
+        const plans = await this.callAPI(SubscriptionAPI, async api => {
             return await api.getPricePlans(await this.getAccessToken(), 'backup', planName);
         });
+        return plans ? plans[0] : null;
 	}
 
 	/**
@@ -142,7 +145,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async getBackupInfo(): Promise<BackupInfo> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.getBackupInfo(await this.getAccessToken());
         });
 	}
@@ -154,7 +157,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async subscribeToBackup(): Promise<BackupInfo> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.subscribeToBackup(await this.getAccessToken());
         });
 	}
@@ -165,7 +168,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async unsubscribeBackup(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.unsubscribeBackup(await this.getAccessToken());
         });
 	}
@@ -176,7 +179,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async activateBackup(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.activateBackup(await this.getAccessToken());
         });
 	}
@@ -187,7 +190,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	async deactivateBackup(): Promise<void> {
-        return this.callAPI(SubscriptionAPI, async api => {
+        return await this.callAPI(SubscriptionAPI, async api => {
             return await api.deactivateBackup(await this.getAccessToken());
         });
 	}
