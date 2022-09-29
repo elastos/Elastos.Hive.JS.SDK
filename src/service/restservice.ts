@@ -140,6 +140,10 @@ export class RestServiceT<T> extends RestService {
     }
 
     protected async getAccessToken(): Promise<string> {
+        if (!this.serviceContext.hasAppContext()) {
+            return ''; // anonymous access on scripting module.
+        }
+
         const accessToken = this.serviceContext.getAccessToken();
         return 'token ' + await accessToken.fetch();
     }
