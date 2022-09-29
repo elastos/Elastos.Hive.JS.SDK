@@ -1,18 +1,14 @@
-import { Claims, DIDDocument, JWTParserBuilder } from '@elastosfoundation/did-js-sdk';
-import { AppContextProvider } from '../../connection/auth/appcontextprovider';
-import { HttpClient } from '../../connection/httpclient';
-import { ServiceEndpoint } from '../../connection/serviceendpoint';
-import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { UnauthorizedException} from '../../exceptions';
-import { Logger } from '../../utils/logger';
-import { RestService } from '../restservice';
-import { HttpMethod } from '../../connection/httpmethod';
+import {Claims, DIDDocument, JWTParserBuilder} from '@elastosfoundation/did-js-sdk';
+import {AppContextProvider} from '../../connection/auth/appcontextprovider';
+import {HttpClient} from '../../connection/httpclient';
+import {ServiceEndpoint} from '../../connection/serviceendpoint';
+import {UnauthorizedException} from '../../exceptions';
+import {Logger} from '../../utils/logger';
+import {RestServiceT} from '../restservice';
+import {AuthAPI} from "./authapi";
 
-export class AuthService extends RestService {
+export class AuthService extends RestServiceT<AuthAPI> {
 	private static LOG = new Logger("AuthService");
-
-	private static SIGN_IN_ENDPOINT = "/api/v2/did/signin";
-	private static AUTH_ENDPOINT = "/api/v2/did/auth";
 
 	private contextProvider: AppContextProvider;
 
@@ -49,25 +45,16 @@ export class AuthService extends RestService {
 	}
 
     async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
-        const payload = { "id": JSON.parse(appInstanceDidDoc.toString(true)) };
-		const challenge: string = await this.httpClient.send(AuthService.SIGN_IN_ENDPOINT, payload, <HttpResponseParser<string>> {
-			deserialize(content: any): string {
-				AuthService.LOG.trace("return sign_in: " + content);
-				return JSON.parse(content)['challenge'];
-			}
-		}, HttpMethod.POST);
-
+        const challenge: string = await this.callAPI(AuthAPI, async api => {
+            return await api.signIn({"id": JSON.parse(appInstanceDidDoc.toString(true))});
+        });
         return this.checkValid(challenge, appInstanceDidDoc.getSubject().toString());
     }
 
     async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
-		const payload = {"challenge_response": challengeResponse};
-		const token: string = await this.httpClient.send(AuthService.AUTH_ENDPOINT, payload, <HttpResponseParser<string>> {
-			deserialize(content: any): string {
-				return JSON.parse(content)['token'];
-			}
-		}, HttpMethod.POST);
-
+        const token: string = await this.callAPI(AuthAPI, async api => {
+            return await api.auth({"challenge_response": challengeResponse});
+        });
         return this.checkValid(token, appInstanceDidDoc.getSubject().toString());
     }
 
