@@ -1,5 +1,5 @@
 import {NodeInfo, NodeVersion, ServiceEndpoint, Logger} from "../../../src";
-import { TestData } from "../config/testdata";
+import {TestData} from "../config/testdata";
 
 describe("test about service", () => {
     const LOG = new Logger('aboutservice.test');
