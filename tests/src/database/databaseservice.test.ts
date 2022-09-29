@@ -88,7 +88,7 @@ describe("test database services", () => {
         await expect(databaseService.insertOne(collectionName, nodes)).resolves.not.toThrow();
 
         let query = {"author": "john doe1"};
-        let result = await databaseService.findOne(collectionName, query, new FindOptions());
+        let result = await databaseService.findOne(collectionName, query);
         expect(result).not.toBeNull();
     });
 

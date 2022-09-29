@@ -2,13 +2,11 @@ import {
     BasePath,
     BaseService,
     Body,
-    Headers,
     DELETE,
     GET,
-    Header, Multipart, Part, PartDescriptor,
+    Header,
     PATCH,
     Path,
-    POST,
     PUT,
     Query,
     Response,
@@ -19,14 +17,6 @@ import {FileInfo} from "../..";
 
 @BasePath("/api/v2/vault")
 export class FilesAPI extends BaseService {
-    @GET("/files/{path}")
-    @ResponseType("arraybuffer")
-    @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data);
-    })
-    async download(@Header("Authorization") authorization: string,
-                   @Path("path") path: string): Promise<Response> { return null; }
-
     @PUT("/files/{path}")
     @RequestTransformer((data: any, headers?: any) => {
         // INFO: Compatible with ts-retrofit style.
@@ -44,6 +34,14 @@ export class FilesAPI extends BaseService {
                  @Query("encrypt_method") encrypt_method: string,
                  @Path("path") path: string,
                  @Body body: object): Promise<Response> { return null; }
+
+    @GET("/files/{path}")
+    @ResponseType("arraybuffer")
+    @ResponseTransformer((data: any, headers?: any) => {
+        return APIResponse.handleResponseData(data);
+    })
+    async download(@Header("Authorization") authorization: string,
+                   @Path("path") path: string): Promise<Response> { return null; }
 
     @GET("/files/{path}?comp=children")
     @ResponseTransformer((data: any, headers?: any) => {

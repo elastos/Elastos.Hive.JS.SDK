@@ -1,16 +1,14 @@
-import { InvalidParameterException, NetworkException, NodeRPCException } from '../../exceptions';
-import { Condition } from './condition';
-import { Executable } from './executable';
-import { ServiceEndpoint } from '../../connection/serviceendpoint';
-import { HttpClient } from '../../connection/httpclient';
-import { HttpResponseParser } from '../../connection/httpresponseparser';
-import { StreamResponseParser } from '../../connection/streamresponseparser';
-import { Context } from './context';
-import { HttpMethod } from '../../connection/httpmethod';
-import { Logger } from '../../utils/logger';
-import { checkNotNull, checkArgument } from '../../utils/utils';
-import { RestService } from '../restservice';
-import { AppContext } from "../..";
+import {InvalidParameterException} from '../../exceptions';
+import {Condition} from './condition';
+import {Executable} from './executable';
+import {ServiceEndpoint} from '../../connection/serviceendpoint';
+import {HttpClient} from '../../connection/httpclient';
+import {Context} from './context';
+import {Logger} from '../../utils/logger';
+import {checkNotNull, checkArgument} from '../../utils/utils';
+import {RestServiceT} from '../restservice';
+import {AppContext} from "../..";
+import {ScriptingAPI} from "./scriptingapi";
 
 interface HiveUrl {
 	targetUsrDid: string,
@@ -19,11 +17,8 @@ interface HiveUrl {
 	params: string
 }
 
-export class ScriptingService extends RestService {
+export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	private static LOG = new Logger("ScriptingService");
-
-	private static API_SCRIPT_ENDPOINT = "/api/v2/vault/scripting";
-	private static API_SCRIPT_STREAM_ENDPOINT = "/api/v2/vault/scripting/stream"; 
 
     constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
 		super(serviceContext, httpClient);
@@ -32,87 +27,83 @@ export class ScriptingService extends RestService {
 	/**
 	* Let the vault owner register a script on his vault for a given application.
 	*
-	* @param name the name of script to register
+	* @param scriptName the name of script to register
 	* @param condition the condition on which the script could be executed.
 	* @param executable the executable body of the script with preset routines
 	* @param allowAnonymousUser whether allows anonymous user.
 	* @param allowAnonymousApp whether allows anonymous application.
 	* @return Void
 	*/
-	async registerScript(name: string, executable: Executable, condition?: Condition, allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
-		checkNotNull(name, "Missing script name.");
+	async registerScript(scriptName: string, executable: Executable, condition?: Condition,
+                         allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
+		checkNotNull(scriptName, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
-        try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`,
-			{
-				"executable": executable,
-				"condition": condition,
-				"allowAnonymousUser": allowAnonymousUser,
-				"allowAnonymousApp": allowAnonymousApp
-			},
-			HttpClient.NO_RESPONSE,
-			HttpMethod.PUT);
-		} 
-		catch (e){
-			this.handleError(e);
-		}
-	}
-	
-	// TODO: handle this method signature
-	// async registerScriptWithoutCondition(name: string, executable: Executable, allowAnonymousUser: boolean, allowAnonymousApp: boolean) : Promise<void>{
-	// 	this.registerScript(name, executable, undefined, allowAnonymousUser, allowAnonymousApp);
-	// }
-		
-	async unregisterScript(name: string) : Promise<void>{
-		try {	
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, HttpClient.NO_PAYLOAD, HttpClient.NO_RESPONSE, HttpMethod.DELETE);
-		} 
-		catch (e){
-			this.handleError(e);
-		}
+        await this.callAPI(ScriptingAPI, async api => {
+            return await api.registerScript(await this.getAccessToken(), scriptName, {
+                "executable": executable,
+                "condition": condition ? condition : undefined,
+                "allowAnonymousUser": allowAnonymousUser,
+                "allowAnonymousApp": allowAnonymousApp
+            });
+        });
 	}
 
-	async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
-		checkNotNull(name, "Missing script name.");
+    /**
+     * Let the vault owner unregister a script when the script become useless to
+     * applications.
+     *
+     * @param scriptName the name of the script to unregister.
+     */
+	async unregisterScript(scriptName: string) : Promise<void>{
+        checkNotNull(scriptName, "Missing script name.");
+
+        await this.callAPI(ScriptingAPI, async api => {
+            return await api.unregisterScript(await this.getAccessToken(), scriptName);
+        });
+	}
+
+    /**
+     * Executes a previously registered server side script with a normal way.
+     * where the values can be passed as part of the query.
+     * Vault owner or external users are allowed to call scripts on someone's vault.
+     *
+     * @param scriptName the name of the script to unregister.
+     * @param params parameters to run the script.
+     * @param targetDid target DID.
+     * @param targetAppDid target application DID.
+     */
+	async callScript<T>(scriptName: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
+		checkNotNull(scriptName, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
 		checkNotNull(targetAppDid, "Missing target application DID");
 
-		try {
-			let context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
-			let returnValue : T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}`, { "context": context, "params": params }, <HttpResponseParser<T>> {
-				deserialize(content: any): T {
-					ScriptingService.LOG.debug("CALLSCRIPT: " + content);
-					return JSON.parse(content) as T;
-				}
-			}, HttpMethod.PATCH);
-			
-			return returnValue;
-		} 
-		catch (e) {
-			this.handleError(e);
-		}
+        const context = new Context().setTargetDid(targetDid).setTargetAppDid(targetAppDid);
+        return await this.callAPI(ScriptingAPI, async api => {
+            return await api.runScript(await this.getAccessToken(), scriptName, { "context": context, "params": params });
+        });
 	}
 
-	async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
-		checkNotNull(name, "Missing script name.");
+    /**
+     * Executes a previously registered server side script with a direct URL
+     * where the values can be passed as part of the query.
+     * Vault owner or external users are allowed to call scripts on someone's vault.
+     *
+     * @param scriptName the name of the script to unregister.
+     * @param params parameters to run the script.
+     * @param targetDid target DID.
+     * @param targetAppDid target application DID.
+     */
+	async callScriptUrl<T>(scriptName: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
+		checkNotNull(scriptName, "Missing script name.");
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
 		checkNotNull(targetAppDid, "Missing target application DID");
 		
-		try{
-			let returnValue: T  = await this.httpClient.send<T>(`${ScriptingService.API_SCRIPT_ENDPOINT}/${name}/${targetDid}@${targetAppDid}/${params}`, HttpClient.NO_PAYLOAD, <HttpResponseParser<T>> {
-				deserialize(content: any): T {
-					return JSON.parse(content) as T;
-				}
-			},HttpMethod.GET);
-			
-			return returnValue;
-		} 
-		catch (e) {
-			this.handleError(e);
-		}
+        return await this.callAPI(ScriptingAPI, async api => {
+            return await api.runScriptUrl(await this.getAccessToken(), scriptName, targetDid, targetAppDid, params);
+        });
 	}
 
     /**
@@ -128,13 +119,21 @@ export class ScriptingService extends RestService {
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
-		try {
-			ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`,
-                                             content, HttpClient.NO_RESPONSE, HttpMethod.PUT, callback);
-		} catch (e) {
-			this.handleError(e);
-		}		
+
+        ScriptingService.LOG.debug("Uploading " + content.byteLength + " byte(s)");
+
+        return await this.callAPI(ScriptingAPI, async (api) => {
+            return await api.uploadFile(await this.getAccessToken(), transactionId, {
+                    'data': content
+                });
+        }, {
+            onUploadProgress: function (progressEvent) {
+                if (callback) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    callback(percent);
+                }
+            }
+        });
 	}
 
     /**
@@ -145,24 +144,21 @@ export class ScriptingService extends RestService {
      */
 	async downloadFile(transactionId: string, callback?: (process: number) => void): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
-		try {
-			let dataBuffer = Buffer.alloc(0);
-			await this.httpClient.send<void>(`${ScriptingService.API_SCRIPT_STREAM_ENDPOINT}/${transactionId}`, HttpClient.NO_PAYLOAD, 
-			{
-				onData(chunk: Buffer): void {
-					dataBuffer = Buffer.concat([dataBuffer, chunk]);
-				},
-				onEnd(): void {
-					// Process end.
-				}
-      		} as StreamResponseParser,
-			HttpMethod.GET, null, callback);
 
-			ScriptingService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
-			return dataBuffer;
-		} catch (e) {
-			this.handleError(e);
-		}
+        const dataBuffer = await this.callAPI(ScriptingAPI, async (api) => {
+            return api.downloadFile(await this.getAccessToken(), transactionId);
+        }, {
+            onDownloadProgress: function (progressEvent) {
+                if (callback) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    callback(percent);
+                }
+            }
+        });
+
+        ScriptingService.LOG.debug("Downloaded " + Buffer.byteLength(dataBuffer) + " byte(s).");
+
+        return dataBuffer;
 	}
 
 	private parseHiveUrl(hiveUrl: string): HiveUrl {
@@ -212,12 +208,5 @@ export class ScriptingService extends RestService {
         // Call on the node contains targetDid vault.
 		const result = await scriptingService.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
 		return await scriptingService.downloadFile(Object.values(result)[0]['transaction_id']);
-	}
-
-	private handleError(e: Error): unknown {
-		if (e instanceof NodeRPCException) {
-			throw e;
-		}
-		throw new NetworkException(e.message, e);
 	}
 }

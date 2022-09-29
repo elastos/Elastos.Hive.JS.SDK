@@ -164,8 +164,8 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 
         DatabaseService.LOG.debug("FILTER_STR: " + filterJson);
 
-        const skip = options ? options.skip : 0;
-        const limit = options ? options.limit : 0;
+        const skip = options ? options.skip : undefined;
+        const limit = options ? options.limit : undefined;
 
         const result = await this.callAPI(DatabaseAPI, async (api) => {
             return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
