@@ -8,12 +8,12 @@ export class CountExecutableBody extends ExecutableDatabaseBody {
     constructor(collection:string, filter: any, options: any) {
         super(collection);
         this.filter = filter;
-        this.options = options;
+        this.options = options ? options : undefined;
     }
 }
 
 export class CountExecutable extends Executable {
-	constructor( name: string,  collectionName: string,  filter: any,  options: any) {
+	constructor( name: string,  collectionName: string,  filter: any,  options?: any) {
 		super(name, ExecutableType.COUNT, null);
 		super.setBody(new CountExecutableBody(collectionName, filter, options));
     }

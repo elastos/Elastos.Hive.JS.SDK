@@ -1,5 +1,4 @@
 import {
-    InvalidParameterException,
     VaultSubscription,
     DatabaseService,
     DeleteExecutable, InsertExecutable,
