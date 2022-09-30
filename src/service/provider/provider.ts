@@ -1,71 +1,37 @@
-import { Logger } from "../../utils/logger";
-import { AppContext } from "../../connection/auth/appcontext";
-import { HttpClient } from "../../connection/httpclient";
-import { HttpMethod } from "../../connection/httpmethod";
-import { HttpResponseParser } from "../../connection/httpresponseparser";
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import {
-    NetworkException,
-    NodeRPCException,
-} from "../../exceptions";
+import {AppContext} from "../../connection/auth/appcontext";
+import {HttpClient} from "../../connection/httpclient";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {VaultDetail} from "./vaultdetail";
 import {BackupDetail} from "./backupdetail";
 import {FilledOrderDetail} from "./filledorderdetail";
+import {RestServiceT} from "../restservice";
+import {ProviderAPI} from "./providerapi";
 
 export class Provider extends ServiceEndpoint {
-    private static LOG = new Logger("Provider");
-
-    private static API_ENDPOINT = "/api/v2/provider";
-    private httpClient: HttpClient;
+    private readonly httpClient: HttpClient;
+    private restService: RestServiceT<ProviderAPI>;
 
     constructor(appContext: AppContext, providerAddress?: string) {
         super(appContext, providerAddress);
         this.httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
+        this.restService = new RestServiceT<ProviderAPI>(this, this.httpClient);
     }
 
-    public async getVaults(): Promise<VaultDetail[]> {
-        try {
-            return await this.httpClient.send<VaultDetail[]>(
-                `${Provider.API_ENDPOINT}/vaults`, HttpClient.NO_PAYLOAD, <HttpResponseParser<VaultDetail[]>>{
-                    deserialize(content: any): VaultDetail[] {
-                        return JSON.parse(content)["vaults"].map(v => Object.assign(new VaultDetail(), v));
-                    }
-                }, HttpMethod.GET);
-        } catch (e) {
-            Provider.handleError(e);
-        }
+    async getVaults(): Promise<VaultDetail[]> {
+        return await this.restService.callAPI(ProviderAPI, async api => {
+            return await api.getVaults(await this.restService.getAccessToken());
+        });
     }
 
-    public async getBackups(): Promise<BackupDetail[]> {
-        try {
-            return await this.httpClient.send<BackupDetail[]>(
-                `${Provider.API_ENDPOINT}/backups`, HttpClient.NO_PAYLOAD, <HttpResponseParser<BackupDetail[]>>{
-                    deserialize(content: any): BackupDetail[] {
-                        return JSON.parse(content)["backups"].map(v => Object.assign(new BackupDetail(), v));
-                    }
-                }, HttpMethod.GET);
-        } catch (e) {
-            Provider.handleError(e);
-        }
+    async getBackups(): Promise<BackupDetail[]> {
+        return await this.restService.callAPI(ProviderAPI, async api => {
+            return await api.getBackups(await this.restService.getAccessToken());
+        });
     }
 
-    public async getFilledOrders(): Promise<FilledOrderDetail[]> {
-        try {
-            return await this.httpClient.send<FilledOrderDetail[]>(
-                `${Provider.API_ENDPOINT}/filled_orders`, HttpClient.NO_PAYLOAD, <HttpResponseParser<FilledOrderDetail[]>>{
-                    deserialize(content: any): FilledOrderDetail[] {
-                        return JSON.parse(content)["orders"].map(v => Object.assign(new FilledOrderDetail(), v));
-                    }
-                }, HttpMethod.GET);
-        } catch (e) {
-            Provider.handleError(e);
-        }
+    async getFilledOrders(): Promise<FilledOrderDetail[]> {
+        return await this.restService.callAPI(ProviderAPI, async api => {
+            return await api.getFilledOrders(await this.restService.getAccessToken());
+        });
     }
-
-	private static handleError(e: Error): unknown {
-		if (e instanceof NodeRPCException) {
-			throw e;
-		}
-		throw new NetworkException(e.message, e);
-	}
 }
