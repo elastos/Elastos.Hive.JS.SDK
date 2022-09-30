@@ -20,7 +20,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 */
 	 async getVaultPricingPlanList(): Promise<PricingPlan[]>  {
         return this.callAPI(SubscriptionAPI, async api => {
-            return await api.getPricePlans(await this.getAccessToken(), 'vault');
+            return await api.getVaultPricePlans(await this.getAccessToken(), 'vault');
         });
 	}
 
@@ -34,7 +34,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	async getVaultPricingPlan(planName: string): Promise<PricingPlan> {
 	    checkArgument(!!planName, 'Invalid plan name.');
         const plans = await this.callAPI(SubscriptionAPI, async api => {
-            return await api.getPricePlans(await this.getAccessToken(), 'vault', planName);
+            return await api.getVaultPricePlans(await this.getAccessToken(), 'vault', planName);
         });
         return plans ? plans[0] : null;
 	}
@@ -118,7 +118,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 */
 	async getBackupPricingPlanList(): Promise<PricingPlan[]>  {
         return await this.callAPI(SubscriptionAPI, async api => {
-            return await api.getPricePlans(await this.getAccessToken(), 'backup');
+            return await api.getBackupPricePlans(await this.getAccessToken(), 'backup');
         });
 	}
 
@@ -132,7 +132,7 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	async getBackupPricingPlan(planName: string): Promise<PricingPlan> {
 	    checkArgument(!!planName, 'Invalid plan name.');
         const plans = await this.callAPI(SubscriptionAPI, async api => {
-            return await api.getPricePlans(await this.getAccessToken(), 'backup', planName);
+            return await api.getBackupPricePlans(await this.getAccessToken(), 'backup', planName);
         });
         return plans ? plans[0] : null;
 	}

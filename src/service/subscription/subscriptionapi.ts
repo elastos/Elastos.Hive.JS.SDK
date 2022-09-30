@@ -17,9 +17,26 @@ export class SubscriptionAPI extends BaseService {
             });
         });
     })
-    async getPricePlans(@Header("Authorization") auth: string,
-                        @Query('subscription') subscription?: string,
-                        @Query('name') name?: string): Promise<Response> { return null; }
+    async getVaultPricePlans(@Header("Authorization") auth: string,
+                             @Query('subscription') subscription?: string,
+                             @Query('name') name?: string): Promise<Response> { return null; }
+
+    @GET("/subscription/pricing_plan")
+    @ResponseTransformer((data: any, headers?: any) => {
+        return APIResponse.handleResponseData(data, (jsonObj) => {
+            const plans = jsonObj['backupPlans'];
+            return plans.map(plan => {
+                return new PricingPlan().setAmount(plan["amount"])
+                    .setCurrency(plan["currency"])
+                    .setMaxStorage(plan["maxStorage"])
+                    .setName(plan["name"])
+                    .setServiceDays(plan["serviceDays"]);
+            });
+        });
+    })
+    async getBackupPricePlans(@Header("Authorization") auth: string,
+                              @Query('subscription') subscription?: string,
+                              @Query('name') name?: string): Promise<Response> { return null; }
 
     @PUT("/subscription/vault")
     @ResponseTransformer((data: any, headers?: any) => {
