@@ -94,11 +94,11 @@ export class RestServiceT<T> extends RestService {
 
     private api;
 
-    protected constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
+    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
         super(serviceContext, httpClient);
     }
 
-    protected async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
+    private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
         if (this.api == null) {
             this.api = new ServiceBuilder()
                 .setEndpoint(await this.serviceContext.getProviderAddress())
@@ -125,7 +125,7 @@ export class RestServiceT<T> extends RestService {
         return this.api;
     }
 
-    protected async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
+    async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
                                                    callback: (a: T) => Promise<any>, // MUST return Response
                                                    extraConfig?): Promise<any> {
         const serviceApi = await this.getAPI(api, extraConfig);
@@ -139,7 +139,7 @@ export class RestServiceT<T> extends RestService {
         }
     }
 
-    protected async getAccessToken(): Promise<string> {
+    async getAccessToken(): Promise<string> {
         if (!this.serviceContext.hasAppContext()) {
             return ''; // anonymous access on scripting module.
         }
@@ -186,7 +186,7 @@ export class RestServiceT<T> extends RestService {
      * @param e from catch clause.
      * @protected
      */
-    protected async handleResponseError(e): Promise<void> {
+    private async handleResponseError(e): Promise<void> {
         if (e instanceof Error) {
             await this.tryHandleResponseError(e);
         }
