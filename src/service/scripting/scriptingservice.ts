@@ -2,7 +2,6 @@ import {InvalidParameterException} from '../../exceptions';
 import {Condition} from './condition';
 import {Executable} from './executable';
 import {ServiceEndpoint} from '../../connection/serviceendpoint';
-import {HttpClient} from '../../connection/httpclient';
 import {Context} from './context';
 import {Logger} from '../../utils/logger';
 import {checkNotNull, checkArgument} from '../../utils/utils';
@@ -20,8 +19,8 @@ interface HiveUrl {
 export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	private static LOG = new Logger("ScriptingService");
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
 	}
     
 	/**
@@ -202,8 +201,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 
 		// Prepare the new scripting service for targetDid with current user's appContext.
 		const endpoint = new ServiceEndpoint(this.getServiceContext().getAppContext(), targetUrl);
-        const httpClient = new HttpClient(endpoint, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-        const scriptingService = new ScriptingService(endpoint, httpClient);
+        const scriptingService = new ScriptingService(endpoint);
 
         // Call on the node contains targetDid vault.
 		const result = await scriptingService.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);

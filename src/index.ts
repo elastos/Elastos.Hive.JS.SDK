@@ -9,7 +9,6 @@ import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
 import { SHA256 } from "./utils/sha256";
 import * as Utils from "./utils/utils";
-import { HttpClient }  from "./connection/httpclient";
 import { HttpOptions, HttpHeaders }  from "./connection/httpoptions";
 import { HttpMethod }  from "./connection/httpmethod";
 import { HttpResponseParser }  from "./connection/httpresponseparser";
@@ -29,7 +28,6 @@ import { FilesService }  from "./service/files/filesservice";
 import { IpfsRunner }  from "./ipfsrunner";
 import { PaymentService }  from "./service/payment/paymentservice";
 import { PromotionService }  from "./service/promotion/promotionservice";
-import { RestService }  from "./service/restservice";
 import { ScriptingService }  from "./service/scripting/scriptingservice";
 import { ScriptRunner }  from "./scriptrunner";
 import { Condition }  from "./service/scripting/condition";
@@ -159,7 +157,6 @@ export {
     VaultInfo,
     File,
     FileStorage,
-    HttpClient,
     HttpMethod,
     ServiceEndpoint,
     AccessToken,
@@ -177,7 +174,6 @@ export {
     FileInfo,
     PaymentService,
     PromotionService,
-    RestService,
     ScriptingService,
     ScriptRunner,
     Condition,

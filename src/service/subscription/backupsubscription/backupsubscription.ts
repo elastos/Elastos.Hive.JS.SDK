@@ -1,5 +1,4 @@
 import {AppContext} from "../../../connection/auth/appcontext";
-import {HttpClient} from "../../../connection/httpclient";
 import {ServiceEndpoint} from "../../../connection/serviceendpoint";
 import {PaymentService} from "../../payment/paymentservice";
 import {SubscriptionService} from "../../subscription/subscriptionservice";
@@ -14,9 +13,8 @@ export class BackupSubscription extends ServiceEndpoint {
 
     constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
-        let httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-        this.paymentService = new PaymentService(this, httpClient);
-        this.subscriptionService = new SubscriptionService(this, httpClient);
+        this.paymentService = new PaymentService(this);
+        this.subscriptionService = new SubscriptionService(this);
 	}
 
 	async getPricingPlanList(): Promise<PricingPlan[]> {

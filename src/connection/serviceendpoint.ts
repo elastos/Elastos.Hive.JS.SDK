@@ -4,9 +4,7 @@ import {AccessToken} from './auth/accesstoken'
 import {DataStorage} from '../utils/storage/datastorage'
 import {FileStorage} from '../utils/storage/filestorage'
 import {NodeVersion} from '../service/about/nodeversion'
-import {HttpClient} from './httpclient'
 import {AboutService} from '../service/about/aboutservice'
-import {Logger} from '../utils/logger'
 import {NodeInfo} from "../service/about/nodeinfo";
 
 export class ServiceEndpoint {
@@ -20,8 +18,6 @@ export class ServiceEndpoint {
     private accessToken: AccessToken;
     private dataStorage: DataStorage;
 
-    private static LOG_SERVICE_CONTEXT = new Logger("ServiceEndpoint");
-
     constructor(context: AppContext, providerAddress?: string) {
         if (!context && !providerAddress)
             throw new Error('Invalid parameter: context and providerAddress can not all empty');
@@ -33,7 +29,7 @@ export class ServiceEndpoint {
     }
 
     private init(): void {
-        this.aboutService = new AboutService(this, new HttpClient(this, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+        this.aboutService = new AboutService(this);
 
         if (this.context) {
             let dataDir = this.context.getAppContextProvider().getLocalDataDir();
@@ -42,7 +38,7 @@ export class ServiceEndpoint {
 
             this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
             this.accessToken = new AccessToken(this, this.dataStorage);
-            this.aboutServiceAuth = new AboutService(this, new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+            this.aboutServiceAuth = new AboutService(this);
         }
     }
 

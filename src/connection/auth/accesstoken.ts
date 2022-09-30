@@ -2,7 +2,6 @@ import {DataStorage} from '../../utils/storage/datastorage';
 import {BridgeHandler} from './bridgehandler';
 import {ServiceEndpoint} from '../serviceendpoint';
 import {AuthService} from '../../service/auth/authservice';
-import {HttpClient} from '../httpclient';
 import {Logger} from '../../utils/logger';
 import {Claims, JWTParserBuilder} from '@elastosfoundation/did-js-sdk'
 import PromiseQueue from "promise-queue";
@@ -41,7 +40,7 @@ export class AccessToken implements CodeFetcher {
 	 */
 	constructor(endpoint: ServiceEndpoint, storage: DataStorage) {
 	    this.endpoint = endpoint;
-		this.authService = new AuthService(endpoint, new HttpClient(endpoint, HttpClient.NO_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS));
+		this.authService = new AuthService(endpoint);
 		this.bridge = new BridgeHandlerImpl(endpoint);
 		this.jwtCode = null;
         this.storageKey = null;
