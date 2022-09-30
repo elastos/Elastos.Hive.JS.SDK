@@ -61,7 +61,7 @@ export class RestServiceT<T> {
         return this.serviceContext;
     }
 
-    protected async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
+    async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
         const appContext = this.serviceContext.getAppContext();
         const doc: DIDDocument = await appContext.getAppContextProvider().getAppInstanceDocument();
         return await doc.createCipher(identifier, secureCode, storepass);
@@ -69,7 +69,7 @@ export class RestServiceT<T> {
 
     private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
         if (this.api == null) {
-            this.api = new ServiceBuilder()
+            this.api = new ServiceBuilder() // TODO: use same ServiceBuilder
                 .setEndpoint(await this.serviceContext.getProviderAddress())
                 .setRequestInterceptors((config) => {
                     RestServiceT._LOG.info(`REQUEST: URL={}, METHOD={}, TOKEN={}, {}`,
