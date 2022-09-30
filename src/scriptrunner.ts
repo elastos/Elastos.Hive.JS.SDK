@@ -1,11 +1,8 @@
 import {ServiceEndpoint} from "./connection/serviceendpoint";
-import {HttpClient} from "./connection/httpclient";
 import {AppContext} from "./connection/auth/appcontext";
 import {ScriptingService} from "./service/scripting/scriptingservice";
 
-
 export class ScriptRunner extends ServiceEndpoint{
-
     private scriptService: ScriptingService;
 
     /**
@@ -16,9 +13,7 @@ export class ScriptRunner extends ServiceEndpoint{
      */
     public constructor(context: AppContext, providerAddress?: string) {
         super(context, providerAddress);
-        const is_auth = context != null ? HttpClient.WITH_AUTHORIZATION : HttpClient.NO_AUTHORIZATION;
-        const httpClient   = new HttpClient(this, is_auth, HttpClient.DEFAULT_OPTIONS);
-        this.scriptService = new ScriptingService(this, httpClient);
+        this.scriptService = new ScriptingService(this);
     }
 
     public async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
@@ -40,5 +35,4 @@ export class ScriptRunner extends ServiceEndpoint{
     public async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
         return await this.scriptService.downloadFileByHiveUrl(hiveUrl);
     }
-
 }
