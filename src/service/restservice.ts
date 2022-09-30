@@ -1,12 +1,6 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {
-    HttpClient,
-    HttpResponseParser,
-    NetworkException,
-    NodeRPCException,
-    ServiceEndpoint
-} from "..";
+import {NetworkException, NodeRPCException, ServiceEndpoint} from "..";
 import {Logger} from '../utils/logger';
 import {assertTrue} from "../../tests/src/util";
 
@@ -14,17 +8,6 @@ import {assertTrue} from "../../tests/src/util";
  * Wrapper class to get the response body as a result object.
  */
 export class APIResponse {
-    constructor(private response) {}
-
-    get<T>(responseParser: HttpResponseParser<T> = HttpClient.DO_NOTHING_RESPONSE_PARSER): T {
-        // Here is 'object' which is different with @ResponseTransformer (raw 'string').
-        return responseParser.deserialize(this.response.data);
-    }
-
-    getStream(): Buffer {
-        return Buffer.from(this.response.data, 'binary');
-    }
-
     /**
      * Transform the data on @ResponseTransformer to json object.
      * Do not use @ResponseTransformer if just want to get error dict
@@ -65,37 +48,23 @@ export class APIResponse {
 }
 
 /**
- * TODO: To be removed.
- */
-export class RestService {
-    protected constructor(protected serviceContext: ServiceEndpoint, protected httpClient: HttpClient) {
-    }
-
-    public getServiceContext(): ServiceEndpoint {
-        return this.serviceContext;
-    }
-
-    public getHttpClient(): HttpClient {
-        return this.httpClient;
-    }
-
-    public async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
-        const appContext = this.serviceContext.getAppContext();
-        const doc: DIDDocument = await appContext.getAppContextProvider().getAppInstanceDocument();
-        return await doc.createCipher(identifier, secureCode, storepass);
-    }
-}
-
-/**
  * Base class for all services.
  */
-export class RestServiceT<T> extends RestService {
+export class RestServiceT<T> {
     private static _LOG = new Logger("RestServiceT");
 
     private api;
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-        super(serviceContext, httpClient);
+    constructor(private serviceContext: ServiceEndpoint) {}
+
+    getServiceContext(): ServiceEndpoint {
+        return this.serviceContext;
+    }
+
+    protected async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
+        const appContext = this.serviceContext.getAppContext();
+        const doc: DIDDocument = await appContext.getAppContextProvider().getAppInstanceDocument();
+        return await doc.createCipher(identifier, secureCode, storepass);
     }
 
     private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {

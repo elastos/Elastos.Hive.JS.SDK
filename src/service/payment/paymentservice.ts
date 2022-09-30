@@ -1,4 +1,3 @@
-import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {Order} from "./order";
@@ -8,8 +7,8 @@ import {IllegalArgumentException, NotImplementedException} from "../../exception
 import {PaymentAPI} from "./paymentapi";
 
 export class PaymentService extends RestServiceT<PaymentAPI> {
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
 	}
 
 	/**

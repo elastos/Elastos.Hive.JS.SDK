@@ -1,14 +1,13 @@
 import {NodeVersion} from "./nodeversion";
 import {HiveException} from "../../exceptions";
-import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {NodeInfo} from "./nodeinfo";
 import {AboutAPI} from "./aboutapi";
 
 export class AboutService extends RestServiceT<AboutAPI> {
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
     }
 
 	/**

@@ -1,5 +1,4 @@
 import {NotImplementedException} from "../../exceptions";
-import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {BackupResult, BackupResultResult} from "./backupresult";
@@ -10,12 +9,12 @@ import {BackupAPI} from "./backupapi";
 export class BackupService extends RestServiceT<BackupAPI> {
 	private credentialCode: CredentialCode;
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
 	}
 
 	setBackupContext(backupContext: BackupContext) {
-		this.credentialCode = new CredentialCode(this.serviceContext, backupContext);
+		this.credentialCode = new CredentialCode(this.getServiceContext(), backupContext);
 	}
 
     /**

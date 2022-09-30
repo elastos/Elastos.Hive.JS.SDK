@@ -1,5 +1,4 @@
 import {Cipher} from "@elastosfoundation/did-js-sdk";
-import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {Logger} from '../../utils/logger';
 import {RestServiceT} from "../restservice";
@@ -14,8 +13,8 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	private encrypt: boolean;
 	private cipher: Cipher;
 
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
 		this.encrypt = false;
 	}
 
