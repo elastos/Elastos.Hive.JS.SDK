@@ -1,5 +1,4 @@
 import {PricingPlan} from "./pricingplan";
-import {HttpClient} from "../../connection/httpclient";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {VaultInfo} from "./vaultinfo";
@@ -9,8 +8,8 @@ import {SubscriptionAPI} from "./subscriptionapi";
 import {checkArgument} from "../../utils/utils";
 
 export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
-    constructor(serviceContext: ServiceEndpoint, httpClient: HttpClient) {
-		super(serviceContext, httpClient);
+    constructor(serviceContext: ServiceEndpoint) {
+		super(serviceContext);
 	}
 
 	/**

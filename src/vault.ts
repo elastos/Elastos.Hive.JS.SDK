@@ -1,4 +1,3 @@
-import { HttpClient } from "./connection/httpclient";
 import { AppContext } from "./connection/auth/appcontext";
 import { ServiceEndpoint } from "./connection/serviceendpoint";
 import { FilesService } from "./service/files/filesservice";
@@ -21,14 +20,12 @@ export class Vault extends ServiceEndpoint {
 
 	public constructor(context: AppContext, providerAddress?: string) {
 		super(context, providerAddress);
-		const httpClient = new HttpClient(this, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-		this.filesService	        = new FilesService(this, httpClient);
+		this.filesService	        = new FilesService(this);
 		this.encryptionFilesService = null;
-		this.database		        = new DatabaseService(this, httpClient);
+		this.database		        = new DatabaseService(this);
 		this.encryptionDatabase     = null;
-		this.scripting	 	        = new ScriptingService(this, httpClient);
-		this.backupService          = new BackupService(this, httpClient);
-		this.httpClient             = httpClient;
+		this.scripting	 	        = new ScriptingService(this);
+		this.backupService          = new BackupService(this);
 	}
 
 	public getFilesService(): FilesService {
@@ -42,7 +39,7 @@ export class Vault extends ServiceEndpoint {
         checkArgument(storepass !== undefined && storepass !== null, 'Invalid storepass');
 
         if (!this.encryptionFilesService) {
-            this.encryptionFilesService = new FilesService(this, this.httpClient);
+            this.encryptionFilesService = new FilesService(this);
             await this.encryptionFilesService.encryptionInit(identifier, secureCode, storepass);
         }
         return this.encryptionFilesService;
@@ -60,7 +57,7 @@ export class Vault extends ServiceEndpoint {
         checkArgument(!!nonce, 'Invalid nonce');
 
 	    if (!this.encryptionDatabase) {
-	        this.encryptionDatabase = new DatabaseService(this, this.httpClient);
+	        this.encryptionDatabase = new DatabaseService(this);
             await this.encryptionDatabase.encryptionInit(identifier, secureCode, storepass, nonce);
         }
         return this.encryptionDatabase;
