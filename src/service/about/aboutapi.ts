@@ -29,5 +29,5 @@ export class AboutAPI extends BaseService {
             return Object.assign(new NodeInfo(), jsonObj);
         });
     })
-    async info(@Header("Authorization") authorization: string): Promise<Response> { return null; }
+    async info(@Header("Authorization") auth: string): Promise<Response> { return null; }
 }
