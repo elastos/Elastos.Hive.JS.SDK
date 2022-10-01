@@ -2,8 +2,6 @@ import { AppContextParameters, AppContext, DefaultAppContextProvider, VaultSubsc
 import {TestData} from "../config/testdata";
 import {AppDID} from "../did/appdid";
 
-
-
 describe.skip("test default appcontext provider", () => {
    
     let testData: TestData;
