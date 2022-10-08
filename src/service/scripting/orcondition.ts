@@ -1,5 +1,5 @@
-import { AggregatedCondition } from "./aggregatedcondition";
-import { Condition } from "./condition";
+import {AggregatedCondition} from "./aggregatedcondition";
+import {Condition} from "./condition";
 
 /**
  * Vault script condition that succeeds if at least one of the contained conditions are successful.
@@ -7,7 +7,7 @@ import { Condition } from "./condition";
  * succeeds.
  */
 export class OrCondition extends AggregatedCondition {
-	public constructor(name: string, conditions?: Condition[]) {
-		super(name, AggregatedCondition.OR, conditions);
-	}
+    public constructor(name: string, conditions?: Condition[]) {
+        super(name, AggregatedCondition.OR, conditions);
+    }
 }

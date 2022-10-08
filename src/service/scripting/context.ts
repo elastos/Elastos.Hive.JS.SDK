@@ -1,8 +1,5 @@
 export class Context {
-    
-    //@SerializedName("target_did")
 	private target_did: string;
-	//@SerializedName("target_app_did")
 	private target_app_did: string;
 
 	public setTargetDid( targetDid: string): Context {

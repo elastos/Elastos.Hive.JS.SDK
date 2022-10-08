@@ -1,7 +1,7 @@
 export class NodeVersion {
-	private major: number;
-	private minor: number;
-	private patch: number;
+	private readonly major: number;
+	private readonly minor: number;
+	private readonly patch: number;
 
 	constructor(major: number, minor: number, patch: number) {
 		this.major = major;

@@ -1,5 +1,5 @@
-import {InvalidParameterException, NotImplementedException} from "../../exceptions";
 import {Cipher, JSONObject} from "@elastosfoundation/did-js-sdk";
+import {InvalidParameterException, NotImplementedException} from "../../exceptions";
 import {BasicEncryptionValue, EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {Logger} from "../../utils/logger";
 
@@ -228,4 +228,3 @@ export class DatabaseEncryption {
         return new EncryptionUpdate(this.cipher, this.nonce, json).encrypt();
     }
 }
-//

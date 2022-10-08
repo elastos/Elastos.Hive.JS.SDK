@@ -1,4 +1,4 @@
-import { Condition } from "./condition";
+import {Condition} from "./condition";
 
 export class ExecutableType {
     public static AGGREGATED = "aggregated";
