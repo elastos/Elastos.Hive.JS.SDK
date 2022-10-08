@@ -1,15 +1,15 @@
-import { Executable, ExecutableType } from "./executable";
+import {Executable, ExecutableType} from "./executable";
 
 /**
  * Convenient class to store and serialize a sequence of executables.
  */
 export class AggregatedExecutable extends Executable {
 
-	public constructor(name: string, executables?: Executable[]) {
+	constructor(name: string, executables?: Executable[]) {
 		super(name, ExecutableType.AGGREGATED, executables);
 	}
 
-	public appendExecutable(executable: Executable): AggregatedExecutable {
+	appendExecutable(executable: Executable): AggregatedExecutable {
 		if (!executable || !executable.getBody())
 			return this;
 

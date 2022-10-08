@@ -1,5 +1,5 @@
-import { Executable } from "./executable";
-import { ExecutableDatabaseBody, ExecutableType } from "./executable";
+import {Executable} from "./executable";
+import {ExecutableDatabaseBody, ExecutableType} from "./executable";
 
 export class CountExecutableBody extends ExecutableDatabaseBody {
     private filter: any;

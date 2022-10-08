@@ -1,4 +1,4 @@
-import { Executable, ExecutableFileBody, ExecutableType } from "./executable";
+import {Executable, ExecutableFileBody, ExecutableType} from "./executable";
 
 export class FilePropertiesExecutable extends Executable {
     public constructor(name: string) {

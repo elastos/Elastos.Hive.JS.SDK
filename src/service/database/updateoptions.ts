@@ -1,4 +1,3 @@
-
 export class UpdateOptions {
     public upsert: boolean;
 	public bypass_document_validation: boolean;
