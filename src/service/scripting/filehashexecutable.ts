@@ -1,4 +1,4 @@
-import { Executable, ExecutableFileBody, ExecutableType } from "./executable";
+import {Executable, ExecutableFileBody, ExecutableType} from "./executable";
 
 export class FileHashExecutable extends Executable {
     constructor( name: string) {

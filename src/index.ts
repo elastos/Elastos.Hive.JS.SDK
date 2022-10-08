@@ -1,4 +1,3 @@
-
 'use strict';
 
 import { Vault } from "./vault";
@@ -9,10 +8,6 @@ import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
 import { SHA256 } from "./utils/sha256";
 import * as Utils from "./utils/utils";
-import { HttpOptions, HttpHeaders }  from "./connection/httpoptions";
-import { HttpMethod }  from "./connection/httpmethod";
-import { HttpResponseParser }  from "./connection/httpresponseparser";
-import { StreamResponseParser }  from "./connection/streamresponseparser";
 import { ServiceEndpoint }  from "./connection/serviceendpoint";
 import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
@@ -127,14 +122,10 @@ Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
     DataStorage,
-    HttpResponseParser,
-    StreamResponseParser,
     AppContextProvider,
     BridgeHandler,
     CodeFetcher,
-    BackupContext,
-    HttpHeaders,
-    HttpOptions
+    BackupContext
 }
 
 export {
@@ -157,7 +148,6 @@ export {
     VaultInfo,
     File,
     FileStorage,
-    HttpMethod,
     ServiceEndpoint,
     AccessToken,
     NodeVersion,

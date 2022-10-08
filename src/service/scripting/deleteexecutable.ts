@@ -1,4 +1,4 @@
-import { Executable, ExecutableDatabaseBody, ExecutableType } from "./executable";
+import {Executable, ExecutableDatabaseBody, ExecutableType} from "./executable";
 
 export class DeleteExecutableBody extends ExecutableDatabaseBody {
     private filter: any;
@@ -14,9 +14,4 @@ export class DeleteExecutable extends Executable {
         super(name, ExecutableType.DELETE, null);
         super.setBody(new DeleteExecutableBody(collectionName, filter));
     }
-
-    // public DeleteExecutable( name: string, collectionName: string) {
-    //     this(name, collectionName, null);
-    // }
-
 }

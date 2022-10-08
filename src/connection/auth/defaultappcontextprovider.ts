@@ -1,10 +1,20 @@
-import { Claims, DID, DIDBackend, DIDDocument, DIDStore, DIDURL, Issuer, JWTHeader, JWTParserBuilder, RootIdentity, VerifiableCredential, VerifiablePresentation } from "@elastosfoundation/did-js-sdk";
-import { HiveException } from "../../exceptions";
-import { AppContextProvider } from "./appcontextprovider";
+import {
+    Claims,
+    DID,
+    DIDDocument,
+    DIDStore,
+    DIDURL,
+    Issuer,
+    JWTHeader,
+    JWTParserBuilder,
+    RootIdentity,
+    VerifiableCredential,
+    VerifiablePresentation
+} from "@elastosfoundation/did-js-sdk";
+import {HiveException} from "../../exceptions";
+import {AppContextProvider} from "./appcontextprovider";
 import dayjs from "dayjs";
-import { Logger } from "../../utils/logger";
-//import { ShorthandPropertyAssignment } from "typescript";
-
+import {Logger} from "../../utils/logger";
 
 export class AppContextParameters {
 	storePath: string;
@@ -18,7 +28,6 @@ export class AppContextParameters {
 	userPhrasePass: string;
 	userStorePass: string;
 }
-
 
 export class DefaultAppContextProvider implements AppContextProvider {
 

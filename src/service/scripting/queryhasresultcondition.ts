@@ -1,4 +1,4 @@
-import { Condition } from "./condition";
+import {Condition} from "./condition";
 
 export class QueryHasResultConditionOptions {
     private skip: number;
@@ -17,7 +17,7 @@ export class QueryHasResultConditionBody {
     private filter: any;
     private options: QueryHasResultConditionOptions;
 
-    constructor( collectionName: string, filter: any, options?: QueryHasResultConditionOptions) {
+    constructor(collectionName: string, filter: any, options?: QueryHasResultConditionOptions) {
         this.collection = collectionName;
         this.filter = filter;
         this.options = options ? options : undefined;
@@ -27,7 +27,7 @@ export class QueryHasResultConditionBody {
 export class QueryHasResultCondition extends Condition {
     private static TYPE = "queryHasResults";
 
-    constructor(name: string, collectionName: string, filter: any,  options?: QueryHasResultConditionOptions) {
+    constructor(name: string, collectionName: string, filter: any, options?: QueryHasResultConditionOptions) {
         super(name, QueryHasResultCondition.TYPE, new QueryHasResultConditionBody(collectionName, filter, options));
     }
 }

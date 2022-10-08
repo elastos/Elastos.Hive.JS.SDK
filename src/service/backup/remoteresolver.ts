@@ -30,5 +30,3 @@ export class RemoteResolver implements CodeFetcher {
         throw new NotImplementedException();
     }
 }
-
-

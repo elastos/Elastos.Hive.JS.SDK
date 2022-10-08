@@ -1,4 +1,3 @@
-
 export class SortItem {
     public static ASCENDING = 1;
     public static DESCENDING = -1;

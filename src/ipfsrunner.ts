@@ -1,9 +1,7 @@
 import * as http from "http";
 import * as https from "https";
 
-
 export class IpfsRunner {
-
     private readonly ipfsGatewayUrl: string;
     private readonly https: any;
 
@@ -28,5 +26,4 @@ export class IpfsRunner {
             })
         });
     }
-
 }

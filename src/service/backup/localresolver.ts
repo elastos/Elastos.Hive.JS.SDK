@@ -1,8 +1,8 @@
-import { ServiceEndpoint } from "../../connection/serviceendpoint";
-import { CodeFetcher } from "../../connection/auth/codefetcher";
+import {VerifiableCredential} from "@elastosfoundation/did-js-sdk";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {CodeFetcher} from "../../connection/auth/codefetcher";
 import {BackupContext} from "./backupcontext";
 import {NotImplementedException} from "../../exceptions";
-import {VerifiableCredential} from "@elastosfoundation/did-js-sdk";
 import {SHA256} from "../..";
 
 export class LocalResolver implements CodeFetcher {
