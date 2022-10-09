@@ -229,7 +229,7 @@ describe("test scripting runner function", () => {
         await downloadFileByHiveUrl(true);
     });
 
-    test("testDownloadFileByHiveUrlWithReal", async () => {
+    test.skip("testDownloadFileByHiveUrlWithReal", async () => {
         const checkHiveUrl = async (url) => {
             const buffer = await scriptRunner.downloadFileByHiveUrl(url);
             expect(buffer).not.toBeNull();
