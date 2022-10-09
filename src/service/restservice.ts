@@ -79,6 +79,12 @@ export class RestServiceT<T> {
                         // BUGBUG: consider the bug of replace with {} on logger.
                         `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
 
+                    config['withCredentials'] = false; // CORS
+
+                    // uploading or other request body size
+                    config['maxContentLength'] = Infinity;
+                    config['maxBodyLength'] = Infinity;
+
                     return extraConfig ? {...config, ...extraConfig} : config;
                 })
                 .setResponseInterceptors((response) => {
