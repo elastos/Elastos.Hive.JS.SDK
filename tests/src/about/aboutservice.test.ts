@@ -38,5 +38,9 @@ describe("test about service", () => {
         expect(nodeInfo.getDescription()).toBeTruthy();
         expect(nodeInfo.getVersion()).toBeTruthy();
         expect(nodeInfo.getLastCommitId()).toBeTruthy();
+        expect(nodeInfo.getMemoryUsed()).toBeTruthy();
+        expect(nodeInfo.getMemoryTotal()).toBeTruthy();
+        expect(nodeInfo.getStorageUsed()).toBeTruthy();
+        expect(nodeInfo.getStorageTotal()).toBeTruthy();
     });
 });

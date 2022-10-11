@@ -46,7 +46,10 @@ export class SubscriptionAPI extends BaseService {
                 .setStorageUsed(jsonObj["storage_used"])
                 .setCreated(new Date(Number(jsonObj["created"]) * 1000))
                 .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                .setPricePlan(jsonObj["pricing_plan"]);
+                .setPricePlan(jsonObj["pricing_plan"])
+                .setAccessCount(0)
+                .setAccessAmount(0)
+                .setAccessLastTime(null);
         });
     })
     async subscribeToVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
@@ -63,6 +66,8 @@ export class SubscriptionAPI extends BaseService {
     @GET("/subscription/vault")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
+            const accessLastTime = jsonObj["access_last_time"] == -1 ? null
+                : new Date(Number(jsonObj["access_last_time"]) * 1000);
             return new VaultInfo().setServiceDid(jsonObj["service_did"])
                 .setStorageQuota(jsonObj["storage_quota"])
                 .setStorageUsed(jsonObj["storage_used"])
@@ -70,7 +75,10 @@ export class SubscriptionAPI extends BaseService {
                 .setEndTime(jsonObj["end_time"] > 0 ? new Date(Number(jsonObj["end_time"]) * 1000) : null)
                 .setCreated(new Date(Number(jsonObj["created"]) * 1000))
                 .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                .setPricePlan(jsonObj["pricing_plan"]);
+                .setPricePlan(jsonObj["pricing_plan"])
+                .setAccessCount(jsonObj['access_count'])
+                .setAccessAmount(jsonObj['access_amount'])
+                .setAccessLastTime(accessLastTime);
         });
     })
     async getVaultInfo(@Header("Authorization") auth: string): Promise<Response> { return null; }
@@ -78,7 +86,11 @@ export class SubscriptionAPI extends BaseService {
     @GET("/subscription/vault/app_stats")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj["apps"].map(v => Object.assign(new AppInfo(), v));
+            return jsonObj["apps"].map(v => {
+                v['access_last_time'] =
+                    v['access_last_time'] == -1 ? null : new Date(jsonObj["access_last_time"] * 1000);
+                return Object.assign(new AppInfo(), v);
+            });
         });
     })
     async getVaultAppStats(@Header("Authorization") auth: string): Promise<Response> { return null; }

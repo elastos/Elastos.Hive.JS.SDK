@@ -52,7 +52,7 @@ describe("test vault subscribe function", () => {
         expect(order2).toEqual(order);
     });
 
-    test.skip("testGetAppStats", async () => {
+    test("testGetAppStats", async () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e) {
@@ -63,12 +63,14 @@ describe("test vault subscribe function", () => {
         let appStats = await vaultSubscription.getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
-        expect(appStats[0].getName()).not.toEqual(null);
-        expect(appStats[0].getDeveloperDid()).not.toEqual(null);
-        expect(appStats[0].getIconUrl()).not.toEqual(null);
-        expect(appStats[0].getUserDid()).not.toEqual(null);
-        expect(appStats[0].getAppDid()).not.toEqual(null);
+        expect(appStats[0].getName()).not.toBeNull();
+        expect(appStats[0].getDeveloperDid()).not.toBeNull();
+        expect(appStats[0].getIconUrl()).not.toBeNull();
+        expect(appStats[0].getUserDid()).toBeTruthy();
+        expect(appStats[0].getAppDid()).toBeTruthy();
         expect(appStats[0].getUsedStorageSize()).toBeGreaterThanOrEqual(0);
+        expect(appStats[0].getAccessCount()).toBeGreaterThanOrEqual(0);
+        expect(appStats[0].getAccessAmount()).toBeGreaterThanOrEqual(0);
     });
 
     test("testSubscribeCheckUnsubscribe", async () => {
@@ -86,6 +88,7 @@ describe("test vault subscribe function", () => {
         const result: SubscriptionInfo = await vaultSubscription.checkSubscription();
         expect(result).not.toBeNull();
         // expect(result.getEndTime()).toBeTruthy();
+        expect(result.getAccessCount()).toBeGreaterThanOrEqual(0);
 
         // await vaultSubscription.deactivate();
 
