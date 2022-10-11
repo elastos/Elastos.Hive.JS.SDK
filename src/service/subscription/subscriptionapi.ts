@@ -61,7 +61,8 @@ export class SubscriptionAPI extends BaseService {
     async deactivateVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
 
     @DELETE("/subscription/vault")
-    async unsubscribeVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async unsubscribeVault(@Header("Authorization") auth: string,
+                           @Query('force') force: boolean): Promise<Response> { return null; }
 
     @GET("/subscription/vault")
     @ResponseTransformer((data: any, headers?: any) => {

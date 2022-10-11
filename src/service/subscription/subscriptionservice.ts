@@ -82,9 +82,9 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	async unsubscribeVault(): Promise<void> {
+	async unsubscribeVault(force: boolean): Promise<void> {
         return await this.callAPI(SubscriptionAPI, async api => {
-            return await api.unsubscribeVault(await this.getAccessToken());
+            return await api.unsubscribeVault(await this.getAccessToken(), force);
         });
 	}
 

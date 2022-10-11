@@ -92,7 +92,7 @@ describe("test vault subscribe function", () => {
 
         // await vaultSubscription.deactivate();
 
-        await vaultSubscription.unsubscribe();
+        await vaultSubscription.unsubscribe(true);
     });
 });
 
