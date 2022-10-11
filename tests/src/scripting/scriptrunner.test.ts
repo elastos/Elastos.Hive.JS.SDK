@@ -75,7 +75,7 @@ describe("test scripting runner function", () => {
             }
         }
         try { // remove vault to remove file
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             // console.log("vault is already subscribed");
         }

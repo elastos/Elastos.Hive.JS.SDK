@@ -11,7 +11,7 @@ describe.skip("test database services", () => {
             testData.getUserAppContext(),
             testData.getProviderAddress());
         try {
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             // do nothing.
         }

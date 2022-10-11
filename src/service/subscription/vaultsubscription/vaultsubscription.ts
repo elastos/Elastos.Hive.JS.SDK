@@ -46,8 +46,8 @@ export class VaultSubscription extends ServiceEndpoint {
         return await this.subscriptionService.getAppStats();
     }
 
-    async unsubscribe(): Promise<void> {
-        return await this.subscriptionService.unsubscribeVault();
+    async unsubscribe(force=false): Promise<void> {
+        return await this.subscriptionService.unsubscribeVault(force);
     }
 
     async placeOrder(planName: string): Promise<Order> {

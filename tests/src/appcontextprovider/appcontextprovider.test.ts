@@ -33,7 +33,7 @@ describe.skip("test default appcontext provider", () => {
         }
 
         try {
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             // Prevent an error on already subscribed vault
         }

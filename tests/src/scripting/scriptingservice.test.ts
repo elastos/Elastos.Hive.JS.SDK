@@ -79,7 +79,7 @@ describe.skip("test scripting function", () => {
     afterAll(async () => {
         try {
             await remove_test_database();
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e){
             console.log("vault is already unsubscribed");
         }

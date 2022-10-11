@@ -28,7 +28,7 @@ describe("test backup services", () => {
 
         // try to remove the vault.
         try {
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             if (!(e instanceof VaultNotFoundException)) {
                 throw e;
