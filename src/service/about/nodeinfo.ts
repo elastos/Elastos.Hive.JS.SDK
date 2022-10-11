@@ -12,6 +12,11 @@ export class NodeInfo {
     private user_count: number;
     private vault_count: number;
     private backup_count: number;
+    private latest_access_time: Date;
+    private memory_used: number;
+    private memory_total: number;
+    private storage_used: number;
+    private storage_total: number;
 
     getServiceDid(): string {
         return this.service_did;
@@ -55,5 +60,25 @@ export class NodeInfo {
 
     getBackupCount() {
         return this.backup_count;
+    }
+
+    getLatestAccessTime(): Date {
+        return this.latest_access_time;
+    }
+
+    getMemoryUsed(): number {
+        return this.memory_used;
+    }
+
+    getMemoryTotal(): number {
+        return this.memory_total;
+    }
+
+    getStorageUsed(): number {
+        return this.storage_used;
+    }
+
+    getStorageTotal(): number {
+        return this.storage_total;
     }
 }

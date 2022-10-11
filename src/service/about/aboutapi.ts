@@ -26,6 +26,8 @@ export class AboutAPI extends BaseService {
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             jsonObj['ownership_presentation'] = VerifiablePresentation.parse(JSON.stringify(jsonObj['ownership_presentation']));
+            jsonObj["latest_access_time"] = jsonObj["latest_access_time"] == -1 ? null
+                : new Date(Number(jsonObj["latest_access_time"]) * 1000);
             return Object.assign(new NodeInfo(), jsonObj);
         });
     })
