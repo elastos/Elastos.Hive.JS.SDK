@@ -52,7 +52,7 @@ describe("test vault subscribe function", () => {
         expect(order2).toEqual(order);
     });
 
-    test("testGetAppStats", async () => {
+    test.skip("testGetAppStats", async () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e) {
