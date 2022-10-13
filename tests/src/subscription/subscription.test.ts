@@ -3,7 +3,7 @@ import {
     PricingPlan,
     BackupSubscription,
     Order,
-    AlreadyExistsException, SubscriptionInfo
+    AlreadyExistsException, SubscriptionInfo, VaultInfo
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -77,6 +77,7 @@ describe("test vault subscribe function", () => {
         try {
             const vaultInfo = await vaultSubscription.subscribe();
             expect(vaultInfo).not.toBeNull();
+            expect(vaultInfo.getAppCount()).toBeGreaterThan(0);
         } catch (e) {
             if (!(e instanceof AlreadyExistsException)) {
                 throw e;
@@ -85,10 +86,11 @@ describe("test vault subscribe function", () => {
 
         // await vaultSubscription.activate();
 
-        const result: SubscriptionInfo = await vaultSubscription.checkSubscription();
+        const result: VaultInfo = await vaultSubscription.checkSubscription();
         expect(result).not.toBeNull();
         // expect(result.getEndTime()).toBeTruthy();
         expect(result.getAccessCount()).toBeGreaterThanOrEqual(0);
+        expect(result.getAppCount()).toBeGreaterThan(0);
 
         // await vaultSubscription.deactivate();
 
