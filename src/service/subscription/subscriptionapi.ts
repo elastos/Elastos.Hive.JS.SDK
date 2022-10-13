@@ -41,15 +41,17 @@ export class SubscriptionAPI extends BaseService {
     @PUT("/subscription/vault")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
-            return new VaultInfo().setServiceDid(jsonObj["service_did"])
+            return new VaultInfo()
+                .setAppCount(jsonObj["app_count"])
+                .setAccessCount(jsonObj["access_count"])
+                .setAccessAmount(jsonObj["access_amount"])
+                .setAccessLastTime(jsonObj["access_last_time"])
+                .setServiceDid(jsonObj["service_did"])
                 .setStorageQuota(jsonObj["storage_quota"])
                 .setStorageUsed(jsonObj["storage_used"])
                 .setCreated(new Date(Number(jsonObj["created"]) * 1000))
                 .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                .setPricePlan(jsonObj["pricing_plan"])
-                .setAccessCount(0)
-                .setAccessAmount(0)
-                .setAccessLastTime(null);
+                .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
     async subscribeToVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
@@ -69,17 +71,19 @@ export class SubscriptionAPI extends BaseService {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             const accessLastTime = jsonObj["access_last_time"] == -1 ? null
                 : new Date(Number(jsonObj["access_last_time"]) * 1000);
-            return new VaultInfo().setServiceDid(jsonObj["service_did"])
+            return new VaultInfo()
+                .setAppCount(jsonObj["app_count"])
+                .setAccessCount(jsonObj['access_count'])
+                .setAccessAmount(jsonObj['access_amount'])
+                .setAccessLastTime(accessLastTime)
+                .setServiceDid(jsonObj["service_did"])
                 .setStorageQuota(jsonObj["storage_quota"])
                 .setStorageUsed(jsonObj["storage_used"])
                 .setStartTime(new Date(Number(jsonObj["start_time"]) * 1000))
                 .setEndTime(jsonObj["end_time"] > 0 ? new Date(Number(jsonObj["end_time"]) * 1000) : null)
                 .setCreated(new Date(Number(jsonObj["created"]) * 1000))
                 .setUpdated(new Date(Number(jsonObj["updated"]) * 1000))
-                .setPricePlan(jsonObj["pricing_plan"])
-                .setAccessCount(jsonObj['access_count'])
-                .setAccessAmount(jsonObj['access_amount'])
-                .setAccessLastTime(accessLastTime);
+                .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
     async getVaultInfo(@Header("Authorization") auth: string): Promise<Response> { return null; }
