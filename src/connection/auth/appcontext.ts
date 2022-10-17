@@ -28,6 +28,8 @@ export class AppContext {
 	static debug = false;
     private static resolverHasSetup = false;
 
+    private static networkTimeout = 30000;
+
     private readonly contextProvider: AppContextProvider;
     private readonly userDid: string;
     private readonly appDid: string;
@@ -38,6 +40,14 @@ export class AppContext {
         this.userDid = userDid;
         this.appDid = appDid;
         this.forceResolve = false;
+    }
+
+    static setNetworkTimeout(timeout: number) {
+        AppContext.networkTimeout = timeout;
+    }
+
+    static getNetworkTimeout() {
+        return AppContext.networkTimeout;
     }
 
 	/**
