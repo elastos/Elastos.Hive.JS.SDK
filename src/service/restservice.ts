@@ -1,6 +1,6 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {NetworkException, NodeRPCException, ServiceEndpoint} from "..";
+import {AppContext, NetworkException, NodeRPCException, ServiceEndpoint} from "..";
 import {Logger} from '../utils/logger';
 import {assertTrue} from "../../tests/src/util";
 
@@ -80,6 +80,7 @@ export class RestServiceT<T> {
                         `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
 
                     config['withCredentials'] = false; // CORS
+                    config['timeout'] = AppContext.getNetworkTimeout();
 
                     // uploading or other request body size
                     config['maxContentLength'] = Infinity;
