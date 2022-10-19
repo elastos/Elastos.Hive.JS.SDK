@@ -11,8 +11,6 @@ export class FileStorage implements DataStorage {
 	private static BACKUP = "credential-backup";
 	private static TOKENS = "tokens";
 
-	private store;
-
 	constructor(rootPath: string, private userDid: string) {}
 
 	async loadBackupCredential(serviceDid: string): Promise<string> {
@@ -52,41 +50,35 @@ export class FileStorage implements DataStorage {
 	}
 
 	private getDatabaseStore(): Promise<any> {
-	    let _this = this;
 	    return new Promise<any>(((resolve, reject) => {
-	        if (!_this.store) {
-                // @ts-ignore
-                const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
-                const open = indexedDB.open("MyDatabase", 1);
+            // @ts-ignore
+            const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+            const open = indexedDB.open("MyDatabase", 1);
 
-                open.onerror = (event) => {
-                    const msg = `Database error: ${event.target.errorCode}`;
-                    FileStorage.LOG.error(msg);
-                    reject(Error(msg));
+            open.onerror = (event) => {
+                const msg = `Database error: ${event.target.errorCode}`;
+                FileStorage.LOG.error(msg);
+                reject(Error(msg));
+            };
+
+            open.onupgradeneeded = () => {
+                // INFO: triggered before "onsuccess"
+                const db = open.result;
+                const store = db.createObjectStore("MyObjectStore", {keyPath: "key"});
+                const index = store.createIndex("NameIndex", ["key"]);
+            };
+
+            open.onsuccess = () => {
+                const db = open.result;
+                const tx = db.transaction("MyObjectStore", "readwrite");
+                const store = tx.objectStore("MyObjectStore");
+                const index = store.index("NameIndex");
+
+                tx.oncomplete = function() {
+                    db.close();
                 };
 
-                open.onupgradeneeded = () => {
-                    // INFO: triggered before "onsuccess"
-                    const db = open.result;
-                    const store = db.createObjectStore("MyObjectStore", {keyPath: "key"});
-                    const index = store.createIndex("NameIndex", ["key"]);
-                };
-
-                open.onsuccess = () => {
-                    const db = open.result;
-                    const tx = db.transaction("MyObjectStore", "readwrite");
-                    const store = tx.objectStore("MyObjectStore");
-                    const index = store.index("NameIndex");
-
-                    tx.oncomplete = function() {
-                        db.close();
-                    };
-
-                    _this.store = store;
-                    resolve(store);
-                }
-            } else {
-                resolve(this.store);
+                resolve(store);
             }
         }));
     }
@@ -96,7 +88,10 @@ export class FileStorage implements DataStorage {
         return new Promise(((resolve, reject) => {
             const get = store.get(path);
             get.onsuccess = () => {
-                resolve(get.result.key);
+                if (!get.result || !get.result.key)
+                    resolve(null);
+                else
+                    resolve(get.result.key);
             };
             get.onerror = () => {
                 reject(Error('Failed to get the value.'));
