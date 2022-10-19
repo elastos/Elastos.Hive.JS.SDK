@@ -84,7 +84,7 @@ export class AccessToken implements CodeFetcher {
         const jwtCode = await this.authService.fetch();
 
         const key = await this.getStorageKey();
-        this.endpoint.getStorage().storeAccessToken(key, jwtCode);
+        await this.endpoint.getStorage().storeAccessToken(key, jwtCode);
 
         await this.bridge.flush(jwtCode);
         return jwtCode;
@@ -93,7 +93,7 @@ export class AccessToken implements CodeFetcher {
 	private async restoreToken() : Promise<string> {
         const key = await this.getStorageKey();
 
-        const jwtCode = this.endpoint.getStorage().loadAccessToken(key);
+        const jwtCode = await this.endpoint.getStorage().loadAccessToken(key);
         if (jwtCode == null) {
             return null;
         }
@@ -122,7 +122,7 @@ export class AccessToken implements CodeFetcher {
 
 	private async clearToken(key?: string) {
         const key_ = key ? key : await this.getStorageKey();
-        this.endpoint.getStorage().clearAccessToken(key_);
+        await this.endpoint.getStorage().clearAccessToken(key_);
 	}
 }
 

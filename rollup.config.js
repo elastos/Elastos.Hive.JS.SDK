@@ -201,6 +201,17 @@ export default command => {
                     'fs from "./fs"' : 'fs from "./fs.browser.ts"'
                 }
             }),
+            // Replace IndexedDB with local storage.
+            replace({
+                delimiters: ['', ''],
+                preventAssignment: true,
+                include: [
+                    'src/connection/serviceendpoint.ts'
+                ],
+                values: {
+                    "from '../utils/storage/filestorage'" : "from '../utils/storage/indexdbstorage'"
+                }
+            }),
             // Dirty circular dependency removal atttempt
             replace({
                 delimiters: ['', ''],

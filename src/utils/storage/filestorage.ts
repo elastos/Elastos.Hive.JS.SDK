@@ -24,85 +24,93 @@ export class FileStorage implements DataStorage {
 			file.createDirectory();
 	}
 
-	public loadBackupCredential(serviceDid: string): string {
-		return this.readContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)));
+	async loadBackupCredential(serviceDid: string): Promise<string> {
+		return await this.readContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)));
 	}
 
-	public loadAccessToken(serviceDid: string): string {
-		return this.readContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)));
+    async loadAccessToken(serviceDid: string): Promise<string> {
+		return await this.readContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)));
 	}
 
-	public loadAccessTokenByAddress(providerAddress: string): string {
-		return this.readContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
+    async loadAccessTokenByAddress(providerAddress: string): Promise<string> {
+		return await this.readContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
 	}
 
-	public storeBackupCredential(serviceDid: string, credential: string): void {
-		this.writeContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)), credential);
+    async storeBackupCredential(serviceDid: string, credential: string): Promise<void> {
+        await this.writeContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)), credential);
 	}
 
-	public storeAccessToken(serviceDid: string, accessToken: string): void {
-		this.writeContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)), accessToken);
+    async storeAccessToken(serviceDid: string, accessToken: string): Promise<void> {
+        await this.writeContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)), accessToken);
 	}
 
-	public storeAccessTokenByAddress(providerAddress: string, accessToken: string): void {
-		this.writeContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))), accessToken);
+    async storeAccessTokenByAddress(providerAddress: string, accessToken: string): Promise<void> {
+        await this.writeContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))), accessToken);
 	}
 
-	public clearBackupCredential(serviceDid: string): void {
-		this.deleteContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)));
+    async clearBackupCredential(serviceDid: string): Promise<void> {
+        await this.deleteContent(this.makeFullPath(FileStorage.BACKUP, this.compatDid(serviceDid)));
 	}
 
-	public clearAccessToken(serviceDid: string): void {
-		this.deleteContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)));
+    async clearAccessToken(serviceDid: string): Promise<void> {
+        await this.deleteContent(this.makeFullPath(FileStorage.TOKENS, this.compatDid(serviceDid)));
 	}
 
-	public clearAccessTokenByAddress(providerAddress: string): void {
-		this.deleteContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
+    async clearAccessTokenByAddress(providerAddress: string): Promise<void> {
+        await this.deleteContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
 	}
 
-	private readContent(path: string): string {
-		if (path == null)
-			return null;
+	private async readContent(path: string): Promise<string> {
+	    return new Promise(resolve => {
+            if (path == null)
+                resolve(null);
 
-		if (!File.exists(path))
-			return null;
+            if (!File.exists(path))
+                resolve(null);
 
-		try {
-			return new File(path).readText();
-		} catch (e) {
-            FileStorage.LOG.error(e.message);
-			return null;
-		}
+            try {
+                resolve(new File(path).readText());
+            } catch (e) {
+                FileStorage.LOG.error(e.message);
+                resolve(null);
+            }
+        });
 	}
 
-	private writeContent(path: string, content: string): void {
-		if (path == null)
-			return;
+	private async writeContent(path: string, content: string): Promise<void> {
+	    return new Promise(resolve => {
+            if (path == null)
+                resolve();
 
-        let targetFile: File = new File(path)
-		let parent: File = targetFile.getParentDirectory();
-		if (!parent.exists())
-			parent.createDirectory();
+            let targetFile: File = new File(path)
+            let parent: File = targetFile.getParentDirectory();
+            if (!parent.exists())
+                parent.createDirectory();
 
-		if (!parent.exists())
-			return;
+            if (!parent.exists())
+                resolve();
 
-		try {
-            targetFile.writeText(content);
-		} catch (e) {
-			FileStorage.LOG.error(e.message);
-		}
+            try {
+                targetFile.writeText(content);
+            } catch (e) {
+                FileStorage.LOG.error(e.message);
+            }
+            resolve();
+        });
 	}
 
-	private deleteContent(path: string): void {
-		if (path == null)
-			return;
+	private async deleteContent(path: string): Promise<void> {
+	    return new Promise(resolve => {
+            if (path == null)
+                resolve();
 
-		try {
-            (new File(path)).delete();
-		} catch (e) {
-			FileStorage.LOG.error(e.message);
-		}
+            try {
+                new File(path).delete();
+            } catch (e) {
+                FileStorage.LOG.error(e.message);
+            }
+            resolve();
+        });
 	}
 
 	private makeFullPath(segPath: string, fileName: string): string {
