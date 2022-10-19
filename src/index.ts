@@ -3,7 +3,6 @@
 import { Vault } from "./vault";
 import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
-import { FileStorage } from "./utils/storage/filestorage";
 import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
 import { SHA256 } from "./utils/sha256";
@@ -147,7 +146,6 @@ export {
     PricingPlan,
     VaultInfo,
     File,
-    FileStorage,
     ServiceEndpoint,
     AccessToken,
     NodeVersion,

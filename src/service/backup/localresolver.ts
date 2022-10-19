@@ -21,12 +21,12 @@ export class LocalResolver implements CodeFetcher {
 	    const key = await this.getStorageKey();
 
 	    // restore backup credential and check expired.
-		let token = this.endpoint.getStorage().loadBackupCredential(key);
+		let token = await this.endpoint.getStorage().loadBackupCredential(key);
 		if (token) {
             const credential = VerifiableCredential.parse(token);
             const expire_time: Date = await credential.getExpirationDate();
             if (expire_time.getTime() < Date.now()) {
-                this.endpoint.getStorage().clearBackupCredential(key);
+                await this.endpoint.getStorage().clearBackupCredential(key);
                 token = null;
             }
         }
@@ -34,7 +34,7 @@ export class LocalResolver implements CodeFetcher {
 		// if not get from local, try to get from remote.
 		if (token == null) {
 			token = await this.nextFetcher.fetch();
-            this.endpoint.getStorage().storeBackupCredential(key, token);
+            await this.endpoint.getStorage().storeBackupCredential(key, token);
 		}
 
 		return token;
