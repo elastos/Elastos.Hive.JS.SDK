@@ -5,48 +5,48 @@ import { Logger } from '../logger';
 /**
  * Based on IndexedDB instead of simulator file system.
  */
-export class FileStorage implements DataStorage {
-	private static LOG = new Logger("FileStorage");
+export class IndexedDBStorage implements DataStorage {
+	private static LOG = new Logger("IndexedDBStorage");
 
 	private static BACKUP = "credential-backup";
 	private static TOKENS = "tokens";
 
-	constructor(rootPath: string, private userDid: string) {}
+	constructor(private userDid: string) {}
 
 	async loadBackupCredential(serviceDid: string): Promise<string> {
-		return await this.readContent(this.makeStorageKey(FileStorage.BACKUP, serviceDid));
+		return await this.readContent(this.makeStorageKey(IndexedDBStorage.BACKUP, serviceDid));
 	}
 
 	async loadAccessToken(serviceDid: string): Promise<string> {
-		return await this.readContent(this.makeStorageKey(FileStorage.TOKENS, serviceDid));
+		return await this.readContent(this.makeStorageKey(IndexedDBStorage.TOKENS, serviceDid));
 	}
 
 	async loadAccessTokenByAddress(providerAddress: string): Promise<string> {
-		return await this.readContent(this.makeStorageKey(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
+		return await this.readContent(this.makeStorageKey(IndexedDBStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
 	}
 
     async storeBackupCredential(serviceDid: string, credential: string): Promise<void> {
-		await this.writeContent(this.makeStorageKey(FileStorage.BACKUP, serviceDid), credential);
+		await this.writeContent(this.makeStorageKey(IndexedDBStorage.BACKUP, serviceDid), credential);
 	}
 
     async storeAccessToken(serviceDid: string, accessToken: string): Promise<void> {
-        await this.writeContent(this.makeStorageKey(FileStorage.TOKENS, serviceDid), accessToken);
+        await this.writeContent(this.makeStorageKey(IndexedDBStorage.TOKENS, serviceDid), accessToken);
 	}
 
     async storeAccessTokenByAddress(providerAddress: string, accessToken: string): Promise<void> {
-        await this.writeContent(this.makeStorageKey(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))), accessToken);
+        await this.writeContent(this.makeStorageKey(IndexedDBStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))), accessToken);
 	}
 
     async clearBackupCredential(serviceDid: string): Promise<void> {
-        await this.deleteContent(this.makeStorageKey(FileStorage.BACKUP, serviceDid));
+        await this.deleteContent(this.makeStorageKey(IndexedDBStorage.BACKUP, serviceDid));
 	}
 
     async clearAccessToken(serviceDid: string): Promise<void> {
-        await this.deleteContent(this.makeStorageKey(FileStorage.TOKENS, serviceDid));
+        await this.deleteContent(this.makeStorageKey(IndexedDBStorage.TOKENS, serviceDid));
 	}
 
     async clearAccessTokenByAddress(providerAddress: string): Promise<void> {
-        await this.deleteContent(this.makeStorageKey(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
+        await this.deleteContent(this.makeStorageKey(IndexedDBStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
 	}
 
 	private getDatabaseStore(): Promise<any> {
@@ -57,7 +57,7 @@ export class FileStorage implements DataStorage {
 
             open.onerror = (event) => {
                 const msg = `Database error: ${event.target.errorCode}`;
-                FileStorage.LOG.error(msg);
+                IndexedDBStorage.LOG.error(msg);
                 reject(Error(msg));
             };
 

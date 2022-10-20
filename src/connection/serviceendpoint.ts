@@ -6,6 +6,7 @@ import {FileStorage} from '../utils/storage/filestorage'
 import {NodeVersion} from '../service/about/nodeversion'
 import {AboutService} from '../service/about/aboutservice'
 import {NodeInfo} from "../service/about/nodeinfo";
+import {IndexedDBStorage} from "../utils/storage/indexdbstorage";
 
 export class ServiceEndpoint {
     private readonly context: AppContext;
@@ -33,10 +34,13 @@ export class ServiceEndpoint {
 
         if (this.context) {
             let dataDir = this.context.getAppContextProvider().getLocalDataDir();
-            if (!dataDir.endsWith(File.SEPARATOR))
+            if (!dataDir.endsWith(File.SEPARATOR)) {
                 dataDir += File.SEPARATOR;
+            }
 
-            this.dataStorage = new FileStorage(dataDir, this.context.getUserDid());
+            this.dataStorage = this.context.isUseIndexedDB()
+                ? new IndexedDBStorage(this.context.getUserDid())
+                : new FileStorage(dataDir, this.context.getUserDid());
             this.accessToken = new AccessToken(this, this.dataStorage);
             this.aboutServiceAuth = new AboutService(this);
         }

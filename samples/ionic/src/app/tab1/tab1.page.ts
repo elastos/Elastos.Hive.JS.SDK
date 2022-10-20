@@ -410,10 +410,10 @@ export class Tab1Page {
 
     async getPlatformFee() {
         await this.initPaymentContract();
-        await this.updateMessage(async () => {
-            const result = await this.paymentContract.getPlatformFee();
-            this.log(`getPlatformFee() successfully: ${JSON.stringify(result)}`);
-        });
+        // await this.updateMessage(async () => {
+        //     const result = await this.paymentContract.getPlatformFee();
+        //     this.log(`getPlatformFee() successfully: ${JSON.stringify(result)}`);
+        // });
     }
 
     private static getIncreasedDays(start: Date, end: Date): number {

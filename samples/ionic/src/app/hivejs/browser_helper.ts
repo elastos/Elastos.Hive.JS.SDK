@@ -64,6 +64,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     }
 
     let appContext = await AppContext.build(appContextProvider, userDid, AppDID.APP_DID);
+    //appContext.setUseIndexedDB(true);
     return appContext;
   }
 

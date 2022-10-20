@@ -32,12 +32,22 @@ export class AppContext {
     private readonly userDid: string;
     private readonly appDid: string;
     private forceResolve: boolean;
+    private useIndexedDB: boolean;
 
     private constructor(provider: AppContextProvider, userDid: string, appDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
         this.appDid = appDid;
         this.forceResolve = false;
+        this.useIndexedDB = false;
+    }
+
+    setUseIndexedDB(use: boolean) {
+        this.useIndexedDB = use;
+    }
+
+    isUseIndexedDB(): boolean {
+        return this.useIndexedDB;
     }
 
 	/**
