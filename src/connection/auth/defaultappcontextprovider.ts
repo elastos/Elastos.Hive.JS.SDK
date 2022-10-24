@@ -39,8 +39,9 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	private appRootId: RootIdentity;
 	private userRootId: RootIdentity;
     private store: DIDStore;
+    private appDID: DIDDocument;
     
-    constructor(contextParameters: AppContextParameters) {
+    private constructor(contextParameters: AppContextParameters) {
 		this.contextParameters = contextParameters;
     }
     
@@ -60,6 +61,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 
 		await this.initDid(this.appRootId);
 		await this.initDid(this.userRootId);
+
+		this.appDID = await this.store.loadDid(this.contextParameters.appDID);
     }
 
     public async initPrivateIdentity(mnemonic: string, did: string|DID, storePass: string): Promise<RootIdentity> {
@@ -114,8 +117,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 * instance did document as the running context.
 	 * @return The application instance did document.
 	 */
-	async getAppInstanceDocument(): Promise<DIDDocument> {
-        return await this.store.loadDid(this.contextParameters.appDID);
+	getAppInstanceDocument(): DIDDocument {
+        return this.appDID;
     }
 
 	/**

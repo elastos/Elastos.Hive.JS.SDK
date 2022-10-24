@@ -19,7 +19,7 @@ export class AuthService extends RestServiceT<AuthAPI> {
 	async fetch(): Promise<string> {
         AuthService.LOG.trace("fetch::start fetch the access token");
 
-        const appInstanceDoc = await this.contextProvider.getAppInstanceDocument();
+        const appInstanceDoc = this.contextProvider.getAppInstanceDocument();
         AuthService.LOG.trace("fetch::application instance document:" + appInstanceDoc.toString(true));
 
         let challenge: string = null;
@@ -34,7 +34,7 @@ export class AuthService extends RestServiceT<AuthAPI> {
             let challengeResponse: string = await this.contextProvider.getAuthorization(challenge);
             AuthService.LOG.debug("fetch::challenge response " + challengeResponse);
 
-            const token = await this.auth(challengeResponse, await this.contextProvider.getAppInstanceDocument());
+            const token = await this.auth(challengeResponse, this.contextProvider.getAppInstanceDocument());
             AuthService.LOG.debug("fetch::token " + token);
 
             return token;
