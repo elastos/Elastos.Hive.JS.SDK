@@ -63,7 +63,7 @@ export class RestServiceT<T> {
 
     async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
         const appContext = this.serviceContext.getAppContext();
-        const doc: DIDDocument = await appContext.getAppContextProvider().getAppInstanceDocument();
+        const doc: DIDDocument = appContext.getAppContextProvider().getAppInstanceDocument();
         return await doc.createCipher(identifier, secureCode, storepass);
     }
 

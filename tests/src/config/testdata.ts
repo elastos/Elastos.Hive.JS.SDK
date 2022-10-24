@@ -22,6 +22,7 @@ export class TestData {
     private readonly clientConfig: any;
 
     private appInstanceDid: AppDID;
+    private appInstanceDidDoc: DIDDocument;
     // user & owner DID
     private userDid: UserDID;
     // caller DID for the scripting service
@@ -60,6 +61,7 @@ export class TestData {
             applicationConfig.storepass,
             this.clientConfig.resolverUrl,
             storeRoot, applicationConfig.did);
+        this.appInstanceDidDoc = await this.appInstanceDid.getDocument();
 
         let userConfig = this.clientConfig.user;
         this.userDid = await UserDID.create(userConfig.name,
@@ -123,8 +125,7 @@ export class TestData {
     }
 
 	async getEncryptionCipher() {
-        const doc = await this.appInstanceDid.getDocument();
-        return await doc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
+        return await this.appInstanceDidDoc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
     }
 
 	async getEncryptionDatabaseService(): Promise<DatabaseService> {
@@ -159,20 +160,14 @@ export class TestData {
     	const self = this;
     	userDid = userDid ? userDid : this.userDid;
         appDid = appDid ? appDid : AppDID.APP_DID;
-		return await AppContext.build({
+		return AppContext.build({
 
 			getLocalDataDir() : string {
 				return self.getLocalCachePath(false);
 			},
 
-			async getAppInstanceDocument() : Promise<DIDDocument>  {
-				try {
-					return await self.appInstanceDid.getDocument();
-				} catch (e) {
-					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
-					TestData.LOG.error(e.stack);
-                    throw e;
-				}
+			getAppInstanceDocument() : DIDDocument  {
+			    return self.appInstanceDidDoc;
 			},
 
 			async getAuthorization(jwtToken : string) : Promise<string> {
@@ -200,8 +195,8 @@ export class TestData {
 		return AppDID.APP_DID;
 	}
 
-	async getAppInstanceDid(): Promise<DIDDocument> {
-        return await this.appInstanceDid.getDocument();
+	getAppInstanceDid(): DIDDocument {
+        return this.appInstanceDidDoc;
     }
 
 	getUserDid(): string {
