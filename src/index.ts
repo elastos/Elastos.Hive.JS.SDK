@@ -1,13 +1,9 @@
 'use strict';
 
 import { Vault } from "./vault";
-import { DataStorage } from "./utils/storage/datastorage";
 import { File } from "./utils/storage/file";
-import { FileStorage } from "./utils/storage/filestorage";
 import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
-import { SHA256 } from "./utils/sha256";
-import * as Utils from "./utils/utils";
 import { ServiceEndpoint }  from "./connection/serviceendpoint";
 import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
@@ -102,10 +98,6 @@ import { Order, OrderState } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./connection/auth/defaultappcontextprovider";
 import { BackupContext } from "./service/backup/backupcontext";
-import { CodeFetcher } from "./connection/auth/codefetcher";
-import { CredentialCode } from "./service/backup/credentialcode";
-import { RemoteResolver } from "./service/backup/remoteresolver";
-import { LocalResolver } from "./service/backup/localresolver";
 import { HiveBackupContext } from "./service/backup/hivebackupcontext";
 import { Backup } from "./backup";
 import { Provider } from "./service/provider/provider";
@@ -121,10 +113,8 @@ import { SubscriptionInfo } from "./service/subscription/subscriptioninfo"
 Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
-    DataStorage,
     AppContextProvider,
     BridgeHandler,
-    CodeFetcher,
     BackupContext
 }
 
@@ -133,9 +123,6 @@ export {
     
     //initialize,
     HiveBackupContext,
-    LocalResolver,
-    CredentialCode,
-    RemoteResolver,
     DefaultAppContextProvider,
     AppContextParameters,
     Vault,
@@ -147,7 +134,6 @@ export {
     PricingPlan,
     VaultInfo,
     File,
-    FileStorage,
     ServiceEndpoint,
     AccessToken,
     NodeVersion,
@@ -263,8 +249,4 @@ export {
     APINotImplementedException,
     InsufficientStorageException,
     ServerUnknownException,
-
-    // Utilities
-    SHA256,
-    Utils,
 }
