@@ -1,6 +1,6 @@
 import {
     VaultSubscription, DatabaseService, AlreadyExistsException,
-    InsertOptions, FindOptions, CountOptions, UpdateOptions, QueryOptions,
+    InsertOptions, CountOptions, UpdateOptions, QueryOptions,
     AscendingSortItem, CollectionNotFoundException, NodeRPCException
 } from "../../../src";
 import { TestData } from "../config/testdata";

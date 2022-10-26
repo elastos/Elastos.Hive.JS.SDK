@@ -1,5 +1,5 @@
-import {TestData} from "./config/testdata";
 import {AlreadyExistsException, VaultSubscription} from "../../src";
+import {TestData} from "./config/testdata";
 
 /**
  * Please run this file in mainnet

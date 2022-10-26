@@ -1,5 +1,5 @@
-import { TestData } from "./config/testdata";
 import {PromotionService, VaultSubscription} from "../../src";
+import {TestData} from "./config/testdata";
 
 describe.skip("test database services", () => {
     let testData:TestData;

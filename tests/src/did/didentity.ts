@@ -1,6 +1,5 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
-import { File, Logger } from "../../../src";
-import {TestData} from "../config/testdata";
+import { Logger } from "../../../src";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
@@ -23,7 +22,7 @@ export class DIDEntity {
 	}
 
 	public async initDid(mnemonic: string, needResolve: boolean, storeRoot: string) {
-		const path = storeRoot + File.SEPARATOR + this.name;
+		const path = storeRoot + '/' + this.name;
 		this.didStore = await DIDStore.open(path);
 		const rootIdentity = await this.getRootIdentity(mnemonic);
 		await this.initDidByRootIdentity(rootIdentity, needResolve);
