@@ -3,7 +3,7 @@ import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {CodeFetcher} from "../../connection/auth/codefetcher";
 import {BackupContext} from "./backupcontext";
 import {NotImplementedException} from "../../exceptions";
-import {SHA256} from "../..";
+import {SHA256} from "../../utils/sha256";
 
 export class LocalResolver implements CodeFetcher {
 	private endpoint: ServiceEndpoint;
