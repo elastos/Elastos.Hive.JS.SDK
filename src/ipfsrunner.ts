@@ -14,16 +14,16 @@ export class IpfsRunner {
         let data = [];
         const url = `${this.ipfsGatewayUrl}/ipfs/${cid}`
         return new Promise(resolve => {
-            const request = this.https.get(url, function (response) {
-                response.on('data', function (chunk) {
+            this.https.get(url, function (response: any) {
+                response.on('data', function (chunk: any) {
                     data.push(chunk);
                 }).on('end', function () {
                     //at this point data is an array of Buffers
                     //so Buffer.concat() can make us a new Buffer
                     //of all of them together
                     resolve(Buffer.concat(data));
-                });
+                })
             })
-        });
+        })
     }
 }
