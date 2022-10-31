@@ -129,13 +129,13 @@ export class TestData {
     }
 
 	async getEncryptionDatabaseService(): Promise<DatabaseService> {
-        return await this.newVault().getEncryptionDatabaseService(this.getAppDid(), 6,
-            this.clientConfig.application.storepass, this.getNonce());
+        return (await this.newVault().setEncryption(this.clientConfig.application.storepass))
+            .getDatabaseService(true);
     }
 
     async getEncryptionFileService(): Promise<FilesService> {
-        return await this.newVault().getEncryptionFilesService(this.getAppDid(), 6,
-            this.clientConfig.application.storepass);
+        return (await this.newVault().setEncryption(this.clientConfig.application.storepass))
+            .getFilesService(true);
     }
 
     async getCipher(): Promise<Cipher> {
