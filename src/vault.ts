@@ -5,14 +5,17 @@ import {DatabaseService} from "./service/database/databaseservice";
 import {ScriptingService} from "./service/scripting/scriptingservice";
 import {BackupService} from "./service/backup/backupservice";
 import {checkArgument} from "./utils/utils";
+import {InvalidParameterException} from "./exceptions";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
 export class Vault extends ServiceEndpoint {
+    private static readonly DATABASE_NONCE = Buffer.from('404142434445464748494a4b4c4d4e4f5051525354555657', 'hex');
+
     private readonly filesService: FilesService;
-    private encryptionFilesService: FilesService;
-    private readonly database: DatabaseService;
+    private encryptionFiles: FilesService;
+    private readonly databaseService: DatabaseService;
     private encryptionDatabase: DatabaseService;
     private readonly scripting: ScriptingService;
     private readonly backupService: BackupService;
@@ -20,46 +23,39 @@ export class Vault extends ServiceEndpoint {
     constructor(context: AppContext, providerAddress?: string) {
         super(context, providerAddress);
         this.filesService = new FilesService(this);
-        this.encryptionFilesService = null;
-        this.database = new DatabaseService(this);
+        this.encryptionFiles = null;
+        this.databaseService = new DatabaseService(this);
         this.encryptionDatabase = null;
         this.scripting = new ScriptingService(this);
         this.backupService = new BackupService(this);
     }
 
-    getFilesService(): FilesService {
-        return this.filesService;
-    }
+    async setEncryption(storepass: string): Promise<Vault> {
+        checkArgument(!!storepass, 'Invalid storepass');
 
-    async getEncryptionFilesService(identifier: string, secureCode: number,
-                                           storepass: string): Promise<FilesService> {
-        checkArgument(!!identifier, 'Invalid identifier');
-        checkArgument(secureCode >= 0, 'Invalid secureCode');
-        checkArgument(storepass !== undefined && storepass !== null, 'Invalid storepass');
-
-        if (!this.encryptionFilesService) {
-            this.encryptionFilesService = new FilesService(this);
-            await this.encryptionFilesService.encryptionInit(identifier, secureCode, storepass);
+        if (!this.encryptionFiles) {
+            this.encryptionFiles = new FilesService(this);
+            await this.encryptionFiles.encryptionInit(this.getAppContext().getAppDid(), 0, storepass);
         }
-        return this.encryptionFilesService;
-    }
-
-    getDatabaseService(): DatabaseService {
-        return this.database;
-    }
-
-    async getEncryptionDatabaseService(identifier: string, secureCode: number,
-                                              storepass: string, nonce: Buffer): Promise<DatabaseService> {
-        checkArgument(!!identifier, 'Invalid identifier');
-        checkArgument(secureCode >= 0, 'Invalid secureCode');
-        checkArgument(storepass !== undefined && storepass !== null, 'Invalid storepass');
-        checkArgument(!!nonce, 'Invalid nonce');
-
         if (!this.encryptionDatabase) {
             this.encryptionDatabase = new DatabaseService(this);
-            await this.encryptionDatabase.encryptionInit(identifier, secureCode, storepass, nonce);
+            await this.encryptionDatabase.encryptionInit(this.getAppContext().getAppDid(), 0, storepass,
+                Vault.DATABASE_NONCE);
         }
-        return this.encryptionDatabase;
+
+        return this;
+    }
+
+    getFilesService(encrypt=false): FilesService {
+        if (encrypt && !this.encryptionFiles)
+            throw new InvalidParameterException(`Encryption need set first.`);
+        return encrypt ? this.encryptionFiles : this.filesService;
+    }
+
+    getDatabaseService(encrypt=false): DatabaseService {
+        if (encrypt && !this.encryptionDatabase)
+            throw new InvalidParameterException(`Encryption need set first.`);
+        return encrypt ? this.encryptionDatabase : this.databaseService;
     }
 
     getScriptingService(): ScriptingService {
