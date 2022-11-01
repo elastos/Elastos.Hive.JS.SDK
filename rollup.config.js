@@ -9,6 +9,8 @@ import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
+import {externals} from "rollup-plugin-node-externals";
+import {terser} from "rollup-plugin-terser";
 
 //import { writeFileSync } from "fs";
 
@@ -180,13 +182,13 @@ export default command => {
     const browserBuilds = {
         input: rollupSourceFile,
         onwarn,
-        external: [
-            '@elastosfoundation/did-js-sdk'
-            //'browserfs'
-            /* 'readable-stream',
-            'readable-stream/transform' */
-        ],
         plugins: [
+            // external the libs under devDependencies.
+            externals({
+                builtins: true,
+                deps: false,
+                devDeps: true
+            }),
             // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
             // GOOD HEADACHES WITH RESOLVE ERROR, UNEXPORTED CLASSES AND SO ON...
             json(),
@@ -284,6 +286,9 @@ export default command => {
                 "BrowserFS": "browserfs"
             }),
             size(),
+            ...prodBuild ? [
+                terser()
+            ] : [],
             visualizer({
                 filename: "./browser-bundle-stats.html"
             }) // To visualize bundle dependencies sizes on a UI.
