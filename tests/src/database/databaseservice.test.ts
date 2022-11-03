@@ -1,7 +1,7 @@
 import {
     VaultSubscription, DatabaseService, AlreadyExistsException,
     InsertOptions, CountOptions, UpdateOptions, QueryOptions,
-    AscendingSortItem, CollectionNotFoundException, NodeRPCException
+    AscendingSortItem, CollectionNotFoundException, HiveException
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -22,7 +22,7 @@ describe("test database services", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e) {
-            if (e instanceof NodeRPCException) {
+            if (e instanceof HiveException) {
                 if (e instanceof AlreadyExistsException) {
                     console.log("vault is already subscribed");
                 } else {

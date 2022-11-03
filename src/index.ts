@@ -1,7 +1,6 @@
 'use strict';
 
 import { Vault } from "./vault";
-import { File } from "./utils/storage/file";
 import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
 import { ServiceEndpoint }  from "./connection/serviceendpoint";
@@ -46,10 +45,8 @@ import { IllegalArgumentException,
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
     BadRequestException,
     InvalidParameterException,
     BackupIsInProcessException,
@@ -133,7 +130,6 @@ export {
     FilledOrderDetail,
     PricingPlan,
     VaultInfo,
-    File,
     ServiceEndpoint,
     AccessToken,
     NodeVersion,
@@ -223,10 +219,8 @@ export {
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
     BadRequestException,
     InvalidParameterException,
     BackupIsInProcessException,
