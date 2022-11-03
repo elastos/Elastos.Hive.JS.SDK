@@ -6,6 +6,7 @@ import {FileInfo} from "./fileinfo";
 import {checkArgument, checkNotNull} from "../../utils/utils";
 import {EncryptionFile} from "./encryptionfile";
 import {FilesAPI} from "./filesapi";
+import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 
 export class FilesService extends RestServiceT<FilesAPI> {
 	private static LOG = new Logger("FilesService");
@@ -75,7 +76,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 		}
 		if (this.encrypt) {
             isEncrypt = true;
-            encryptMethod = 'user_did';
+            encryptMethod = EncryptionValue.ENCRYPT_METHOD;
         }
 
         return await this.callAPI(FilesAPI, async (api) => {

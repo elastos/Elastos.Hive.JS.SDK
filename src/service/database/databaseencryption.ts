@@ -41,9 +41,7 @@ export class EncryptionDocument extends EncryptionValue {
             throw new InvalidParameterException(`Invalid dictionary ${JSON.stringify(this.value)}(${typeof this.value})`);
         }
 
-        let retVal = encryptRecursive(this.value);
-        retVal['__encrypt__'] = 'user_did'; // record encrypt way
-        return retVal;
+        return encryptRecursive(this.value);
     }
 
     decrypt() {
@@ -74,10 +72,6 @@ export class EncryptionDocument extends EncryptionValue {
 
             return value;
         };
-
-        if ('__encrypt__' in this.value) {
-            delete this.value['__encrypt__'];
-        }
 
         let retVal = decryptRecursive(this.value);
         return JSON.parse(JSON.stringify(retVal)); // JSONObject
@@ -168,7 +162,7 @@ export class DatabaseEncryption {
      * @param doc
      * @param isEncrypt
      */
-    encryptDoc(doc: any, isEncrypt=true) {
+    private encryptDoc(doc: any, isEncrypt=true) {
         const json = DatabaseEncryption.getGeneralJsonDict(doc, 'The document must be dictionary.');
         if (Object.keys(json).length == 0) {
             return {};
@@ -187,8 +181,6 @@ export class DatabaseEncryption {
     encryptDocs(docs: any[], isEncrypt=true) {
         let resDocs = [];
         for (const doc of docs) {
-            let edoc = this.encryptDoc(doc, isEncrypt);
-            edoc = this.encryptDoc(edoc, false);
             resDocs.push(this.encryptDoc(doc, isEncrypt));
         }
         return resDocs;

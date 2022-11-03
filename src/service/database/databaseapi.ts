@@ -15,12 +15,14 @@ import {
 } from 'ts-retrofit';
 import {InsertResult, UpdateResult} from "../..";
 import {APIResponse} from "../restservice";
+import {FindResult} from "./findresult";
 
 @BasePath("/api/v2/vault/db")
 export class DatabaseAPI extends BaseService {
     @PUT("/collections/{collectionName}")
     async createCollection(@Header("Authorization") authorization: string,
-                           @Path('collectionName') collectionName: string): Promise<Response> { return null; }
+                           @Path('collectionName') collectionName: string,
+                           @Body body: object): Promise<Response> { return null; }
 
     @DELETE("/{collectionName}")
     async deleteCollection(@Header("Authorization") authorization: string,
@@ -74,7 +76,7 @@ export class DatabaseAPI extends BaseService {
     @GET("/{collectionName}")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj["items"];
+            return Object.assign(new FindResult(), jsonObj);
         });
     })
     async find(@Header("Authorization") authorization: string,
@@ -86,7 +88,7 @@ export class DatabaseAPI extends BaseService {
     @POST("/query")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj["items"];
+            return Object.assign(new FindResult(), jsonObj);
         });
     })
     async query(@Header("Authorization") authorization: string,

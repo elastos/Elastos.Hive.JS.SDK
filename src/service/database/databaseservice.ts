@@ -12,6 +12,9 @@ import {UpdateResult} from "./updateresult";
 import {DeleteOptions} from "./deleteoptions";
 import {DatabaseEncryption} from "./databaseencryption";
 import {DatabaseAPI} from "./databaseapi";
+import {InvalidParameterException} from "../../exceptions";
+import {FindResult} from "./findresult";
+import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 
 /**
  * Database service is for save JSON data on the mongo database on hive node.
@@ -45,8 +48,13 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @return void
 	 */
 	async createCollection(collectionName: string): Promise<void>{
+	    let body = {};
+	    if (this.encrypt) {
+	        body['is_encrypt'] = true;
+	        body['encrypt_method'] = EncryptionValue.ENCRYPT_METHOD;
+        }
         await this.callAPI(DatabaseAPI, async (api) => {
-            return await api.createCollection(await this.getAccessToken(), collectionName);
+            return await api.createCollection(await this.getAccessToken(), collectionName, body);
         });
 	}
 
@@ -141,11 +149,7 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 
 		DatabaseService.LOG.debug(`fine docs: ${JSON.stringify(docs)}`);
 
-		if (!docs || docs.length === 0) {
-		    return null;
-        }
-
-		return this.encrypt ? this.databaseEncrypt.encryptDoc(docs[0], false) : docs[0];
+        return !docs || docs.length === 0 ? null : docs[0];
 	}
 
 	/**
@@ -166,11 +170,14 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         const skip = options ? options.skip : undefined;
         const limit = options ? options.limit : undefined;
 
-        const result = await this.callAPI(DatabaseAPI, async (api) => {
+        const result: FindResult = await this.callAPI(DatabaseAPI, async (api) => {
             return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
         });
 
-        return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
+        if (this.encrypt && !result.isEncrypt())
+            throw new InvalidParameterException('Cannot decrypt the documents from the encryption collection.');
+
+        return this.encrypt ? this.databaseEncrypt.encryptDocs(result.getItems(), false) : result.getItems();
 	}
 
  	/**
@@ -192,11 +199,11 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
             body['options'] = optionsJson;
         }
 
-        const result = await this.callAPI(DatabaseAPI, async (api) => {
+        const result: FindResult = await this.callAPI(DatabaseAPI, async (api) => {
             return await api.query(await this.getAccessToken(), collectionName, body);
         });
 
-        return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
+        return this.encrypt ? this.databaseEncrypt.encryptDocs(result.getItems(), false) : result.getItems();
 	}
 
 	/**
