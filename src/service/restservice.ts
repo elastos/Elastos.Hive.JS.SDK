@@ -1,8 +1,9 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {AppContext, NetworkException, NodeRPCException, ServiceEndpoint} from "..";
+import {AppContext, NetworkException, ServiceEndpoint} from "..";
 import {Logger} from '../utils/logger';
 import {assertTrue} from "../../tests/src/util";
+import {NodeExceptionAdapter} from "../exceptions";
 
 /**
  * Wrapper class to get the response body as a result object.
@@ -93,7 +94,7 @@ export class RestServiceT<T> {
                         response['config']['url'],
                         response['config']['method'],
                         response.status,
-                        response.data);
+                        JSON.stringify(response.data));
                     return response;
                 })
                 .build<T>(api);
@@ -152,7 +153,7 @@ export class RestServiceT<T> {
                 }
                 errorMessage = jsonObj['error']['message'];
             }
-            throw NodeRPCException.forHttpCode(status, errorMessage, errorCode);
+            throw NodeExceptionAdapter.forHttpCode(status, errorMessage, errorCode);
         }
     }
 

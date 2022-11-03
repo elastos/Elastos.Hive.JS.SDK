@@ -1,12 +1,13 @@
 import {
     AlreadyExistsException,
-    File, FileNotFoundException,
+    FileNotFoundException,
     FilesService, IpfsRunner,
     ScriptRunner,
     VaultSubscription
 } from "../../../src";
-import { TestData } from "../config/testdata";
-import { Blob } from 'buffer';
+import {TestData} from "../config/testdata";
+import {File} from "../../../src/utils/storage/file";
+import {Blob} from 'buffer';
 
 describe("test files service", () => {
 

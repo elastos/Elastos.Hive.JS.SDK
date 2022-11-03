@@ -1,12 +1,12 @@
 import {
     AlreadyExistsException,
-    File,
     FilesService,
     VaultSubscription
 } from "../../../src";
 import { TestData } from "../config/testdata";
 import {Cipher} from "@elastosfoundation/did-js-sdk";
 import {EncryptionFile} from "../../../src/service/files/encryptionfile";
+import {File} from "../../../src/utils/storage/file";
 import {randomBytes} from "crypto";
 
 describe("test files service", () => {

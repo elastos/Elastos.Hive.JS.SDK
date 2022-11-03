@@ -1,6 +1,6 @@
 import {
     VaultSubscription, DatabaseService, AlreadyExistsException,
-    InsertOptions, CollectionNotFoundException, NodeRPCException, UpdateOptions
+    InsertOptions, CollectionNotFoundException, UpdateOptions, HiveException
 } from "../../../src";
 import { TestData } from "../config/testdata";
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
@@ -20,7 +20,7 @@ describe("test database services", () => {
         try {
             await vaultSubscription.subscribe();
         } catch (e) {
-            if (e instanceof NodeRPCException) {
+            if (e instanceof HiveException) {
                 if (e instanceof AlreadyExistsException) {
                     console.log("vault is already subscribed");
                 } else {

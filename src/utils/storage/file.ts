@@ -22,11 +22,8 @@
 
 import path from "path";
 
-//import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, renameSync, statSync, writeFileSync, lstatSync, rmdirSync } from "./fs";
 import * as fs from "./fs";
 import { Logger } from "../logger";
-
-
 
 /**
  * Internal class mimicing Java File class in order to reduce the divergence with Java implementation
@@ -35,7 +32,7 @@ import { Logger } from "../logger";
  * implementation as we can until this SDK is totally stable.
  */
 
- export class File { // Exported, for test cases only
+ export class File {
     static SEPARATOR = "/";
 
     private static LOG = new Logger("File");
