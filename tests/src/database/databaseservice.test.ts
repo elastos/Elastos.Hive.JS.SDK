@@ -42,6 +42,10 @@ describe("test database services", () => {
         await expect(databaseService.createCollection(COLLECTION_NAME)).resolves.not.toThrow();
     });
 
+    test("testGetCollections", async () => {
+        await expect(databaseService.getCollections()).resolves.not.toThrow();
+    });
+
     test("testCreateCollection4AlreadyExistsException", async () => {
         let collectionName = `collection_${Date.now().toString()}`; 
         await databaseService.createCollection(collectionName);
