@@ -16,9 +16,18 @@ import {
 import {InsertResult, UpdateResult} from "../..";
 import {APIResponse} from "../restservice";
 import {FindResult} from "./findresult";
+import {Collection} from "./collection";
 
 @BasePath("/api/v2/vault/db")
 export class DatabaseAPI extends BaseService {
+    @GET("/collections")
+    @ResponseTransformer((data: any, headers?: any) => {
+        return APIResponse.handleResponseData(data, (jsonObj) => {
+            return jsonObj["collections"].map((c) => Object.assign(new Collection(), c));
+        });
+    })
+    async getCollections(@Header("Authorization") authorization: string): Promise<Response> { return null; }
+
     @PUT("/collections/{collectionName}")
     async createCollection(@Header("Authorization") authorization: string,
                            @Path('collectionName') collectionName: string,

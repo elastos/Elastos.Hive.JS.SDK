@@ -15,6 +15,7 @@ import {DatabaseAPI} from "./databaseapi";
 import {InvalidParameterException} from "../../exceptions";
 import {FindResult} from "./findresult";
 import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
+import {Collection} from "./collection";
 
 /**
  * Database service is for save JSON data on the mongo database on hive node.
@@ -39,6 +40,17 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         this.encrypt = true;
         const cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
         this.databaseEncrypt = new DatabaseEncryption(cipher, nonce);
+    }
+
+    /**
+     * Get all collections under user database.
+     *
+     * @return collection list
+     */
+    async getCollections(): Promise<Collection[]>{
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.getCollections(await this.getAccessToken());
+        });
     }
 
 	/**
