@@ -7,10 +7,13 @@ import {checkArgument, checkNotNull} from "../../utils/utils";
 import {EncryptionFile} from "./encryptionfile";
 import {FilesAPI} from "./filesapi";
 import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
+import { ProgressDisposer } from "./progressdisposer";
+import { ProgressHandler } from "./progresshandler";
+import { InvalidParameterException } from "../../exceptions";
+
+const logger = new Logger("FileService")
 
 export class FilesService extends RestServiceT<FilesAPI> {
-	private static LOG = new Logger("FilesService");
-
 	private encrypt: boolean;
 	private cipher: Cipher;
 
@@ -27,24 +30,28 @@ export class FilesService extends RestServiceT<FilesAPI> {
     /**
      * Download the file content by the remote file path.
      *
-     * @param path Relative remote file path.
-     * @param callback Callback for the progress of downloading with percent value. Only supported on browser side.
+     * @param path 	Relative remote file path.
+     * @param progressHandler Callback for the progress of downloading with percent value.
+	 * 				Only supported on browser side.
      */
-	async download(path: string, callback?: (process: number) => void): Promise<Buffer> {
-		checkNotNull(path, "Remote file path is mandatory.");
+	async download(path: string,
+		progressHandler: ProgressHandler = new ProgressDisposer()
+	): Promise<Buffer> {
+		if (path === null || path === '' )
+			throw new InvalidParameterException("Remote file path missing or invalid.")
 
-        const result = await this.callAPI(FilesAPI, async (api) => {
+		let cb = async (api: FilesAPI) => {
             return api.download(await this.getAccessToken(), path);
-        }, {
-            onDownloadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+        }
+		let moreConfig: any = {
+			onDownloadProgress: (progressEvent: any) => {
+                let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+				progressHandler.onProgress(percent)
             }
-        });
+		}
 
-        FilesService.LOG.debug("Downloaded " + Buffer.byteLength(result) + " byte(s).");
+        let result = await this.callAPI(FilesAPI, cb, moreConfig);
+        logger.debug(`Downloaded<${path}> with ${Buffer.byteLength(result)} byte(s)`);
 
         return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, result).decrypt()) : result;
 	}
@@ -54,22 +61,31 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *
 	 * @param path the path in files service.
 	 * @param data file's content.
-	 * @param isPublic 'true' will return the cid of the file which can be used to access from global ipfs gateway.
+	 * @param publicOnIPFS 'true' will return the cid of the file which can be used to access from global ipfs gateway.
 	 * @param scriptName used when is_public is true, this will create a new downloading script with name script_name.
-	 * @param callback callback for the process of uploading with percent value. Only supported on browser side.
+	 * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
 	 */
-	async upload(path: string, data: Buffer | string, callback?: (process: number) => void,
-                 isPublic = false, scriptName?: string): Promise<string> {
-		checkNotNull(path, "Remote destination path is mandatory.");
-		checkNotNull(data, "data must be provided.");
+	async upload(path: string,
+		data: Buffer | string,
+		progressHandler: ProgressHandler = new ProgressDisposer(),
+		publicOnIPFS = false,
+		scriptName?: string
+	): Promise<string> {
+		if (path === null || path === '')
+			throw new InvalidParameterException('Remote destination path missing or invalid');
+
+		if (data == null)
+			throw new InvalidParameterException('The data to put missing or invalid')
+
+
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
         const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, content).encrypt()) : content;
 
-		FilesService.LOG.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
+		logger.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
 
         let [isPublic_, scriptName_, isEncrypt, encryptMethod] = [null, null, null, null];
-        if (isPublic) {
+        if (publicOnIPFS) {
             checkArgument(!!scriptName, "Script name must be provided when is_public is true.");
             isPublic_ = true;
             scriptName_ = scriptName;
@@ -79,19 +95,20 @@ export class FilesService extends RestServiceT<FilesAPI> {
             encryptMethod = EncryptionValue.ENCRYPT_METHOD;
         }
 
-        return await this.callAPI(FilesAPI, async (api) => {
+		let cb = async (api: FilesAPI) => {
             return await api.upload(await this.getAccessToken(),
                 isPublic_, scriptName_, isEncrypt, encryptMethod, path, {
                     'data': encryptData
                 });
-        }, {
-            onUploadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+        }
+
+		let moreConfig: any = {
+            onUploadProgress: (progressEvent: any) => {
+                let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressHandler.onProgress(percent)
             }
-        });
+        }
+        return await this.callAPI(FilesAPI, cb, moreConfig);
 	}
 
 	/**
@@ -118,7 +135,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
             return api.getMetadata(await this.getAccessToken(), path);
         });
 	}
- 
+
 	/**
 	 * Returns the SHA256 hash of the given file.
 	 *
@@ -131,7 +148,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
             return api.getHash(await this.getAccessToken(), path);
         });
 	}
- 
+
 	/**
 	 * Moves (or renames) a file or folder.
 	 *
@@ -147,7 +164,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
             return api.move(await this.getAccessToken(), source, target);
         });
 	}
- 
+
 	/**
 	 * Copies a file or a folder (recursively).
 	 *
@@ -161,7 +178,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
             return api.copy(await this.getAccessToken(), source, target);
         });
 	}
- 
+
 	/**
 	 * Deletes a file, or a folder. In case the given path is a folder,
 	 * deletion is recursive.
@@ -171,8 +188,8 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *		 successfully deleted; false otherwise
 	 */
 	async delete(path: string): Promise<void> {
-        await this.callAPI(FilesAPI, async (api) => {
-            return api.delete(await this.getAccessToken(), path);
+		await this.callAPI(FilesAPI, async (api) => {
+			return api.delete(await this.getAccessToken(), path);
         });
 	}
 }
