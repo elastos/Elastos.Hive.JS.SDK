@@ -24,30 +24,39 @@ import { Logger } from '../../utils/logger';
  */
 export class AppContext {
 	private static LOG = new Logger("AppContext");
-	
+
 	static debug = false;
     private static resolverHasSetup = false;
-
-    private static networkTimeout = 30000;
 
     private readonly contextProvider: AppContextProvider;
     private readonly userDid: string;
     private readonly appDid: string;
     private forceResolve: boolean;
+    private networkTimeout: number;
 
     private constructor(provider: AppContextProvider, userDid: string, appDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
         this.appDid = appDid;
         this.forceResolve = false;
+        this.networkTimeout = 30000;
     }
 
-    static setNetworkTimeout(timeout: number) {
-        AppContext.networkTimeout = timeout;
+    /**
+     * Peg with network timeout
+     * @param timeout tiemout value in milliseconds
+     */
+    setNetworkTimeout(timeout: number): AppContext {
+        this.networkTimeout = timeout;
+        return this;
     }
 
-    static getNetworkTimeout() {
-        return AppContext.networkTimeout;
+    /**
+     * Get the configed network timeout
+     * @returns the network timeout.
+     */
+    getNetworkTimeout(): number {
+        return this.networkTimeout;
     }
 
 	/**
