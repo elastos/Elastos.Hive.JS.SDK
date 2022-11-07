@@ -1,31 +1,16 @@
-import {Cipher} from "@elastosfoundation/did-js-sdk";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
-import {Logger} from '../../utils/logger';
 import {RestServiceT} from "../restservice";
 import {FileInfo} from "./fileinfo";
 import {checkArgument, checkNotNull} from "../../utils/utils";
-import {EncryptionFile} from "./encryptionfile";
 import {FilesAPI} from "./filesapi";
 import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import { ProgressDisposer } from "./progressdisposer";
 import { ProgressHandler } from "./progresshandler";
-import { InvalidParameterException } from "../../exceptions";
-
-const logger = new Logger("FileService")
 
 export class FilesService extends RestServiceT<FilesAPI> {
-	private encrypt: boolean;
-	private cipher: Cipher;
-
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
-		this.encrypt = false;
 	}
-
-    async encryptionInit(identifier: string, secureCode: number, storepass: string) {
-        this.encrypt = true;
-        this.cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
-    }
 
     /**
      * Download the file content by the remote file path.
@@ -37,23 +22,19 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	async download(path: string,
 		progressHandler: ProgressHandler = new ProgressDisposer()
 	): Promise<Buffer> {
-		if (path === null || path === '' )
-			throw new InvalidParameterException("Remote file path missing or invalid.")
+        checkNotNull(path, "Remote file path is mandatory.");
 
-		let cb = async (api: FilesAPI) => {
+        let cb = async (api: FilesAPI) => {
             return api.download(await this.getAccessToken(), path);
         }
-		let moreConfig: any = {
-			onDownloadProgress: (progressEvent: any) => {
+        let moreConfig: any = {
+            onDownloadProgress: (progressEvent: any) => {
                 let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-				progressHandler.onProgress(percent)
+                progressHandler.onProgress(percent)
             }
-		}
+        }
 
-        let result = await this.callAPI(FilesAPI, cb, moreConfig);
-        logger.debug(`Downloaded<${path}> with ${Buffer.byteLength(result)} byte(s)`);
-
-        return this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, result).decrypt()) : result;
+        return await this.callAPI(FilesAPI, cb, moreConfig);
 	}
 
 	/**
@@ -61,48 +42,33 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 *
 	 * @param path the path in files service.
 	 * @param data file's content.
+     * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
 	 * @param publicOnIPFS 'true' will return the cid of the file which can be used to access from global ipfs gateway.
 	 * @param scriptName used when is_public is true, this will create a new downloading script with name script_name.
-	 * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
-	 */
-	async upload(path: string,
-		data: Buffer | string,
-		progressHandler: ProgressHandler = new ProgressDisposer(),
-		publicOnIPFS = false,
-		scriptName?: string
-	): Promise<string> {
-		if (path === null || path === '')
-			throw new InvalidParameterException('Remote destination path missing or invalid');
-
-		if (data == null)
-			throw new InvalidParameterException('The data to put missing or invalid')
-
-
+     * @param isEncrypt whether the content of the file is encrypted.
+     */
+	protected async uploadInternal(path: string,
+        data: Buffer | string,
+        progressHandler: ProgressHandler = new ProgressDisposer(),
+        publicOnIPFS = false,
+        scriptName?: string,
+        isEncrypt = false
+    ): Promise<string> {
+		checkNotNull(path, "Remote destination path is mandatory.");
+		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
-        const encryptData = this.encrypt ? Buffer.from(new EncryptionFile(this.cipher, content).encrypt()) : content;
 
-		logger.debug("Uploading " + Buffer.byteLength(content) + " byte(s).");
+		const encryptMethod = isEncrypt ? EncryptionValue.ENCRYPT_METHOD : '';
 
-        let [isPublic_, scriptName_, isEncrypt, encryptMethod] = [null, null, null, null];
-        if (publicOnIPFS) {
-            checkArgument(!!scriptName, "Script name must be provided when is_public is true.");
-            isPublic_ = true;
-            scriptName_ = scriptName;
-		}
-		if (this.encrypt) {
-            isEncrypt = true;
-            encryptMethod = EncryptionValue.ENCRYPT_METHOD;
-        }
-
-		let cb = async (api: FilesAPI) => {
+        let cb = async (api: FilesAPI) => {
             return await api.upload(await this.getAccessToken(),
-                isPublic_, scriptName_, isEncrypt, encryptMethod, path, {
-                    'data': encryptData
+                publicOnIPFS, scriptName, isEncrypt, encryptMethod, path, {
+                    'data': content
                 });
         }
 
-		let moreConfig: any = {
+        let moreConfig: any = {
             onUploadProgress: (progressEvent: any) => {
                 let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 progressHandler.onProgress(percent)
@@ -110,6 +76,11 @@ export class FilesService extends RestServiceT<FilesAPI> {
         }
         return await this.callAPI(FilesAPI, cb, moreConfig);
 	}
+
+    async upload(path: string, data: Buffer | string, callback?: (process: number) => void,
+                 isPublic: boolean = false, scriptName?: string): Promise<string> {
+        return this.uploadInternal(path, data, callback, isPublic, scriptName);
+    }
 
 	/**
 	 * Returns the list of all files in a given folder.
