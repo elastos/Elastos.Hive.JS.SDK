@@ -68,7 +68,7 @@ export class RestServiceT<T> {
         return await doc.createCipher(identifier, secureCode, storepass);
     }
 
-    private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
+    private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?: object): Promise<T> {
         if (this.api == null) {
             this.api = new ServiceBuilder() // TODO: use same ServiceBuilder
                 .setEndpoint(await this.serviceContext.getProviderAddress())
@@ -103,8 +103,8 @@ export class RestServiceT<T> {
     }
 
     async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
-                                                   callback: (a: T) => Promise<any>, // MUST return Response
-                                                   extraConfig?): Promise<any> {
+                                        callback: (a: T) => Promise<any>, // MUST return Response
+                                        extraConfig?): Promise<any> {
         const serviceApi = await this.getAPI(api, extraConfig);
         try {
             // do real api call
