@@ -24,6 +24,7 @@ import { Logger } from '../../utils/logger';
  */
 export class AppContext {
 	private static LOG = new Logger("AppContext");
+	private static networkTimeout = 30000;
 
 	static debug = false;
     private static resolverHasSetup = false;
@@ -46,17 +47,16 @@ export class AppContext {
      * Peg with network timeout
      * @param timeout tiemout value in milliseconds
      */
-    setNetworkTimeout(timeout: number): AppContext {
-        this.networkTimeout = timeout;
-        return this;
+    static setNetworkTimeout(timeout: number): void {
+        AppContext.networkTimeout = timeout;
     }
 
     /**
      * Get the configed network timeout
      * @returns the network timeout.
      */
-    getNetworkTimeout(): number {
-        return this.networkTimeout;
+    static getNetworkTimeout(): number {
+        return AppContext.networkTimeout;
     }
 
 	/**

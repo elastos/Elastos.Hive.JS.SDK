@@ -6,7 +6,7 @@ import {ScriptingService} from "./service/scripting/scriptingservice";
 import {BackupService} from "./service/backup/backupservice";
 import {checkArgument} from "./utils/utils";
 import {InvalidParameterException} from "./exceptions";
-import {EncryptionFilesservice} from "./service/files/encryption.filesservice";
+import {EncryptionFilesService} from "./service/files/encryption.filesservice";
 import {EncryptionDatabaseService} from "./service/database/encryption.databaseservice";
 import {AppInfo} from "./service/subscription/appinfo";
 import {SubscriptionAPI} from "./service/subscription/subscriptionapi";
@@ -39,7 +39,7 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
         checkArgument(!!storepass, 'Invalid storepass');
 
         if (!this.encryptionFiles) {
-            const service = new EncryptionFilesservice(this.getServiceContext());
+            const service = new EncryptionFilesService(this.getServiceContext());
             await service.encryptionInit(this.getServiceContext().getAppContext().getAppDid(), 0, storepass);
             this.encryptionFiles = service;
         }

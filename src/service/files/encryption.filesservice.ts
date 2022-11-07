@@ -5,7 +5,7 @@ import {EncryptionFile} from "./encryptionfile";
 import {ProgressHandler} from "./progresshandler";
 import {ProgressDisposer} from "./progressdisposer";
 
-export class EncryptionFilesservice extends FilesService {
+export class EncryptionFilesService extends FilesService {
     private cipher: Cipher;
 
     constructor(serviceContext: ServiceEndpoint) {
@@ -24,7 +24,7 @@ export class EncryptionFilesservice extends FilesService {
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
                  isPublic: boolean = false,
-                 scriptName: string = ''): Promise<string> {
+                 scriptName: string = null): Promise<string> {
         if (isPublic)
             throw new InvalidParameterException('No support for public the encrypted file.');
 

@@ -51,7 +51,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
         data: Buffer | string,
         progressHandler: ProgressHandler = new ProgressDisposer(),
         publicOnIPFS = false,
-        scriptName?: string,
+        scriptName: string = null,
         isEncrypt = false
     ): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
@@ -59,7 +59,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
 		checkArgument(content.length > 0, "No data to upload.");
 
-		const encryptMethod = isEncrypt ? EncryptionValue.ENCRYPT_METHOD : '';
+		const encryptMethod = isEncrypt ? EncryptionValue.ENCRYPT_METHOD : null;
 
         let cb = async (api: FilesAPI) => {
             return await api.upload(await this.getAccessToken(),
@@ -80,7 +80,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
                  isPublic: boolean = false,
-                 scriptName: string = ''): Promise<string> {
+                 scriptName: string = null): Promise<string> {
         return this.uploadInternal(path, data, progressHandler, isPublic, scriptName);
     }
 
