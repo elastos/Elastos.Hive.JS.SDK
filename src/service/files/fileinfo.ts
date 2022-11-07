@@ -3,29 +3,34 @@
  */
 export class FileInfo {
 	private name: string;
-	private is_file: boolean;
+	private _isFile: boolean;
 	private size: number;
 	private created: number;
 	private updated: number;
 
-	public setName(name: string): void {
+	public setName(name: string): FileInfo {
 		this.name = name;
+		return this;
 	}
 
-	public setAsFile(file: boolean): void {
-		this.is_file = file;
+	public setAsFile(file: boolean): FileInfo {
+		this._isFile = file;
+		return this;
 	}
 
-	public setSize(size: number): void {
+	public setSize(size: number): FileInfo {
 		this.size = size;
+		return this;
 	}
 
-	public setCreated(created: number): void {
+	public setCreated(created: number): FileInfo {
 		this.created = created;
+		return this;
 	}
 
-	public setUpdated(updated: number): void {
+	public setUpdated(updated: number): FileInfo {
 		this.updated = updated;
+		return this;
 	}
 
 	public getName(): string {
@@ -33,7 +38,7 @@ export class FileInfo {
 	}
 
 	public isFile(): boolean {
-		return this.is_file;
+		return this._isFile;
 	}
 
 	public getSize(): number {

@@ -27,21 +27,29 @@ export class FilesAPI extends BaseService {
             return jsonObj["cid"];
         });
     })
-    async upload(@Header("Authorization") authorization: string,
-                 @Query("public") isPublic: boolean,
-                 @Query("script_name") scriptName: string,
-                 @Query("is_encrypt") isEncrypt: boolean,
-                 @Query("encrypt_method") encrypt_method: string,
-                 @Path("path") path: string,
-                 @Body body: object): Promise<Response> { return null; }
+    async upload(
+        @Header("Authorization") authorization: string,
+        @Query("public") isPublic: boolean,
+        @Query("script_name") scriptName: string,
+        @Query("is_encrypt") isEncrypt: boolean,
+        @Query("encrypt_method") encrypt_method: string,
+        @Path("path") path: string,
+        @Body body: object
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @GET("/files/{path}")
     @ResponseType("arraybuffer")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data);
     })
-    async download(@Header("Authorization") authorization: string,
-                   @Path("path") path: string): Promise<Response> { return null; }
+    async download(
+        @Header("Authorization") authorization: string,
+        @Path("path") path: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @GET("/files/{path}?comp=children")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -49,33 +57,39 @@ export class FilesAPI extends BaseService {
             const rawFiles = jsonObj["value"];
             let files = [];
             for (let file of rawFiles) {
-                let fileInfo = new FileInfo();
-                fileInfo.setCreated(file["created"]);
-                fileInfo.setUpdated(file["updated"]);
-                fileInfo.setName(file["name"]);
-                fileInfo.setAsFile(file["is_file"]);
-                fileInfo.setSize(file["size"]);
-                files.push(fileInfo);
+                let item = new FileInfo()
+                    .setCreated(file["created"])
+                    .setName(file["updated"])
+                    .setAsFile(file["is_file"])
+                    .setSize(file["size"]);
+                files.push(item);
             }
             return files;
         });
     })
-    async listChildren(@Header("Authorization") authorization: string,
-                       @Path("path") path: string): Promise<Response> { return null; }
+    async listChildren(
+        @Header("Authorization") authorization: string,
+        @Path("path") path: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @GET("/files/{path}?comp=metadata")
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
-            const newFileInfo = new FileInfo();
-            newFileInfo.setCreated(jsonObj["created"]);
-            newFileInfo.setUpdated(jsonObj["updated"]);
-            newFileInfo.setName(jsonObj["name"]);
-            newFileInfo.setAsFile(jsonObj["is_file"]);
-            return newFileInfo;
+            return new FileInfo()
+                .setCreated(jsonObj["created"])
+                .setUpdated(jsonObj["updated"])
+                .setName(jsonObj["name"])
+                .setAsFile(jsonObj["is_file"]);
         });
     })
-    async getMetadata(@Header("Authorization") authorization: string,
-                      @Path("path") path: string): Promise<Response> { return null; }
+    async getMetadata(
+        @Header("Authorization") authorization: string,
+        @Path("path") path: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+     }
 
     @GET("/files/{path}?comp=hash")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -83,8 +97,12 @@ export class FilesAPI extends BaseService {
             return jsonObj['hash'];
         });
     })
-    async getHash(@Header("Authorization") authorization: string,
-                  @Path("path") path: string): Promise<Response> { return null; }
+    async getHash(
+        @Header("Authorization") authorization: string,
+        @Path("path") path: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @PUT("/files/{path}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -92,9 +110,13 @@ export class FilesAPI extends BaseService {
             return jsonObj['name'];
         });
     })
-    async copy(@Header("Authorization") authorization: string,
-               @Path("path") src: string,
-               @Query("dest") dest: string): Promise<Response> { return null; }
+    async copy(
+        @Header("Authorization") authorization: string,
+        @Path("path") src: string,
+        @Query("dest") dest: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @PATCH("/files/{path}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -102,11 +124,19 @@ export class FilesAPI extends BaseService {
             return jsonObj['name'];
         });
     })
-    async move(@Header("Authorization") authorization: string,
-               @Path("path") src: string,
-               @Query("to") dst: string): Promise<Response> { return null; }
+    async move(
+        @Header("Authorization") authorization: string,
+        @Path("path") src: string,
+        @Query("to") dst: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+    }
 
     @DELETE("/files/{path}")
-    async delete(@Header("Authorization") authorization: string,
-                 @Path("path") path: string): Promise<Response> { return null; }
+    async delete(
+        @Header("Authorization") authorization: string,
+        @Path("path") path: string
+    ): Promise<Response> {
+        throw new Error("Not implemented");
+     }
 }
