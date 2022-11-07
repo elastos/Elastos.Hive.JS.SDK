@@ -3,7 +3,6 @@ import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {VaultInfo} from "./vaultinfo";
 import {BackupInfo} from "./backupinfo";
-import {AppInfo} from "./appinfo";
 import {SubscriptionAPI} from "./subscriptionapi";
 import {checkArgument} from "../../utils/utils";
 
@@ -48,18 +47,6 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	async getVaultInfo(): Promise<VaultInfo> {
 	    return await this.callAPI(SubscriptionAPI, async api => {
             return await api.getVaultInfo(await this.getAccessToken());
-        });
-	}
-
-	/**
-	 * Get the details of the vault applications.
-	 *
-	 * @return The details of the vault applications.
-	 * @throws HiveException The error comes from the hive node.
-	 */
-	async getAppStats(): Promise<AppInfo[]> {
-        return await this.callAPI(SubscriptionAPI, async api => {
-            return await api.getVaultAppStats(await this.getAccessToken());
         });
 	}
 

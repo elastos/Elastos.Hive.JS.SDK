@@ -77,9 +77,10 @@ export class FilesService extends RestServiceT<FilesAPI> {
         return await this.callAPI(FilesAPI, cb, moreConfig);
 	}
 
-    async upload(path: string, data: Buffer | string, callback?: (process: number) => void,
+    async upload(path: string, data: Buffer | string,
+                 progressHandler: ProgressHandler = new ProgressDisposer(),
                  isPublic: boolean = false, scriptName?: string): Promise<string> {
-        return this.uploadInternal(path, data, callback, isPublic, scriptName);
+        return this.uploadInternal(path, data, progressHandler, isPublic, scriptName);
     }
 
 	/**
