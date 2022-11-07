@@ -122,18 +122,12 @@ export default command => {
         ],
         // fsevents is a dependency of chokidar that cannot be bundled as it contains binary code
         external: [
-            'assert',
             'axios',
-            'crypto',
-            'events',
-            'fs',
-            'fsevents',
-            'module',
-            'path',
-            'os',
-            'stream',
-            'url',
-            'util',
+            'browserfs',
+            'buffer',
+            'dayjs',
+            'promise-queue',
+            'ts-retrofit',
             '@elastosfoundation/did-js-sdk'
         ],
         treeshake,
@@ -183,10 +177,13 @@ export default command => {
         input: rollupSourceFile,
         onwarn,
         external: [
+            'axios',
+            'browserfs',
+            'buffer',
+            'dayjs',
+            'promise-queue',
+            'ts-retrofit',
             '@elastosfoundation/did-js-sdk'
-            //'browserfs'
-            /* 'readable-stream',
-            'readable-stream/transform' */
         ],
         plugins: [
             // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
