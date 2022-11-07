@@ -6,6 +6,8 @@ import {ScriptingService} from "./service/scripting/scriptingservice";
 import {BackupService} from "./service/backup/backupservice";
 import {checkArgument} from "./utils/utils";
 import {InvalidParameterException} from "./exceptions";
+import {EncryptionFilesservice} from "./service/files/encryption.filesservice";
+import {EncryptionDatabaseService} from "./service/database/encryption.databaseservice";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
@@ -34,12 +36,13 @@ export class Vault extends ServiceEndpoint {
         checkArgument(!!storepass, 'Invalid storepass');
 
         if (!this.encryptionFiles) {
-            this.encryptionFiles = new FilesService(this);
-            await this.encryptionFiles.encryptionInit(this.getAppContext().getAppDid(), 0, storepass);
+            const service = new EncryptionFilesservice(this);
+            await service.encryptionInit(this.getAppContext().getAppDid(), 0, storepass);
+            this.encryptionFiles = service;
         }
         if (!this.encryptionDatabase) {
-            this.encryptionDatabase = new DatabaseService(this);
-            await this.encryptionDatabase.encryptionInit(this.getAppContext().getAppDid(), 0, storepass,
+            const service = new EncryptionDatabaseService(this);
+            await service.encryptionInit(this.getAppContext().getAppDid(), 0, storepass,
                 Vault.DATABASE_NONCE);
         }
 

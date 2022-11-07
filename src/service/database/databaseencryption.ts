@@ -162,7 +162,7 @@ export class DatabaseEncryption {
      * @param doc
      * @param isEncrypt
      */
-    private encryptDoc(doc: any, isEncrypt=true) {
+    encryptDoc(doc: any, isEncrypt=true) {
         const json = DatabaseEncryption.getGeneralJsonDict(doc, 'The document must be dictionary.');
         if (Object.keys(json).length == 0) {
             return {};
