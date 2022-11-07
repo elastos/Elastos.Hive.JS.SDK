@@ -23,7 +23,8 @@ export class EncryptionFilesservice extends FilesService {
 
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic: boolean = false, scriptName?: string): Promise<string> {
+                 isPublic: boolean = false,
+                 scriptName: string = ''): Promise<string> {
         if (isPublic)
             throw new InvalidParameterException('No support for public the encrypted file.');
 
