@@ -10,6 +10,7 @@ import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
 import { terser } from 'rollup-plugin-terser';
+import pkg from './package.json';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -22,13 +23,13 @@ export function emitModulePackageFile() {
 	};
 }
 
-// const commitHash = (function () {
-//     try {
-//         return fs.readFileSync('.commithash', 'utf-8');
-//     } catch (err) {
-//         return 'unknown';
-//     }
-// })();
+const commitHash = (function () {
+    try {
+        return fs.readFileSync('.commithash', 'utf-8');
+    } catch (err) {
+        return 'unknown';
+    }
+})();
 
 const prodBuild = process.env.prodbuild || false;
 console.log("Prod build: ", prodBuild);
@@ -37,13 +38,13 @@ const now = new Date(
     process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
 ).toUTCString();
 
-// const banner = `/*
-//   @license
-//     hive.js v${pkg.version}
-//     ${now} - commit ${commitHash}
+const banner = `/*
+  @license
+    hive.js v${pkg.version}
+    ${now} - commit ${commitHash}
 
-//     Released under the MIT License.
-// */`;
+    Released under the MIT License.
+*/`;
 
 const onwarn = warning => {
     // eslint-disable-next-line no-console
@@ -133,7 +134,7 @@ export default command => {
         treeshake,
         strictDeprecations: true,
         output: {
-            //banner,
+            banner,
             chunkFileNames: 'shared/[name].js',
             dir: 'dist',
             entryFileNames: '[name]',
@@ -298,7 +299,7 @@ export default command => {
             {
                 file: 'dist/es/hive.browser.js',
                 format: 'es',
-                //banner,
+                banner,
                 sourcemap: !prodBuild,
                 //intro: 'var process: { env: {}};'
                 //intro: 'var global = typeof self !== undefined ? self : this;' // Fix "global is not defined"
