@@ -269,20 +269,7 @@ export default command => {
                 }
             }),
             alias({
-                "entries": [
-                    { "find": "buffer", "replacement": "buffer-es6" },
-                    { "find": "process", "replacement": "process-es6" },
-                    //{ "find": "fs", "replacement": "browserfs/dist/shims/fs" },
-                    { "find": "path", "replacement": "path-browserify" },
-                    { "find": "crypto", "replacement": "crypto-browserify" },
-                    { "find": "util/", "replacement": "node_modules/util/util.js" },
-                    { "find": "util", "replacement": "node_modules/util/util.js" },
-                    { "find": "stream", "replacement": "./src/utils/browser/stream.js" },
-                    { "find": "string_decoder/", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
-                    { "find": "string_decoder", "replacement": "node_modules/string_decoder/lib/string_decoder.js" },
-                    { "find": "events", "replacement": "node_modules/events/events.js" },
-                    { "find": "assert", "replacement": "node_modules/assert/build/assert.js" }
-                ]
+                "entries": []
             }),
             nodeResolve({
                 mainFields: ['browser', 'module', 'jsnext:main', 'main'],
