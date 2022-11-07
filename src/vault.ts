@@ -44,6 +44,7 @@ export class Vault extends ServiceEndpoint {
             const service = new EncryptionDatabaseService(this);
             await service.encryptionInit(this.getAppContext().getAppDid(), 0, storepass,
                 Vault.DATABASE_NONCE);
+            this.encryptionDatabase = service;
         }
 
         return this;
