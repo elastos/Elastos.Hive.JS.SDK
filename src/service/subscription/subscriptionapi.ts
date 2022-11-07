@@ -5,10 +5,10 @@ import {AppInfo, BackupInfo, PricingPlan, VaultInfo} from "../..";
 @BasePath("/api/v2")
 export class SubscriptionAPI extends BaseService {
     @GET("/subscription/pricing_plan")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             const plans = jsonObj['pricingPlans'];
-            return plans.map(plan => {
+            return plans.map((plan: any) => {
                 return new PricingPlan().setAmount(plan["amount"])
                     .setCurrency(plan["currency"])
                     .setMaxStorage(plan["maxStorage"])
@@ -17,15 +17,19 @@ export class SubscriptionAPI extends BaseService {
             });
         });
     })
-    async getVaultPricePlans(@Header("Authorization") auth: string,
-                             @Query('subscription') subscription?: string,
-                             @Query('name') name?: string): Promise<Response> { return null; }
+    async getVaultPricePlans(
+        @Header("Authorization") _auth: string,
+        @Query('subscription') _subscription?: string,
+        @Query('name') _name?: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @GET("/subscription/pricing_plan")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             const plans = jsonObj['backupPlans'];
-            return plans.map(plan => {
+            return plans.map((plan: any) => {
                 return new PricingPlan().setAmount(plan["amount"])
                     .setCurrency(plan["currency"])
                     .setMaxStorage(plan["maxStorage"])
@@ -34,13 +38,17 @@ export class SubscriptionAPI extends BaseService {
             });
         });
     })
-    async getBackupPricePlans(@Header("Authorization") auth: string,
-                              @Query('subscription') subscription?: string,
-                              @Query('name') name?: string): Promise<Response> { return null; }
+    async getBackupPricePlans(
+        @Header("Authorization") _auth: string,
+        @Query('subscription') _subscription?: string,
+        @Query('name') _name?: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @PUT("/subscription/vault")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
+        return APIResponse.handleResponseData(data, (jsonObj: any) => {
             return new VaultInfo()
                 .setAppCount(jsonObj["app_count"])
                 .setAccessCount(jsonObj["access_count"])
@@ -54,20 +62,36 @@ export class SubscriptionAPI extends BaseService {
                 .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
-    async subscribeToVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async subscribeToVault(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @POST("/subscription/vault?op=activation")
-    async activateVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async activateVault(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @POST("/subscription/vault?op=deactivation")
-    async deactivateVault(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async deactivateVault(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @DELETE("/subscription/vault")
-    async unsubscribeVault(@Header("Authorization") auth: string,
-                           @Query('force') force: boolean): Promise<Response> { return null; }
+    async unsubscribeVault(
+        @Header("Authorization") _auth: string,
+        @Query('force') _force: boolean
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @GET("/subscription/vault")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             const accessLastTime = jsonObj["access_last_time"] == -1 ? null
                 : new Date(Number(jsonObj["access_last_time"]) * 1000);
@@ -86,10 +110,14 @@ export class SubscriptionAPI extends BaseService {
                 .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
-    async getVaultInfo(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async getVaultInfo(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @GET("/subscription/vault/app_stats")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             return jsonObj["apps"].map(v => {
                 v['access_last_time'] =
@@ -98,10 +126,14 @@ export class SubscriptionAPI extends BaseService {
             });
         });
     })
-    async getVaultAppStats(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async getVaultAppStats(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @PUT("/subscription/backup")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             return new BackupInfo().setServiceDid(jsonObj["service_did"])
                 .setStorageQuota(jsonObj["storage_quota"])
@@ -111,19 +143,35 @@ export class SubscriptionAPI extends BaseService {
                 .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
-    async subscribeToBackup(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async subscribeToBackup(
+        @Header("Authorization") auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @POST("/subscription/backup?op=activation")
-    async activateBackup(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async activateBackup(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @POST("/subscription/backup?op=deactivation")
-    async deactivateBackup(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async deactivateBackup(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @DELETE("/subscription/backup")
-    async unsubscribeBackup(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async unsubscribeBackup(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 
     @GET("/subscription/backup")
-    @ResponseTransformer((data: any, headers?: any) => {
+    @ResponseTransformer((data: any, _headers?: any) => {
         return APIResponse.handleResponseData(data, (jsonObj) => {
             return new BackupInfo().setServiceDid(jsonObj["service_did"])
                 .setStorageQuota(jsonObj["storage_quota"])
@@ -135,5 +183,9 @@ export class SubscriptionAPI extends BaseService {
                 .setPricePlan(jsonObj["pricing_plan"]);
         });
     })
-    async getBackupInfo(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async getBackupInfo(
+        @Header("Authorization") _auth: string
+    ): Promise<Response> {
+        throw new Error("Not implemented")
+    }
 }
