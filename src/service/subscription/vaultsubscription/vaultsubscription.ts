@@ -42,10 +42,6 @@ export class VaultSubscription extends ServiceEndpoint {
         return await this.subscriptionService.getVaultInfo();
     }
 
-    async getAppStats(): Promise<AppInfo[]> {
-        return await this.subscriptionService.getAppStats();
-    }
-
     async unsubscribe(force=false): Promise<void> {
         return await this.subscriptionService.unsubscribeVault(force);
     }

@@ -60,7 +60,7 @@ describe("test vault subscribe function", () => {
                 throw e;
             }
         }
-        let appStats = await vaultSubscription.getAppStats();
+        let appStats = await testData.newVault().getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
         expect(appStats[0].getName()).not.toBeNull();
