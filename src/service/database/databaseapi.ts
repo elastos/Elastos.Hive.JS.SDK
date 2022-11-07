@@ -17,7 +17,6 @@ import {InsertResult, UpdateResult} from "../..";
 import {APIResponse} from "../restservice";
 import {FindResult} from "./findresult";
 import {Collection} from "./collection";
-import {JSONObject} from "@elastosfoundation/did-js-sdk";
 
 @BasePath("/api/v2/vault/db")
 export class DatabaseAPI extends BaseService {
@@ -91,7 +90,7 @@ export class DatabaseAPI extends BaseService {
     })
     async find(@Header("Authorization") authorization: string,
                @Path('collectionName') collectionName: string,
-               @Query("filter") filter: JSONObject,
+               @Query("filter") filter: string,
                @Query("skip") skip: number,
                @Query("limit") limit: number): Promise<Response> { return null; }
 
