@@ -59,7 +59,8 @@ export class FilesAPI extends BaseService {
             for (let file of rawFiles) {
                 let item = new FileInfo()
                     .setCreated(file["created"])
-                    .setName(file["updated"])
+                    .setUpdated(file["updated"])
+                    .setName(file["name"])
                     .setAsFile(file["is_file"])
                     .setSize(file["size"]);
                 files.push(item);
@@ -81,7 +82,8 @@ export class FilesAPI extends BaseService {
                 .setCreated(jsonObj["created"])
                 .setUpdated(jsonObj["updated"])
                 .setName(jsonObj["name"])
-                .setAsFile(jsonObj["is_file"]);
+                .setAsFile(jsonObj["is_file"])
+                .setSize(jsonObj["size"]);
         });
     })
     async getMetadata(

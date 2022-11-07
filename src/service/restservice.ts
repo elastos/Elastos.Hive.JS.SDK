@@ -81,7 +81,7 @@ export class RestServiceT<T> {
                         `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
 
                     config['withCredentials'] = false; // CORS
-                    config['timeout'] = this.serviceContext.getAppContext().getNetworkTimeout();
+                    config['timeout'] = AppContext.getNetworkTimeout();
 
                     // uploading or other request body size
                     config['maxContentLength'] = Infinity;
