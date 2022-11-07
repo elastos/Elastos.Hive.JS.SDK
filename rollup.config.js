@@ -9,8 +9,7 @@ import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
-
-//import { writeFileSync } from "fs";
+import { terser } from 'rollup-plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -97,6 +96,9 @@ const nodePlugins = [
         sourceMap: !prodBuild,
         exclude: "*.browser.ts"
     }),
+    ...prodBuild ? [
+        terser()
+    ] : [],
     size()
 ];
 
@@ -284,6 +286,9 @@ export default command => {
                 "BrowserFS": "browserfs"
             }),
             size(),
+            ...prodBuild ? [
+                terser()
+            ] : [],
             visualizer({
                 filename: "./browser-bundle-stats.html"
             }) // To visualize bundle dependencies sizes on a UI.
