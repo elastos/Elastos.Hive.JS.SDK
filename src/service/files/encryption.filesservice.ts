@@ -4,6 +4,7 @@ import {Cipher} from "@elastosfoundation/did-js-sdk";
 import {EncryptionFile} from "./encryptionfile";
 import {ProgressHandler} from "./progresshandler";
 import {ProgressDisposer} from "./progressdisposer";
+import {checkArgument} from "../../utils/utils";
 
 export class EncryptionFilesService extends FilesService {
     private cipher: Cipher;
@@ -25,9 +26,11 @@ export class EncryptionFilesService extends FilesService {
                  progressHandler: ProgressHandler = new ProgressDisposer(),
                  isPublic: boolean = false,
                  scriptName: string = null): Promise<string> {
+        checkArgument(!!data, 'Invalid data');
         if (isPublic)
             throw new InvalidParameterException('No support for public the encrypted file.');
 
-        return super.uploadInternal(path, data, progressHandler, isPublic, scriptName, true);
+        const encryptedData = Buffer.from(new EncryptionFile(this.cipher, data).encrypt())
+        return super.uploadInternal(path, encryptedData, progressHandler, isPublic, scriptName, true);
     }
 }
