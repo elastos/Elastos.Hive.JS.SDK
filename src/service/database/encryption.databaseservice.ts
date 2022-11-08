@@ -8,19 +8,14 @@ import {
     ServiceEndpoint, UpdateOptions, UpdateResult
 } from "../..";
 import {DatabaseEncryption} from "./databaseencryption";
-import {JSONObject} from "@elastosfoundation/did-js-sdk";
+import {JSONObject, Cipher} from "@elastosfoundation/did-js-sdk";
 import {FindResult} from "./findresult";
 
 export class EncryptionDatabaseService extends DatabaseService {
     private databaseEncrypt: DatabaseEncryption;
 
-    constructor(serviceContext: ServiceEndpoint) {
+    constructor(serviceContext: ServiceEndpoint, cipher: Cipher, nonce: Buffer) {
         super(serviceContext);
-        this.databaseEncrypt = null;
-    }
-
-    async encryptionInit(identifier: string, secureCode: number, storepass: string, nonce: Buffer) {
-        const cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
         this.databaseEncrypt = new DatabaseEncryption(cipher, nonce);
     }
 
