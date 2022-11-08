@@ -129,13 +129,21 @@ export class TestData {
     }
 
 	async getEncryptionDatabaseService(): Promise<DatabaseService> {
-        return (await this.newVault().setEncryption(this.clientConfig.application.storepass))
-            .getDatabaseService(true);
+        let vault = this.newVault();
+        try {
+            await vault.enableEncryption(this.clientConfig.application.storepass);
+        } catch (error) {
+        }
+        return vault.getDatabaseService(true);
     }
 
     async getEncryptionFileService(): Promise<FilesService> {
-        return (await this.newVault().setEncryption(this.clientConfig.application.storepass))
-            .getFilesService(true);
+        let vault = this.newVault();
+        try {
+            await vault.enableEncryption(this.clientConfig.application.storepass);
+        } catch (error) {
+        }
+        return vault.getFilesService(true);
     }
 
     async getCipher(): Promise<Cipher> {

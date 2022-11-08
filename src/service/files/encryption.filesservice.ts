@@ -9,12 +9,9 @@ import {checkArgument} from "../../utils/utils";
 export class EncryptionFilesService extends FilesService {
     private cipher: Cipher;
 
-    constructor(serviceContext: ServiceEndpoint) {
+    constructor(serviceContext: ServiceEndpoint, cipher: Cipher) {
         super(serviceContext);
-    }
-
-    async encryptionInit(identifier: string, secureCode: number, storepass: string) {
-        this.cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
+        this.cipher = cipher;
     }
 
     async download(path: string, progressHandler: ProgressHandler = new ProgressDisposer()): Promise<Buffer> {
@@ -24,7 +21,7 @@ export class EncryptionFilesService extends FilesService {
 
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic: boolean = false,
+                 isPublic = false,
                  scriptName: string = null): Promise<string> {
         checkArgument(!!data, 'Invalid data');
         if (isPublic)
