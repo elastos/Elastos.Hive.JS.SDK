@@ -30,7 +30,6 @@ export class FilesAPI extends BaseService {
     async upload(
         @Header("Authorization") authorization: string,
         @Query("public") isPublic: boolean,
-        @Query("script_name") scriptName: string,
         @Query("is_encrypt") isEncrypt: boolean,
         @Query("encrypt_method") encrypt_method: string,
         @Path("path") path: string,
