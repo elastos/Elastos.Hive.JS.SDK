@@ -1,21 +1,19 @@
 import {ServiceEndpoint} from "./connection/serviceendpoint";
-import {AppContext} from "./connection/auth/appcontext";
 import {ScriptingService} from "./service/scripting/scriptingservice";
 import {InvalidParameterException} from "./exceptions";
 
-export class ScriptRunner extends ServiceEndpoint{
+export class AnonymousScriptRunner extends ServiceEndpoint{
     private scriptService: ScriptingService;
 
     /**
-     * ScriptRunner can be used by other caller with authorization token.
+     * AnonymousScriptRunner can be used by other caller without authorization token.
      *
-     * @param context application context
-     * @param providerAddress provider address
+     * @param providerAddress must provide when context is null
      */
-    constructor(context: AppContext, providerAddress?: string) {
-        super(context, providerAddress);
+    constructor(providerAddress: string) {
+        super(null, providerAddress);
 
-        if (!context)
+        if (!providerAddress)
             throw new InvalidParameterException('Invalid parameter context');
 
         this.scriptService = new ScriptingService(this);
@@ -37,7 +35,17 @@ export class ScriptRunner extends ServiceEndpoint{
         return await this.scriptService.downloadFile(transactionId);
     }
 
-    async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
-        return await this.scriptService.downloadFileByHiveUrl(hiveUrl);
+    /**
+     * Download anonymous file which can be uploaded by the files service with public flag.
+     *
+     * @param targetDid
+     * @param targetAppDid
+     * @param path the path of the file.
+     */
+    async downloadAnonymousFile(targetDid: string, targetAppDid: string, path: string): Promise<Buffer> {
+        const result = await this.scriptService.callScript('__anonymous_files__', {
+                'path': path
+            }, targetDid, targetAppDid);
+        return await this.scriptService.downloadFile(Object.values(result)[0]['transaction_id']);
     }
 }

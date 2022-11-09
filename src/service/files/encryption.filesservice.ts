@@ -21,13 +21,12 @@ export class EncryptionFilesService extends FilesService {
 
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic = false,
-                 scriptName: string = null): Promise<string> {
+                 isPublic = false): Promise<string> {
         checkArgument(!!data, 'Invalid data');
         if (isPublic)
             throw new InvalidParameterException('No support for public the encrypted file.');
 
         const encryptedData = Buffer.from(new EncryptionFile(this.cipher, data).encrypt())
-        return super.uploadInternal(path, encryptedData, progressHandler, isPublic, scriptName, true);
+        return super.uploadInternal(path, encryptedData, progressHandler, isPublic, true);
     }
 }

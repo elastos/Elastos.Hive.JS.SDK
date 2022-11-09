@@ -44,14 +44,13 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 * @param data file's content.
      * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
 	 * @param publicOnIPFS 'true' will return the cid of the file which can be used to access from global ipfs gateway.
-	 * @param scriptName used when is_public is true, this will create a new downloading script with name script_name.
+     *                      The file can be download by AnonymousScriptRunner.downloadAnonymousFile() with file path.
      * @param isEncrypt whether the content of the file is encrypted.
      */
 	protected async uploadInternal(path: string,
         data: Buffer | string,
         progressHandler: ProgressHandler = new ProgressDisposer(),
         publicOnIPFS = false,
-        scriptName: string = null,
         isEncrypt = false
     ): Promise<string> {
 		checkNotNull(path, "Remote destination path is mandatory.");
@@ -63,7 +62,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 
         let cb = async (api: FilesAPI) => {
             return await api.upload(await this.getAccessToken(),
-                publicOnIPFS, scriptName, isEncrypt, encryptMethod, path, {
+                publicOnIPFS, isEncrypt, encryptMethod, path, {
                     'data': content
                 });
         }
@@ -79,9 +78,8 @@ export class FilesService extends RestServiceT<FilesAPI> {
 
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic: boolean = false,
-                 scriptName: string = null): Promise<string> {
-        return this.uploadInternal(path, data, progressHandler, isPublic, scriptName);
+                 isPublic: boolean = false): Promise<string> {
+        return this.uploadInternal(path, data, progressHandler, isPublic);
     }
 
 	/**

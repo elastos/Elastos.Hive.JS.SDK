@@ -109,8 +109,7 @@ describe("test files service", () => {
 
 	test("testUploadTextPublic", async () => {
 		const fileName = REMOTE_DIR + FILE_PUBLIC_NAME;
-		const scriptName = FILE_PUBLIC_NAME.split('.')[0]
-		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), null, true, scriptName);
+		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), null, true);
         expect(cid).toBeTruthy();
 		// check by directly downloading.
 		let data = await filesService.download(fileName);
