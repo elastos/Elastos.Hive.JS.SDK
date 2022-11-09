@@ -179,7 +179,6 @@ export default command => {
         onwarn,
         external: [
             'axios',
-            'browserfs',
             'buffer',
             'dayjs',
             'promise-queue',
