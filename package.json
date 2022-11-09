@@ -1,6 +1,6 @@
 {
   "name": "@elastosfoundation/hive-js-sdk",
-  "version": "2.9.3",
+  "version": "2.9.5",
   "description": "Elastos Hive JS SDK",
   "exports": {
     "node": "./dist/hive.js",
@@ -35,7 +35,7 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "@elastosfoundation/did-js-sdk": "^2.2.10",
+    "@elastosfoundation/did-js-sdk": "^2.2.12",
     "axios": "^0.24.0",
     "browserfs": "^1.4.3",
     "buffer": "^5.6.0",
