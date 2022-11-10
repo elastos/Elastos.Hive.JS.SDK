@@ -11,7 +11,7 @@ import {
     ScriptingService, ScriptRunner,
     Vault,
     QueryHasResultCondition,
-    Executable, NotFoundException, AlreadyExistsException, CountExecutable
+    Executable, NotFoundException, AlreadyExistsException, CountExecutable, AnonymousScriptRunner
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -32,15 +32,15 @@ describe("test scripting runner function", () => {
     let databaseService: DatabaseService;
     let scriptingService: ScriptingService;
     let scriptRunner: ScriptRunner;
-    let anonymousRunner: ScriptRunner;
+    let anonymousRunner: AnonymousScriptRunner;
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");
         vaultSubscription = new VaultSubscription(testData.getUserAppContext(), testData.getProviderAddress());
         vault = new Vault(testData.getUserAppContext(), testData.getProviderAddress());
 
-        scriptRunner = new ScriptRunner(testData.getCallerAppContext(), testData.getProviderAddress());
-        anonymousRunner = new ScriptRunner(null, testData.getProviderAddress());
+        scriptRunner = testData.newCallerScriptRunner();
+        anonymousRunner = testData.newAnonymousCallerScriptRunner();
 
         try {
             await vaultSubscription.subscribe();
@@ -226,7 +226,6 @@ describe("test scripting runner function", () => {
     test.skip("testDownloadFileByHiveUrl", async () => {
         await uploadFile();
         await downloadFileByHiveUrl();
-        await downloadFileByHiveUrl(true);
     });
 
     test.skip("testDownloadFileByHiveUrlWithReal", async () => {
@@ -381,17 +380,19 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     }
 
-    async function downloadFileByHiveUrl(anonymous=false) {
+    async function downloadFileByHiveUrl() {
         const [scriptName, executableName] = ['script_file_download_by_hiveurl', 'file_download'];
 
         // register download script
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(executableName), null, anonymous, anonymous);
+            new FileDownloadExecutable(executableName), null, false, false);
 
+        // download by hive url
         const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}?params={"path":"${FILE_NAME}"}`;
-        const buffer = await getScriptRunner(anonymous).downloadFileByHiveUrl(hiveUrl);
+        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
 
+        // unregister the script.
         await scriptingService.unregisterScript(scriptName);
     }
 
