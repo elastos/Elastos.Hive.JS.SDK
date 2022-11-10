@@ -20,6 +20,7 @@ import { PaymentService }  from "./service/payment/paymentservice";
 import { PromotionService }  from "./service/promotion/promotionservice";
 import { ScriptingService }  from "./service/scripting/scriptingservice";
 import { ScriptRunner }  from "./scriptrunner";
+import { AnonymousScriptRunner }  from "./anonymous.scriptrunner";
 import { Condition }  from "./service/scripting/condition";
 import { OrCondition }  from "./service/scripting/orcondition";
 import { AndCondition }  from "./service/scripting/andcondition";
@@ -148,6 +149,7 @@ export {
     PromotionService,
     ScriptingService,
     ScriptRunner,
+    AnonymousScriptRunner,
     Condition,
     AggregatedCondition,
     OrCondition,

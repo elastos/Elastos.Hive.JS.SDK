@@ -13,6 +13,7 @@ import {
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { ClientConfig } from "./clientconfig";
+import {AnonymousScriptRunner} from "../../../src/anonymous.scriptrunner";
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -152,8 +153,12 @@ export class TestData {
             this.clientConfig.application.storepass);
     }
 
-	newAnonymousCallerScriptRunner(): ScriptRunner {
-		return new ScriptRunner(this.anonymousContext, this.getProviderAddress());
+    newCallerScriptRunner(): ScriptRunner {
+        return new ScriptRunner(this.callerAppContext, this.getProviderAddress());
+    }
+
+	newAnonymousCallerScriptRunner(): AnonymousScriptRunner {
+		return new AnonymousScriptRunner(this.getProviderAddress());
 	}
 
 	newBackup(): Backup {
