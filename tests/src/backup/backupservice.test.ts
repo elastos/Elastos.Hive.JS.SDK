@@ -83,7 +83,7 @@ describe("test backup services", () => {
                 onProgress: (process) => {
                     LOG.info(`uploading file ${fileNamePrefix}${i}.bin: ${process}`);
                 }
-            }, true, `public_file_${i}`);
+            }, false);
         }
 
         const uploadEnd = new Date().getTime();
