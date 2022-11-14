@@ -10,6 +10,7 @@ import {AppInfo} from "./service/subscription/appinfo";
 import {SubscriptionAPI} from "./service/subscription/subscriptionapi";
 import {RestServiceT} from "./service/restservice";
 import { Cipher } from "@elastosfoundation/did-js-sdk";
+import {EncryptionException, InvalidParameterException} from "./exceptions";
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
@@ -36,19 +37,19 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
 
     async enableEncryption(storepass: string) {
         if (this.cipher)
-            throw new Error("Encryption ciper already being enabled.");
+            throw new EncryptionException("Encryption ciper already being enabled.");
 
         try {
             let appDid = this.getServiceContext().getAppContext().getAppDid();
             this.cipher = await this.getEncryptionCipher(appDid, 0, storepass);
         } catch (error) {
-            throw new Error(`Generating encryption cipher error: ${error}`)
+            throw new EncryptionException(`Generating encryption cipher error: ${error}`)
         }
     }
 
     getFilesService(encrypt = false): FilesService {
         if (encrypt && this.cipher === null)
-            throw new Error("Encryption has not been enabled, call 'enableEncrytpion'");
+            throw new InvalidParameterException("Encryption has not been enabled, call 'enableEncrytpion'");
 
         if (encrypt && !this.encryptedFileServcie)
             this.encryptedFileServcie = new EncryptionFilesService(this.getServiceContext(), this.cipher);
@@ -58,7 +59,7 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
 
     getDatabaseService(encrypt=false): DatabaseService {
         if (encrypt && this.cipher === null)
-            throw new Error("Encryption has not been enabled, call 'enableEncrytpion'");
+            throw new InvalidParameterException("Encryption has not been enabled, call 'enableEncrytpion'");
 
         if (encrypt && !this.encryptedDBService)
             this.encryptedDBService = new EncryptionDatabaseService(this.getServiceContext(), this.cipher, Vault.DATABASE_NONCE);

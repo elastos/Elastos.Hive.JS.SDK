@@ -2,6 +2,7 @@ import {BasePath, BaseService, Body, GET, Header, Path, POST, PUT, Response, Res
 import {APIResponse} from "../restservice";
 import {Order, OrderState} from "./order";
 import {Receipt} from "./receipt";
+import {NotImplementedException} from "../../exceptions";
 
 function getOrderStateByStr(value: string): OrderState {
     if (value === 'normal') {
@@ -25,7 +26,9 @@ export class PaymentAPI extends BaseService {
             return jsonObj['version'];
         });
     })
-    async version(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async version(@Header("Authorization") auth: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PUT("/payment/order")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -35,7 +38,9 @@ export class PaymentAPI extends BaseService {
         });
     })
     async placeOrder(@Header("Authorization") auth: string,
-                     @Body body: object): Promise<Response> { return null; }
+                     @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/payment/order/{orderId}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -44,7 +49,9 @@ export class PaymentAPI extends BaseService {
         });
     })
     async settleOrder(@Header("Authorization") auth: string,
-                      @Path('orderId') orderId: number): Promise<Response> { return null; }
+                      @Path('orderId') orderId: number): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/payment/order")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -57,7 +64,9 @@ export class PaymentAPI extends BaseService {
         });
     })
     async getOrders(@Header("Authorization") auth: string,
-                    @Body body: object): Promise<Response> { return null; }
+                    @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/payment/receipt")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -67,5 +76,7 @@ export class PaymentAPI extends BaseService {
         });
     })
     async getReceipts(@Header("Authorization") auth: string,
-                      @Body body: object): Promise<Response> { return null; }
+                      @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

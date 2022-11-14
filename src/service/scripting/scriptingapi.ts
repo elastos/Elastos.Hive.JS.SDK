@@ -12,13 +12,16 @@ import {
     ResponseTransformer, ResponseType
 } from 'ts-retrofit';
 import {APIResponse} from "../restservice";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class ScriptingAPI extends BaseService {
     @PUT("/vault/scripting/{scriptName}")
     async registerScript(@Header("Authorization") authorization: string,
                          @Path("scriptName") scriptName: string,
-                         @Body body: object): Promise<Response> { return null; }
+                         @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PATCH("/vault/scripting/{scriptName}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -28,7 +31,9 @@ export class ScriptingAPI extends BaseService {
     })
     async runScript(@Header("Authorization") authorization: string,
                     @Path("scriptName") scriptName: string,
-                    @Body body: object): Promise<Response> { return null; }
+                    @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -40,11 +45,15 @@ export class ScriptingAPI extends BaseService {
                        @Path("scriptName") scriptName: string,
                        @Path("targetDid") targetDid: string,
                        @Path("targetAppDid") targetAppDid: string,
-                       @Path("params") params: string): Promise<Response> { return null; }
+                       @Path("params") params: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @DELETE("/vault/scripting/{scriptName}")
     async unregisterScript(@Header("Authorization") authorization: string,
-                           @Path("scriptName") scriptName: string): Promise<Response> { return null; }
+                           @Path("scriptName") scriptName: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PUT("/vault/scripting/stream/{transactionId}")
     @RequestTransformer((data: any, headers?: any) => {
@@ -53,7 +62,9 @@ export class ScriptingAPI extends BaseService {
     })
     async uploadFile(@Header("Authorization") authorization: string,
                      @Path("transactionId") transactionId: string,
-                     @Body body: object): Promise<Response> { return null; }
+                     @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/vault/scripting/stream/{transactionId}")
     @ResponseType("arraybuffer")
@@ -61,5 +72,7 @@ export class ScriptingAPI extends BaseService {
         return APIResponse.handleResponseData(data);
     })
     async downloadFile(@Header("Authorization") authorization: string,
-                       @Path("transactionId") transactionId: string): Promise<Response> { return null; }
+                       @Path("transactionId") transactionId: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

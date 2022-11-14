@@ -3,6 +3,7 @@ import {VerifiablePresentation} from "@elastosfoundation/did-js-sdk";
 import {NodeVersion} from "./nodeversion";
 import {NodeInfo} from "./nodeinfo";
 import {APIResponse} from "../restservice";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class AboutAPI extends BaseService {
@@ -12,7 +13,9 @@ export class AboutAPI extends BaseService {
             return new NodeVersion(jsonObj['major'], jsonObj['minor'], jsonObj['patch']);
         });
     })
-    async version(): Promise<Response> { return null; }
+    async version(): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/node/commit_id")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -20,7 +23,9 @@ export class AboutAPI extends BaseService {
             return jsonObj['commit_id'];
         });
     })
-    async commitId(): Promise<Response> { return null; }
+    async commitId(): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/node/info")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -31,5 +36,7 @@ export class AboutAPI extends BaseService {
             return Object.assign(new NodeInfo(), jsonObj);
         });
     })
-    async info(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async info(@Header("Authorization") auth: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

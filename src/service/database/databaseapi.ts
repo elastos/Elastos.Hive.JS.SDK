@@ -13,7 +13,7 @@ import {
     Response,
     ResponseTransformer
 } from 'ts-retrofit';
-import {InsertResult, UpdateResult} from "../..";
+import {InsertResult, NotImplementedException, UpdateResult} from "../..";
 import {APIResponse} from "../restservice";
 import {FindResult} from "./findresult";
 import {Collection} from "./collection";
@@ -26,16 +26,22 @@ export class DatabaseAPI extends BaseService {
             return jsonObj["collections"].map((c) => Object.assign(new Collection(), c));
         });
     })
-    async getCollections(@Header("Authorization") authorization: string): Promise<Response> { return null; }
+    async getCollections(@Header("Authorization") authorization: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PUT("/collections/{collectionName}")
     async createCollection(@Header("Authorization") authorization: string,
                            @Path('collectionName') collectionName: string,
-                           @Body body: object): Promise<Response> { return null; }
+                           @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @DELETE("/{collectionName}")
     async deleteCollection(@Header("Authorization") authorization: string,
-                           @Path('collectionName') collectionName: string): Promise<Response> { return null; }
+                           @Path('collectionName') collectionName: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/collection/{collectionName}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -48,7 +54,9 @@ export class DatabaseAPI extends BaseService {
     })
     async insert(@Header("Authorization") authorization: string,
                  @Path('collectionName') collectionName: string,
-                 @Body body: object): Promise<Response> { return null; }
+                 @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/collection/{collectionName}?op=count")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -58,7 +66,9 @@ export class DatabaseAPI extends BaseService {
     })
     async count(@Header("Authorization") authorization: string,
                 @Path('collectionName') collectionName: string,
-                @Body body: object): Promise<Response> { return null; }
+                @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PATCH("/collection/{collectionName}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -74,13 +84,17 @@ export class DatabaseAPI extends BaseService {
     async update(@Header("Authorization") authorization: string,
                  @Path('collectionName') collectionName: string,
                  @Query("updateone") updateOne: boolean,
-                 @Body body: object): Promise<Response> { return null; }
+                 @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @DELETE("/collection/{collectionName}")
     async delete(@Header("Authorization") authorization: string,
                  @Path('collectionName') collectionName: string,
                  @Query("deleteone") updateOne: boolean,
-                 @Body body: object): Promise<Response> { return null; }
+                 @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/{collectionName}")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -92,7 +106,9 @@ export class DatabaseAPI extends BaseService {
                @Path('collectionName') collectionName: string,
                @Query("filter") filter: string,
                @Query("skip") skip: number,
-               @Query("limit") limit: number): Promise<Response> { return null; }
+               @Query("limit") limit: number): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/query")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -102,5 +118,7 @@ export class DatabaseAPI extends BaseService {
     })
     async query(@Header("Authorization") authorization: string,
                 @Path('collectionName') collectionName: string,
-                @Body body: object): Promise<Response> { return null; }
+                @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

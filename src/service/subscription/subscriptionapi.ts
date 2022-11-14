@@ -1,6 +1,6 @@
 import {BasePath, BaseService, DELETE, GET, Header, POST, PUT, Query, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {AppInfo, BackupInfo, PricingPlan, VaultInfo} from "../..";
+import {AppInfo, BackupInfo, NotImplementedException, PricingPlan, VaultInfo} from "../..";
 
 @BasePath("/api/v2")
 export class SubscriptionAPI extends BaseService {
@@ -22,7 +22,7 @@ export class SubscriptionAPI extends BaseService {
         @Query('subscription') _subscription?: string,
         @Query('name') _name?: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @GET("/subscription/pricing_plan")
@@ -43,7 +43,7 @@ export class SubscriptionAPI extends BaseService {
         @Query('subscription') _subscription?: string,
         @Query('name') _name?: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @PUT("/subscription/vault")
@@ -65,21 +65,21 @@ export class SubscriptionAPI extends BaseService {
     async subscribeToVault(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @POST("/subscription/vault?op=activation")
     async activateVault(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @POST("/subscription/vault?op=deactivation")
     async deactivateVault(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @DELETE("/subscription/vault")
@@ -87,7 +87,7 @@ export class SubscriptionAPI extends BaseService {
         @Header("Authorization") _auth: string,
         @Query('force') _force: boolean
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @GET("/subscription/vault")
@@ -113,7 +113,7 @@ export class SubscriptionAPI extends BaseService {
     async getVaultInfo(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @GET("/subscription/vault/app_stats")
@@ -129,7 +129,7 @@ export class SubscriptionAPI extends BaseService {
     async getVaultAppStats(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @PUT("/subscription/backup")
@@ -146,28 +146,28 @@ export class SubscriptionAPI extends BaseService {
     async subscribeToBackup(
         @Header("Authorization") auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @POST("/subscription/backup?op=activation")
     async activateBackup(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @POST("/subscription/backup?op=deactivation")
     async deactivateBackup(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @DELETE("/subscription/backup")
     async unsubscribeBackup(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 
     @GET("/subscription/backup")
@@ -186,6 +186,6 @@ export class SubscriptionAPI extends BaseService {
     async getBackupInfo(
         @Header("Authorization") _auth: string
     ): Promise<Response> {
-        throw new Error("Not implemented")
+        throw new NotImplementedException();
     }
 }

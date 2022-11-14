@@ -1,5 +1,6 @@
 import {BasePath, BaseService, Body, POST, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class AuthAPI extends BaseService {
@@ -9,7 +10,9 @@ export class AuthAPI extends BaseService {
             return jsonObj['challenge'];
         });
     })
-    async signIn(@Body body: object): Promise<Response> { return null; }
+    async signIn(@Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/did/auth")
     @ResponseTransformer((data: any, headers?: any) => {
@@ -17,5 +20,7 @@ export class AuthAPI extends BaseService {
             return jsonObj['token'];
         });
     })
-    async auth(@Body body: object): Promise<Response> { return null; }
+    async auth(@Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }
