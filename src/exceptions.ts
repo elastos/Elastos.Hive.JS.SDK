@@ -22,7 +22,9 @@ export class DIDResolveException extends HiveException {}
 export class JWTException extends HiveException {}
 export class IOException extends HiveException {}
 export class DeserializationError extends HiveException {}
+export class EncryptionException extends HiveException {}
 export class MalformedDIDException extends IllegalArgumentException {}
+export class InvalidMnemonicException extends IllegalArgumentException {}
 export class NetworkException extends HiveException {
     constructor(message: string, causedBy?: Error) {
         super("Unknown network exception with message: " + message, causedBy);

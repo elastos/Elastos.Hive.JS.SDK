@@ -6,6 +6,7 @@ import {FileStorage} from '../utils/storage/filestorage'
 import {NodeVersion} from '../service/about/nodeversion'
 import {AboutService} from '../service/about/aboutservice'
 import {NodeInfo} from "../service/about/nodeinfo";
+import {InvalidParameterException} from "../exceptions";
 
 export class ServiceEndpoint {
     private readonly context: AppContext;
@@ -20,7 +21,7 @@ export class ServiceEndpoint {
 
     constructor(context: AppContext, providerAddress?: string) {
         if (!context && !providerAddress)
-            throw new Error('Invalid parameter: context and providerAddress can not all empty');
+            throw new InvalidParameterException('Invalid parameter: context and providerAddress can not all empty');
 
         this.context = context;  // nullable
         this.providerAddress = providerAddress;
@@ -48,7 +49,7 @@ export class ServiceEndpoint {
 
     getAccessToken(): AccessToken {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return this.accessToken;
     }
@@ -62,7 +63,7 @@ export class ServiceEndpoint {
 
     getAppContext(): AppContext {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return this.context;
     }
@@ -74,7 +75,7 @@ export class ServiceEndpoint {
      */
     getUserDid(): string {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return this.context.getUserDid();
     }
@@ -86,7 +87,7 @@ export class ServiceEndpoint {
      */
     getAppDid(): string {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return this.context.getAppDid();
     }
@@ -117,7 +118,7 @@ export class ServiceEndpoint {
     async getServiceInstanceDid(): Promise<string> {
         if (!this.serviceInstanceDid) {
             if (!this.context)
-                throw new Error('AppContext not setup');
+                throw new InvalidParameterException('AppContext not setup');
 
             await this.accessToken.fetch();
         }
@@ -131,7 +132,7 @@ export class ServiceEndpoint {
 
     getStorage(): DataStorage {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return this.dataStorage;
     }
@@ -146,7 +147,7 @@ export class ServiceEndpoint {
 
     async getNodeInfo(): Promise<NodeInfo> {
         if (!this.context)
-            throw new Error('AppContext not setup');
+            throw new InvalidParameterException('AppContext not setup');
 
         return await this.aboutServiceAuth.getInfo();
     }

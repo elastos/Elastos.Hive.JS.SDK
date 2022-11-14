@@ -13,7 +13,7 @@ import {
     ResponseTransformer, ResponseType, RequestTransformer
 } from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {FileInfo} from "../..";
+import {FileInfo, NotImplementedException} from "../..";
 
 @BasePath("/api/v2/vault")
 export class FilesAPI extends BaseService {
@@ -35,7 +35,7 @@ export class FilesAPI extends BaseService {
         @Path("path") path: string,
         @Body body: object
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @GET("/files/{path}")
@@ -47,7 +47,7 @@ export class FilesAPI extends BaseService {
         @Header("Authorization") authorization: string,
         @Path("path") path: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @GET("/files/{path}?comp=children")
@@ -71,7 +71,7 @@ export class FilesAPI extends BaseService {
         @Header("Authorization") authorization: string,
         @Path("path") path: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @GET("/files/{path}?comp=metadata")
@@ -89,7 +89,7 @@ export class FilesAPI extends BaseService {
         @Header("Authorization") authorization: string,
         @Path("path") path: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
      }
 
     @GET("/files/{path}?comp=hash")
@@ -102,7 +102,7 @@ export class FilesAPI extends BaseService {
         @Header("Authorization") authorization: string,
         @Path("path") path: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @PUT("/files/{path}")
@@ -116,7 +116,7 @@ export class FilesAPI extends BaseService {
         @Path("path") src: string,
         @Query("dest") dest: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @PATCH("/files/{path}")
@@ -130,7 +130,7 @@ export class FilesAPI extends BaseService {
         @Path("path") src: string,
         @Query("to") dst: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
     }
 
     @DELETE("/files/{path}")
@@ -138,6 +138,6 @@ export class FilesAPI extends BaseService {
         @Header("Authorization") authorization: string,
         @Path("path") path: string
     ): Promise<Response> {
-        throw new Error("Not implemented");
+        throw new NotImplementedException();
      }
 }

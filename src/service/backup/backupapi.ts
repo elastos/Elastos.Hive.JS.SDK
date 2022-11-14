@@ -1,6 +1,6 @@
 import {BasePath, BaseService, Body, GET, Header, POST, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {BackupResult, BackupResultResult, BackupResultState} from "../..";
+import {BackupResult, BackupResultResult, BackupResultState, NotImplementedException} from "../..";
 
 @BasePath("/api/v2")
 export class BackupAPI extends BaseService {
@@ -36,13 +36,19 @@ export class BackupAPI extends BaseService {
             return Object.assign(new BackupResult(), jsonObj);
         });
     })
-    async getState(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async getState(@Header("Authorization") auth: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/vault/content?to=hive_node")
     async saveToNode(@Header("Authorization") auth: string,
-                     @Body body: object): Promise<Response> { return null; }
+                     @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/vault/content?from=hive_node")
     async restoreFromNode(@Header("Authorization") auth: string,
-                          @Body body: object): Promise<Response> { return null; }
+                          @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

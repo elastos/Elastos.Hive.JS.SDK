@@ -22,11 +22,11 @@
 
 import { BASE64 } from "./base64";
 import { SHA256 } from "./sha256";
-import { IllegalArgumentException } from "../exceptions";
+import {IllegalArgumentException, InvalidParameterException} from "../exceptions";
 
 export function checkArgument(condition: boolean, errorMessage: string): void {
     if (!condition)
-        throw new Error(errorMessage);
+        throw new InvalidParameterException(errorMessage);
 }
 
 export function checkEmpty(value: string, errorMessage: string): void {
@@ -35,7 +35,7 @@ export function checkEmpty(value: string, errorMessage: string): void {
 
 export function checkNotNull(value: any, errorMessage: string): void {
     if (value === null) {
-        throw new Error(errorMessage);
+        throw new InvalidParameterException(errorMessage);
     }
 }
 

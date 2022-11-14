@@ -1,7 +1,7 @@
 import {Claims, DIDDocument, JWTParserBuilder} from '@elastosfoundation/did-js-sdk';
 import {AppContextProvider} from '../../connection/auth/appcontextprovider';
 import {ServiceEndpoint} from '../../connection/serviceendpoint';
-import {UnauthorizedException} from '../../exceptions';
+import {JWTException, UnauthorizedException} from '../../exceptions';
 import {Logger} from '../../utils/logger';
 import {RestServiceT} from '../restservice';
 import {AuthAPI} from "./authapi";
@@ -67,14 +67,14 @@ export class AuthService extends RestServiceT<AuthAPI> {
             AuthService.LOG.trace("Claims->getAudience(): " + claims.getAudience() + ":" + expectationDid);
             AuthService.LOG.trace("is equal:" + (claims.getAudience() === expectationDid).toString());
         } catch (e) {
-            throw new Error(`failed to parse jwt string: ${JSON.stringify(e)}`);
+            throw new JWTException(`failed to parse jwt string: ${JSON.stringify(e)}`, e);
         }
 
         if (claims.getExpiration() * 1000 < Date.now()) {
-            throw new Error('jwt string expired');
+            throw new JWTException('jwt string expired');
         }
         if (claims.getAudience() !== expectationDid) {
-            throw new Error(`jwt string with invalid audience: ${claims.getAudience()}, expected: ${expectationDid}`);
+            throw new JWTException(`jwt string with invalid audience: ${claims.getAudience()}, expected: ${expectationDid}`);
         }
 
         return jwtCode;
