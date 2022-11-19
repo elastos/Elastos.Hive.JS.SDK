@@ -1,6 +1,6 @@
-import { File } from './file'
-import { DataStorage } from './datastorage'
-import { SHA256 } from '../sha256'
+import { File } from './file';
+import { DataStorage } from './datastorage';
+import { SHA256 } from '../sha256';
 import { Logger } from '../logger';
 
 export class FileStorage implements DataStorage {
@@ -9,19 +9,16 @@ export class FileStorage implements DataStorage {
 	private static BACKUP = "credential-backup";
 	private static TOKENS = "tokens";
 
-	private basePath: string;
+	private readonly basePath: string;
 
 	constructor(rootPath: string, userDid: string) {
 		let path = rootPath;
 		if (!path.endsWith(File.SEPARATOR))
-			path += File.SEPARATOR;
+		    path += File.SEPARATOR;
 
-		path += this.compatDid(userDid);
+        path += this.compatDid(userDid);
+        if (!this.isOnBrowser()) this.createDirectory(path);
 		this.basePath = path;
-
-		let file = new File(path);
-		if (!file.exists())
-			file.createDirectory();
 	}
 
 	public loadBackupCredential(serviceDid: string): string {
@@ -60,57 +57,91 @@ export class FileStorage implements DataStorage {
 		this.deleteContent(this.makeFullPath(FileStorage.TOKENS, SHA256.encodeToString(Buffer.from(providerAddress))));
 	}
 
+    private isOnBrowser() {
+        return typeof window !== 'undefined';
+    }
+
+    // browser side
+    private getLocalStorage() {
+        return window.localStorage;
+    }
+
+    private getFs() {
+	    return require('fs');
+    }
+
+    // node side
+    private createDirectory(path: string) {
+        if (!this.getFs().existsSync(path)) {
+            let completion = path.startsWith(File.SEPARATOR) ? File.SEPARATOR : "";
+            for (const dir of path.split(File.SEPARATOR)) {
+                if (!dir) continue;
+
+                completion = completion + dir + File.SEPARATOR;
+                if (!this.getFs().existsSync(completion)) {
+                    this.getFs().mkdirSync(completion);
+                }
+            }
+        }
+    }
+
 	private readContent(path: string): string {
-		if (path == null)
+		if (!path)
 			return null;
 
-		if (!File.exists(path))
+		if (this.isOnBrowser()) {
+            return this.getLocalStorage().getItem(path);
+        }
+
+		if (!this.getFs().existsSync(path))
 			return null;
 
 		try {
-			return new File(path).readText();
+            return this.getFs().readFileSync(path, { encoding: "utf-8" });
 		} catch (e) {
-            FileStorage.LOG.error(e.message);
+            FileStorage.LOG.error(`read content error: ${e.message}`);
 			return null;
 		}
 	}
 
 	private writeContent(path: string, content: string): void {
-		if (path == null)
+		if (!path)
 			return;
 
-        let targetFile: File = new File(path)
-		let parent: File = targetFile.getParentDirectory();
-		if (!parent.exists())
-			parent.createDirectory();
+		if (this.isOnBrowser()) {
+            this.getLocalStorage().setItem(path, content);
+            return;
+        }
 
-		if (!parent.exists())
-			return;
+		const parentPath = path.substring(0, path.lastIndexOf(File.SEPARATOR));
+        this.createDirectory(parentPath);
 
 		try {
-            targetFile.writeText(content);
+            this.getFs().writeFileSync(path, content, { encoding: "utf-8" });
 		} catch (e) {
-			FileStorage.LOG.error(e.message);
+			FileStorage.LOG.error(`write content error: ${e.message}`);
 		}
 	}
 
 	private deleteContent(path: string): void {
-		if (path == null)
+		if (!path)
 			return;
 
+        if (this.isOnBrowser()) {
+            this.getLocalStorage().removeItem(path);
+            return;
+        }
+
 		try {
-            (new File(path)).delete();
+            if (this.getFs().existsSync(path))
+                this.getFs().unlinkSync(path);
 		} catch (e) {
 			FileStorage.LOG.error(e.message);
 		}
 	}
 
 	private makeFullPath(segPath: string, fileName: string): string {
-		return this.basePath
-					+ File.SEPARATOR
-					+ segPath
-					+ File.SEPARATOR
-					+ fileName;
+		return this.basePath + segPath + File.SEPARATOR + fileName;
 	}
 
 	private compatDid(did: string): string {

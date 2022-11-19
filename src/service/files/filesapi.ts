@@ -13,7 +13,8 @@ import {
     ResponseTransformer, ResponseType, RequestTransformer
 } from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {FileInfo, NotImplementedException} from "../..";
+import {FileInfo} from "./fileinfo";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2/vault")
 export class FilesAPI extends BaseService {

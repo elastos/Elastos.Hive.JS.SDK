@@ -6,7 +6,7 @@ import {
     VaultSubscription
 } from "../../../src";
 import {TestData} from "../config/testdata";
-import {File} from "../../../src/utils/storage/file";
+import {File} from "../file";
 import {Blob} from 'buffer';
 
 describe("test files service", () => {

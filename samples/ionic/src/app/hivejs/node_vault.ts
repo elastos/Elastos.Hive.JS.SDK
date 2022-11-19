@@ -23,6 +23,7 @@ export class NodeVault extends VaultBase {
 
 
     private appInstanceDid: AppDID;
+    private appInstanceDoc: DIDDocument;
     private userDid: UserDID;
 
     private constructor() {
@@ -39,6 +40,7 @@ export class NodeVault extends VaultBase {
             this.config['application']['passPhrase'],
             this.config['application']['storepass'],
             this.config['resolverUrl']);
+        this.appInstanceDoc = await this.appInstanceDid.getDocument();
 
         this.userDid = await UserDID.create(
             this.config['user']['name'],
@@ -57,13 +59,13 @@ export class NodeVault extends VaultBase {
     // Override
     protected async createAppContext(): Promise<AppContext> {
         const owner = this;
-        return await AppContext.build({
+        const context = AppContext.build({
             getLocalDataDir(): string {
                 return `${NodeVault.LOCAL_STORE_PATH}/${owner.config['node']['storePath']}`;
             },
 
-            async getAppInstanceDocument(): Promise<DIDDocument>  {
-                return await owner.appInstanceDid.getDocument();
+            getAppInstanceDocument(): DIDDocument {
+                return owner.appInstanceDoc;
             },
 
             async getAuthorization(jwtToken: string): Promise<string> {
@@ -79,6 +81,7 @@ export class NodeVault extends VaultBase {
                 return await owner.appInstanceDid.createToken(presentation,  claims.getIssuer());
             }
         }, owner.userDid.getDid().toString(), AppDID.APP_DID);
+        return Promise.resolve(context);
     }
 
     getTargetUserDid(): string {

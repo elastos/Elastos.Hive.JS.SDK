@@ -1,6 +1,10 @@
 import {BasePath, BaseService, DELETE, GET, Header, POST, PUT, Query, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {AppInfo, BackupInfo, NotImplementedException, PricingPlan, VaultInfo} from "../..";
+import {AppInfo} from "./appinfo";
+import {BackupInfo} from "./backupinfo";
+import {PricingPlan} from "./pricingplan";
+import {VaultInfo} from "./vaultinfo";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class SubscriptionAPI extends BaseService {

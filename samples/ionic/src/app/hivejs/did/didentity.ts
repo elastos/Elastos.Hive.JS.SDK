@@ -1,5 +1,5 @@
 import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
-import { File, Logger } from "@elastosfoundation/hive-js-sdk";
+import { Logger } from "@elastosfoundation/hive-js-sdk";
 
 export class DIDEntity {
     protected static LOG = new Logger("DIDEntity");
@@ -23,7 +23,7 @@ export class DIDEntity {
 	}
 
 	public async initDid(mnemonic: string, needResolve: boolean) {
-		const path = DIDEntity.RESOLVE_CACHE + File.SEPARATOR + this.name;
+		const path = DIDEntity.RESOLVE_CACHE + '/' + this.name;
 		this.didStore = await DIDStore.open(path);
 		const rootIdentity = await this.getRootIdentity(mnemonic);
 		await this.initDidByRootIdentity(rootIdentity, needResolve);

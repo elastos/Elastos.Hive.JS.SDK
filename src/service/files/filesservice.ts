@@ -78,7 +78,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic: boolean = false): Promise<string> {
+                 isPublic = false): Promise<string> {
         return this.uploadInternal(path, data, progressHandler, isPublic);
     }
 

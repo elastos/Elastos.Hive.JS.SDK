@@ -1,12 +1,13 @@
 import {DatabaseService} from "./databaseservice";
-import {
-    CountOptions,
-    FindOptions,
-    InsertOptions,
-    InsertResult,
-    InvalidParameterException, QueryOptions,
-    ServiceEndpoint, UpdateOptions, UpdateResult
-} from "../..";
+import {CountOptions} from "./countoptions";
+import {FindOptions} from "./findoptions";
+import {InsertOptions} from "./insertoptions";
+import {InsertResult} from "./InsertResult";
+import {QueryOptions} from "./QueryOptions";
+import {UpdateOptions} from "./UpdateOptions";
+import {UpdateResult} from "./UpdateResult";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {InvalidParameterException} from "../../exceptions";
 import {DatabaseEncryption} from "./databaseencryption";
 import {JSONObject, Cipher} from "@elastosfoundation/did-js-sdk";
 import {FindResult} from "./findresult";

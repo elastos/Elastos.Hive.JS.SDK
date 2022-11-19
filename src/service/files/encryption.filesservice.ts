@@ -1,5 +1,6 @@
 import {FilesService} from "./filesservice";
-import {InvalidParameterException, ServiceEndpoint} from "../..";
+import {InvalidParameterException} from "../../exceptions";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {Cipher} from "@elastosfoundation/did-js-sdk";
 import {EncryptionFile} from "./encryptionfile";
 import {ProgressHandler} from "./progresshandler";

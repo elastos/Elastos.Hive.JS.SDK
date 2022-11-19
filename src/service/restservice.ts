@@ -1,8 +1,9 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {AppContext, NetworkException, ServiceEndpoint} from "..";
+import {AppContext} from "../connection/auth/appcontext";
+import {NetworkException, ServerUnknownException} from "../exceptions";
+import {ServiceEndpoint} from "../connection/serviceendpoint";
 import {Logger} from '../utils/logger';
-import {assertTrue} from "../../tests/src/util";
 import {NodeExceptionAdapter} from "../exceptions";
 
 /**
@@ -109,7 +110,8 @@ export class RestServiceT<T> {
         try {
             // do real api call
             const response = await callback(serviceApi);
-            assertTrue(response);
+            if (!response)
+                throw new ServerUnknownException();
             return response.data;
         } catch (e) {
             await this.handleResponseError(e);

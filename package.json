@@ -1,6 +1,6 @@
 {
   "name": "@elastosfoundation/hive-js-sdk",
-  "version": "2.9.3",
+  "version": "2.9.5",
   "description": "Elastos Hive JS SDK",
   "exports": {
     "node": "./dist/hive.js",
@@ -35,7 +35,6 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "browserfs": "^1.4.3",
     "dayjs": "^1.10.4",
     "promise-queue": "^2.2.5",
     "ts-retrofit": "^1.17.0",
@@ -91,7 +90,6 @@
     "rollup-plugin-copy-assets": "^2.0.3",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-multi-input": "^1.2.0",
-    "rollup-plugin-node-externals": "^5.0.1",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "rollup-plugin-postcss": "^4.0.2",

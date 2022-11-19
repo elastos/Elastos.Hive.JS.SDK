@@ -1,6 +1,7 @@
 import {BasePath, BaseService, Body, GET, Header, POST, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {BackupResult, BackupResultResult, BackupResultState, NotImplementedException} from "../..";
+import {BackupResult, BackupResultResult, BackupResultState} from "./backupresult";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class BackupAPI extends BaseService {
