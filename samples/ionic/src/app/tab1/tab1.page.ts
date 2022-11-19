@@ -164,9 +164,9 @@ export class Tab1Page {
                 buffer.writeUInt8(48, i);
             }
 
-            await filesService.upload(Tab1Page.FILE_NAME, buffer, process => {
-                this.log('uploading process: ' + process);
-            }, false, null);
+            await filesService.upload(Tab1Page.FILE_NAME, buffer, {
+                onProgress: (process) => this.log('uploading process: ' + process)
+            }, false);
             this.log('uploading file done !');
         });
     }
@@ -175,8 +175,8 @@ export class Tab1Page {
         await this.updateMessage(async () => {
             const vault = await this.getVault();
             const filesService = await (await vault.createVault()).getFilesService();
-            const content = await filesService.download(Tab1Page.FILE_NAME, process => {
-                this.log('downloading process: ' + process);
+            const content = await filesService.download(Tab1Page.FILE_NAME, {
+                onProgress: (process) => this.log('downloading process: ' + process)
             });
             this.log(`Get the content of the file '${Tab1Page.FILE_NAME}': ${content.toString()}`);
             await filesService.delete(Tab1Page.FILE_NAME);
@@ -411,8 +411,8 @@ export class Tab1Page {
     async getPlatformFee() {
         await this.initPaymentContract();
         await this.updateMessage(async () => {
-            const result = await this.paymentContract.getPlatformFee();
-            this.log(`getPlatformFee() successfully: ${JSON.stringify(result)}`);
+            // const result = await this.paymentContract.getPlatformFee();
+            // this.log(`getPlatformFee() successfully: ${JSON.stringify(result)}`);
         });
     }
 

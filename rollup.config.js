@@ -9,7 +9,6 @@ import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
 import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
-import {externals} from "rollup-plugin-node-externals";
 import {terser} from "rollup-plugin-terser";
 
 //import { writeFileSync } from "fs";
@@ -182,28 +181,56 @@ export default command => {
     const browserBuilds = {
         input: rollupSourceFile,
         onwarn,
+        external: [
+            //'browserfs'
+            /* 'readable-stream',
+            'readable-stream/transform' */
+            'axios',
+            'fs',
+            'fsevents',
+            'module',
+            'os',
+            'url',
+            'util',
+            'crypto-browserify',
+            'path-browserify',
+            'stream-browserify',
+            'elliptic',
+            'buffer',
+            'process-es6',
+            "lodash",
+            "util",
+            "dayjs",
+            "string_decoder",
+            "bip32",
+            "bip39",
+            "bn.js",
+            "secp256r1",
+            "js-crypto-key-utils",
+            "create-hash",
+            "jose",
+            "bs58",
+            "bs58check",
+            "jszip",
+            "libsodium-wrappers",
+            '@elastosfoundation/did-js-sdk'
+        ],
         plugins: [
-            // external the libs under devDependencies.
-            externals({
-                builtins: true,
-                deps: false,
-                devDeps: true
-            }),
             // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
             // GOOD HEADACHES WITH RESOLVE ERROR, UNEXPORTED CLASSES AND SO ON...
             json(),
             // Replace fs with browser implementation.
-            replace({
-                delimiters: ['', ''],
-                preventAssignment: true,
-                include: [
-                    'src/utils/storage/file.ts'
-                ],
-                values: {
-                    'fs from "./fs"' : 'fs from "./fs.browser.ts"'
-                }
-            }),
-            // Dirty circular dependency removal atttempt
+            // replace({
+            //     delimiters: ['', ''],
+            //     preventAssignment: true,
+            //     include: [
+            //         'src/utils/storage/file.ts'
+            //     ],
+            //     values: {
+            //         'fs from "./fs"' : 'fs from "./fs.browser.ts"'
+            //     }
+            // }),
+            // Dirty circular dependency removal attempt
             replace({
                 delimiters: ['', ''],
                 preventAssignment: true,
@@ -276,15 +303,16 @@ export default command => {
             }),
             globals(), // Defines process, Buffer, etc
             typescript({
+                sourceMap: !prodBuild,
                 exclude: "*.node.ts"
             }),
             /* nodePolyfills({
                 stream: true
                 // crypto:true // Broken, the polyfill just doesn't work. We have to use crypto-browserify directly in our TS code instead.
             }), */ // To let some modules bundle NodeJS stream, util, fs ... in browser
-            inject({
-                "BrowserFS": "browserfs"
-            }),
+            // inject({
+            //     "BrowserFS": "browserfs"
+            // }),
             size(),
             ...prodBuild ? [
                 terser()

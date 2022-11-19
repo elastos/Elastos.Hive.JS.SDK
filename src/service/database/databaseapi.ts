@@ -13,7 +13,9 @@ import {
     Response,
     ResponseTransformer
 } from 'ts-retrofit';
-import {InsertResult, NotImplementedException, UpdateResult} from "../..";
+import {InsertResult} from "./insertresult";
+import {UpdateResult} from "./updateresult";
+import {NotImplementedException} from "../../exceptions";
 import {APIResponse} from "../restservice";
 import {FindResult} from "./findresult";
 import {Collection} from "./collection";

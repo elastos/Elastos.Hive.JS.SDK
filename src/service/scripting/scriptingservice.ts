@@ -6,7 +6,7 @@ import {Context} from './context';
 import {Logger} from '../../utils/logger';
 import {checkNotNull, checkArgument} from '../../utils/utils';
 import {RestServiceT} from '../restservice';
-import {AppContext} from "../..";
+import {AppContext} from "../../connection/auth/appcontext";
 import {ScriptingAPI} from "./scriptingapi";
 
 interface HiveUrl {

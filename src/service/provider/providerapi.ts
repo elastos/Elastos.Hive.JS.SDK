@@ -1,6 +1,9 @@
 import {BasePath, BaseService, GET, Header, Response, ResponseTransformer} from 'ts-retrofit';
 import {APIResponse} from "../restservice";
-import {BackupDetail, FilledOrderDetail, NotImplementedException, VaultDetail} from "../..";
+import {BackupDetail} from "./backupdetail";
+import {FilledOrderDetail} from "./filledorderdetail";
+import {VaultDetail} from "./vaultdetail";
+import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class ProviderAPI extends BaseService {

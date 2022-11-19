@@ -66,7 +66,7 @@ module.exports = {
 
         // Test specific
         "jest/expect-expect":"off",
-        "jest/no-disabled-tests":"warn",
+        "jest/no-disabled-tests": "off",
         "jest/no-focused-tests": "warn",
         "jest/no-identical-title": "warn",
         "jest/prefer-to-have-length": "warn",
