@@ -1,15 +1,15 @@
+import {JSONObject, Cipher} from "@elastosfoundation/did-js-sdk";
 import {DatabaseService} from "./databaseservice";
 import {CountOptions} from "./countoptions";
 import {FindOptions} from "./findoptions";
 import {InsertOptions} from "./insertoptions";
-import {InsertResult} from "./InsertResult";
-import {QueryOptions} from "./QueryOptions";
-import {UpdateOptions} from "./UpdateOptions";
-import {UpdateResult} from "./UpdateResult";
+import {InsertResult} from "./insertresult";
+import {QueryOptions} from "./queryoptions";
+import {UpdateOptions} from "./updateoptions";
+import {UpdateResult} from "./updateresult";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {InvalidParameterException} from "../../exceptions";
 import {DatabaseEncryption} from "./databaseencryption";
-import {JSONObject, Cipher} from "@elastosfoundation/did-js-sdk";
 import {FindResult} from "./findresult";
 
 export class EncryptionDatabaseService extends DatabaseService {
@@ -50,7 +50,8 @@ export class EncryptionDatabaseService extends DatabaseService {
     }
 
     async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
-        const result: FindResult = await super.queryInternal(collectionName, filter, options);
+        const result: FindResult = await super.queryInternal(collectionName,
+            this.databaseEncrypt.encryptFilter(filter), options);
         if (!result.isEncrypt())
             throw new InvalidParameterException('Cannot decrypt the documents from the encryption collection.');
 
@@ -60,14 +61,14 @@ export class EncryptionDatabaseService extends DatabaseService {
     async updateOne(collectionName: string, filter: JSONObject, update: JSONObject,
                     options?: UpdateOptions): Promise<UpdateResult> {
         const filter_ = this.databaseEncrypt.encryptFilter(filter);
-        const update_ = this.databaseEncrypt.encryptFilter(update);
+        const update_ = this.databaseEncrypt.encryptUpdate(update);
         return await super.updateInternal(collectionName, true, filter_, update_, options);
     }
 
     async updateMany(collectionName: string, filter: JSONObject, update: JSONObject,
                      options?: UpdateOptions): Promise<UpdateResult> {
         const filter_ = this.databaseEncrypt.encryptFilter(filter);
-        const update_ = this.databaseEncrypt.encryptFilter(update);
+        const update_ = this.databaseEncrypt.encryptUpdate(update);
         return await this.updateInternal(collectionName, false, filter_, update_, options);
     }
 
