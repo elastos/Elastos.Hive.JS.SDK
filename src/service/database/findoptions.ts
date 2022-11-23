@@ -1,6 +1,6 @@
 export class FindOptions {
-    public skip: number;
-    public limit: number;
+    skip: number;
+    limit: number;
 
     constructor(){
         this.limit = 0;

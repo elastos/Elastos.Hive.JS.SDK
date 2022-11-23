@@ -48,7 +48,7 @@ export class TestData {
 
     constructor() {
         // TODO: Update ClientConfig here: ClientConfig.MAINNET, ClientConfig.TESTNET.
-        this.clientConfig = ClientConfig.TESTNET;
+        this.clientConfig = ClientConfig.MAINNET;
     }
 
     async init(): Promise<TestData> {

@@ -1,16 +1,16 @@
 import { Collation } from "./collation";
 
 export class DeleteOrder {
-	public static readonly ASCENDING = 1;
-	public static readonly DESCENDING = -1;
+	static readonly ASCENDING = 1;
+	static readonly DESCENDING = -1;
 }
 
 export class DeleteIndex {
-	public key: string;
-	public order: DeleteOrder;
+	key: string;
+	order: DeleteOrder;
 }
 
 export class DeleteOptions {
-	public collation: Collation;
-	public hint: DeleteIndex[];
+	collation: Collation;
+	hint: DeleteIndex[];
 }
