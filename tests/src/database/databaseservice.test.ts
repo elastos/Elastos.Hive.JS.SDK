@@ -60,7 +60,7 @@ describe("test database services", () => {
 
         let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
         expect(result).not.toBeNull();
-        expect(result.getInsertedIds().length).toEqual(1);
+        expect(result.getInsertedIds()).toHaveLength(1);
     });
 
     test("testInsertOne4NotFoundException", async () => {
@@ -74,7 +74,7 @@ describe("test database services", () => {
                      {"author": "john doe3", "title": "Eve for Dummies3"}];
         let result = await databaseService.insertMany(COLLECTION_NAME, nodes, new InsertOptions(false, true)); 
         expect(result).not.toBeNull();
-        expect(result.getInsertedIds().length).toEqual(2);
+        expect(result.getInsertedIds()).toHaveLength(2);
     });
 
     test("testInsertMany4NotFoundException", async () => {

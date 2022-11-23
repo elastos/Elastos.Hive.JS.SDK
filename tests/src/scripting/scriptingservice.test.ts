@@ -47,7 +47,7 @@ describe.skip("test scripting function", () => {
     let localSrcFilePath: string;
     let localDstFileRoot: string;
     let localDstFilePath: string;
-    let fileName: string = "test.txt";
+    let fileName = "test.txt";
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");

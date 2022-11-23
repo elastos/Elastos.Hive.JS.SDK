@@ -7,11 +7,8 @@ import size from 'rollup-plugin-size';
 import eslint from '@rollup/plugin-eslint';
 import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
-import inject from "@rollup/plugin-inject";
 import { visualizer } from 'rollup-plugin-visualizer';
 import {terser} from "rollup-plugin-terser";
-
-//import { writeFileSync } from "fs";
 
 const production = !process.env.ROLLUP_WATCH;
 
