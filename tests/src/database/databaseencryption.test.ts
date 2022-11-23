@@ -47,7 +47,7 @@ describe("test database services", () => {
 
         let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
         expect(result).not.toBeNull();
-        expect(result.getInsertedIds().length).toEqual(1);
+        expect(result.getInsertedIds()).toHaveLength(1);
     });
 
     test("testUpdateAndFindMany", async () => {
@@ -59,7 +59,7 @@ describe("test database services", () => {
         expect(docs).toBeTruthy();
         expect(docs).not.toBeUndefined();
         expect(docs).not.toBeNull();
-        expect(docs.length).toBe(1);
+        expect(docs).toHaveLength(1);
         expect(docs[0]['author']).toEqual('john doe1');
         expect(docs[0]['title']).toEqual('Eve for Dummies2');
         expect(docs[0]['words_count']).toEqual(10000);
