@@ -6,8 +6,8 @@ import {NotImplementedException} from "../../exceptions";
 export class AuthAPI extends BaseService {
     @POST("/did/signin")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['challenge'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['challenge'];
         });
     })
     async signIn(@Body body: object): Promise<Response> {
@@ -16,8 +16,8 @@ export class AuthAPI extends BaseService {
 
     @POST("/did/auth")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['token'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['token'];
         });
     })
     async auth(@Body body: object): Promise<Response> {

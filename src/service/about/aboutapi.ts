@@ -46,10 +46,10 @@ export class AboutAPI extends BaseService {
                 .setVaultCount(body['vault_count'])
                 .setBackupCount(body['backup_count'])
                 .setLatestAccessTime(latestAccessTime)
-                .setStorageUsed(body['storage_used'])
-                .setStorageTotal(body['storage_total'])
                 .setMemoryUsed(body['memory_used'])
-                .setMemoryTotal(body['memory_total']);
+                .setMemoryTotal(body['memory_total'])
+                .setStorageUsed(body['storage_used'])
+                .setStorageTotal(body['storage_total']);
         });
     })
     async info(@Header("Authorization") auth: string): Promise<Response> {

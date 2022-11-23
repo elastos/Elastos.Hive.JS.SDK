@@ -9,19 +9,19 @@ export class NodeVersion {
 		this.patch = patch;
 	}
 
-	public getMajor(): number {
+	getMajor(): number {
 		return this.major;
 	}
 
-	public getMinor(): number {
+	getMinor(): number {
 		return this.minor;
 	}
 
-	public getPatch(): number {
+	getPatch(): number {
 		return this.patch;
 	}
 
-	public toString(): string {
+	toString(): string {
 		let version : number[] = [];
 
 		this.major && version.push(this.major);

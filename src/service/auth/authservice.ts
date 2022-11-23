@@ -1,11 +1,14 @@
 import {Claims, DIDDocument, JWTParserBuilder} from '@elastosfoundation/did-js-sdk';
+import {Logger} from '../../utils/logger';
 import {AppContextProvider} from '../../connection/auth/appcontextprovider';
 import {ServiceEndpoint} from '../../connection/serviceendpoint';
 import {JWTException, UnauthorizedException} from '../../exceptions';
-import {Logger} from '../../utils/logger';
 import {RestServiceT} from '../restservice';
 import {AuthAPI} from "./authapi";
 
+/**
+ * The auth service is for the access token which can be used as the credential of the user.
+ */
 export class AuthService extends RestServiceT<AuthAPI> {
 	private static LOG = new Logger("AuthService");
 
@@ -16,6 +19,9 @@ export class AuthService extends RestServiceT<AuthAPI> {
 		this.contextProvider = serviceContext.getAppContext().getAppContextProvider();
     }
 
+    /**
+     * Fetch the access token from local cache or remote hive node.
+     */
 	async fetch(): Promise<string> {
         AuthService.LOG.trace("fetch::start fetch the access token");
 
@@ -43,14 +49,14 @@ export class AuthService extends RestServiceT<AuthAPI> {
         }
 	}
 
-    async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
+    private async signIn(appInstanceDidDoc: DIDDocument): Promise<string> {
         const challenge: string = await this.callAPI(AuthAPI, async api => {
             return await api.signIn({"id": JSON.parse(appInstanceDidDoc.toString(true))});
         });
         return this.checkValid(challenge, appInstanceDidDoc.getSubject().toString());
     }
 
-    async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
+    private async auth(challengeResponse: string, appInstanceDidDoc: DIDDocument): Promise<string> {
         const token: string = await this.callAPI(AuthAPI, async api => {
             return await api.auth({"challenge_response": challengeResponse});
         });

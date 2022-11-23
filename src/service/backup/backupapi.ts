@@ -1,7 +1,7 @@
 import {BasePath, BaseService, Body, GET, Header, POST, Response, ResponseTransformer} from 'ts-retrofit';
+import {NotImplementedException, ServerUnknownException} from "../../exceptions";
 import {APIResponse} from "../restservice";
 import {BackupResult, BackupResultResult, BackupResultState} from "./backupresult";
-import {NotImplementedException} from "../../exceptions";
 
 @BasePath("/api/v2")
 export class BackupAPI extends BaseService {
@@ -15,7 +15,7 @@ export class BackupAPI extends BaseService {
             } else if (value === 'restore') {
                 return BackupResultState.STATE_RESTORE;
             } else {
-                throw Error('Unknown state.');
+                throw new ServerUnknownException('Unknown state.');
             }
         }
 
@@ -27,14 +27,15 @@ export class BackupAPI extends BaseService {
             } else if (value === 'process') {
                 return BackupResultResult.RESULT_PROCESS;
             } else {
-                throw Error('Unknown result.');
+                throw new ServerUnknownException('Unknown result.');
             }
         }
 
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            jsonObj['state'] = getBackupResultStateByStr(jsonObj['state']);
-            jsonObj['result'] = getBackupResultStatusByStr(jsonObj['result']);
-            return Object.assign(new BackupResult(), jsonObj);
+        return APIResponse.handleResponseData(data, (body) => {
+            return new BackupResult()
+                .setState(getBackupResultStateByStr(body['state']))
+                .setResult(getBackupResultStatusByStr(body['result']))
+                .setMessage(body['message']);
         });
     })
     async getState(@Header("Authorization") auth: string): Promise<Response> {
