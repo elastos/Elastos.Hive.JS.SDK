@@ -241,7 +241,7 @@ describe("test scripting runner function", () => {
             hiveUrl = 'hive://did:elastos:iT6mGBL8nATPhLGowgi2PRRRG85X4TKVYc@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1658844232162?params={"empty":0}'
         } else {
             // avatar is on hive1 mainnet node.
-            hiveUrl = 'hive://did:elastos:icWMZ8SSqPuKr6yVTBAoUttP57bmCDzTRT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1654590319406?params={\\"empty\\":0}';
+            hiveUrl = 'hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={"empty":0}';
         }
         await checkHiveUrl(hiveUrl);
         // compatible check.

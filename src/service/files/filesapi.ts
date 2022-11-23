@@ -12,9 +12,10 @@ import {
     Response,
     ResponseTransformer, ResponseType, RequestTransformer
 } from 'ts-retrofit';
+import {NotImplementedException} from "../../exceptions";
 import {APIResponse} from "../restservice";
 import {FileInfo} from "./fileinfo";
-import {NotImplementedException} from "../../exceptions";
+import {HashInfo} from "./hashinfo";
 
 @BasePath("/api/v2/vault")
 export class FilesAPI extends BaseService {
@@ -24,8 +25,8 @@ export class FilesAPI extends BaseService {
         return data['data'];
     })
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj["cid"];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body["cid"];
         });
     })
     async upload(
@@ -53,19 +54,13 @@ export class FilesAPI extends BaseService {
 
     @GET("/files/{path}?comp=children")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            const rawFiles = jsonObj["value"];
-            let files = [];
-            for (let file of rawFiles) {
-                let item = new FileInfo()
-                    .setCreated(file["created"])
-                    .setUpdated(file["updated"])
-                    .setName(file["name"])
-                    .setAsFile(file["is_file"])
-                    .setSize(file["size"]);
-                files.push(item);
-            }
-            return files;
+        return APIResponse.handleResponseData(data, (body) => {
+            return body["value"].map((file) => new FileInfo()
+                .setCreated(file["created"])
+                .setUpdated(file["updated"])
+                .setName(file["name"])
+                .setAsFile(file["is_file"])
+                .setSize(file["size"]))
         });
     })
     async listChildren(
@@ -77,13 +72,13 @@ export class FilesAPI extends BaseService {
 
     @GET("/files/{path}?comp=metadata")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
+        return APIResponse.handleResponseData(data, (body) => {
             return new FileInfo()
-                .setCreated(jsonObj["created"])
-                .setUpdated(jsonObj["updated"])
-                .setName(jsonObj["name"])
-                .setAsFile(jsonObj["is_file"])
-                .setSize(jsonObj["size"]);
+                .setCreated(body["created"])
+                .setUpdated(body["updated"])
+                .setName(body["name"])
+                .setAsFile(body["is_file"])
+                .setSize(body["size"]);
         });
     })
     async getMetadata(
@@ -91,12 +86,15 @@ export class FilesAPI extends BaseService {
         @Path("path") path: string
     ): Promise<Response> {
         throw new NotImplementedException();
-     }
+    }
 
     @GET("/files/{path}?comp=hash")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['hash'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return new HashInfo()
+                .setName(body['name'])
+                .setAlgorithm(body['algorithm'])
+                .setHash(body['hash']);
         });
     })
     async getHash(
@@ -108,8 +106,8 @@ export class FilesAPI extends BaseService {
 
     @PUT("/files/{path}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['name'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['name'];
         });
     })
     async copy(
@@ -122,8 +120,8 @@ export class FilesAPI extends BaseService {
 
     @PATCH("/files/{path}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['name'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['name'];
         });
     })
     async move(

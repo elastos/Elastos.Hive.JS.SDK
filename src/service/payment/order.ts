@@ -9,103 +9,104 @@ export enum OrderState {
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 export class Order {
-	private order_id: number;
+	private orderId: number;
 	private subscription: string;
-	private pricing_plan: string;
-	private paying_did: string;
-	private payment_amount: number;
-    private create_time: number;
-    private expiration_time: number;
-    private receiving_address: string;
+	private pricingPlan: string;
+	private payingDid: string;
+	private paymentAmount: number;
+    private createTime: number;
+    private expirationTime: number;
+    private receivingAddress: string;
     private state: OrderState;
     private proof: string;
 
-	getOrderId(): number {
-		return this.order_id;
-	}
-
-	setOrderId(orderId: number): Order {
-		this.order_id = orderId;
+    setOrderId(orderId: number) {
+        this.orderId = orderId;
         return this;
+    }
+
+    setSubscription(subscription: string) {
+        this.subscription = subscription;
+        return this;
+    }
+
+    setPricingPlan(pricingName: string) {
+        this.pricingPlan = pricingName;
+        return this;
+    }
+
+    setPayingDid(payingDid: string) {
+        this.payingDid = payingDid;
+        return this;
+    }
+
+    setPaymentAmount(paymentAmount: number) {
+        this.paymentAmount = paymentAmount;
+        return this;
+    }
+
+    setCreateTime(createTime: number) {
+        this.createTime = createTime;
+        return this;
+    }
+
+    setExpirationTime(expirationTime: number) {
+        this.expirationTime = expirationTime;
+        return this;
+    }
+
+    setReceivingAddress(receivingAddress: string) {
+        this.receivingAddress = receivingAddress;
+        return this;
+    }
+
+    setState(state: OrderState) {
+        this.state = state;
+        return this;
+    }
+
+    setProof(proof: string) {
+        this.proof = proof;
+        return this;
+    }
+
+	getOrderId(): number {
+		return this.orderId;
 	}
 
 	getSubscription(): string {
 		return this.subscription;
 	}
 
-	setSubscription(subscription: string): Order {
-		this.subscription = subscription;
-        return this;
-	}
-
 	getPricingPlan(): string {
-		return this.pricing_plan;
-	}
-
-	setPricingPlan(pricingName: string): Order {
-		this.pricing_plan = pricingName;
-        return this;
+		return this.pricingPlan;
 	}
 
     getPayingDid(): string {
-        return this.paying_did;
-    }
-
-    setPayingDid(payingDid: string): Order {
-        this.paying_did = payingDid;
-        return this;
+        return this.payingDid;
     }
 
 	getPaymentAmount(): number {
-		return this.payment_amount;
-	}
-
-	setPaymentAmount(paymentAmount: number): Order {
-		this.payment_amount = paymentAmount;
-        return this;
+		return this.paymentAmount;
 	}
 
     getCreateTime(): number {
-        return this.create_time;
-    }
-
-    setCreateTime(createTime: number): Order {
-        this.create_time = createTime;
-        return this;
+        return this.createTime;
     }
 
     getExpirationTime(): number {
-        return this.expiration_time;
-    }
-
-    setExpirationTime(expirationTime: number): Order {
-        this.expiration_time = expirationTime;
-        return this;
+        return this.expirationTime;
     }
 
 	getReceivingAddress(): string {
-		return this.receiving_address;
-	}
-
-	setReceivingAddress(receivingAddress: string): Order {
-		this.receiving_address = receivingAddress;
-        return this;
+		return this.receivingAddress;
 	}
 
     getState(): string {
         return this.state;
     }
 
-	setState(state: OrderState) {
-	    this.state = state;
-    }
-
 	getProof(): string {
 		return this.proof;
-	}
-
-	setProof(proof: string): Order {
-		this.proof = proof;
-        return this;
 	}
 }

@@ -1,5 +1,8 @@
 import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 
+/**
+ * This is for encrypting or decrypting the file content.
+ */
 export class EncryptionFile extends EncryptionValue {
     constructor(cipher, value: Buffer | string) {
         super(cipher, value);

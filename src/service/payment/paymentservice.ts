@@ -1,11 +1,14 @@
+import {checkNotNull} from "../../utils/utils";
+import {IllegalArgumentException, NotImplementedException} from "../../exceptions";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {Order} from "./order";
 import {Receipt} from "./receipt";
-import {checkNotNull} from "../../utils/utils";
-import {IllegalArgumentException, NotImplementedException} from "../../exceptions";
 import {PaymentAPI} from "./paymentapi";
 
+/**
+ * The payment service is for upgrading the vault of the user.
+ */
 export class PaymentService extends RestServiceT<PaymentAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);

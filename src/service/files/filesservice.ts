@@ -1,12 +1,16 @@
+import {checkArgument, checkNotNull} from "../../utils/utils";
+import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
 import {FileInfo} from "./fileinfo";
-import {checkArgument, checkNotNull} from "../../utils/utils";
 import {FilesAPI} from "./filesapi";
-import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
-import { ProgressDisposer } from "./progressdisposer";
-import { ProgressHandler } from "./progresshandler";
+import {ProgressDisposer} from "./progressdisposer";
+import {ProgressHandler} from "./progresshandler";
+import {HashInfo} from "./hashinfo";
 
+/**
+ * The files service is for files management on the node.
+ */
 export class FilesService extends RestServiceT<FilesAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
@@ -76,10 +80,19 @@ export class FilesService extends RestServiceT<FilesAPI> {
         return await this.callAPI(FilesAPI, cb, moreConfig);
 	}
 
+    /**
+     * Upload a file to the files service.
+     *
+     * @param path the path in files service.
+     * @param data file's content.
+     * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
+     * @param publicOnIPFS 'true' will return the cid of the file which can be used to access from global ipfs gateway.
+     *                      The file can be download by AnonymousScriptRunner.downloadAnonymousFile() with file path.
+     */
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
-                 isPublic = false): Promise<string> {
-        return this.uploadInternal(path, data, progressHandler, isPublic);
+                 publicOnIPFS = false): Promise<string> {
+        return this.uploadInternal(path, data, progressHandler, publicOnIPFS);
     }
 
 	/**
@@ -114,7 +127,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
 	 * @return the new CompletionStage, the result is the base64 hash string
 	 *		 if the hash successfully calculated; null otherwise
 	 */
-	async hash(path: string): Promise<string> {
+	async hash(path: string): Promise<HashInfo> {
         return await this.callAPI(FilesAPI, async (api) => {
             return api.getHash(await this.getAccessToken(), path);
         });
