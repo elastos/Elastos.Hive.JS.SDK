@@ -1,4 +1,5 @@
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
+import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {ServiceEndpoint} from "../..";
 import {RestServiceT} from "../restservice";
 import {InsertOptions} from "./insertoptions";
@@ -11,7 +12,6 @@ import {UpdateResult} from "./updateresult";
 import {DeleteOptions} from "./deleteoptions";
 import {DatabaseAPI} from "./databaseapi";
 import {FindResult} from "./findresult";
-import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {Collection} from "./collection";
 
 /**
@@ -55,6 +55,12 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         });
 	}
 
+    /**
+     * Create a new collection.
+     *
+     * @param collectionName the collection name.
+     * @return void
+     */
 	async createCollection(collectionName: string): Promise<void> {
 	    return this.createCollectionInternal(collectionName);
     }
@@ -165,6 +171,14 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         });
 	}
 
+    /**
+     * Find all matched documents.
+     *
+     * @param collectionName the collection name
+     * @param filter optional, a JSON object specifying elements which must be present for a document to be included in the result set
+     * @param options optional,refer to {@link FindOptions}
+     * @return a JSON object document result
+     */
     async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
 	    const result: FindResult = await this.findManyInternal(collectionName, filter, options);
 	    return result.getItems();
@@ -193,6 +207,14 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         });
 	}
 
+    /**
+     * Find many documents by many options.
+     *
+     * @param collectionName the collection name
+     * @param filter optional, a JSON object specifying elements which must be present for a document to be included in the result set
+     * @param options optional,refer to {@link QueryOptions}
+     * @return a JsonNode array result of document
+     */
     async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
         const result: FindResult = await this.queryInternal(collectionName, filter, options);
         return result.getItems();
@@ -238,7 +260,6 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	async deleteOne(collectionName: string, filter: JSONObject): Promise<void> {
 		return await this.deleteInternal(collectionName, true, filter);
 	}
-
 
  	/**
  	 * Delete many existing documents in a given collection.

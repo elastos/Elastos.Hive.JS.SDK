@@ -2,12 +2,12 @@ import { JSONObject } from "@elastosfoundation/did-js-sdk";
 import { SortItem } from "./sortitem";
 
 export class QueryOptions {
-	public skip: number;
-	public limit: number;
-	public projection: JSONObject;
-    public sort: SortItem[];
-	public allow_partial_results: boolean;
-	public return_key: boolean;
-	public show_record_id: boolean;
-	public batch_size: number;
+	skip: number;
+	limit: number;
+	projection: JSONObject;
+    sort: SortItem[];
+	allow_partial_results: boolean;
+	return_key: boolean;
+	show_record_id: boolean;
+	batch_size: number;
 }

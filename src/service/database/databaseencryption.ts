@@ -3,6 +3,9 @@ import {InvalidParameterException, NotImplementedException} from "../../exceptio
 import {BasicEncryptionValue, EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {Logger} from "../../utils/logger";
 
+/**
+ * Document encryption or decryption.
+ */
 export class EncryptionDocument extends EncryptionValue {
     constructor(cipher: Cipher, private nonce: Buffer, value: any) {
         super(cipher, value);
@@ -79,6 +82,10 @@ export class EncryptionDocument extends EncryptionValue {
 
 }
 
+/**
+ * Filter encryption or decryption.
+ * Filter object is for any documents query and to find matched documents.
+ */
 export class EncryptionFilter extends EncryptionValue {
     private static LOG = new Logger("EncryptionFilter");
 
@@ -117,6 +124,10 @@ export class EncryptionFilter extends EncryptionValue {
     }
 }
 
+/**
+ * Update encryption and decryption.
+ * Update object is for updating the properties of the matched documents.
+ */
 export class EncryptionUpdate extends EncryptionValue {
     constructor(cipher: Cipher, private nonce: Buffer, value: any) {
         super(cipher, value);
@@ -144,6 +155,9 @@ export class EncryptionUpdate extends EncryptionValue {
     }
 }
 
+/**
+ * The encryption entry for the database service.
+ */
 export class DatabaseEncryption {
     constructor(private cipher: Cipher, private nonce: Buffer) {}
 

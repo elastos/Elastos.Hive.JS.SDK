@@ -1,20 +1,22 @@
 export class InsertResult {
     private acknowledged: boolean;
-    private inserted_ids: string[];
+    private insertedIds: string[];
 
-    public isAcknowledge(): boolean {
+    setAcknowledge(isAcknowledge: boolean) {
+        this.acknowledged = isAcknowledge;
+        return this;
+    }
+
+    setInsertedIds(insertedIds: string[]) {
+        this.insertedIds = insertedIds;
+        return this;
+    }
+
+    isAcknowledge(): boolean {
         return this.acknowledged;
     }
 
-    public getInsertedIds(): string[] {
-        return this.inserted_ids;
-    }
-
-    public setAcknowledge(isAcknowledge: boolean): void {
-        this.acknowledged = isAcknowledge;
-    }
-
-    public setInsertedIds(insertedIds: string[]): void {
-        this.inserted_ids = insertedIds;
+    getInsertedIds(): string[] {
+        return this.insertedIds;
     }
 }
