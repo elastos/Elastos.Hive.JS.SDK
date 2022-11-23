@@ -1,10 +1,13 @@
-import {NodeVersion} from "./nodeversion";
-import {HiveException} from "../../exceptions";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
+import {HiveException} from "../../exceptions";
 import {RestServiceT} from "../restservice";
-import {NodeInfo} from "./nodeinfo";
 import {AboutAPI} from "./aboutapi";
+import {NodeVersion} from "./nodeversion";
+import {NodeInfo} from "./nodeinfo";
 
+/**
+ * The about service is to show some information of the hive node.
+ */
 export class AboutService extends RestServiceT<AboutAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
@@ -44,5 +47,4 @@ export class AboutService extends RestServiceT<AboutAPI> {
             return await api.info(await this.getAccessToken());
         });
 	}
-
 }
