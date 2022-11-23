@@ -1,5 +1,8 @@
 import { BackupContext } from "./backupcontext";
 
+/**
+ * This context is for backup the vault data to any other hive node.
+ */
 export class HiveBackupContext implements BackupContext {
 	private readonly targetServiceDid: string;
 	private readonly targetProviderAddress: string;
@@ -9,15 +12,15 @@ export class HiveBackupContext implements BackupContext {
 		this.targetProviderAddress = providerAddress;
 	}
 
-    public getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
+    getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string> {
         return Promise.resolve("");
     }
     
-    public getType(): string {
+    getType(): string {
         return null;
     }  
 
-	public getParameter(parameter: string): string {
+	getParameter(parameter: string): string {
 		switch (parameter) {
 			case "targetAddress":
 				return this.targetProviderAddress;

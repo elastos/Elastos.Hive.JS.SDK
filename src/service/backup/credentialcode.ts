@@ -1,11 +1,13 @@
-import {BackupContext} from "./backupcontext";
+import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {CodeFetcher} from "../../connection/auth/codefetcher";
+import {BackupContext} from "./backupcontext";
 import {LocalResolver} from "./localresolver";
 import {RemoteResolver} from "./remoteresolver";
-import {ServiceEndpoint} from "../../connection/serviceendpoint";
 
 /**
  * Used to fetch backup credential and keep it in local storage.
+ *
+ * Internal class.
  */
 export class CredentialCode {
     private readonly endpoint: ServiceEndpoint;
@@ -21,6 +23,11 @@ export class CredentialCode {
 		this.credentialFetcher = new LocalResolver(endpoint, context, remoteResolver);
     }
 
+    /**
+     * Get the credential which represents the user to execute the backup action.
+     *
+     * @return The credential issued by the user.
+     */
     async getToken(): Promise<string> {
 		if (this.jwtCode != null)
 			return this.jwtCode;
