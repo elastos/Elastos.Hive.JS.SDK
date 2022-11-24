@@ -1,0 +1,38 @@
+{
+  "resolverUrl": "testnet",
+  "ipfsGateUrl": "https://ipfs-test.trinity-feeds.app",
+
+  "application": {
+    "name": "developAppTestnet",
+    "mnemonic": "wash busy tell relief street maximum dumb fat legend end panic warrior",
+    "passPhrase": "password",
+    "storepass": "password",
+    "did":"did:elastos:imMY7uHc5WCDUhWCVaH5MtFFCBMegCaEYH"
+  },
+
+  "user": {
+    "name": "developUser",
+    "mnemonic": "decrease eagle devote evoke dragon dignity affair fame honey tourist shrug divorce",
+    "passPhrase": "123456",
+    "storepass": "123456",
+    "did": "did:elastos:ipBaBr6HQ6h92T1fh5fFQS14xhTcyt3Azq"
+  },
+
+  "node": {
+    "provider": "https://hive-testnet1.trinity-tech.io",
+    "__comment__": "target is for backup",
+    "targetDid": "did:elastos:ijebJBsSZxJjKkSZD86kZXXM3uJiUbZcjh",
+    "targetHost": "https://hive-testnet2.trinity-tech.io"
+  },
+
+  "cross": {
+    "user": {
+      "__comment__": "the caller for the scripting service",
+      "name": "crossUser",
+      "mnemonic": "stage west lava group genre ten farm pony small family february drink",
+      "passPhrase": "secret",
+      "storepass": "password",
+      "did": "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7"
+    }
+  }
+}

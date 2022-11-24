@@ -1,0 +1,26 @@
+{
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "CommonJS",
+    "lib": ["es2017", "es7", "es6", "dom"],
+    "moduleResolution": "node",
+    // "outDir": "out-tsc",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": false,
+    "experimentalDecorators": true,
+    "allowJs": true,
+    "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "sourceMap": true,
+    "strict": false,
+    "isolatedModules": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "resolveJsonModule": true
+  }
+}
