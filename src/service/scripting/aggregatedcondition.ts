@@ -1,27 +1,28 @@
 import {Condition} from "./condition";
+import {InvalidParameterException} from "../../exceptions";
 
+/**
+ * The aggregated condition uses 'and' or 'or' to aggregate conditions
+ * which also includes aggregated conditions.
+ */
 export abstract class AggregatedCondition extends Condition {
-    public static AND = "and";
-    public static OR = "or";
+    protected static AND = "and";
+    protected static OR = "or";
 
 	protected constructor(name: string, type: string, conditions?: Condition[]) {
-		super(name, type, conditions);
-	}
-
-	setConditions(conditions: Condition[]): AggregatedCondition {
-		super.setBody(conditions == null ? [] : conditions);
-		return this;
+		super(name, type, conditions ? conditions : []);
 	}
 
 	appendCondition(condition: Condition): AggregatedCondition {
-		if (!condition) {
-			return this;
+        if (!condition)
+            throw new InvalidParameterException('Invalid condition');
+
+        if (condition instanceof AggregatedCondition) {
+            if (condition.getBody())
+                super.getBody().push(...condition.getBody());
+        } else {
+            super.getBody().push(condition);
         }
-		if (!super.getBody()) {
-			super.setBody([condition]);
-		} else {
-			(super.getBody() as Condition[]).push(condition);
-		}
-		return this;
+        return this;
 	}
 }

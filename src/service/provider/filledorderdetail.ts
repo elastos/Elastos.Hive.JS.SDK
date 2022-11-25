@@ -1,3 +1,6 @@
+/**
+ * Represents the order detail which is already paid by user.
+ */
 export class FilledOrderDetail {
 	private order_id: string;
 	private receipt_id: string;
@@ -8,67 +11,75 @@ export class FilledOrderDetail {
 	private ela_address: string;
 	private paid_did: string;
 
-	public getOrderId() {
+    setOrderId(orderId) {
+        this.order_id = orderId;
+        return this;
+    }
+
+    setReceiptId(receiptId) {
+        this.receipt_id = receiptId;
+        return this;
+    }
+
+    setUserDid(userDid) {
+        this.user_did = userDid;
+        return this;
+    }
+
+    setSubscription(subscription) {
+        this.subscription = subscription;
+        return this;
+    }
+
+    setPricingName(pricingName) {
+        this.pricing_name = pricingName;
+        return this;
+    }
+
+    setElaAmount(elaAmount) {
+        this.ela_amount = elaAmount;
+        return this;
+    }
+
+    setElaAddress(elaAddress) {
+        this.ela_address = elaAddress;
+        return this;
+    }
+
+    setPaidDid(paidDid) {
+        this.paid_did = paidDid;
+        return this;
+    }
+
+	getOrderId() {
 		return this.order_id;
 	}
 
-	public setOrderId(orderId) {
-		this.order_id = orderId;
-	}
-
-	public getReceiptId() {
+	getReceiptId() {
 		return this.receipt_id;
 	}
 
-	public setReceiptId(receiptId) {
-		this.receipt_id = receiptId;
-	}
-
-	public getUserDid() {
+	getUserDid() {
 		return this.user_did;
 	}
 
-	public setUserDid(userDid) {
-		this.user_did = userDid;
-	}
-
-	public getSubscription() {
+	getSubscription() {
 		return this.subscription;
 	}
 
-	public setSubscription(subscription) {
-		this.subscription = subscription;
-	}
-
-	public getPricingName() {
+	getPricingName() {
 		return this.pricing_name;
 	}
 
-	public setPricingName(pricingName) {
-		this.pricing_name = pricingName;
-	}
-
-	public getElaAmount() {
+	getElaAmount() {
 		return this.ela_amount;
 	}
 
-	public setElaAmount(elaAmount) {
-		this.ela_amount = elaAmount;
-	}
-
-	public getElaAddress() {
+	getElaAddress() {
 		return this.ela_address;
 	}
 
-	public setElaAddress(elaAddress) {
-		this.ela_address = elaAddress;
-	}
-
-	public getPaidDid() {
+	getPaidDid() {
 		return this.paid_did;
-	}
-
-	public setPaidDid(paidDid) {
-		this.paid_did = paidDid;
 	}
 }
