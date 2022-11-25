@@ -116,7 +116,7 @@ describe("test scripting runner function", () => {
         const scriptName = "database_find";
         const filter = { "author": "$params.author" };
         await scriptingService.registerScript(scriptName,
-            new FindExecutable(scriptName, COLLECTION_NAME, filter, null));
+            new FindExecutable(scriptName, COLLECTION_NAME, filter));
 
         const result: FindResponse =
             await scriptRunner.callScriptUrl<FindResponse>(scriptName, '{"author": "John"}', targetDid, appDid);
@@ -136,8 +136,8 @@ describe("test scripting runner function", () => {
         const filter = { "author": "$params.author" };
 
         await scriptingService.registerScript(scriptName,
-            new CountExecutable(executableName, COLLECTION_NAME, filter, null),
-            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+            new CountExecutable(executableName, COLLECTION_NAME, filter),
+            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter));
 
         const result: CountResponse =
             await scriptRunner.callScript<CountResponse>(scriptName, {"author": "John"}, targetDid, appDid);
@@ -154,8 +154,8 @@ describe("test scripting runner function", () => {
         const filter = { "author": "$params.author" };
 
         await scriptingService.registerScript(scriptName,
-            new FindExecutable(scriptName, COLLECTION_NAME, filter, null),
-            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+            new FindExecutable(scriptName, COLLECTION_NAME, filter),
+            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter));
 
         const result: FindResponse =
             await scriptRunner.callScript<FindResponse>(scriptName, {"author": "John"}, targetDid, appDid);
