@@ -13,6 +13,51 @@ export class AppInfo {
     private access_amount: number;
     private access_last_time: Date;
 
+    setName(name: string) {
+        this.name = name;
+        return this;
+    }
+
+    setDeveloperDid(did: string) {
+        this.developer_did = did;
+        return this;
+    }
+
+    setIconUrl(url: string) {
+        this.icon_url = url;
+        return this;
+    }
+
+    setUserDid(did: string) {
+        this.user_did = did;
+        return this;
+    }
+
+    setAppDid(did: string) {
+        this.app_did = did;
+        return this;
+    }
+
+    setUsedStorageSize(size: number) {
+        this.used_storage_size = size;
+        return this;
+    }
+
+    setAccessAccount(account: number) {
+        this.access_count = account;
+        return this;
+    }
+
+    setAccessAmount(amount: number) {
+        this.access_amount = amount;
+        return this;
+    }
+
+    setAccessLastTime(time: Date) {
+        this.access_last_time = time;
+        return this;
+    }
+
     getName(): string {
         return this.name;
     }

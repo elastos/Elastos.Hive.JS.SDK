@@ -27,7 +27,6 @@ import { AndCondition }  from "./service/scripting/andcondition";
 import { AggregatedCondition }  from "./service/scripting/aggregatedcondition";
 import { Executable, ExecutableType, ExecutableDatabaseBody, ExecutableFileBody }  from "./service/scripting/executable";
 import { Context }  from "./service/scripting/context";
-import { SubscriptionService }  from "./service/subscription/subscriptionservice";
 import { VaultSubscription }  from "./service/subscription/vaultsubscription/vaultsubscription";
 import { PricingPlan } from "./service/subscription/pricingplan";
 import { VaultInfo } from "./service/subscription/vaultinfo";
@@ -166,7 +165,6 @@ export {
     InsertResult,
     SubscriptionInfo,
     Context,
-    SubscriptionService,
     VaultSubscription,
     QueryHasResultCondition,
     QueryHasResultConditionOptions,

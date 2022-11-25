@@ -35,6 +35,12 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
         this.backupService = new BackupService(this.getServiceContext());
     }
 
+    /**
+     * Enable the encrypt of this vault.
+     * Only supported on the database and files services.
+     *
+     * @param storepass local did store password.
+     */
     async enableEncryption(storepass: string) {
         if (this.cipher)
             throw new EncryptionException("Encryption ciper already being enabled.");
@@ -47,6 +53,11 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
         }
     }
 
+    /**
+     * Get the files service.
+     *
+     * @param encrypt Whether supports encryption.
+     */
     getFilesService(encrypt = false): FilesService {
         if (encrypt && this.cipher === null)
             throw new InvalidParameterException("Encryption has not been enabled, call 'enableEncrytpion'");
@@ -57,6 +68,11 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
         return encrypt ? this.encryptedFileServcie : this.filesService;
     }
 
+    /**
+     * Get the database service.
+     *
+     * @param encrypt Whether supports encryption.
+     */
     getDatabaseService(encrypt=false): DatabaseService {
         if (encrypt && this.cipher === null)
             throw new InvalidParameterException("Encryption has not been enabled, call 'enableEncrytpion'");
@@ -67,10 +83,16 @@ export class Vault extends RestServiceT<SubscriptionAPI> {
             return encrypt ? this.encryptedDBService : this.databaseService;
     }
 
+    /**
+     * Get the scripting service.
+     */
     getScriptingService(): ScriptingService {
         return this.scripting;
     }
 
+    /**
+     * Get the backup service.
+     */
     getBackupService(): BackupService {
         return this.backupService;
     }
