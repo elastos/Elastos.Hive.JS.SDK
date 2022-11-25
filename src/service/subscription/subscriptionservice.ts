@@ -1,11 +1,14 @@
-import {PricingPlan} from "./pricingplan";
+import {checkArgument} from "../../utils/utils";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
+import {PricingPlan} from "./pricingplan";
 import {VaultInfo} from "./vaultinfo";
 import {BackupInfo} from "./backupinfo";
 import {SubscriptionAPI} from "./subscriptionapi";
-import {checkArgument} from "../../utils/utils";
 
+/**
+ * Base subscription service is for the backup or vault service.
+ */
 export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);

@@ -8,6 +8,8 @@ import {Executable} from './executable';
 import {Context} from './context';
 import {RestServiceT} from '../restservice';
 import {ScriptingAPI} from "./scriptingapi";
+import {ProgressHandler} from "../files/progresshandler";
+import {ProgressDisposer} from "../files/progressdisposer";
 
 interface HiveUrl {
 	targetUsrDid: string,
@@ -113,10 +115,10 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      *
      * @param transactionId Transaction ID which can be got by the calling of the script 'fileUpload'.
      * @param data File content.
-     * @param callback The callback to get the progress of uploading with percent value. Only supported on browser side.
+     * @param progressHandler Get the progress of uploading with percent value.
      */
 	async uploadFile(transactionId: string, data: Buffer | string,
-                            callback?: (process: number) => void): Promise<void> {
+                     progressHandler: ProgressHandler = new ProgressDisposer()): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
@@ -129,11 +131,9 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
                     'data': content
                 });
         }, {
-            onUploadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+            onUploadProgress: (progressEvent: any) => {
+                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressHandler.onProgress(percent);
             }
         });
 	}
@@ -142,19 +142,18 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      * Download file by transaction ID
      *
      * @param transactionId Transaction ID which can be got by the calling of the script 'fileDownload'.
-     * @param callback The callback to get the progress of downloading with percent value. Only supported on browser side.
+     * @param progressHandler Get the progress of downloading with percent value.
      */
-	async downloadFile(transactionId: string, callback?: (process: number) => void): Promise<Buffer> {
+	async downloadFile(transactionId: string,
+                       progressHandler: ProgressHandler = new ProgressDisposer()): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
 
         const dataBuffer = await this.callAPI(ScriptingAPI, async (api) => {
             return api.downloadFile(await this.getAccessToken(), transactionId);
         }, {
-            onDownloadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+            onDownloadProgress: function (progressEvent: any) {
+                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressHandler.onProgress(percent);
             }
         });
 

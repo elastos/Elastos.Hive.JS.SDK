@@ -1,7 +1,12 @@
 import {ServiceEndpoint} from "./connection/serviceendpoint";
 import {ScriptingService} from "./service/scripting/scriptingservice";
 import {InvalidParameterException} from "./exceptions";
+import {ProgressHandler} from "./service/files/progresshandler";
+import {ProgressDisposer} from "./service/files/progressdisposer";
 
+/**
+ * The script runner is for running script anonymously.
+ */
 export class AnonymousScriptRunner extends ServiceEndpoint{
     private scriptService: ScriptingService;
 
@@ -19,20 +24,55 @@ export class AnonymousScriptRunner extends ServiceEndpoint{
         this.scriptService = new ScriptingService(this);
     }
 
-    async callScript<T>(name: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
-        return await this.scriptService.callScript(name, params, targetDid, targetAppDid);
+    /**
+     * Executes a previously registered server side script with a normal way.
+     * where the values can be passed as part of the query.
+     * Vault owner or external users are allowed to call scripts on someone's vault.
+     *
+     * @param scriptName the name of the script to unregister.
+     * @param params parameters to run the script.
+     * @param targetDid target DID.
+     * @param targetAppDid target application DID.
+     */
+    async callScript<T>(scriptName: string, params: any, targetDid: string, targetAppDid: string): Promise<T> {
+        return await this.scriptService.callScript(scriptName, params, targetDid, targetAppDid);
     }
 
-    async callScriptUrl<T>(name: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
-        return await this.scriptService.callScriptUrl(name, params, targetDid, targetAppDid);
+    /**
+     * Executes a previously registered server side script with a direct URL
+     * where the values can be passed as part of the query.
+     * Vault owner or external users are allowed to call scripts on someone's vault.
+     *
+     * @param scriptName the name of the script to unregister.
+     * @param params parameters to run the script.
+     * @param targetDid target DID.
+     * @param targetAppDid target application DID.
+     */
+    async callScriptUrl<T>(scriptName: string, params: string, targetDid: string, targetAppDid: string): Promise<T> {
+        return await this.scriptService.callScriptUrl(scriptName, params, targetDid, targetAppDid);
     }
 
-    async uploadFile(transactionId: string, data: Buffer | string): Promise<void> {
-        return await this.scriptService.uploadFile(transactionId, data);
+    /**
+     * Upload file by transaction ID
+     *
+     * @param transactionId Transaction ID which can be got by the calling of the script 'fileUpload'.
+     * @param data File content.
+     * @param progressHandler Get the progress of uploading with percent value.
+     */
+    async uploadFile(transactionId: string, data: Buffer | string,
+                     progressHandler: ProgressHandler = new ProgressDisposer()): Promise<void> {
+        return await this.scriptService.uploadFile(transactionId, data, progressHandler);
     }
 
-    async downloadFile(transactionId: string): Promise<Buffer> {
-        return await this.scriptService.downloadFile(transactionId);
+    /**
+     * Download file by transaction ID
+     *
+     * @param transactionId Transaction ID which can be got by the calling of the script 'fileDownload'.
+     * @param progressHandler Get the progress of downloading with percent value.
+     */
+    async downloadFile(transactionId: string,
+                       progressHandler: ProgressHandler = new ProgressDisposer()): Promise<Buffer> {
+        return await this.scriptService.downloadFile(transactionId, progressHandler);
     }
 
     /**

@@ -1,6 +1,9 @@
 import * as http from "http";
 import * as https from "https";
 
+/**
+ * The IPFS runner is for communicating with IPFS node.
+ */
 export class IpfsRunner {
     private readonly ipfsGatewayUrl: string;
     private readonly https: any;
@@ -10,14 +13,15 @@ export class IpfsRunner {
         this.https = this.ipfsGatewayUrl.startsWith('https://') ? https : http;
     }
 
-    public getFile(cid: string): Promise<Buffer> {
-        let data = [];
-        const url = `${this.ipfsGatewayUrl}/ipfs/${cid}`
+    /**
+     * Get the file content from the IPFS node.
+     * @param cid the cid of the file.
+     */
+    getFile(cid: string): Promise<Buffer> {
         return new Promise(resolve => {
-            const request = this.https.get(url, function (response) {
-                response.on('data', function (chunk) {
-                    data.push(chunk);
-                }).on('end', function () {
+            let data = [];
+            this.https.get(`${this.ipfsGatewayUrl}/ipfs/${cid}`, function (response) {
+                response.on('data', (chunk) => data.push(chunk)).on('end', () => {
                     //at this point data is an array of Buffers
                     //so Buffer.concat() can make us a new Buffer
                     //of all of them together
