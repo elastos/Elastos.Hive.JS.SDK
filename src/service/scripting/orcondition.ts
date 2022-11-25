@@ -7,7 +7,7 @@ import {Condition} from "./condition";
  * succeeds.
  */
 export class OrCondition extends AggregatedCondition {
-    public constructor(name: string, conditions?: Condition[]) {
+    constructor(name: string, conditions?: Condition[]) {
         super(name, AggregatedCondition.OR, conditions);
     }
 }

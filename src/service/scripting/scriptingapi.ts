@@ -1,18 +1,7 @@
-import {
-    BasePath,
-    BaseService,
-    Body,
-    DELETE,
-    GET,
-    Header,
-    PATCH,
-    Path,
-    PUT, RequestTransformer,
-    Response,
-    ResponseTransformer, ResponseType
-} from 'ts-retrofit';
-import {APIResponse} from "../restservice";
+import {BasePath, BaseService, Body, DELETE, GET, Header, PATCH, Path, PUT,
+    RequestTransformer, Response, ResponseTransformer, ResponseType} from 'ts-retrofit';
 import {NotImplementedException} from "../../exceptions";
+import {APIResponse} from "../restservice";
 
 @BasePath("/api/v2")
 export class ScriptingAPI extends BaseService {
@@ -25,8 +14,8 @@ export class ScriptingAPI extends BaseService {
 
     @PATCH("/vault/scripting/{scriptName}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj;
+        return APIResponse.handleResponseData(data, (body) => {
+            return body;
         });
     })
     async runScript(@Header("Authorization") authorization: string,
@@ -37,8 +26,8 @@ export class ScriptingAPI extends BaseService {
 
     @GET("/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj;
+        return APIResponse.handleResponseData(data, (body) => {
+            return body;
         });
     })
     async runScriptUrl(@Header("Authorization") authorization: string,

@@ -1,12 +1,12 @@
-import {InvalidParameterException} from '../../exceptions';
-import {Condition} from './condition';
-import {Executable} from './executable';
-import {ServiceEndpoint} from '../../connection/serviceendpoint';
-import {Context} from './context';
 import {Logger} from '../../utils/logger';
 import {checkNotNull, checkArgument} from '../../utils/utils';
-import {RestServiceT} from '../restservice';
+import {InvalidParameterException} from '../../exceptions';
 import {AppContext} from "../../connection/auth/appcontext";
+import {ServiceEndpoint} from '../../connection/serviceendpoint';
+import {Condition} from './condition';
+import {Executable} from './executable';
+import {Context} from './context';
+import {RestServiceT} from '../restservice';
 import {ScriptingAPI} from "./scriptingapi";
 
 interface HiveUrl {
@@ -16,6 +16,9 @@ interface HiveUrl {
 	params: string
 }
 
+/**
+ * The scripting service is for the script owner to operate database and files by the script.
+ */
 export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	private static LOG = new Logger("ScriptingService");
 

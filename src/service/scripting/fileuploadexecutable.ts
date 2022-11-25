@@ -1,8 +1,10 @@
 import {Executable, ExecutableFileBody, ExecutableType} from "./executable";
 
+/**
+ * Used to upload the file content.
+ */
 export class FileUploadExecutable extends Executable {
-    public constructor(name: string) {
-        super(name, ExecutableType.FILE_UPLOAD, null);
-        super.setBody(new ExecutableFileBody());
+    constructor(name: string) {
+        super(name, ExecutableType.FILE_UPLOAD, new ExecutableFileBody());
     }
 }
