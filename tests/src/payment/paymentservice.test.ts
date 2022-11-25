@@ -110,7 +110,7 @@ describe("test payment service", () => {
     });
 
     test.skip("testGetOrders", async () => {
-        const orders: Order[] = await vaultSubscription.getOrderList();
+        const orders: Order[] = await vaultSubscription.getOrders();
         expect(orders).not.toBeNull();
         expect(orders.length).toBeGreaterThan(0);
         const order: Order = orders[0];
