@@ -3,7 +3,7 @@
  */
 export class FileInfo {
 	private name: string;
-	private _isFile: boolean;
+	private is_file: boolean;
 	private size: number;
 	private created: number;
 	private updated: number;
@@ -14,7 +14,7 @@ export class FileInfo {
 	}
 
 	public setAsFile(file: boolean): FileInfo {
-		this._isFile = file;
+		this.is_file = file;
 		return this;
 	}
 
@@ -38,7 +38,7 @@ export class FileInfo {
 	}
 
 	public isFile(): boolean {
-		return this._isFile;
+		return this.is_file;
 	}
 
 	public getSize(): number {

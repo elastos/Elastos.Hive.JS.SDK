@@ -1,6 +1,6 @@
 export class InsertResult {
     private acknowledged: boolean;
-    private insertedIds: string[];
+    private inserted_ids: string[];
 
     setAcknowledge(isAcknowledge: boolean) {
         this.acknowledged = isAcknowledge;
@@ -8,7 +8,7 @@ export class InsertResult {
     }
 
     setInsertedIds(insertedIds: string[]) {
-        this.insertedIds = insertedIds;
+        this.inserted_ids = insertedIds;
         return this;
     }
 
@@ -17,6 +17,6 @@ export class InsertResult {
     }
 
     getInsertedIds(): string[] {
-        return this.insertedIds;
+        return this.inserted_ids;
     }
 }

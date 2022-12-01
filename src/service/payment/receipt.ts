@@ -2,23 +2,23 @@
  * The receipt contains the details of the paid information.
  */
 export class Receipt {
-	private receiptId: string;
-	private orderId: number;
+	private receipt_id: string;
+	private order_id: number;
     private subscription: string;
-    private pricingPlan: string;
-    private paymentAmount: number;
-    private paidDid: string;
-    private createTime: number;
-    private receivingAddress: string;
-    private receiptProof: string;
+    private pricing_plan: string;
+    private payment_amount: number;
+    private paid_did: string;
+    private create_time: number;
+    private receiving_address: string;
+    private receipt_proof: string;
 
     setReceiptId(receiptId: string) {
-        this.receiptId = receiptId;
+        this.receipt_id = receiptId;
         return this;
     }
 
     setOrderId(orderId: number) {
-        this.orderId = orderId;
+        this.order_id = orderId;
         return this;
     }
 
@@ -28,41 +28,41 @@ export class Receipt {
     }
 
     setPricingPlan(pricingPlan: string): Receipt {
-        this.pricingPlan = pricingPlan;
+        this.pricing_plan = pricingPlan;
         return this;
     }
 
     setPaymentAmount(paymentAmount: number): Receipt {
-        this.paymentAmount = paymentAmount;
+        this.payment_amount = paymentAmount;
         return this;
     }
 
     setPaidDid(paidDid: string): Receipt {
-        this.paidDid = paidDid;
+        this.paid_did = paidDid;
         return this;
     }
 
     setCreateTime(createTime: number): Receipt {
-        this.createTime = createTime;
+        this.create_time = createTime;
         return this;
     }
 
     setReceivingAddress(receivingAddress: string): Receipt {
-        this.receivingAddress = receivingAddress;
+        this.receiving_address = receivingAddress;
         return this;
     }
 
     setReceiptProof(receiptProof: string): Receipt {
-        this.receiptProof = receiptProof;
+        this.receipt_proof = receiptProof;
         return this;
     }
 
     getReceiptId(): string {
-        return this.receiptId;
+        return this.receipt_id;
     }
 
 	getOrderId(): number {
-		return this.orderId;
+		return this.order_id;
 	}
 
     getSubscription(): string {
@@ -70,26 +70,26 @@ export class Receipt {
     }
 
     getPricingPlan(): string {
-        return this.pricingPlan;
+        return this.pricing_plan;
     }
 
     getPaymentAmount(): number {
-        return this.paymentAmount;
+        return this.payment_amount;
     }
 
     getPaidDid(): string {
-        return this.paidDid;
+        return this.paid_did;
     }
 
     getCreateTime(): number {
-        return this.createTime;
+        return this.create_time;
     }
 
     getReceivingAddress(): string {
-        return this.receivingAddress;
+        return this.receiving_address;
     }
 
 	getReceiptProof(): string {
-		return this.receiptProof;
+		return this.receipt_proof;
 	}
 }

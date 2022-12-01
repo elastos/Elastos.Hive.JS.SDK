@@ -1,8 +1,8 @@
 export class UpdateResult {
 	private acknowledged: boolean;
-	private matchedCount: number;
-	private modifiedCount: number;
-	private upsertedId: string;
+	private matched_count: number;
+	private modified_count: number;
+	private upserted_id: string;
 
 	setAcknowledged(acknowledged: boolean) {
 		this.acknowledged = acknowledged;
@@ -10,17 +10,17 @@ export class UpdateResult {
 	}
 
 	setMatchedCount(matchedCount: number) {
-		this.matchedCount = matchedCount;
+		this.matched_count = matchedCount;
         return this;
 	}
 
 	setModifiedCount(modifiedCount: number) {
-		this.modifiedCount = modifiedCount;
+		this.modified_count = modifiedCount;
         return this;
 	}
 
 	setUpsertedId(upsertedId: string) {
-		this.upsertedId = upsertedId;
+		this.upserted_id = upsertedId;
         return this;
 	}
 
@@ -29,14 +29,14 @@ export class UpdateResult {
 	}
 
 	getMatchedCount(): number {
-		return this.matchedCount;
+		return this.matched_count;
 	}
 
 	getModifiedCount(): number {
-		return this.modifiedCount;
+		return this.modified_count;
 	}
 
 	getUpsertedId(): string {
-		return this.upsertedId;
+		return this.upserted_id;
 	}
 }

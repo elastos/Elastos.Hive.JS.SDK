@@ -9,19 +9,19 @@ export enum OrderState {
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 export class Order {
-	private orderId: number;
+	private order_id: number;
 	private subscription: string;
-	private pricingPlan: string;
-	private payingDid: string;
-	private paymentAmount: number;
-    private createTime: number;
-    private expirationTime: number;
-    private receivingAddress: string;
+	private pricing_plan: string;
+	private paying_did: string;
+	private payment_amount: number;
+    private create_time: number;
+    private expiration_time: number;
+    private receiving_address: string;
     private state: OrderState;
     private proof: string;
 
     setOrderId(orderId: number) {
-        this.orderId = orderId;
+        this.order_id = orderId;
         return this;
     }
 
@@ -31,32 +31,32 @@ export class Order {
     }
 
     setPricingPlan(pricingName: string) {
-        this.pricingPlan = pricingName;
+        this.pricing_plan = pricingName;
         return this;
     }
 
     setPayingDid(payingDid: string) {
-        this.payingDid = payingDid;
+        this.paying_did = payingDid;
         return this;
     }
 
     setPaymentAmount(paymentAmount: number) {
-        this.paymentAmount = paymentAmount;
+        this.payment_amount = paymentAmount;
         return this;
     }
 
     setCreateTime(createTime: number) {
-        this.createTime = createTime;
+        this.create_time = createTime;
         return this;
     }
 
     setExpirationTime(expirationTime: number) {
-        this.expirationTime = expirationTime;
+        this.expiration_time = expirationTime;
         return this;
     }
 
     setReceivingAddress(receivingAddress: string) {
-        this.receivingAddress = receivingAddress;
+        this.receiving_address = receivingAddress;
         return this;
     }
 
@@ -71,7 +71,7 @@ export class Order {
     }
 
 	getOrderId(): number {
-		return this.orderId;
+		return this.order_id;
 	}
 
 	getSubscription(): string {
@@ -79,27 +79,27 @@ export class Order {
 	}
 
 	getPricingPlan(): string {
-		return this.pricingPlan;
+		return this.pricing_plan;
 	}
 
     getPayingDid(): string {
-        return this.payingDid;
+        return this.paying_did;
     }
 
 	getPaymentAmount(): number {
-		return this.paymentAmount;
+		return this.payment_amount;
 	}
 
     getCreateTime(): number {
-        return this.createTime;
+        return this.create_time;
     }
 
     getExpirationTime(): number {
-        return this.expirationTime;
+        return this.expiration_time;
     }
 
 	getReceivingAddress(): string {
-		return this.receivingAddress;
+		return this.receiving_address;
 	}
 
     getState(): string {

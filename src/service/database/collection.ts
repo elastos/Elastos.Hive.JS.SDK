@@ -1,7 +1,7 @@
 export class Collection {
     private name: string;
-    private _isEncrypt: boolean;
-    private encryptMethod: string;
+    private is_encrypt: boolean;
+    private encrypt_method: string;
 
     setName(name: string) {
         this.name = name;
@@ -9,12 +9,12 @@ export class Collection {
     }
 
     setEncrypt(encrypt: boolean) {
-        this._isEncrypt = encrypt;
+        this.is_encrypt = encrypt;
         return this;
     }
 
     setEncryptMethod(method: string) {
-        this.encryptMethod = method;
+        this.encrypt_method = method;
         return this;
     }
 
@@ -23,10 +23,10 @@ export class Collection {
     }
 
     isEncrypt(): boolean {
-        return this._isEncrypt;
+        return this.is_encrypt;
     }
 
     getEncryptMethod(): string {
-        return this.encryptMethod;
+        return this.encrypt_method;
     }
 }
