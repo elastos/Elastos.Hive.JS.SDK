@@ -13,6 +13,7 @@ import { AboutService }  from "./service/about/aboutservice";
 import { AuthService }  from "./service/auth/authservice";
 import { BackupService }  from "./service/backup/backupservice";
 import { BackupSubscription }  from "./service/subscription/backupsubscription/backupsubscription";
+import { Collection }  from "./service/database/collection";
 import { DatabaseService }  from "./service/database/databaseservice";
 import { FilesService }  from "./service/files/filesservice";
 import { IpfsRunner }  from "./ipfsrunner";
@@ -87,9 +88,7 @@ import { FindOptions } from "./service/database/findoptions";
 import { UpdateOptions } from "./service/database/updateoptions";
 import { QueryOptions } from "./service/database/queryoptions";
 import { CountOptions } from "./service/database/countoptions";
-import { DeleteOptions, DeleteIndex, DeleteOrder } from "./service/database/deleteoptions";
 import { UpdateResult } from "./service/database/updateresult";
-import { CaseFirst, Strength, Alternate, Collation, MaxVariable } from "./service/database/collation";
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./service/database/sortitem";
 import { Order, OrderState } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
@@ -139,6 +138,7 @@ export {
     AuthService,
     BackupService,
     BackupSubscription,
+    Collection,
     DatabaseService,
     FilesService,
     IpfsRunner,
@@ -189,9 +189,6 @@ export {
     UpdateOptions,
     QueryOptions,
     CountOptions,
-    DeleteOptions,
-    DeleteOrder,
-    DeleteIndex,
     SortItem,
     AscendingSortItem,
     DescendingSortItem,
@@ -199,11 +196,6 @@ export {
     OrderState,
     Receipt,
     UpdateResult,
-    CaseFirst,
-    Strength,
-    Alternate,
-    Collation,
-    MaxVariable,
     IllegalArgumentException,
     BadContextProviderException,
     DIDNotPublishedException,

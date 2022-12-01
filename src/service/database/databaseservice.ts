@@ -9,7 +9,6 @@ import {CountOptions} from "./countoptions";
 import {QueryOptions} from "./queryoptions";
 import {UpdateOptions} from "./updateoptions";
 import {UpdateResult} from "./updateresult";
-import {DeleteOptions} from "./deleteoptions";
 import {DatabaseAPI} from "./databaseapi";
 import {FindResult} from "./findresult";
 import {Collection} from "./collection";
@@ -162,9 +161,9 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @return a JsonNode array result of document
 	 */
 	protected async findManyInternal(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<FindResult> {
-        const filterJson = filter === null ? {} : filter;
-        const skip = options ? options.skip : undefined;
-        const limit = options ? options.limit : undefined;
+        const filterJson = !filter ? {} : filter;
+        const skip = options ? options.getSkip() : undefined;
+        const limit = options ? options.getLimit() : undefined;
 
         return await this.callAPI(DatabaseAPI, async (api) => {
             return await api.find(await this.getAccessToken(), collectionName, JSON.stringify(filterJson), skip, limit);
@@ -197,9 +196,8 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
             "collection": collectionName,
             "filter": filter
         };
-        const optionsJson = DatabaseService.normalizeSortQueryOptions(options);
-        if (optionsJson) {
-            body['options'] = optionsJson;
+        if (options) {
+            body['options'] = options;
         }
 
         return await this.callAPI(DatabaseAPI, async (api) => {
@@ -272,17 +270,6 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 		return await this.deleteInternal(collectionName, false, filter);
 	}
 
-	private static normalizeSortQueryOptions(options: QueryOptions): QueryOptions {
-		if (options && options.sort) {
-			let sortQuery = [];
-			for (const s of options.sort) {
-				sortQuery.push([s.key, s.order])
-			}
-			options.sort = sortQuery;
-		}
-		return options;
-	}
-
 	protected async updateInternal(collectionName: string, isOnlyOne: boolean, filter: JSONObject, update: JSONObject,
                                  options?: UpdateOptions): Promise<UpdateResult> {
         let body = {
@@ -297,18 +284,10 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
         });
 	}
 
-	private async deleteInternal(collectionName: string, isOnlyOne:boolean, filter: JSONObject,
-                                 options?: DeleteOptions): Promise<void> {
-        let body = {
-            "filter": filter
-        };
-        if (options) {
-            body['options'] = options;
-        }
+	private async deleteInternal(collectionName: string, isOnlyOne:boolean, filter: JSONObject): Promise<void> {
         await this.callAPI(DatabaseAPI, async (api) => {
             return await api.delete(await this.getAccessToken(), collectionName, isOnlyOne, {
-                "filter": filter,
-                "options": options
+                "filter": filter
             });
         });
 	}

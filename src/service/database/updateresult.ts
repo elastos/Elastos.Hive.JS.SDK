@@ -1,3 +1,6 @@
+/**
+ * The result of the updating operation.
+ */
 export class UpdateResult {
 	private acknowledged: boolean;
 	private matched_count: number;

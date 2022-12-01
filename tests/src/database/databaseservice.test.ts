@@ -58,21 +58,24 @@ describe("test database services", () => {
         docNode['author'] = 'john doe1';
         docNode['title'] = 'Eve for Dummies1';
 
-        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
+        let result = await databaseService.insertOne(COLLECTION_NAME, docNode,
+            new InsertOptions().setBypassDocumentValidation(false).setOrdered(false));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds()).toHaveLength(1);
     });
 
     test("testInsertOne4NotFoundException", async () => {
         let docNode = {"author": "john doe1", "title": "Eve for Dummies1"};
-        await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode, new InsertOptions(false, false)))
+        await expect(databaseService.insertOne(COLLECTION_NAME_NOT_EXIST, docNode,
+            new InsertOptions().setBypassDocumentValidation(false).setOrdered(false)))
             .rejects.toThrow(CollectionNotFoundException);
  	});
 
     test("testInsertMany", async () => {
         let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
                      {"author": "john doe3", "title": "Eve for Dummies3"}];
-        let result = await databaseService.insertMany(COLLECTION_NAME, nodes, new InsertOptions(false, true)); 
+        let result = await databaseService.insertMany(COLLECTION_NAME, nodes,
+            new InsertOptions().setBypassDocumentValidation(false).setOrdered(false));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds()).toHaveLength(2);
     });
@@ -80,7 +83,8 @@ describe("test database services", () => {
     test("testInsertMany4NotFoundException", async () => {
         let nodes = [{"author": "john doe2", "title": "Eve for Dummies2"},
                      {"author": "john doe3", "title": "Eve for Dummies3"}];
-        await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes, new InsertOptions(false, false)))
+        await expect(databaseService.insertMany(COLLECTION_NAME_NOT_EXIST, nodes,
+            new InsertOptions().setBypassDocumentValidation(false).setOrdered(false)))
             .rejects.toThrow(CollectionNotFoundException);
     });
 
@@ -126,25 +130,19 @@ describe("test database services", () => {
     test("testQueryWithOptions", async () => {
         let query = {"author": "john doe1"};
         let options: QueryOptions = new QueryOptions();
-        options.sort = [new AscendingSortItem("_id")];
+        options.setSort([new AscendingSortItem("_id")]);
         await expect(databaseService.query(COLLECTION_NAME, query, options)).resolves.not.toBeNull();
     });
 
     test("testCountDoc", async () => {
         let filter = { "author": "john doe1" };
-        let countOptions = new CountOptions();
-        countOptions.skip = 0;
-        countOptions.limit = 1;
-        countOptions.maxTimeMS = 1000000000;
+        let countOptions = new CountOptions().setSkip(0).setLimit(1).setMaxTimeMS(1000000000);
         await expect(databaseService.countDocuments(COLLECTION_NAME, filter, countOptions)).resolves.not.toBeNull();
     });
 
     test("testCountDoc4NotFoundException", async () => {
         let filter = { "author": "john doe1" };
-        let countOptions = new CountOptions();
-        countOptions.skip = 0;
-        countOptions.limit = 1;
-        countOptions.maxTimeMS = 1000000000;
+        let countOptions = new CountOptions().setSkip(0).setLimit(1).setMaxTimeMS(1000000000);
         await expect(databaseService.countDocuments(COLLECTION_NAME_NOT_EXIST, filter, countOptions))
             .rejects.toThrow(CollectionNotFoundException);
     });
@@ -153,7 +151,8 @@ describe("test database services", () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false))).resolves.not.toBeNull();
     });
 
     test("testUpdateInsertIfNotExists", async () => {
@@ -166,7 +165,8 @@ describe("test database services", () => {
         */
         let filter = { "author": "john doe4" };
         let updateNode = { "$setOnInsert": { "title": "Eve for Dummies4" } };
-        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(true, true))).resolves.not.toBeNull();
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false))).resolves.not.toBeNull();
     });
 
     test("testUpdateOneNoOptions", async () => {
@@ -180,7 +180,8 @@ describe("test database services", () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_1" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateOne(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true)))
+        await expect(databaseService.updateOne(COLLECTION_NAME_NOT_EXIST, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false)))
             .rejects.toThrow(CollectionNotFoundException);
     });
 
@@ -188,14 +189,16 @@ describe("test database services", () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_2" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateMany(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
+        await expect(databaseService.updateMany(COLLECTION_NAME, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false))).resolves.not.toBeNull();
     });
 
     test("testUpdateMany4NotFoundException", async () => {
         let filter = { "author": "john doe1" };
         let docNode = { "author": "john doe1", "title": "Eve for Dummies1_2" };
         let updateNode = { "$set": docNode };
-        await expect(databaseService.updateMany(COLLECTION_NAME_NOT_EXIST, filter, updateNode, new UpdateOptions(false, true))).rejects.toThrow(CollectionNotFoundException);
+        await expect(databaseService.updateMany(COLLECTION_NAME_NOT_EXIST, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false))).rejects.toThrow(CollectionNotFoundException);
     });
 
     test("testDeleteOne", async () => {

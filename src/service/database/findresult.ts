@@ -1,5 +1,8 @@
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
 
+/**
+ * The result of the finding operation.
+ */
 export class FindResult {
     private items: JSONObject[];
     private is_encrypt: boolean;
