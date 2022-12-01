@@ -1,35 +1,35 @@
 import { VerifiablePresentation } from "@elastosfoundation/did-js-sdk";
 
 export class NodeInfo {
-    private serviceDid: string;
-    private ownerDid: string;
-    private ownershipPresentation: VerifiablePresentation;
+    private service_did: string;
+    private owner_did: string;
+    private ownership_presentation: VerifiablePresentation;
     private name: string;
     private email: string;
     private description: string;
     private version: string;
-    private lastCommitId: string;
-    private userCount: number;
-    private vaultCount: number;
-    private backupCount: number;
-    private latestAccessTime: Date;
-    private memoryUsed: number;
-    private memoryTotal: number;
-    private storageUsed: number;
-    private storageTotal: number;
+    private last_commit_id: string;
+    private user_count: number;
+    private vault_count: number;
+    private backup_count: number;
+    private latest_access_time: Date;
+    private memory_used: number;
+    private memory_total: number;
+    private storage_used: number;
+    private storage_total: number;
 
     setServiceDid(serviceDid: string) {
-        this.serviceDid = serviceDid;
+        this.service_did = serviceDid;
         return this;
     }
 
     setOwnerDid(ownerDid: string) {
-        this.ownerDid = ownerDid;
+        this.owner_did = ownerDid;
         return this;
     }
 
     setOwnershipPresentation(vp: VerifiablePresentation) {
-        this.ownershipPresentation = vp;
+        this.ownership_presentation = vp;
         return this;
     }
 
@@ -54,60 +54,60 @@ export class NodeInfo {
     }
 
     setLastCommitId(cid: string) {
-        this.lastCommitId = cid;
+        this.last_commit_id = cid;
         return this;
     }
 
     setUserCount(count: number) {
-        this.userCount = count;
+        this.user_count = count;
         return this;
     }
 
     setVaultCount(count: number) {
-        this.vaultCount = count;
+        this.vault_count = count;
         return this;
     }
 
     setBackupCount(count: number) {
-        this.backupCount = count;
+        this.backup_count = count;
         return this;
     }
 
     setLatestAccessTime(accessTime: Date) {
-        this.latestAccessTime = accessTime;
+        this.latest_access_time = accessTime;
         return this;
     }
 
     setMemoryUsed(count: number) {
-        this.memoryUsed = count;
+        this.memory_used = count;
         return this;
     }
 
     setMemoryTotal(count: number) {
-        this.memoryTotal = count;
+        this.memory_total = count;
         return this;
     }
 
     setStorageUsed(count: number) {
-        this.storageUsed = count;
+        this.storage_used = count;
         return this;
     }
 
     setStorageTotal(count: number) {
-        this.storageTotal = count;
+        this.storage_total = count;
         return this;
     }
 
     getServiceDid(): string {
-        return this.serviceDid;
+        return this.service_did;
     }
 
     getOwnerDid(): string {
-        return this.ownerDid;
+        return this.owner_did;
     }
 
     getOwnershipPresentation(): VerifiablePresentation {
-        return this.ownershipPresentation;
+        return this.ownership_presentation;
     }
 
     getName(): string {
@@ -127,38 +127,38 @@ export class NodeInfo {
     }
 
     getLastCommitId(): string {
-        return this.lastCommitId;
+        return this.last_commit_id;
     }
 
     getUserCount() {
-        return this.userCount;
+        return this.user_count;
     }
 
     getVaultCount() {
-        return this.vaultCount;
+        return this.vault_count;
     }
 
     getBackupCount() {
-        return this.backupCount;
+        return this.backup_count;
     }
 
     getLatestAccessTime(): Date {
-        return this.latestAccessTime;
+        return this.latest_access_time;
     }
 
     getMemoryUsed(): number {
-        return this.memoryUsed;
+        return this.memory_used;
     }
 
     getMemoryTotal(): number {
-        return this.memoryTotal;
+        return this.memory_total;
     }
 
     getStorageUsed(): number {
-        return this.storageUsed;
+        return this.storage_used;
     }
 
     getStorageTotal(): number {
-        return this.storageTotal;
+        return this.storage_total;
     }
 }

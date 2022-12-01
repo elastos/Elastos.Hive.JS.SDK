@@ -35,15 +35,15 @@ export class PaymentAPI extends BaseService {
         return APIResponse.handleResponseData(data, (body) => {
             return new Order()
                 .setOrderId(body['order_id'])
-                .setSubscription(body['order_id'])
-                .setPricingPlan(body['order_id'])
-                .setPayingDid(body['order_id'])
-                .setPaymentAmount(body['order_id'])
-                .setCreateTime(body['order_id'])
-                .setExpirationTime(body['order_id'])
-                .setReceivingAddress(body['order_id'])
+                .setSubscription(body['subscription'])
+                .setPricingPlan(body['pricing_plan'])
+                .setPayingDid(body['paying_did'])
+                .setPaymentAmount(body['payment_amount'])
+                .setCreateTime(body['create_time'])
+                .setExpirationTime(body['expiration_time'])
+                .setReceivingAddress(body['receiving_address'])
                 .setState(getOrderStateByStr(body['state']))
-                .setProof(body['order_id']);
+                .setProof(body['proof']);
         });
     })
     async placeOrder(@Header("Authorization") auth: string,
@@ -75,16 +75,16 @@ export class PaymentAPI extends BaseService {
     @ResponseTransformer((data: any, headers?: any) => {
         return APIResponse.handleResponseData(data, (body) => {
             return body['orders'].map(o => new Order()
-                .setOrderId(o['order_id'])
-                .setSubscription(o['order_id'])
-                .setPricingPlan(o['order_id'])
-                .setPayingDid(o['order_id'])
-                .setPaymentAmount(o['order_id'])
-                .setCreateTime(o['order_id'])
-                .setExpirationTime(o['order_id'])
-                .setReceivingAddress(o['order_id'])
-                .setState(getOrderStateByStr(o['state']))
-                .setProof(o['order_id']));
+                .setOrderId(body['order_id'])
+                .setSubscription(body['subscription'])
+                .setPricingPlan(body['pricing_plan'])
+                .setPayingDid(body['paying_did'])
+                .setPaymentAmount(body['payment_amount'])
+                .setCreateTime(body['create_time'])
+                .setExpirationTime(body['expiration_time'])
+                .setReceivingAddress(body['receiving_address'])
+                .setState(getOrderStateByStr(body['state']))
+                .setProof(body['proof']));
         });
     })
     async getOrders(@Header("Authorization") auth: string,
