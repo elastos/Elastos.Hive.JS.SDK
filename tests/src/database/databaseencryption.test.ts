@@ -45,7 +45,8 @@ describe("test database services", () => {
         docNode['words_count'] = 10000;
         docNode['published'] = true;
 
-        let result = await databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, false, true));
+        let result = await databaseService.insertOne(COLLECTION_NAME, docNode,
+            new InsertOptions().setBypassDocumentValidation(false).setOrdered(false));
         expect(result).not.toBeNull();
         expect(result.getInsertedIds()).toHaveLength(1);
     });
@@ -53,7 +54,8 @@ describe("test database services", () => {
     test("testUpdateAndFindMany", async () => {
         const filter = { "author": "john doe1" };
         const updateNode = { "$set": { "title": "Eve for Dummies2" } };
-        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode, new UpdateOptions(false, true))).resolves.not.toBeNull();
+        await expect(databaseService.updateOne(COLLECTION_NAME, filter, updateNode,
+            new UpdateOptions().setBypassDocumentValidation(false).setUpsert(false))).resolves.not.toBeNull();
 
         const docs: JSONObject[] = await databaseService.findMany(COLLECTION_NAME, filter);
         expect(docs).toBeTruthy();

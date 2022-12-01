@@ -1,11 +1,35 @@
+/**
+ * The options of the inserting operation.
+ */
 export class InsertOptions {
-    bypass_document_validation: boolean;
-    ordered: boolean;
-    timestamp: boolean
+    private bypass_document_validation: boolean;
+    private ordered: boolean;
+    private timestamp = true;
 
-    constructor(bypassDocumentValidation?: boolean, ordered?: boolean, timestamp?: boolean){
-        this.bypass_document_validation = bypassDocumentValidation ?? false;
-        this.ordered = ordered ?? false;
-        this.timestamp = timestamp ?? true;
+    setBypassDocumentValidation(validation: boolean): InsertOptions {
+        this.bypass_document_validation = validation;
+        return this;
+    }
+
+    setOrdered(ordered: boolean): InsertOptions {
+        this.ordered = ordered;
+        return this;
+    }
+
+    setTimestamp(timestamp: boolean): InsertOptions {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    isBypassDocumentValidation(): boolean {
+        return this.bypass_document_validation;
+    }
+
+    isOrdered(): boolean {
+        return this.ordered;
+    }
+
+    isTimestamp(): boolean {
+        return this.timestamp;
     }
 }

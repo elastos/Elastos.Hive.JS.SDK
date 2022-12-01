@@ -1,13 +1,18 @@
-export class SortItem {
+/**
+ * Sort item for the querying sort option.
+ */
+export abstract class SortItem {
     static ASCENDING = 1;
     static DESCENDING = -1;
 
-    key: string;
-    order: number;
+    protected constructor(private key: string, private order: number) {}
 
-    constructor(key?: string, order?: number) {
-        this.key = key;
-        this.order = order;
+    getKey(): string {
+        return this.key;
+    }
+
+    getOrder(): number {
+        return this.order;
     }
 }
 

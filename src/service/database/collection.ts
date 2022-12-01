@@ -1,3 +1,6 @@
+/**
+ * Collection details.
+ */
 export class Collection {
     private name: string;
     private is_encrypt: boolean;
