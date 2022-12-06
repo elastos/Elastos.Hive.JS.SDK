@@ -139,6 +139,12 @@ describe("test scripting runner function", () => {
             new CountExecutable(executableName, COLLECTION_NAME, filter),
             new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter));
 
+        // get scripts
+        const scripts = await scriptingService.getScripts(scriptName);
+        expect(scripts).toHaveLength(1);
+        expect(scripts[0].getName()).toEqual(scriptName);
+        expect(scripts[0].getExecutable()['name']).toEqual(executableName);
+
         const result: CountResponse =
             await scriptRunner.callScript<CountResponse>(scriptName, {"author": "John"}, targetDid, appDid);
 

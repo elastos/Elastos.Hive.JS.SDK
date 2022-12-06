@@ -2,6 +2,7 @@ import {BasePath, BaseService, Body, DELETE, GET, Header, PATCH, Path, PUT,
     RequestTransformer, Response, ResponseTransformer, ResponseType} from 'ts-retrofit';
 import {NotImplementedException} from "../../exceptions";
 import {APIResponse} from "../restservice";
+import {ScriptContent} from "./scriptcontent";
 
 @BasePath("/api/v2")
 export class ScriptingAPI extends BaseService {
@@ -9,6 +10,24 @@ export class ScriptingAPI extends BaseService {
     async registerScript(@Header("Authorization") authorization: string,
                          @Path("scriptName") scriptName: string,
                          @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
+
+    @GET("/vault/scripting/scripts")
+    @ResponseTransformer((data: any, headers?: any) => {
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['scripts'].map(s => new ScriptContent()
+                .setName(s['name'])
+                .setCondition(s['condition'])
+                .setExecutable(s['executable'])
+                .setAllowAnonymousUser(s['allowAnonymousUser'])
+                .setAllowAnonymousApp(s['allowAnonymousApp']));
+        });
+    })
+    async getScripts(@Header("Authorization") authorization: string,
+                     @Path("name") name: string,
+                     @Path("skip") skip: number,
+                     @Path("limit") limit: number): Promise<Response> {
         throw new NotImplementedException();
     }
 
