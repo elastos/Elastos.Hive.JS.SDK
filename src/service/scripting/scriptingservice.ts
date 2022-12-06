@@ -10,6 +10,7 @@ import {RestServiceT} from '../restservice';
 import {ScriptingAPI} from "./scriptingapi";
 import {ProgressHandler} from "../files/progresshandler";
 import {ProgressDisposer} from "../files/progressdisposer";
+import {ScriptContent} from "./scriptcontent";
 
 interface HiveUrl {
 	targetUsrDid: string,
@@ -39,7 +40,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	* @return Void
 	*/
 	async registerScript(scriptName: string, executable: Executable, condition?: Condition,
-                         allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
+                         allowAnonymousUser?: boolean, allowAnonymousApp?: boolean): Promise<void> {
 		checkNotNull(scriptName, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
@@ -59,13 +60,26 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      *
      * @param scriptName the name of the script to unregister.
      */
-	async unregisterScript(scriptName: string) : Promise<void>{
+	async unregisterScript(scriptName: string): Promise<void>{
         checkNotNull(scriptName, "Missing script name.");
 
         await this.callAPI(ScriptingAPI, async api => {
             return await api.unregisterScript(await this.getAccessToken(), scriptName);
         });
 	}
+
+    /**
+     * Get scripts user registered.
+     *
+     * @param name the specific script name.
+     * @param skip skip, default 0
+     * @param limit limit, default 0
+     */
+	async getScripts(name?: string, skip?: number, limit?: number): Promise<ScriptContent[]> {
+        return await this.callAPI(ScriptingAPI, async api => {
+            return await api.getScripts(await this.getAccessToken(), name, skip, limit);
+        });
+    }
 
     /**
      * Executes a previously registered server side script with a normal way.
