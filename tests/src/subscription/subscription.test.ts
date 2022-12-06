@@ -11,7 +11,7 @@ describe("test vault subscribe function", () => {
 
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
-    let PRICING_PLAN_NAME = "Rookie";
+    let PRICING_PLAN_NAME = "Standard";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
@@ -103,7 +103,7 @@ describe("test backup subscribe function", () => {
 
     let testData: TestData;
     let backupSubscription: BackupSubscription;
-    let PRICING_PLAN_NAME = "Rookie";
+    let PRICING_PLAN_NAME = "Standard";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("backup subscribe.test");
