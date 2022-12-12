@@ -21,13 +21,13 @@ export function emitModulePackageFile() {
 	};
 }
 
-// const commitHash = (function () {
-//     try {
-//         return fs.readFileSync('.commithash', 'utf-8');
-//     } catch (err) {
-//         return 'unknown';
-//     }
-// })();
+const commitHash = (function () {
+    try {
+        return fs.readFileSync('.commithash', 'utf-8');
+    } catch (err) {
+        return 'unknown';
+    }
+})();
 
 const prodBuild = process.env.prodbuild || false;
 console.log("Prod build: ", prodBuild);
@@ -36,13 +36,13 @@ const now = new Date(
     process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
 ).toUTCString();
 
-// const banner = `/*
-//   @license
-//     hive.js v${pkg.version}
-//     ${now} - commit ${commitHash}
+const banner = `/*
+  @license
+    hive.js v${pkg.version}
+    ${now} - commit ${commitHash}
 
-//     Released under the MIT License.
-// */`;
+    Released under the MIT License.
+*/`;
 
 const onwarn = warning => {
     // eslint-disable-next-line no-console
@@ -95,6 +95,9 @@ const nodePlugins = [
         sourceMap: !prodBuild,
         exclude: "*.browser.ts"
     }),
+    ...prodBuild ? [
+        terser()
+    ] : [],
     size()
 ];
 
@@ -118,24 +121,18 @@ export default command => {
         ],
         // fsevents is a dependency of chokidar that cannot be bundled as it contains binary code
         external: [
-            'assert',
             'axios',
-            'crypto',
-            'events',
-            'fs',
-            'fsevents',
-            'module',
-            'path',
-            'os',
-            'stream',
-            'url',
-            'util',
+            'browserfs',
+            'buffer',
+            'dayjs',
+            'promise-queue',
+            'ts-retrofit',
             '@elastosfoundation/did-js-sdk'
         ],
         treeshake,
         strictDeprecations: true,
         output: {
-            //banner,
+            banner,
             chunkFileNames: 'shared/[name].js',
             dir: 'dist',
             entryFileNames: '[name]',
@@ -313,7 +310,7 @@ export default command => {
             {
                 file: 'dist/es/hive.browser.js',
                 format: 'es',
-                //banner,
+                banner,
                 sourcemap: !prodBuild,
                 //intro: 'var process: { env: {}};'
                 //intro: 'var global = typeof self !== undefined ? self : this;' // Fix "global is not defined"

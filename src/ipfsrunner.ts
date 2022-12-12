@@ -26,8 +26,8 @@ export class IpfsRunner {
                     //so Buffer.concat() can make us a new Buffer
                     //of all of them together
                     resolve(Buffer.concat(data));
-                });
+                })
             })
-        });
+        })
     }
 }
