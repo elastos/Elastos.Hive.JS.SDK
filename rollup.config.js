@@ -9,6 +9,7 @@ import alias from "@rollup/plugin-alias";
 import globals from 'rollup-plugin-node-globals';
 import { visualizer } from 'rollup-plugin-visualizer';
 import {terser} from "rollup-plugin-terser";
+import pkg from './package.json';
 
 const production = !process.env.ROLLUP_WATCH;
 
