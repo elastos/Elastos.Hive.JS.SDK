@@ -1,8 +1,11 @@
 import {NotImplementedException, UnauthorizedException} from "../../exceptions";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
-import {BackupContext} from "./backupcontext";
 import {CodeFetcher} from "../../connection/auth/codefetcher";
+import {BackupContext} from "./backupcontext";
 
+/**
+ * Fetch the token from the remote hive node.
+ */
 export class RemoteResolver implements CodeFetcher {
     private readonly targetDid: string;
     private readonly targetHost: string;

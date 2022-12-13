@@ -3,7 +3,7 @@ import {
     PricingPlan,
     BackupSubscription,
     Order,
-    AlreadyExistsException, SubscriptionInfo
+    AlreadyExistsException, SubscriptionInfo, VaultInfo
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -11,7 +11,7 @@ describe("test vault subscribe function", () => {
 
     let testData: TestData;
     let vaultSubscription: VaultSubscription;
-    let PRICING_PLAN_NAME = "Rookie";
+    let PRICING_PLAN_NAME = "Standard";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("vault subscribe.test");
@@ -60,21 +60,24 @@ describe("test vault subscribe function", () => {
                 throw e;
             }
         }
-        let appStats = await vaultSubscription.getAppStats();
+        let appStats = await testData.newVault().getAppStats();
         expect(appStats).not.toBeNull();
         expect(appStats).not.toEqual([]);
-        expect(appStats[0].getName()).not.toEqual(null);
-        expect(appStats[0].getDeveloperDid()).not.toEqual(null);
-        expect(appStats[0].getIconUrl()).not.toEqual(null);
-        expect(appStats[0].getUserDid()).not.toEqual(null);
-        expect(appStats[0].getAppDid()).not.toEqual(null);
+        expect(appStats[0].getName()).not.toBeNull();
+        expect(appStats[0].getDeveloperDid()).not.toBeNull();
+        expect(appStats[0].getIconUrl()).not.toBeNull();
+        expect(appStats[0].getUserDid()).toBeTruthy();
+        expect(appStats[0].getAppDid()).toBeTruthy();
         expect(appStats[0].getUsedStorageSize()).toBeGreaterThanOrEqual(0);
+        expect(appStats[0].getAccessCount()).toBeGreaterThanOrEqual(0);
+        expect(appStats[0].getAccessAmount()).toBeGreaterThanOrEqual(0);
     });
 
     test("testSubscribeCheckUnsubscribe", async () => {
         try {
             const vaultInfo = await vaultSubscription.subscribe();
             expect(vaultInfo).not.toBeNull();
+            expect(vaultInfo.getAppCount()).toBeGreaterThan(0);
         } catch (e) {
             if (!(e instanceof AlreadyExistsException)) {
                 throw e;
@@ -83,13 +86,15 @@ describe("test vault subscribe function", () => {
 
         // await vaultSubscription.activate();
 
-        const result: SubscriptionInfo = await vaultSubscription.checkSubscription();
+        const result: VaultInfo = await vaultSubscription.checkSubscription();
         expect(result).not.toBeNull();
         // expect(result.getEndTime()).toBeTruthy();
+        expect(result.getAccessCount()).toBeGreaterThanOrEqual(0);
+        expect(result.getAppCount()).toBeGreaterThan(0);
 
         // await vaultSubscription.deactivate();
 
-        await vaultSubscription.unsubscribe();
+        await vaultSubscription.unsubscribe(true);
     });
 });
 
@@ -98,7 +103,7 @@ describe("test backup subscribe function", () => {
 
     let testData: TestData;
     let backupSubscription: BackupSubscription;
-    let PRICING_PLAN_NAME = "Rookie";
+    let PRICING_PLAN_NAME = "Standard";
 
     beforeEach(async () => {
         testData = await TestData.getInstance("backup subscribe.test");

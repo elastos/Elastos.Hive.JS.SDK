@@ -1,3 +1,8 @@
+/**
+ * The backup context provides the information required by the backup and restore process.
+ *
+ * Need choose different sub-class to backup to different target.
+ */
 export interface BackupContext {
     /**
 	* Get the backup destination type which the vault want to go.
@@ -25,6 +30,3 @@ export interface BackupContext {
 	*/
 	getAuthorization(srcDid: string, targetDid: string, targetHost: string): Promise<string>;
 }
-
-
-

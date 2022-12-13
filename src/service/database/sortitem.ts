@@ -1,24 +1,29 @@
-export class SortItem {
-    public static ASCENDING = 1;
-    public static DESCENDING = -1;
+/**
+ * Sort item for the querying sort option.
+ */
+export abstract class SortItem {
+    static ASCENDING = 1;
+    static DESCENDING = -1;
 
-    public key: string;
-    public order: number;
+    protected constructor(private key: string, private order: number) {}
 
-    public constructor(key?: string, order?: number) {
-        this.key = key;
-        this.order = order;
+    getKey(): string {
+        return this.key;
+    }
+
+    getOrder(): number {
+        return this.order;
     }
 }
 
 export class AscendingSortItem extends SortItem {
-    public constructor(key: string) {
+    constructor(key: string) {
         super(key, SortItem.ASCENDING);
     }
 }
 
 export class DescendingSortItem extends SortItem {
-    public constructor(key: string) {
+    constructor(key: string) {
         super(key, SortItem.DESCENDING);
     }
 }

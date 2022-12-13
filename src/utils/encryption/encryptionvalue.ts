@@ -5,7 +5,8 @@ import {Cipher, DecryptionStream} from "@elastosfoundation/did-js-sdk";
  * Represent a value which needs be encrypted or decrypted.
  */
 export abstract class EncryptionValue {
-    private static TRUNK_SIZE = 4096;
+    private static readonly TRUNK_SIZE = 4096;
+    public static readonly ENCRYPT_METHOD = 'user_did';
 
     protected constructor(protected cipher: Cipher, protected value: any) {}
 

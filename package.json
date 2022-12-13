@@ -35,13 +35,11 @@
     "test:node:profile": "JEST_CIRCUS=1 node --prof --no-logfile-per-isolate ./node_modules/.bin/jest --silent=false --verbose --runInBand --config jest.node.config.ts -- crypto/hdkey.test && node --prof-process v8.log > processed.log && echo '' && echo 'Please open processed.log'. && echo ''"
   },
   "dependencies": {
-    "@elastosfoundation/did-js-sdk": "^2.2.12",
-    "axios": "^0.24.0",
-    "browserfs": "^1.4.3",
-    "buffer": "^5.6.0",
     "dayjs": "^1.10.4",
     "promise-queue": "^2.2.5",
-    "ts-retrofit": "^1.17.0"
+    "ts-retrofit": "^1.17.0",
+    "url": "^0.11.0",
+    "web3": "^1.6.0"
   },
   "repository": {
     "type": "git",
@@ -53,6 +51,7 @@
     "@babel/plugin-proposal-decorators": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.13.0",
+    "@elastosfoundation/did-js-sdk": "^2.2.12",
     "@rollup/plugin-alias": "^3.1.5",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-eslint": "^8.0.1",
@@ -62,14 +61,19 @@
     "@rollup/plugin-replace": "^3.0.0",
     "@rollup/plugin-typescript": "^8.2.1",
     "@types/bn.js": "^5.1.0",
+    "@types/bs58": "^4.0.1",
     "@types/crypto-js": "^4.0.1",
+    "@types/fs-extra": "^9.0.13",
     "@types/jest": "^26.0.24",
     "@types/node": "^14.18.2",
     "@types/promise-queue": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "antlr4ts-cli": "^0.5.0-alpha.4",
+    "axios": "^0.24.0",
     "babel-jest": "^27.5.1",
+    "bs58": "^5.0.0",
+    "buffer": "^5.6.0",
     "eslint": "^8.16.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^26.2.2",
@@ -97,6 +101,7 @@
     "rollup-plugin-visualizer": "^5.5.2",
     "ts-jest": "^26.5.6",
     "ts-node": "^10.8.0",
+    "tslib": "^2.3.1",
     "typedoc": "^0.22.13",
     "typescript": "^4.5.2"
   },

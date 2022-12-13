@@ -1,12 +1,13 @@
 import {
     AlreadyExistsException,
-    File, FileNotFoundException,
+    FileNotFoundException,
     FilesService, IpfsRunner,
-    ScriptRunner,
+    AnonymousScriptRunner,
     VaultSubscription
 } from "../../../src";
-import { TestData } from "../config/testdata";
-import { Blob } from 'buffer';
+import {TestData} from "../config/testdata";
+import {File} from "../file";
+import {Blob} from 'buffer';
 
 describe("test files service", () => {
 
@@ -28,7 +29,7 @@ describe("test files service", () => {
 	let filesService: FilesService;
 	let testData: TestData;
 
-	let anonymousScriptRunner: ScriptRunner;
+	let anonymousScriptRunner: AnonymousScriptRunner;
 	let targetDid: string;
 	let appDid: string;
 
@@ -47,7 +48,7 @@ describe("test files service", () => {
 			}
 		}
 
-		anonymousScriptRunner = new ScriptRunner(null, testData.getProviderAddress());
+        anonymousScriptRunner = testData.newAnonymousCallerScriptRunner();
 		targetDid = testData.getUserDid();
 		appDid = testData.getAppDid();
 	});
@@ -106,34 +107,23 @@ describe("test files service", () => {
 		await verifyRemoteFileExists(REMOTE_DIR + FILE_NAME_TXT);
     });
 
-	test("testUploadTextPublic", async () => {
+	test.skip("testUploadTextPublic", async () => {
 		const fileName = REMOTE_DIR + FILE_PUBLIC_NAME;
-		const scriptName = FILE_PUBLIC_NAME.split('.')[0]
-		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), null, true, scriptName);
+		const cid = await filesService.upload(fileName, Buffer.from(FILE_PUBLIC_CONTENT), null, true);
         expect(cid).toBeTruthy();
+
 		// check by directly downloading.
-		let data = await filesService.download(fileName);
+		let data: Buffer = await filesService.download(fileName);
 		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
+
 		// check by scripting downloading.
-		let downloadTransactionId = await callScriptFileDownload(FILE_PUBLIC_NAME.split('.')[0]);
-		data = await downloadFileByTransActionId(downloadTransactionId);
+        data = await anonymousScriptRunner.downloadAnonymousFile(targetDid, appDid, fileName);
 		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
+
 		// check by cid
 		data = await new IpfsRunner(testData.getIpfsGatewayUrl()).getFile(cid);
 		expectBuffersToBeEqual(Buffer.from(FILE_PUBLIC_CONTENT), data);
 	});
-
-	async function callScriptFileDownload(scriptName: string): Promise<string> {
-		let result = await anonymousScriptRunner.callScript(scriptName, {}, targetDid, appDid);
-		expect(result).not.toBeNull();
-		expect(result[scriptName]).not.toBeNull();
-		expect(result[scriptName].transaction_id).not.toBeNull();
-		return result[scriptName].transaction_id;
-	}
-
-	async function downloadFileByTransActionId(transactionId: string): Promise<Buffer> {
-		return await anonymousScriptRunner.downloadFile(transactionId);
-	}
 
 	test("testUploadWithString", async () => {
 		const filePath = REMOTE_DIR + FILE_STR_NAME

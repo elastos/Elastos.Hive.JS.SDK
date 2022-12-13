@@ -1,42 +1,65 @@
-import {Condition} from "./condition";
+import {InvalidParameterException} from "../../exceptions";
+import {ScriptEntity} from "./scriptentity";
 
+/**
+ * Defines all possible executable types.
+ */
 export class ExecutableType {
-    public static AGGREGATED = "aggregated";
-    public static FIND = "find";
-    public static COUNT = "count";
-    public static INSERT = "insert";
-    public static UPDATE = "update";
-    public static DELETE = "delete";
-    public static FILE_UPLOAD = "fileUpload";
-    public static FILE_DOWNLOAD = "fileDownload";
-    public static FILE_PROPERTIES = "fileProperties";
-    public static FILE_HASH = "fileHash";
+    static AGGREGATED = "aggregated";
+    static FIND = "find";
+    static COUNT = "count";
+    static INSERT = "insert";
+    static UPDATE = "update";
+    static DELETE = "delete";
+    static FILE_UPLOAD = "fileUpload";
+    static FILE_DOWNLOAD = "fileDownload";
+    static FILE_PROPERTIES = "fileProperties";
+    static FILE_HASH = "fileHash";
 }
-export class Executable extends Condition {
 
-    output = true;
+/**
+ * The base class of the executable.
+ *
+ * An executable represents an executing body of the script.
+ */
+export abstract class Executable extends ScriptEntity {
+    private output = true;
    
-    constructor(name: string, type: ExecutableType, body: any) {
+    protected constructor(name: string, type: ExecutableType, body: any) {
         super(name, type as string, body);
     }
 
-    public setOutput(output: boolean): Executable  {
+    setOutput(output: boolean): Executable  {
         this.output = output;
         return this;
     }
 
-    public static createRunFileParams(path: string) : any {
+    isOutput(): boolean {
+        return this.output;
+    }
+
+    static createRunFileParams(path: string) : any {
 		return {"path": path};
 	}
 }
 
-export class ExecutableDatabaseBody {
-    collection: string;
-    constructor(collection: string) {
-        this.collection = collection;
+/**
+ * Base class of the database executable body.
+ */
+export abstract class ExecutableDatabaseBody {
+    protected constructor(private collection: string) {
+        if (!this.collection)
+            throw new InvalidParameterException('Invalid collection');
+    }
+
+    getCollection(): string {
+        return this.collection;
     }
 }
 
+/**
+ * Base class of the files executable body.
+ */
 export class ExecutableFileBody {
     private path: string;
 

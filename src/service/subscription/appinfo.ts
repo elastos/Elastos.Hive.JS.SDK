@@ -9,29 +9,88 @@ export class AppInfo {
     private user_did: string;
     private app_did: string;
     private used_storage_size: number;
+    private access_count: number;
+    private access_amount: number;
+    private access_last_time: Date;
 
-    public getName(): string {
+    setName(name: string) {
+        this.name = name;
+        return this;
+    }
+
+    setDeveloperDid(did: string) {
+        this.developer_did = did;
+        return this;
+    }
+
+    setIconUrl(url: string) {
+        this.icon_url = url;
+        return this;
+    }
+
+    setUserDid(did: string) {
+        this.user_did = did;
+        return this;
+    }
+
+    setAppDid(did: string) {
+        this.app_did = did;
+        return this;
+    }
+
+    setUsedStorageSize(size: number) {
+        this.used_storage_size = size;
+        return this;
+    }
+
+    setAccessAccount(account: number) {
+        this.access_count = account;
+        return this;
+    }
+
+    setAccessAmount(amount: number) {
+        this.access_amount = amount;
+        return this;
+    }
+
+    setAccessLastTime(time: Date) {
+        this.access_last_time = time;
+        return this;
+    }
+
+    getName(): string {
         return this.name;
     }
 
-    public getDeveloperDid(): string {
+    getDeveloperDid(): string {
         return this.developer_did;
     }
 
-    public getIconUrl(): string {
+    getIconUrl(): string {
         return this.icon_url;
     }
 
-    public getUserDid(): string {
+    getUserDid(): string {
         return this.user_did;
     }
 
-    public getAppDid(): string {
+    getAppDid(): string {
         return this.app_did;
     }
 
-    public getUsedStorageSize(): number {
+    getUsedStorageSize(): number {
         return this.used_storage_size;
     }
 
+    getAccessCount(): number {
+        return this.access_count;
+    }
+
+    getAccessAmount(): number {
+        return this.access_amount;
+    }
+
+    getAccessLastTime(): Date {
+        return this.access_last_time;
+    }
 }

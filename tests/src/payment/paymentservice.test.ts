@@ -110,7 +110,7 @@ describe("test payment service", () => {
     });
 
     test.skip("testGetOrders", async () => {
-        const orders: Order[] = await vaultSubscription.getOrderList();
+        const orders: Order[] = await vaultSubscription.getOrders();
         expect(orders).not.toBeNull();
         expect(orders.length).toBeGreaterThan(0);
         const order: Order = orders[0];
@@ -127,7 +127,7 @@ describe("test payment service", () => {
 
     test.skip("testGetReceipt", async () => {
         const receipts: Receipt[] = await vaultSubscription.getReceipts(1);
-        expect(receipts.length).toEqual(1);
+        expect(receipts).toHaveLength(1);
         const receipt = receipts[0];
         expect(receipt).not.toBeNull();
         expect(receipt.getReceiptId()).not.toBeNull();

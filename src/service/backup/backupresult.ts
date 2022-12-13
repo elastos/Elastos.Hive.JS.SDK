@@ -15,15 +15,30 @@ export class BackupResult {
     private result: BackupResultResult;
     private message: string;
 
-    public getState(): BackupResultState {
+    setState(state: BackupResultState) {
+        this.state = state;
+        return this;
+    }
+
+    setResult(result: BackupResultResult) {
+        this.result = result;
+        return this;
+    }
+
+    setMessage(message: string) {
+        this.message = message;
+        return this;
+    }
+
+    getState(): BackupResultState {
         return this.state;
     }
 
-    public getResult(): BackupResultResult {
+    getResult(): BackupResultResult {
         return this.result;
     }
 
-    public getMessage(): string {
+    getMessage(): string {
         return this.message;
     }
 }

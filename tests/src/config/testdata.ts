@@ -13,6 +13,7 @@ import {
 import { AppDID } from '../did/appdid';
 import { UserDID } from '../did/userdid';
 import { ClientConfig } from "./clientconfig";
+import {AnonymousScriptRunner} from "../../../src/anonymous.scriptrunner";
 
 export class TestData {
     private static LOG = new Logger("TestData");
@@ -22,6 +23,7 @@ export class TestData {
     private readonly clientConfig: any;
 
     private appInstanceDid: AppDID;
+    private appInstanceDidDoc: DIDDocument;
     // user & owner DID
     private userDid: UserDID;
     // caller DID for the scripting service
@@ -60,6 +62,7 @@ export class TestData {
             applicationConfig.storepass,
             this.clientConfig.resolverUrl,
             storeRoot, applicationConfig.did);
+        this.appInstanceDidDoc = await this.appInstanceDid.getDocument();
 
         let userConfig = this.clientConfig.user;
         this.userDid = await UserDID.create(userConfig.name,
@@ -123,18 +126,25 @@ export class TestData {
     }
 
 	async getEncryptionCipher() {
-        const doc = await this.appInstanceDid.getDocument();
-        return await doc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
+        return await this.appInstanceDidDoc.createCipher(this.getAppDid(), 6, this.clientConfig.application.storepass);
     }
 
 	async getEncryptionDatabaseService(): Promise<DatabaseService> {
-        return await this.newVault().getEncryptionDatabaseService(this.getAppDid(), 6,
-            this.clientConfig.application.storepass, this.getNonce());
+        let vault = this.newVault();
+        try {
+            await vault.enableEncryption(this.clientConfig.application.storepass);
+        } catch (error) {
+        }
+        return vault.getDatabaseService(true);
     }
 
     async getEncryptionFileService(): Promise<FilesService> {
-        return await this.newVault().getEncryptionFilesService(this.getAppDid(), 6,
-            this.clientConfig.application.storepass);
+        let vault = this.newVault();
+        try {
+            await vault.enableEncryption(this.clientConfig.application.storepass);
+        } catch (error) {
+        }
+        return vault.getFilesService(true);
     }
 
     async getCipher(): Promise<Cipher> {
@@ -143,8 +153,12 @@ export class TestData {
             this.clientConfig.application.storepass);
     }
 
-	newAnonymousCallerScriptRunner(): ScriptRunner {
-		return new ScriptRunner(this.anonymousContext, this.getProviderAddress());
+    newCallerScriptRunner(): ScriptRunner {
+        return new ScriptRunner(this.callerAppContext, this.getProviderAddress());
+    }
+
+	newAnonymousCallerScriptRunner(): AnonymousScriptRunner {
+		return new AnonymousScriptRunner(this.getProviderAddress());
 	}
 
 	newBackup(): Backup {
@@ -159,20 +173,14 @@ export class TestData {
     	const self = this;
     	userDid = userDid ? userDid : this.userDid;
         appDid = appDid ? appDid : AppDID.APP_DID;
-		return await AppContext.build({
+		return AppContext.build({
 
 			getLocalDataDir() : string {
 				return self.getLocalCachePath(false);
 			},
 
-			async getAppInstanceDocument() : Promise<DIDDocument>  {
-				try {
-					return await self.appInstanceDid.getDocument();
-				} catch (e) {
-					TestData.LOG.debug("TestData.getAppInstanceDocument Error {}", e);
-					TestData.LOG.error(e.stack);
-                    throw e;
-				}
+			getAppInstanceDocument() : DIDDocument  {
+			    return self.appInstanceDidDoc;
 			},
 
 			async getAuthorization(jwtToken : string) : Promise<string> {
@@ -200,8 +208,8 @@ export class TestData {
 		return AppDID.APP_DID;
 	}
 
-	async getAppInstanceDid(): Promise<DIDDocument> {
-        return await this.appInstanceDid.getDocument();
+	getAppInstanceDid(): DIDDocument {
+        return this.appInstanceDidDoc;
     }
 
 	getUserDid(): string {

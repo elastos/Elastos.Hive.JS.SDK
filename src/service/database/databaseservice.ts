@@ -1,6 +1,6 @@
 import {JSONObject} from "@elastosfoundation/did-js-sdk";
-import {ServiceEndpoint} from "../../connection/serviceendpoint";
-import {Logger} from '../../utils/logger';
+import {EncryptionValue} from "../../utils/encryption/encryptionvalue";
+import {ServiceEndpoint} from "../..";
 import {RestServiceT} from "../restservice";
 import {InsertOptions} from "./insertoptions";
 import {InsertResult} from "./insertresult";
@@ -9,9 +9,9 @@ import {CountOptions} from "./countoptions";
 import {QueryOptions} from "./queryoptions";
 import {UpdateOptions} from "./updateoptions";
 import {UpdateResult} from "./updateresult";
-import {DeleteOptions} from "./deleteoptions";
-import {DatabaseEncryption} from "./databaseencryption";
 import {DatabaseAPI} from "./databaseapi";
+import {FindResult} from "./findresult";
+import {Collection} from "./collection";
 
 /**
  * Database service is for save JSON data on the mongo database on hive node.
@@ -21,34 +21,48 @@ import {DatabaseAPI} from "./databaseapi";
  * If wants encryptDoc the document, please make sure the document is Object or Map.
  */
 export class DatabaseService extends RestServiceT<DatabaseAPI> {
-	private static LOG = new Logger("DatabaseService");
-
-	private encrypt: boolean;
-	private databaseEncrypt: DatabaseEncryption;
-
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
-        this.encrypt = false;
-        this.databaseEncrypt = null;
 	}
 
-	async encryptionInit(identifier: string, secureCode: number, storepass: string, nonce: Buffer) {
-        this.encrypt = true;
-        const cipher = await this.getEncryptionCipher(identifier, secureCode, storepass);
-        this.databaseEncrypt = new DatabaseEncryption(cipher, nonce);
+    /**
+     * Get all collections under user database.
+     *
+     * @return collection list
+     */
+    async getCollections(): Promise<Collection[]>{
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.getCollections(await this.getAccessToken());
+        });
     }
 
 	/**
 	 * Lets the vault owner create a collection on database.
 	 *
-	 * @param collectionName the collection name
+	 * @param collectionName the collection name.
+	 * @param isEncrypt whether the collection is encryption.
 	 * @return void
 	 */
-	async createCollection(collectionName: string): Promise<void>{
+	protected async createCollectionInternal(collectionName: string, isEncrypt=false): Promise<void>{
+	    let body = {};
+	    if (isEncrypt) {
+	        body['is_encrypt'] = true;
+	        body['encrypt_method'] = EncryptionValue.ENCRYPT_METHOD;
+        }
         await this.callAPI(DatabaseAPI, async (api) => {
-            return await api.createCollection(await this.getAccessToken(), collectionName);
+            return await api.createCollection(await this.getAccessToken(), collectionName, body);
         });
 	}
+
+    /**
+     * Create a new collection.
+     *
+     * @param collectionName the collection name.
+     * @return void
+     */
+	async createCollection(collectionName: string): Promise<void> {
+	    return this.createCollectionInternal(collectionName);
+    }
 
 	/**
 	 * Lets the vault owner delete a collection on database according to collection name.
@@ -89,9 +103,8 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	* @return Results returned by {@link InsertResult} wrapper
 	*/
 	async insertMany(collectionName: string, docs: any[], options?: InsertOptions): Promise<InsertResult>{
-        const encryptedDocs = this.encrypt ? this.databaseEncrypt.encryptDocs(docs) : docs;
         let body = {
-            "document": encryptedDocs
+            "document": docs
         };
         if (options) {
             body['options'] = options;
@@ -114,9 +127,8 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
  	 * @return count size
  	 */
  	async countDocuments(collectionName: string, filter: JSONObject, options?: CountOptions): Promise<number> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
         let body = {
-            "filter": encryptedFilter
+            "filter": filter
         };
         if (options) {
             body['options'] = options;
@@ -136,16 +148,8 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @return a JSON object document result
 	 */
 	async findOne(collectionName: string, filter: JSONObject, options?: FindOptions): Promise<JSONObject> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-		const docs = await this.findMany(collectionName, encryptedFilter, options);
-
-		DatabaseService.LOG.debug(`fine docs: ${JSON.stringify(docs)}`);
-
-		if (!docs || docs.length === 0) {
-		    return null;
-        }
-
-		return this.encrypt ? this.databaseEncrypt.encryptDoc(docs[0], false) : docs[0];
+		const docs = await this.findMany(collectionName, filter, options);
+        return !docs || docs.length === 0 ? null : docs[0];
 	}
 
 	/**
@@ -156,22 +160,28 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 	 * @param options optional,refer to {@link FindOptions}
 	 * @return a JsonNode array result of document
 	 */
+	protected async findManyInternal(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<FindResult> {
+        const filterJson = !filter ? {} : filter;
+        const skip = options ? options.getSkip() : undefined;
+        const limit = options ? options.getLimit() : undefined;
 
-	async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-        const filterJson = encryptedFilter === null ? {} : encryptedFilter;
-
-        DatabaseService.LOG.debug("FILTER_STR: " + filterJson);
-
-        const skip = options ? options.skip : undefined;
-        const limit = options ? options.limit : undefined;
-
-        const result = await this.callAPI(DatabaseAPI, async (api) => {
-            return await api.find(await this.getAccessToken(), collectionName, filterJson, skip, limit);
+        return await this.callAPI(DatabaseAPI, async (api) => {
+            return await api.find(await this.getAccessToken(), collectionName, JSON.stringify(filterJson), skip, limit);
         });
-
-        return this.encrypt ? this.databaseEncrypt.encryptDocs(result, false) : result;
 	}
+
+    /**
+     * Find all matched documents.
+     *
+     * @param collectionName the collection name
+     * @param filter optional, a JSON object specifying elements which must be present for a document to be included in the result set
+     * @param options optional,refer to {@link FindOptions}
+     * @return a JSON object document result
+     */
+    async findMany(collectionName: string, filter: JSONObject, options?: FindOptions) : Promise<JSONObject[]> {
+	    const result: FindResult = await this.findManyInternal(collectionName, filter, options);
+	    return result.getItems();
+    }
 
  	/**
  	 * Find many documents by many options.
@@ -181,23 +191,32 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
  	 * @param options optional,refer to {@link QueryOptions}
  	 * @return a JsonNode array result of document
  	 */
-	async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
+	protected async queryInternal(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<FindResult> {
         let body = {
             "collection": collectionName,
-            "filter": encryptedFilter
+            "filter": filter
         };
-        const optionsJson = DatabaseService.normalizeSortQueryOptions(options);
-        if (optionsJson) {
-            body['options'] = optionsJson;
+        if (options) {
+            body['options'] = options;
         }
 
-        const result = await this.callAPI(DatabaseAPI, async (api) => {
+        return await this.callAPI(DatabaseAPI, async (api) => {
             return await api.query(await this.getAccessToken(), collectionName, body);
         });
-
-        return this.encrypt ? this.databaseEncrypt.encryptDocs(result) : result;
 	}
+
+    /**
+     * Find many documents by many options.
+     *
+     * @param collectionName the collection name
+     * @param filter optional, a JSON object specifying elements which must be present for a document to be included in the result set
+     * @param options optional,refer to {@link QueryOptions}
+     * @return a JsonNode array result of document
+     */
+    async query(collectionName: string, filter: JSONObject, options?: QueryOptions): Promise<JSONObject[]> {
+        const result: FindResult = await this.queryInternal(collectionName, filter, options);
+        return result.getItems();
+    }
 
 	/**
  	 * Update an existing document in a given collection.
@@ -240,7 +259,6 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 		return await this.deleteInternal(collectionName, true, filter);
 	}
 
-
  	/**
  	 * Delete many existing documents in a given collection.
  	 *
@@ -252,48 +270,24 @@ export class DatabaseService extends RestServiceT<DatabaseAPI> {
 		return await this.deleteInternal(collectionName, false, filter);
 	}
 
-	private static normalizeSortQueryOptions(options: QueryOptions): QueryOptions {
-		if (options && options.sort) {
-			let sortQuery = [];
-			for (const s of options.sort) {
-				sortQuery.push([s.key, s.order])
-			}
-			options.sort = sortQuery;
-		}
-		return options;
-	}
-
-	private async updateInternal(collectionName: string, isOnlyOne: boolean, filter: JSONObject, update: JSONObject,
+	protected async updateInternal(collectionName: string, isOnlyOne: boolean, filter: JSONObject, update: JSONObject,
                                  options?: UpdateOptions): Promise<UpdateResult> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-        const encryptedUpdate = this.encrypt ? this.databaseEncrypt.encryptUpdate(update) : update;
         let body = {
-            "filter": encryptedFilter,
-            "update": encryptedUpdate
+            "filter": filter,
+            "update": update
         };
         if (options) {
             body['options'] = options;
         }
-
         return await this.callAPI(DatabaseAPI, async (api) => {
             return await api.update(await this.getAccessToken(), collectionName, isOnlyOne, body);
         });
 	}
 
-	private async deleteInternal(collectionName: string, isOnlyOne:boolean, filter: JSONObject,
-                                 options?: DeleteOptions): Promise<void> {
-        const encryptedFilter = this.encrypt ? this.databaseEncrypt.encryptFilter(filter) : filter;
-        let body = {
-            "filter": encryptedFilter
-        };
-        if (options) {
-            body['options'] = options;
-        }
-
+	private async deleteInternal(collectionName: string, isOnlyOne:boolean, filter: JSONObject): Promise<void> {
         await this.callAPI(DatabaseAPI, async (api) => {
             return await api.delete(await this.getAccessToken(), collectionName, isOnlyOne, {
-                "filter": encryptedFilter,
-                "options": options
+                "filter": filter
             });
         });
 	}

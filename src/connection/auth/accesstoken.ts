@@ -5,7 +5,8 @@ import {AuthService} from '../../service/auth/authservice';
 import {Logger} from '../../utils/logger';
 import {Claims, JWTParserBuilder} from '@elastosfoundation/did-js-sdk'
 import PromiseQueue from "promise-queue";
-import {CodeFetcher, SHA256} from "../..";
+import {CodeFetcher} from "./codefetcher";
+import {SHA256} from "../../utils/sha256";
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.

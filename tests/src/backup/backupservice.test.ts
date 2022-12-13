@@ -28,7 +28,7 @@ describe("test backup services", () => {
 
         // try to remove the vault.
         try {
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             if (!(e instanceof VaultNotFoundException)) {
                 throw e;
@@ -79,9 +79,11 @@ describe("test backup services", () => {
 
         for (let i = 0; i < count; i++) {
             const buffer: Buffer = randomBytes(10 * 1024 * 1024 + i + 1);
-            await filesService.upload(`${fileNamePrefix}${i}.bin`, buffer, (process => {
-                LOG.info(`uploading file ${fileNamePrefix}${i}.bin: ${process}`)
-            }), true, `public_file_${i}`);
+            await filesService.upload(`${fileNamePrefix}${i}.bin`, buffer, {
+                onProgress: (process) => {
+                    LOG.info(`uploading file ${fileNamePrefix}${i}.bin: ${process}`);
+                }
+            }, false);
         }
 
         const uploadEnd = new Date().getTime();

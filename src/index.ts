@@ -1,13 +1,8 @@
 'use strict';
 
 import { Vault } from "./vault";
-import { DataStorage } from "./utils/storage/datastorage";
-import { File } from "./utils/storage/file";
-import { FileStorage } from "./utils/storage/filestorage";
 import { NodeVersion } from "./service/about/nodeversion";
 import { NodeInfo } from "./service/about/nodeinfo";
-import { SHA256 } from "./utils/sha256";
-import * as Utils from "./utils/utils";
 import { ServiceEndpoint }  from "./connection/serviceendpoint";
 import { AccessToken }  from "./connection/auth/accesstoken";
 import { AppContext }  from "./connection/auth/appcontext";
@@ -18,6 +13,7 @@ import { AboutService }  from "./service/about/aboutservice";
 import { AuthService }  from "./service/auth/authservice";
 import { BackupService }  from "./service/backup/backupservice";
 import { BackupSubscription }  from "./service/subscription/backupsubscription/backupsubscription";
+import { Collection }  from "./service/database/collection";
 import { DatabaseService }  from "./service/database/databaseservice";
 import { FilesService }  from "./service/files/filesservice";
 import { IpfsRunner }  from "./ipfsrunner";
@@ -25,13 +21,13 @@ import { PaymentService }  from "./service/payment/paymentservice";
 import { PromotionService }  from "./service/promotion/promotionservice";
 import { ScriptingService }  from "./service/scripting/scriptingservice";
 import { ScriptRunner }  from "./scriptrunner";
+import { AnonymousScriptRunner }  from "./anonymous.scriptrunner";
 import { Condition }  from "./service/scripting/condition";
 import { OrCondition }  from "./service/scripting/orcondition";
 import { AndCondition }  from "./service/scripting/andcondition";
 import { AggregatedCondition }  from "./service/scripting/aggregatedcondition";
 import { Executable, ExecutableType, ExecutableDatabaseBody, ExecutableFileBody }  from "./service/scripting/executable";
 import { Context }  from "./service/scripting/context";
-import { SubscriptionService }  from "./service/subscription/subscriptionservice";
 import { VaultSubscription }  from "./service/subscription/vaultsubscription/vaultsubscription";
 import { PricingPlan } from "./service/subscription/pricingplan";
 import { VaultInfo } from "./service/subscription/vaultinfo";
@@ -50,10 +46,8 @@ import { IllegalArgumentException,
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
     BadRequestException,
     InvalidParameterException,
     BackupIsInProcessException,
@@ -94,18 +88,12 @@ import { FindOptions } from "./service/database/findoptions";
 import { UpdateOptions } from "./service/database/updateoptions";
 import { QueryOptions } from "./service/database/queryoptions";
 import { CountOptions } from "./service/database/countoptions";
-import { DeleteOptions, DeleteIndex, DeleteOrder } from "./service/database/deleteoptions";
 import { UpdateResult } from "./service/database/updateresult";
-import { CaseFirst, Strength, Alternate, Collation, MaxVariable } from "./service/database/collation";
 import { SortItem, AscendingSortItem, DescendingSortItem } from "./service/database/sortitem";
 import { Order, OrderState } from "./service/payment/order";
 import { Receipt } from "./service/payment/receipt";
 import { AppContextParameters, DefaultAppContextProvider } from "./connection/auth/defaultappcontextprovider";
 import { BackupContext } from "./service/backup/backupcontext";
-import { CodeFetcher } from "./connection/auth/codefetcher";
-import { CredentialCode } from "./service/backup/credentialcode";
-import { RemoteResolver } from "./service/backup/remoteresolver";
-import { LocalResolver } from "./service/backup/localresolver";
 import { HiveBackupContext } from "./service/backup/hivebackupcontext";
 import { Backup } from "./backup";
 import { Provider } from "./service/provider/provider";
@@ -121,10 +109,8 @@ import { SubscriptionInfo } from "./service/subscription/subscriptioninfo"
 Logger.setDefaultLevel(Logger.DEBUG);
 
 export type {
-    DataStorage,
     AppContextProvider,
     BridgeHandler,
-    CodeFetcher,
     BackupContext
 }
 
@@ -133,9 +119,6 @@ export {
     
     //initialize,
     HiveBackupContext,
-    LocalResolver,
-    CredentialCode,
-    RemoteResolver,
     DefaultAppContextProvider,
     AppContextParameters,
     Vault,
@@ -146,8 +129,6 @@ export {
     FilledOrderDetail,
     PricingPlan,
     VaultInfo,
-    File,
-    FileStorage,
     ServiceEndpoint,
     AccessToken,
     NodeVersion,
@@ -157,6 +138,7 @@ export {
     AuthService,
     BackupService,
     BackupSubscription,
+    Collection,
     DatabaseService,
     FilesService,
     IpfsRunner,
@@ -166,6 +148,7 @@ export {
     PromotionService,
     ScriptingService,
     ScriptRunner,
+    AnonymousScriptRunner,
     Condition,
     AggregatedCondition,
     OrCondition,
@@ -182,7 +165,6 @@ export {
     InsertResult,
     SubscriptionInfo,
     Context,
-    SubscriptionService,
     VaultSubscription,
     QueryHasResultCondition,
     QueryHasResultConditionOptions,
@@ -207,9 +189,6 @@ export {
     UpdateOptions,
     QueryOptions,
     CountOptions,
-    DeleteOptions,
-    DeleteOrder,
-    DeleteIndex,
     SortItem,
     AscendingSortItem,
     DescendingSortItem,
@@ -217,11 +196,6 @@ export {
     OrderState,
     Receipt,
     UpdateResult,
-    CaseFirst,
-    Strength,
-    Alternate,
-    Collation,
-    MaxVariable,
     IllegalArgumentException,
     BadContextProviderException,
     DIDNotPublishedException,
@@ -237,10 +211,8 @@ export {
     JWTException,
     IOException,
     DeserializationError,
-    HttpException,
     MalformedDIDException,
     NetworkException,
-    NodeRPCException,
     BadRequestException,
     InvalidParameterException,
     BackupIsInProcessException,
@@ -263,8 +235,4 @@ export {
     APINotImplementedException,
     InsufficientStorageException,
     ServerUnknownException,
-
-    // Utilities
-    SHA256,
-    Utils,
 }

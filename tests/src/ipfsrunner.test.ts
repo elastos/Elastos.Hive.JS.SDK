@@ -1,5 +1,5 @@
-import {assertEquals} from "./util";
 import {IpfsRunner} from "../../src";
+import {assertEquals} from "./util";
 
 describe.skip("test ipfs runner", () => {
     beforeAll(() => {

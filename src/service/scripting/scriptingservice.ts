@@ -1,13 +1,16 @@
-import {InvalidParameterException} from '../../exceptions';
-import {Condition} from './condition';
-import {Executable} from './executable';
-import {ServiceEndpoint} from '../../connection/serviceendpoint';
-import {Context} from './context';
 import {Logger} from '../../utils/logger';
 import {checkNotNull, checkArgument} from '../../utils/utils';
+import {InvalidParameterException} from '../../exceptions';
+import {AppContext} from "../../connection/auth/appcontext";
+import {ServiceEndpoint} from '../../connection/serviceendpoint';
+import {Condition} from './condition';
+import {Executable} from './executable';
+import {Context} from './context';
 import {RestServiceT} from '../restservice';
-import {AppContext} from "../..";
 import {ScriptingAPI} from "./scriptingapi";
+import {ProgressHandler} from "../files/progresshandler";
+import {ProgressDisposer} from "../files/progressdisposer";
+import {ScriptContent} from "./scriptcontent";
 
 interface HiveUrl {
 	targetUsrDid: string,
@@ -16,6 +19,9 @@ interface HiveUrl {
 	params: string
 }
 
+/**
+ * The scripting service is for the script owner to operate database and files by the script.
+ */
 export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	private static LOG = new Logger("ScriptingService");
 
@@ -34,7 +40,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	* @return Void
 	*/
 	async registerScript(scriptName: string, executable: Executable, condition?: Condition,
-                         allowAnonymousUser?: boolean, allowAnonymousApp?: boolean) : Promise<void> {
+                         allowAnonymousUser?: boolean, allowAnonymousApp?: boolean): Promise<void> {
 		checkNotNull(scriptName, "Missing script name.");
 		checkNotNull(executable, "Missing executable script");
 
@@ -54,13 +60,26 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      *
      * @param scriptName the name of the script to unregister.
      */
-	async unregisterScript(scriptName: string) : Promise<void>{
+	async unregisterScript(scriptName: string): Promise<void>{
         checkNotNull(scriptName, "Missing script name.");
 
         await this.callAPI(ScriptingAPI, async api => {
             return await api.unregisterScript(await this.getAccessToken(), scriptName);
         });
 	}
+
+    /**
+     * Get scripts user registered.
+     *
+     * @param name the specific script name.
+     * @param skip skip, default 0
+     * @param limit limit, default 0
+     */
+	async getScripts(name?: string, skip?: number, limit?: number): Promise<ScriptContent[]> {
+        return await this.callAPI(ScriptingAPI, async api => {
+            return await api.getScripts(await this.getAccessToken(), name, skip, limit);
+        });
+    }
 
     /**
      * Executes a previously registered server side script with a normal way.
@@ -110,10 +129,10 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      *
      * @param transactionId Transaction ID which can be got by the calling of the script 'fileUpload'.
      * @param data File content.
-     * @param callback The callback to get the progress of uploading with percent value. Only supported on browser side.
+     * @param progressHandler Get the progress of uploading with percent value.
      */
 	async uploadFile(transactionId: string, data: Buffer | string,
-                            callback?: (process: number) => void): Promise<void> {
+                     progressHandler: ProgressHandler = new ProgressDisposer()): Promise<void> {
 		checkNotNull(transactionId, "Missing transactionId.");
 		checkNotNull(data, "data must be provided.");
 		const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
@@ -126,11 +145,9 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
                     'data': content
                 });
         }, {
-            onUploadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+            onUploadProgress: (progressEvent: any) => {
+                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressHandler.onProgress(percent);
             }
         });
 	}
@@ -139,19 +156,18 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
      * Download file by transaction ID
      *
      * @param transactionId Transaction ID which can be got by the calling of the script 'fileDownload'.
-     * @param callback The callback to get the progress of downloading with percent value. Only supported on browser side.
+     * @param progressHandler Get the progress of downloading with percent value.
      */
-	async downloadFile(transactionId: string, callback?: (process: number) => void): Promise<Buffer> {
+	async downloadFile(transactionId: string,
+                       progressHandler: ProgressHandler = new ProgressDisposer()): Promise<Buffer> {
 		checkNotNull(transactionId, "Missing transactionId.");
 
         const dataBuffer = await this.callAPI(ScriptingAPI, async (api) => {
             return api.downloadFile(await this.getAccessToken(), transactionId);
         }, {
-            onDownloadProgress: function (progressEvent) {
-                if (callback) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    callback(percent);
-                }
+            onDownloadProgress: function (progressEvent: any) {
+                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                progressHandler.onProgress(percent);
             }
         });
 

@@ -1,17 +1,24 @@
 import {Executable, ExecutableDatabaseBody, ExecutableType} from "./executable";
+import {InvalidParameterException} from "../../exceptions";
 
 export class DeleteExecutableBody extends ExecutableDatabaseBody {
-    private filter: any;
-
-    constructor( collection: string, filter: any) {
+    constructor(collection: string, private filter: any) {
         super(collection);
-        this.filter = filter;
+
+        if (!this.filter)
+            throw new InvalidParameterException('Invalid filter');
+    }
+
+    getFilter(): any {
+        return this.filter;
     }
 }
 
+/**
+ * The delete executable can be used to delete documents.
+ */
 export class DeleteExecutable extends Executable {
-    constructor(name: string, collectionName: string, filter: any) {
-        super(name, ExecutableType.DELETE, null);
-        super.setBody(new DeleteExecutableBody(collectionName, filter));
+    constructor(name: string, collection: string, filter: any) {
+        super(name, ExecutableType.DELETE, new DeleteExecutableBody(collection, filter));
     }
 }

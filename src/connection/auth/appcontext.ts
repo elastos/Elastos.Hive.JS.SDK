@@ -24,7 +24,8 @@ import { Logger } from '../../utils/logger';
  */
 export class AppContext {
 	private static LOG = new Logger("AppContext");
-	
+	private static networkTimeout = 30000;
+
 	static debug = false;
     private static resolverHasSetup = false;
 
@@ -32,12 +33,30 @@ export class AppContext {
     private readonly userDid: string;
     private readonly appDid: string;
     private forceResolve: boolean;
+    private networkTimeout: number;
 
     private constructor(provider: AppContextProvider, userDid: string, appDid: string) {
         this.contextProvider = provider;
         this.userDid = userDid;
         this.appDid = appDid;
         this.forceResolve = false;
+        this.networkTimeout = 30000;
+    }
+
+    /**
+     * Peg with network timeout
+     * @param timeout tiemout value in milliseconds
+     */
+    static setNetworkTimeout(timeout: number): void {
+        AppContext.networkTimeout = timeout;
+    }
+
+    /**
+     * Get the configed network timeout
+     * @returns the network timeout.
+     */
+    static getNetworkTimeout(): number {
+        return AppContext.networkTimeout;
     }
 
 	/**
@@ -103,7 +122,7 @@ export class AppContext {
 	 * @param appDid The application DID.
 	 * @return The application context.
 	 */
-	static async build(provider: AppContextProvider, userDid: string, appDid: string): Promise<AppContext> {
+	static build(provider: AppContextProvider, userDid: string, appDid: string): AppContext {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
@@ -116,7 +135,7 @@ export class AppContext {
 		if (provider.getLocalDataDir() == null)
 			throw new BadContextProviderException("Missing method to acquire data location");
 
-		if (await provider.getAppInstanceDocument() == null)
+		if (provider.getAppInstanceDocument() == null)
 			throw new BadContextProviderException("Missing method to acquire App instance DID document");
 
 		if (!AppContext.resolverHasSetup)

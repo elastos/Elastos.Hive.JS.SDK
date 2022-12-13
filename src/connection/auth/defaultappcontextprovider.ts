@@ -11,7 +11,7 @@ import {
     VerifiableCredential,
     VerifiablePresentation
 } from "@elastosfoundation/did-js-sdk";
-import {HiveException} from "../../exceptions";
+import {HiveException, InvalidMnemonicException} from "../../exceptions";
 import {AppContextProvider} from "./appcontextprovider";
 import dayjs from "dayjs";
 import {Logger} from "../../utils/logger";
@@ -39,8 +39,9 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	private appRootId: RootIdentity;
 	private userRootId: RootIdentity;
     private store: DIDStore;
+    private appDID: DIDDocument;
     
-    constructor(contextParameters: AppContextParameters) {
+    private constructor(contextParameters: AppContextParameters) {
 		this.contextParameters = contextParameters;
     }
     
@@ -60,6 +61,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 
 		await this.initDid(this.appRootId);
 		await this.initDid(this.userRootId);
+
+		this.appDID = await this.store.loadDid(this.contextParameters.appDID);
     }
 
     public async initPrivateIdentity(mnemonic: string, did: string|DID, storePass: string): Promise<RootIdentity> {
@@ -81,7 +84,7 @@ export class DefaultAppContextProvider implements AppContextProvider {
 			rootIdentity = RootIdentity.createFromMnemonic(mnemonic, this.contextParameters.appPhrasePass, this.store, storePass);
 		} catch (e){
 			DefaultAppContextProvider.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, JSON.stringify(e));
-			throw new Error("Error Creating root identity for mnemonic");
+			throw new InvalidMnemonicException("Error Creating root identity for mnemonic", e);
 		}
 		
 		await rootIdentity.synchronize();
@@ -114,8 +117,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 * instance did document as the running context.
 	 * @return The application instance did document.
 	 */
-	async getAppInstanceDocument(): Promise<DIDDocument> {
-        return await this.store.loadDid(this.contextParameters.appDID);
+	getAppInstanceDocument(): DIDDocument {
+        return this.appDID;
     }
 
 	/**

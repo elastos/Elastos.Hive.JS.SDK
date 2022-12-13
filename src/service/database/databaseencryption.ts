@@ -3,6 +3,9 @@ import {InvalidParameterException, NotImplementedException} from "../../exceptio
 import {BasicEncryptionValue, EncryptionValue} from "../../utils/encryption/encryptionvalue";
 import {Logger} from "../../utils/logger";
 
+/**
+ * Document encryption or decryption.
+ */
 export class EncryptionDocument extends EncryptionValue {
     constructor(cipher: Cipher, private nonce: Buffer, value: any) {
         super(cipher, value);
@@ -41,9 +44,7 @@ export class EncryptionDocument extends EncryptionValue {
             throw new InvalidParameterException(`Invalid dictionary ${JSON.stringify(this.value)}(${typeof this.value})`);
         }
 
-        let retVal = encryptRecursive(this.value);
-        retVal['__encrypt__'] = 'user_did'; // record encrypt way
-        return retVal;
+        return encryptRecursive(this.value);
     }
 
     decrypt() {
@@ -75,16 +76,16 @@ export class EncryptionDocument extends EncryptionValue {
             return value;
         };
 
-        if ('__encrypt__' in this.value) {
-            delete this.value['__encrypt__'];
-        }
-
         let retVal = decryptRecursive(this.value);
         return JSON.parse(JSON.stringify(retVal)); // JSONObject
     }
 
 }
 
+/**
+ * Filter encryption or decryption.
+ * Filter object is for any documents query and to find matched documents.
+ */
 export class EncryptionFilter extends EncryptionValue {
     private static LOG = new Logger("EncryptionFilter");
 
@@ -123,6 +124,10 @@ export class EncryptionFilter extends EncryptionValue {
     }
 }
 
+/**
+ * Update encryption and decryption.
+ * Update object is for updating the properties of the matched documents.
+ */
 export class EncryptionUpdate extends EncryptionValue {
     constructor(cipher: Cipher, private nonce: Buffer, value: any) {
         super(cipher, value);
@@ -150,6 +155,9 @@ export class EncryptionUpdate extends EncryptionValue {
     }
 }
 
+/**
+ * The encryption entry for the database service.
+ */
 export class DatabaseEncryption {
     constructor(private cipher: Cipher, private nonce: Buffer) {}
 
@@ -187,8 +195,6 @@ export class DatabaseEncryption {
     encryptDocs(docs: any[], isEncrypt=true) {
         let resDocs = [];
         for (const doc of docs) {
-            let edoc = this.encryptDoc(doc, isEncrypt);
-            edoc = this.encryptDoc(edoc, false);
             resDocs.push(this.encryptDoc(doc, isEncrypt));
         }
         return resDocs;

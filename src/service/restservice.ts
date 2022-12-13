@@ -1,8 +1,10 @@
 import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
 import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {NetworkException, NodeRPCException, ServiceEndpoint} from "..";
+import {AppContext} from "../connection/auth/appcontext";
+import {NetworkException, ServerUnknownException} from "../exceptions";
+import {ServiceEndpoint} from "../connection/serviceendpoint";
 import {Logger} from '../utils/logger';
-import {assertTrue} from "../../tests/src/util";
+import {NodeExceptionAdapter} from "../exceptions";
 
 /**
  * Wrapper class to get the response body as a result object.
@@ -63,11 +65,11 @@ export class RestServiceT<T> {
 
     async getEncryptionCipher(identifier: string, secureCode: number, storepass: string): Promise<Cipher> {
         const appContext = this.serviceContext.getAppContext();
-        const doc: DIDDocument = await appContext.getAppContextProvider().getAppInstanceDocument();
+        const doc: DIDDocument = appContext.getAppContextProvider().getAppInstanceDocument();
         return await doc.createCipher(identifier, secureCode, storepass);
     }
 
-    private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?): Promise<T> {
+    private async getAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T, extraConfig?: object): Promise<T> {
         if (this.api == null) {
             this.api = new ServiceBuilder() // TODO: use same ServiceBuilder
                 .setEndpoint(await this.serviceContext.getProviderAddress())
@@ -80,6 +82,7 @@ export class RestServiceT<T> {
                         `ARGS=${JSON.stringify(config['params'])}, BODY=${JSON.stringify(config['data'])}`);
 
                     config['withCredentials'] = false; // CORS
+                    config['timeout'] = AppContext.getNetworkTimeout();
 
                     // uploading or other request body size
                     config['maxContentLength'] = Infinity;
@@ -92,7 +95,7 @@ export class RestServiceT<T> {
                         response['config']['url'],
                         response['config']['method'],
                         response.status,
-                        response.data);
+                        JSON.stringify(response.data));
                     return response;
                 })
                 .build<T>(api);
@@ -101,13 +104,14 @@ export class RestServiceT<T> {
     }
 
     async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
-                                                   callback: (a: T) => Promise<any>, // MUST return Response
-                                                   extraConfig?): Promise<any> {
+                                        callback: (a: T) => Promise<any>, // MUST return Response
+                                        extraConfig?): Promise<any> {
         const serviceApi = await this.getAPI(api, extraConfig);
         try {
             // do real api call
             const response = await callback(serviceApi);
-            assertTrue(response);
+            if (!response)
+                throw new ServerUnknownException();
             return response.data;
         } catch (e) {
             await this.handleResponseError(e);
@@ -151,7 +155,7 @@ export class RestServiceT<T> {
                 }
                 errorMessage = jsonObj['error']['message'];
             }
-            throw NodeRPCException.forHttpCode(status, errorMessage, errorCode);
+            throw NodeExceptionAdapter.forHttpCode(status, errorMessage, errorCode);
         }
     }
 

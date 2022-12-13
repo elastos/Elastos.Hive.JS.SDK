@@ -41,8 +41,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       getLocalDataDir: (): string => {
         return "/";
       },
-      getAppInstanceDocument: (): Promise<DIDDocument> => {
-        return Promise.resolve(didDocument);
+      getAppInstanceDocument: (): DIDDocument => {
+        return didDocument;
       },
       getAuthorization: (authenticationChallengeJWtCode: string): Promise<string> => {
         /**
@@ -63,8 +63,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       }
     }
 
-    let appContext = await AppContext.build(appContextProvider, userDid, AppDID.APP_DID);
-    return appContext;
+    return AppContext.build(appContextProvider, userDid, AppDID.APP_DID);
   }
 
   /* public async getSubscriptionService(targetDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultSubscriptionService> {

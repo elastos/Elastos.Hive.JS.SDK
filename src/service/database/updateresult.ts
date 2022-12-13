@@ -1,38 +1,45 @@
+/**
+ * The result of the updating operation.
+ */
 export class UpdateResult {
 	private acknowledged: boolean;
 	private matched_count: number;
 	private modified_count: number;
 	private upserted_id: string;
 
-	public setAcknowledged(acknowledged: boolean): void {
+	setAcknowledged(acknowledged: boolean) {
 		this.acknowledged = acknowledged;
+		return this;
 	}
 
-	public setMatchedCount(matchedCount: number): void {
+	setMatchedCount(matchedCount: number) {
 		this.matched_count = matchedCount;
+        return this;
 	}
 
-	public setModifiedCount(modifiedCount: number): void {
+	setModifiedCount(modifiedCount: number) {
 		this.modified_count = modifiedCount;
+        return this;
 	}
 
-	public setUpsertedId(upsertedId: string): void {
+	setUpsertedId(upsertedId: string) {
 		this.upserted_id = upsertedId;
+        return this;
 	}
 
-	public isAcknowledged(): boolean {
+	isAcknowledged(): boolean {
 		return this.acknowledged;
 	}
 
-	public getMatchedCount(): number {
+	getMatchedCount(): number {
 		return this.matched_count;
 	}
 
-	public getModifiedCount(): number {
+	getModifiedCount(): number {
 		return this.modified_count;
 	}
 
-	public getUpsertedId(): string {
+	getUpsertedId(): string {
 		return this.upserted_id;
 	}
 }

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { File } from "../../src";
+import { File } from "./file";
 
 /* declare global {
     interface Array<T> {

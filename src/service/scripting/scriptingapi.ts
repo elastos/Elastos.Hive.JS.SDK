@@ -1,50 +1,67 @@
-import {
-    BasePath,
-    BaseService,
-    Body,
-    DELETE,
-    GET,
-    Header,
-    PATCH,
-    Path,
-    PUT, RequestTransformer,
-    Response,
-    ResponseTransformer, ResponseType
-} from 'ts-retrofit';
+import {BasePath, BaseService, Body, DELETE, GET, Header, PATCH, Path, PUT,
+    RequestTransformer, Response, ResponseTransformer, ResponseType} from 'ts-retrofit';
+import {NotImplementedException} from "../../exceptions";
 import {APIResponse} from "../restservice";
+import {ScriptContent} from "./scriptcontent";
 
 @BasePath("/api/v2")
 export class ScriptingAPI extends BaseService {
     @PUT("/vault/scripting/{scriptName}")
     async registerScript(@Header("Authorization") authorization: string,
                          @Path("scriptName") scriptName: string,
-                         @Body body: object): Promise<Response> { return null; }
+                         @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
+
+    @GET("/vault/scripting/scripts")
+    @ResponseTransformer((data: any, headers?: any) => {
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['scripts'].map(s => new ScriptContent()
+                .setName(s['name'])
+                .setCondition(s['condition'])
+                .setExecutable(s['executable'])
+                .setAllowAnonymousUser(s['allowAnonymousUser'])
+                .setAllowAnonymousApp(s['allowAnonymousApp']));
+        });
+    })
+    async getScripts(@Header("Authorization") authorization: string,
+                     @Path("name") name: string,
+                     @Path("skip") skip: number,
+                     @Path("limit") limit: number): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PATCH("/vault/scripting/{scriptName}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj;
+        return APIResponse.handleResponseData(data, (body) => {
+            return body;
         });
     })
     async runScript(@Header("Authorization") authorization: string,
                     @Path("scriptName") scriptName: string,
-                    @Body body: object): Promise<Response> { return null; }
+                    @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj;
+        return APIResponse.handleResponseData(data, (body) => {
+            return body;
         });
     })
     async runScriptUrl(@Header("Authorization") authorization: string,
                        @Path("scriptName") scriptName: string,
                        @Path("targetDid") targetDid: string,
                        @Path("targetAppDid") targetAppDid: string,
-                       @Path("params") params: string): Promise<Response> { return null; }
+                       @Path("params") params: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @DELETE("/vault/scripting/{scriptName}")
     async unregisterScript(@Header("Authorization") authorization: string,
-                           @Path("scriptName") scriptName: string): Promise<Response> { return null; }
+                           @Path("scriptName") scriptName: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PUT("/vault/scripting/stream/{transactionId}")
     @RequestTransformer((data: any, headers?: any) => {
@@ -53,7 +70,9 @@ export class ScriptingAPI extends BaseService {
     })
     async uploadFile(@Header("Authorization") authorization: string,
                      @Path("transactionId") transactionId: string,
-                     @Body body: object): Promise<Response> { return null; }
+                     @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/vault/scripting/stream/{transactionId}")
     @ResponseType("arraybuffer")
@@ -61,5 +80,7 @@ export class ScriptingAPI extends BaseService {
         return APIResponse.handleResponseData(data);
     })
     async downloadFile(@Header("Authorization") authorization: string,
-                       @Path("transactionId") transactionId: string): Promise<Response> { return null; }
+                       @Path("transactionId") transactionId: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

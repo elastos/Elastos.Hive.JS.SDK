@@ -1,4 +1,5 @@
 import {BasePath, BaseService, Body, GET, Header, Path, POST, PUT, Response, ResponseTransformer} from 'ts-retrofit';
+import {NotImplementedException, ServerUnknownException} from "../../exceptions";
 import {APIResponse} from "../restservice";
 import {Order, OrderState} from "./order";
 import {Receipt} from "./receipt";
@@ -13,7 +14,7 @@ function getOrderStateByStr(value: string): OrderState {
     } else if (value === 'archive') {
         return OrderState.ARCHIVE;
     } else {
-        throw Error('Unknown result.');
+        throw new ServerUnknownException('Unknown result.');
     }
 }
 
@@ -21,51 +22,93 @@ function getOrderStateByStr(value: string): OrderState {
 export class PaymentAPI extends BaseService {
     @GET("/payment/version")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return jsonObj['version'];
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['version'];
         });
     })
-    async version(@Header("Authorization") auth: string): Promise<Response> { return null; }
+    async version(@Header("Authorization") auth: string): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @PUT("/payment/order")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            jsonObj['state'] = getOrderStateByStr(jsonObj['state']);
-            return Object.assign(new Order(), jsonObj);
+        return APIResponse.handleResponseData(data, (body) => {
+            return new Order()
+                .setOrderId(body['order_id'])
+                .setSubscription(body['subscription'])
+                .setPricingPlan(body['pricing_plan'])
+                .setPayingDid(body['paying_did'])
+                .setPaymentAmount(body['payment_amount'])
+                .setCreateTime(body['create_time'])
+                .setExpirationTime(body['expiration_time'])
+                .setReceivingAddress(body['receiving_address'])
+                .setState(getOrderStateByStr(body['state']))
+                .setProof(body['proof']);
         });
     })
     async placeOrder(@Header("Authorization") auth: string,
-                     @Body body: object): Promise<Response> { return null; }
+                     @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @POST("/payment/order/{orderId}")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            return Object.assign(new Receipt(), jsonObj);
+        return APIResponse.handleResponseData(data, (body) => {
+            return new Receipt()
+                .setReceiptId(body['receipt_id'])
+                .setOrderId(body['order_id'])
+                .setSubscription(body['subscription'])
+                .setPricingPlan(body['pricing_plan'])
+                .setPaymentAmount(body['payment_amount'])
+                .setPaidDid(body['paid_did'])
+                .setCreateTime(body['create_time'])
+                .setReceivingAddress(body['receiving_address'])
+                .setReceiptProof(body['receipt_proof']);
         });
     })
     async settleOrder(@Header("Authorization") auth: string,
-                      @Path('orderId') orderId: number): Promise<Response> { return null; }
+                      @Path('orderId') orderId: number): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/payment/order")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            const jsonObjs: [] = jsonObj['orders'];
-            return jsonObjs.map((o: {[key: string]: string}) => {
-                o['state'] = getOrderStateByStr(o['state']);
-                return Object.assign(new Order(), o);
-            });
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['orders'].map(o => new Order()
+                .setOrderId(body['order_id'])
+                .setSubscription(body['subscription'])
+                .setPricingPlan(body['pricing_plan'])
+                .setPayingDid(body['paying_did'])
+                .setPaymentAmount(body['payment_amount'])
+                .setCreateTime(body['create_time'])
+                .setExpirationTime(body['expiration_time'])
+                .setReceivingAddress(body['receiving_address'])
+                .setState(getOrderStateByStr(body['state']))
+                .setProof(body['proof']));
         });
     })
     async getOrders(@Header("Authorization") auth: string,
-                    @Body body: object): Promise<Response> { return null; }
+                    @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 
     @GET("/payment/receipt")
     @ResponseTransformer((data: any, headers?: any) => {
-        return APIResponse.handleResponseData(data, (jsonObj) => {
-            const jsonObjs: [] = jsonObj['receipts'];
-            return jsonObjs.map(o => Object.assign(new Receipt(), o));
+        return APIResponse.handleResponseData(data, (body) => {
+            return body['receipts'].map(o => new Receipt()
+                .setReceiptId(o['receipt_id'])
+                .setOrderId(o['order_id'])
+                .setSubscription(o['subscription'])
+                .setPricingPlan(o['pricing_plan'])
+                .setPaymentAmount(o['payment_amount'])
+                .setPaidDid(o['paid_did'])
+                .setCreateTime(o['create_time'])
+                .setReceivingAddress(o['receiving_address'])
+                .setReceiptProof(o['receipt_proof']));
         });
     })
     async getReceipts(@Header("Authorization") auth: string,
-                      @Body body: object): Promise<Response> { return null; }
+                      @Body body: object): Promise<Response> {
+        throw new NotImplementedException();
+    }
 }

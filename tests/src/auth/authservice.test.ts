@@ -69,9 +69,9 @@ describe.skip("authentication fail test", () => {
     let vaultSubscription: VaultSubscription;
 
     beforeAll(() => {
-        let spy = jest.spyOn(AuthService.prototype, 'auth').mockImplementation(() => {
-            throw new ServerException("Expected error");
-        });
+        // let spy = jest.spyOn(AuthService.prototype, 'auth').mockImplementation(() => {
+        //     throw new ServerException("Expected error");
+        // });
     });
 
     beforeEach(async () => {

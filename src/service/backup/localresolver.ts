@@ -1,10 +1,14 @@
 import {VerifiableCredential} from "@elastosfoundation/did-js-sdk";
+import {SHA256} from "../../utils/sha256";
+import {NotImplementedException} from "../../exceptions";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {CodeFetcher} from "../../connection/auth/codefetcher";
 import {BackupContext} from "./backupcontext";
-import {NotImplementedException} from "../../exceptions";
-import {SHA256} from "../..";
 
+/**
+ * Local token fetcher and keeper.
+ * It will get the token from remote hive node if local does not exist.
+ */
 export class LocalResolver implements CodeFetcher {
 	private endpoint: ServiceEndpoint;
 	private backupContext: BackupContext;

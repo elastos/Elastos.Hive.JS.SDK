@@ -1,5 +1,5 @@
-import { TestData } from "./config/testdata";
 import {PromotionService, VaultSubscription} from "../../src";
+import {TestData} from "./config/testdata";
 
 describe.skip("test database services", () => {
     let testData:TestData;
@@ -11,7 +11,7 @@ describe.skip("test database services", () => {
             testData.getUserAppContext(),
             testData.getProviderAddress());
         try {
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             // do nothing.
         }

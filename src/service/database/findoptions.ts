@@ -1,9 +1,25 @@
+/**
+ * The options for the finding operation.
+ */
 export class FindOptions {
-    public skip: number;
-    public limit: number;
+    private skip: number;
+    private limit: number;
 
-    constructor(){
-        this.limit = 0;
-        this.skip = 0;
+    setSkip(skip: number) {
+        this.skip = skip
+        return this;
+    }
+
+    setLimit(limit: number) {
+        this.limit = limit
+        return this;
+    }
+
+    getSkip(): number {
+        return this.skip;
+    }
+
+    getLimit(): number {
+        return this.limit;
     }
 }

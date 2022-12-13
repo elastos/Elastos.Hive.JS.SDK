@@ -20,92 +20,93 @@ export class Order {
     private state: OrderState;
     private proof: string;
 
+    setOrderId(orderId: number) {
+        this.order_id = orderId;
+        return this;
+    }
+
+    setSubscription(subscription: string) {
+        this.subscription = subscription;
+        return this;
+    }
+
+    setPricingPlan(pricingName: string) {
+        this.pricing_plan = pricingName;
+        return this;
+    }
+
+    setPayingDid(payingDid: string) {
+        this.paying_did = payingDid;
+        return this;
+    }
+
+    setPaymentAmount(paymentAmount: number) {
+        this.payment_amount = paymentAmount;
+        return this;
+    }
+
+    setCreateTime(createTime: number) {
+        this.create_time = createTime;
+        return this;
+    }
+
+    setExpirationTime(expirationTime: number) {
+        this.expiration_time = expirationTime;
+        return this;
+    }
+
+    setReceivingAddress(receivingAddress: string) {
+        this.receiving_address = receivingAddress;
+        return this;
+    }
+
+    setState(state: OrderState) {
+        this.state = state;
+        return this;
+    }
+
+    setProof(proof: string) {
+        this.proof = proof;
+        return this;
+    }
+
 	getOrderId(): number {
 		return this.order_id;
-	}
-
-	setOrderId(orderId: number): Order {
-		this.order_id = orderId;
-        return this;
 	}
 
 	getSubscription(): string {
 		return this.subscription;
 	}
 
-	setSubscription(subscription: string): Order {
-		this.subscription = subscription;
-        return this;
-	}
-
 	getPricingPlan(): string {
 		return this.pricing_plan;
-	}
-
-	setPricingPlan(pricingName: string): Order {
-		this.pricing_plan = pricingName;
-        return this;
 	}
 
     getPayingDid(): string {
         return this.paying_did;
     }
 
-    setPayingDid(payingDid: string): Order {
-        this.paying_did = payingDid;
-        return this;
-    }
-
 	getPaymentAmount(): number {
 		return this.payment_amount;
-	}
-
-	setPaymentAmount(paymentAmount: number): Order {
-		this.payment_amount = paymentAmount;
-        return this;
 	}
 
     getCreateTime(): number {
         return this.create_time;
     }
 
-    setCreateTime(createTime: number): Order {
-        this.create_time = createTime;
-        return this;
-    }
-
     getExpirationTime(): number {
         return this.expiration_time;
-    }
-
-    setExpirationTime(expirationTime: number): Order {
-        this.expiration_time = expirationTime;
-        return this;
     }
 
 	getReceivingAddress(): string {
 		return this.receiving_address;
 	}
 
-	setReceivingAddress(receivingAddress: string): Order {
-		this.receiving_address = receivingAddress;
-        return this;
-	}
-
     getState(): string {
         return this.state;
     }
 
-	setState(state: OrderState) {
-	    this.state = state;
-    }
-
 	getProof(): string {
 		return this.proof;
-	}
-
-	setProof(proof: string): Order {
-		this.proof = proof;
-        return this;
 	}
 }

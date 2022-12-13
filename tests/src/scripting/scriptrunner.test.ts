@@ -11,7 +11,7 @@ import {
     ScriptingService, ScriptRunner,
     Vault,
     QueryHasResultCondition,
-    Executable, NotFoundException, AlreadyExistsException, CountExecutable
+    Executable, NotFoundException, AlreadyExistsException, CountExecutable, AnonymousScriptRunner
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -32,15 +32,15 @@ describe("test scripting runner function", () => {
     let databaseService: DatabaseService;
     let scriptingService: ScriptingService;
     let scriptRunner: ScriptRunner;
-    let anonymousRunner: ScriptRunner;
+    let anonymousRunner: AnonymousScriptRunner;
 
     beforeAll(async () => {
         testData = await TestData.getInstance("scriptingservice.test");
         vaultSubscription = new VaultSubscription(testData.getUserAppContext(), testData.getProviderAddress());
         vault = new Vault(testData.getUserAppContext(), testData.getProviderAddress());
 
-        scriptRunner = new ScriptRunner(testData.getCallerAppContext(), testData.getProviderAddress());
-        anonymousRunner = new ScriptRunner(null, testData.getProviderAddress());
+        scriptRunner = testData.newCallerScriptRunner();
+        anonymousRunner = testData.newAnonymousCallerScriptRunner();
 
         try {
             await vaultSubscription.subscribe();
@@ -75,7 +75,7 @@ describe("test scripting runner function", () => {
             }
         }
         try { // remove vault to remove file
-            await vaultSubscription.unsubscribe();
+            await vaultSubscription.unsubscribe(true);
         } catch (e) {
             // console.log("vault is already subscribed");
         }
@@ -116,7 +116,7 @@ describe("test scripting runner function", () => {
         const scriptName = "database_find";
         const filter = { "author": "$params.author" };
         await scriptingService.registerScript(scriptName,
-            new FindExecutable(scriptName, COLLECTION_NAME, filter, null));
+            new FindExecutable(scriptName, COLLECTION_NAME, filter));
 
         const result: FindResponse =
             await scriptRunner.callScriptUrl<FindResponse>(scriptName, '{"author": "John"}', targetDid, appDid);
@@ -136,8 +136,14 @@ describe("test scripting runner function", () => {
         const filter = { "author": "$params.author" };
 
         await scriptingService.registerScript(scriptName,
-            new CountExecutable(executableName, COLLECTION_NAME, filter, null),
-            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+            new CountExecutable(executableName, COLLECTION_NAME, filter),
+            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter));
+
+        // get scripts
+        const scripts = await scriptingService.getScripts(scriptName);
+        expect(scripts).toHaveLength(1);
+        expect(scripts[0].getName()).toEqual(scriptName);
+        expect(scripts[0].getExecutable()['name']).toEqual(executableName);
 
         const result: CountResponse =
             await scriptRunner.callScript<CountResponse>(scriptName, {"author": "John"}, targetDid, appDid);
@@ -154,8 +160,8 @@ describe("test scripting runner function", () => {
         const filter = { "author": "$params.author" };
 
         await scriptingService.registerScript(scriptName,
-            new FindExecutable(scriptName, COLLECTION_NAME, filter, null),
-            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter, null));
+            new FindExecutable(scriptName, COLLECTION_NAME, filter),
+            new QueryHasResultCondition("verify_user_permission", COLLECTION_NAME, filter));
 
         const result: FindResponse =
             await scriptRunner.callScript<FindResponse>(scriptName, {"author": "John"}, targetDid, appDid);
@@ -226,10 +232,9 @@ describe("test scripting runner function", () => {
     test.skip("testDownloadFileByHiveUrl", async () => {
         await uploadFile();
         await downloadFileByHiveUrl();
-        await downloadFileByHiveUrl(true);
     });
 
-    test.skip("testDownloadFileByHiveUrlWithReal", async () => {
+    test("testDownloadFileByHiveUrlWithReal", async () => {
         const checkHiveUrl = async (url) => {
             const buffer = await scriptRunner.downloadFileByHiveUrl(url);
             expect(buffer).not.toBeNull();
@@ -381,17 +386,19 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     }
 
-    async function downloadFileByHiveUrl(anonymous=false) {
+    async function downloadFileByHiveUrl() {
         const [scriptName, executableName] = ['script_file_download_by_hiveurl', 'file_download'];
 
         // register download script
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(executableName), null, anonymous, anonymous);
+            new FileDownloadExecutable(executableName), null, false, false);
 
+        // download by hive url
         const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}?params={"path":"${FILE_NAME}"}`;
-        const buffer = await getScriptRunner(anonymous).downloadFileByHiveUrl(hiveUrl);
+        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
 
+        // unregister the script.
         await scriptingService.unregisterScript(scriptName);
     }
 

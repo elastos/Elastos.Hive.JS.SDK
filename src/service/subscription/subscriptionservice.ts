@@ -1,12 +1,14 @@
-import {PricingPlan} from "./pricingplan";
+import {checkArgument} from "../../utils/utils";
 import {ServiceEndpoint} from "../../connection/serviceendpoint";
 import {RestServiceT} from "../restservice";
+import {PricingPlan} from "./pricingplan";
 import {VaultInfo} from "./vaultinfo";
 import {BackupInfo} from "./backupinfo";
-import {AppInfo} from "./appinfo";
 import {SubscriptionAPI} from "./subscriptionapi";
-import {checkArgument} from "../../utils/utils";
 
+/**
+ * Base subscription service is for the backup or vault service.
+ */
 export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
@@ -52,18 +54,6 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	}
 
 	/**
-	 * Get the details of the vault applications.
-	 *
-	 * @return The details of the vault applications.
-	 * @throws HiveException The error comes from the hive node.
-	 */
-	async getAppStats(): Promise<AppInfo[]> {
-        return await this.callAPI(SubscriptionAPI, async api => {
-            return await api.getVaultAppStats(await this.getAccessToken());
-        });
-	}
-
-	/**
 	 * Subscribe the vault with the free pricing plan.
 	 *
 	 * <p>TODO: remove the parameter "credential"</p>
@@ -82,9 +72,9 @@ export class SubscriptionService extends RestServiceT<SubscriptionAPI> {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	async unsubscribeVault(): Promise<void> {
+	async unsubscribeVault(force: boolean): Promise<void> {
         return await this.callAPI(SubscriptionAPI, async api => {
-            return await api.unsubscribeVault(await this.getAccessToken());
+            return await api.unsubscribeVault(await this.getAccessToken(), force);
         });
 	}
 
