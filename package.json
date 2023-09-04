@@ -1,16 +1,21 @@
 {
   "name": "@elastosfoundation/hive-js-sdk",
-  "version": "2.9.5",
+  "version": "2.9.6",
   "description": "Elastos Hive JS SDK",
   "exports": {
     "node": "./dist/hive.js",
     "browser": {
+      "types": "./typings/src/index.d.ts",
       "import": "./dist/es/hive.browser.js"
+    },
+    "default": {
+      "types": "./typings/src/index.d.ts",
+      "default": "./dist/es/hive.browser.js"
     }
   },
   "main": "./dist/hive.js",
   "module": "./dist/es/hive.js",
-  "typings": "typings/",
+  "typings": "typings/src",
   "browser": {
     "./dist/hive.js": "./dist/hive.browser.js",
     "./dist/es/hive.js": "./dist/es/hive.browser.js"
@@ -22,7 +27,7 @@
     "build:release": "npm run lint && npm run clean && npm run types && rollup -c --environment prodbuild",
     "dev": "rollup -c -w",
     "clean": "rm -rf ./dist ./typings ./generated",
-    "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
+    "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/src --project tsconfig.types.json",
     "tsc:build": "rollup -c",
     "tsc:w": "tsc -w",
     "docs": "npx typedoc src/index.ts --excludePrivate --excludeProtected --excludeInternal",
@@ -51,7 +56,7 @@
     "@babel/plugin-proposal-decorators": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.13.0",
-    "@elastosfoundation/did-js-sdk": "^2.2.12",
+    "@elastosfoundation/did-js-sdk": "2.2.12",
     "@rollup/plugin-alias": "^3.1.5",
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-eslint": "^8.0.1",
@@ -74,7 +79,7 @@
     "babel-jest": "^27.5.1",
     "bs58": "^5.0.0",
     "buffer": "^5.6.0",
-    "eslint": "^8.16.0",
+    "eslint": "8.36.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^26.2.2",
     "jest": "^26.6.3",
