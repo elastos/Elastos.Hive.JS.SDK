@@ -121,15 +121,7 @@ export default command => {
             eslint()
         ],
         // fsevents is a dependency of chokidar that cannot be bundled as it contains binary code
-        external: [
-            'axios',
-            'browserfs',
-            'buffer',
-            'dayjs',
-            'promise-queue',
-            'ts-retrofit',
-            '@elastosfoundation/did-js-sdk'
-        ],
+        external: Object.keys(pkg.dependencies || {}),
         treeshake,
         strictDeprecations: true,
         output: {
@@ -176,40 +168,7 @@ export default command => {
     const browserBuilds = {
         input: rollupSourceFile,
         onwarn,
-        external: [
-            //'browserfs'
-            /* 'readable-stream',
-            'readable-stream/transform' */
-            'axios',
-            'fs',
-            'fsevents',
-            'module',
-            'os',
-            'url',
-            'util',
-            'crypto-browserify',
-            'path-browserify',
-            'stream-browserify',
-            'elliptic',
-            'buffer',
-            'process-es6',
-            "lodash",
-            "util",
-            "dayjs",
-            "string_decoder",
-            "bip32",
-            "bip39",
-            "bn.js",
-            "secp256r1",
-            "js-crypto-key-utils",
-            "create-hash",
-            "jose",
-            "bs58",
-            "bs58check",
-            "jszip",
-            "libsodium-wrappers",
-            '@elastosfoundation/did-js-sdk'
-        ],
+        external: Object.keys(pkg.dependencies || {}),
         plugins: [
             // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
             // GOOD HEADACHES WITH RESOLVE ERROR, UNEXPORTED CLASSES AND SO ON...
