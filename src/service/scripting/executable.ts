@@ -24,7 +24,7 @@ export class ExecutableType {
  */
 export abstract class Executable extends ScriptEntity {
     private output = true;
-   
+
     protected constructor(name: string, type: ExecutableType, body: any) {
         super(name, type as string, body);
     }
@@ -63,7 +63,7 @@ export abstract class ExecutableDatabaseBody {
 export class ExecutableFileBody {
     private path: string;
 
-    constructor() {
-        this.path = "$params.path";
+    constructor(path?: string) {
+        this.path = path ? path : "$params.path";
     }
 }

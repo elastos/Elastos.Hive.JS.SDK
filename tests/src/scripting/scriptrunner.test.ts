@@ -232,6 +232,7 @@ describe("test scripting runner function", () => {
     test.skip("testDownloadFileByHiveUrl", async () => {
         await uploadFile();
         await downloadFileByHiveUrl();
+        await downloadFileByHiveUrl(true);
     });
 
     test("testDownloadFileByHiveUrlWithReal", async () => {
@@ -386,15 +387,16 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     }
 
-    async function downloadFileByHiveUrl() {
+    async function downloadFileByHiveUrl(hasParams = false) {
         const [scriptName, executableName] = ['script_file_download_by_hiveurl', 'file_download'];
 
         // register download script
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(executableName), null, false, false);
+            new FileDownloadExecutable(executableName, hasParams ? undefined : FILE_NAME), null, false, false);
 
         // download by hive url
-        const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}?params={"path":"${FILE_NAME}"}`;
+        const paramStr = hasParams ? `?params={"path":"${FILE_NAME}"` : '';
+        const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}${paramStr}`;
         const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
 

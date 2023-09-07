@@ -28,7 +28,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
     constructor(serviceContext: ServiceEndpoint) {
 		super(serviceContext);
 	}
-    
+
 	/**
 	* Let the vault owner register a script on his vault for a given application.
 	*
@@ -118,7 +118,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 		checkNotNull(params, "Missing parameters to run the script");
 		checkNotNull(targetDid, "Missing target user DID");
 		checkNotNull(targetAppDid, "Missing target application DID");
-		
+
         return await this.callAPI(ScriptingAPI, async api => {
             return await api.runScriptUrl(await this.getAccessToken(), scriptName, targetDid, targetAppDid, params);
         });
@@ -189,15 +189,30 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 			throw new InvalidParameterException('Invalid hive url: must contain two DIDs');
 		}
 		const values = parts[1].split('?params=');
-		if (values.length != 2) {
-			throw new InvalidParameterException('Invalid hive url: must contain script name and params');
+		let paramsStr = null;
+		if (values.length >= 2) {
+			paramsStr = values[1];
 		}
+
+		const getVerifiedParamsStr = (params: string) => {
+			// INFO: compatible with wrong params string, such as {empty:0} [miss "" around empty]
+			// wrong json string will be change to '{}', else the params string.
+			if (!params)
+				return '{}';
+
+			try {
+				JSON.parse(params);
+				return params;
+			} catch (e) {
+				return '{}';
+			}
+		}
+
 		return {
 			targetUsrDid: dids[0],
 			targetAppDid: dids[1],
 			scriptName: values[0],
-			// params: values[1]
-            params: '{}' // INFO: compatible with wrong params string, such as {empty:0} [miss "" around empty]
+			params: getVerifiedParamsStr(paramsStr)
 		}
 	}
 
