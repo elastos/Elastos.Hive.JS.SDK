@@ -1,10 +1,9 @@
-import {Cipher, DIDDocument} from "@elastosfoundation/did-js-sdk";
-import {BaseService, ServiceBuilder} from "ts-retrofit";
-import {AppContext} from "../connection/auth/appcontext";
-import {NetworkException, ServerUnknownException} from "../exceptions";
-import {ServiceEndpoint} from "../connection/serviceendpoint";
-import {Logger} from '../utils/logger';
-import {NodeExceptionAdapter} from "../exceptions";
+import { Cipher, DIDDocument } from "@elastosfoundation/did-js-sdk";
+import { BaseService, ServiceBuilder } from "ts-retrofit";
+import { AppContext } from "../connection/auth/appcontext";
+import { ServiceEndpoint } from "../connection/serviceendpoint";
+import { NetworkException, NodeExceptionAdapter, ServerUnknownException } from "../exceptions";
+import { Logger } from '../utils/logger';
 
 /**
  * Wrapper class to get the response body as a result object.
@@ -57,7 +56,7 @@ export class RestServiceT<T> {
 
     private api;
 
-    constructor(private serviceContext: ServiceEndpoint) {}
+    constructor(private serviceContext: ServiceEndpoint) { }
 
     getServiceContext(): ServiceEndpoint {
         return this.serviceContext;
@@ -88,7 +87,7 @@ export class RestServiceT<T> {
                     config['maxContentLength'] = Infinity;
                     config['maxBodyLength'] = Infinity;
 
-                    return extraConfig ? {...config, ...extraConfig} : config;
+                    return extraConfig ? { ...config, ...extraConfig } : config;
                 })
                 .setResponseInterceptors((response) => {
                     RestServiceT._LOG.info(`RESPONSE: URL={}, METHOD={}, STATUS={}, BODY={}`,
@@ -104,8 +103,8 @@ export class RestServiceT<T> {
     }
 
     async callAPI<T extends BaseService>(api: new (builder: ServiceBuilder) => T,
-                                        callback: (a: T) => Promise<any>, // MUST return Response
-                                        extraConfig?): Promise<any> {
+        callback: (a: T) => Promise<any>, // MUST return Response
+        extraConfig?): Promise<any> {
         const serviceApi = await this.getAPI(api, extraConfig);
         try {
             // do real api call
@@ -127,7 +126,7 @@ export class RestServiceT<T> {
         return 'token ' + await accessToken.fetch();
     }
 
-    private async tryHandleResponseError(e: Error): Promise<void> {
+    private async tryHandleResponseError(e: any): Promise<void> {
         if (!('response' in e) || !e['response'] || typeof e['response'] != 'object') {
             return;
         }

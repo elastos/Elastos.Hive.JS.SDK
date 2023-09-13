@@ -1,8 +1,8 @@
-import { RootIdentity, DIDStore, DID, DIDDocument } from "@elastosfoundation/did-js-sdk";
+import { DID, DIDDocument, DIDStore, RootIdentity } from "@elastosfoundation/did-js-sdk";
 import { Logger } from "../../../src";
 
 export class DIDEntity {
-    protected static LOG = new Logger("DIDEntity");
+	protected static LOG = new Logger("DIDEntity");
 
 	private readonly name: string;
 	private readonly phrasepass: string;
@@ -13,7 +13,7 @@ export class DIDEntity {
 	private did: DID;
 	private didString: string;
 
-	constructor (name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
+	constructor(name: string, mnemonic: string, phrasepass: string, storepass: string, did?: string) {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
@@ -30,7 +30,7 @@ export class DIDEntity {
 
 	protected async getRootIdentity(mnemonic: string): Promise<RootIdentity> {
 		const id = RootIdentity.getIdFromMnemonic(mnemonic, this.phrasepass);
-		return this.didStore.containsRootIdentity(id) ? await this.didStore.loadRootIdentity(id)
+		return (await this.didStore.containsRootIdentity(id)) ? await this.didStore.loadRootIdentity(id)
 			: RootIdentity.createFromMnemonic(mnemonic, this.phrasepass, this.didStore, this.storepass);
 	}
 
