@@ -1,20 +1,20 @@
 import {
-    Claims,
-    DID,
-    DIDDocument,
-    DIDStore,
-    DIDURL,
-    Issuer,
-    JWTHeader,
-    JWTParserBuilder,
-    RootIdentity,
-    VerifiableCredential,
-    VerifiablePresentation
+	Claims,
+	DID,
+	DIDDocument,
+	DIDStore,
+	DIDURL,
+	Issuer,
+	JWTHeader,
+	JWTParserBuilder,
+	RootIdentity,
+	VerifiableCredential,
+	VerifiablePresentation
 } from "@elastosfoundation/did-js-sdk";
-import {HiveException, InvalidMnemonicException} from "../../exceptions";
-import {AppContextProvider} from "./appcontextprovider";
 import dayjs from "dayjs";
-import {Logger} from "../../utils/logger";
+import { HiveException, InvalidMnemonicException } from "../../exceptions";
+import { Logger } from "../../utils/logger";
+import { AppContextProvider } from "./appcontextprovider";
 
 export class AppContextParameters {
 	storePath: string;
@@ -22,9 +22,9 @@ export class AppContextParameters {
 	appMnemonics: string;
 	appPhrasePass: string;
 	appStorePass: string;
-	
+
 	userDID: string | DID;
-	userMnemonics:string;
+	userMnemonics: string;
 	userPhrasePass: string;
 	userStorePass: string;
 }
@@ -34,38 +34,38 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	private static LOG = new Logger("DefaultAppContextProvider");
 
 
-    private contextParameters: AppContextParameters;
+	private contextParameters: AppContextParameters;
 
 	private appRootId: RootIdentity;
 	private userRootId: RootIdentity;
-    private store: DIDStore;
-    private appDID: DIDDocument;
-    
-    private constructor(contextParameters: AppContextParameters) {
-		this.contextParameters = contextParameters;
-    }
-    
-    public static async create(contextParameters: AppContextParameters) : Promise<DefaultAppContextProvider> {
-        let defaultAppContext = new DefaultAppContextProvider(contextParameters);
-        await defaultAppContext.init();
-        return defaultAppContext;
-    }
+	private store: DIDStore;
+	private appDID: DIDDocument;
 
-    async init() : Promise<void>{
+	private constructor(contextParameters: AppContextParameters) {
+		this.contextParameters = contextParameters;
+	}
+
+	public static async create(contextParameters: AppContextParameters): Promise<DefaultAppContextProvider> {
+		let defaultAppContext = new DefaultAppContextProvider(contextParameters);
+		await defaultAppContext.init();
+		return defaultAppContext;
+	}
+
+	async init(): Promise<void> {
 		this.appRootId = await this.initPrivateIdentity(this.contextParameters.appMnemonics, this.contextParameters.appDID, this.contextParameters.appStorePass);
 		DefaultAppContextProvider.LOG.debug("Init app private identity");
 
 
-        this.userRootId = await this.initPrivateIdentity(this.contextParameters.userMnemonics, this.contextParameters.userDID, this.contextParameters.userStorePass);
+		this.userRootId = await this.initPrivateIdentity(this.contextParameters.userMnemonics, this.contextParameters.userDID, this.contextParameters.userStorePass);
 		DefaultAppContextProvider.LOG.debug("Init user private identity");
 
 		await this.initDid(this.appRootId);
 		await this.initDid(this.userRootId);
 
 		this.appDID = await this.store.loadDid(this.contextParameters.appDID);
-    }
+	}
 
-    public async initPrivateIdentity(mnemonic: string, did: string|DID, storePass: string): Promise<RootIdentity> {
+	public async initPrivateIdentity(mnemonic: string, did: string | DID, storePass: string): Promise<RootIdentity> {
 		this.store = await DIDStore.open(this.contextParameters.storePath);
 
 		DefaultAppContextProvider.LOG.debug("Opens store");
@@ -73,20 +73,20 @@ export class DefaultAppContextProvider implements AppContextProvider {
 
 		DefaultAppContextProvider.LOG.debug("ID from mnemonic {} : {}", mnemonic, id);
 
-		if (this.store.containsRootIdentity(id)){
+		if (await this.store.containsRootIdentity(id)) {
 			DefaultAppContextProvider.LOG.debug("Store constains RootIdentity");
 			return await this.store.loadRootIdentity(id);
 		}
 
-		let rootIdentity : RootIdentity = undefined;
+		let rootIdentity: RootIdentity = undefined;
 		try {
 			DefaultAppContextProvider.LOG.info("Creating root identity for mnemonic {}", mnemonic);
-			rootIdentity = RootIdentity.createFromMnemonic(mnemonic, this.contextParameters.appPhrasePass, this.store, storePass);
-		} catch (e){
+			rootIdentity = await RootIdentity.createFromMnemonic(mnemonic, this.contextParameters.appPhrasePass, this.store, storePass);
+		} catch (e) {
 			DefaultAppContextProvider.LOG.error("Error Creating root identity for mnemonic {}. Error {}", mnemonic, JSON.stringify(e));
 			throw new InvalidMnemonicException("Error Creating root identity for mnemonic", e);
 		}
-		
+
 		await rootIdentity.synchronize();
 		rootIdentity.setDefaultDid(this.contextParameters.appDID);
 
@@ -108,9 +108,9 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	}
 
 
-    getLocalDataDir(): string {
-        return this.contextParameters.storePath;
-    }
+	getLocalDataDir(): string {
+		return this.contextParameters.storePath;
+	}
 
 	/**
 	 * The method for upper Application to implement to provide current application
@@ -118,8 +118,8 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 * @return The application instance did document.
 	 */
 	getAppInstanceDocument(): DIDDocument {
-        return this.appDID;
-    }
+		return this.appDID;
+	}
 
 	/**
 	 * The method for upper Application to implement to acquire the authorization
@@ -128,78 +128,78 @@ export class DefaultAppContextProvider implements AppContextProvider {
 	 * @return The credential issued by user.
 	 */
 	async getAuthorization(authenticationChallengeJWtCode: string): Promise<string> {
-        try {
-            let claims : Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(authenticationChallengeJWtCode)).getBody();
-            if (claims == null)
-                throw new HiveException("Invalid jwt token as authorization.");
+		try {
+			let claims: Claims = (await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(authenticationChallengeJWtCode)).getBody();
+			if (claims == null)
+				throw new HiveException("Invalid jwt token as authorization.");
 
-			DefaultAppContextProvider.LOG.debug("getAuthorization createPresentation");	
-			
+			DefaultAppContextProvider.LOG.debug("getAuthorization createPresentation");
+
 			let diploma = await this.issueDiplomaFor(DID.from(this.contextParameters.appDID));
-			DefaultAppContextProvider.LOG.debug("diploma created");	
+			DefaultAppContextProvider.LOG.debug("diploma created");
 
 			let presentation = await this.createPresentation(
-                diploma,
-                claims.getIssuer(), claims.get("nonce") as string);
-            return await this.createToken(presentation,  claims.getIssuer());
-        } catch (e) {
-			DefaultAppContextProvider.LOG.error("{} stack {}", e, e.stack);	
-        }
-    }
+				diploma,
+				claims.getIssuer(), claims.get("nonce") as string);
+			return await this.createToken(presentation, claims.getIssuer());
+		} catch (e) {
+			DefaultAppContextProvider.LOG.error("{} stack {}", e, e.stack);
+		}
+	}
 
-    private async getIssuer(){
-		DefaultAppContextProvider.LOG.debug("getIssuer");	
+	private async getIssuer() {
+		DefaultAppContextProvider.LOG.debug("getIssuer");
 
 		let userDocument = await this.store.loadDid(this.contextParameters.userDID);
-		
-		DefaultAppContextProvider.LOG.debug("userDocument: {}", userDocument.toString(true));	
+
+		DefaultAppContextProvider.LOG.debug("userDocument: {}", userDocument.toString(true));
 
 		try {
 
-			let issuer = new Issuer(userDocument);
+			let issuer = await Issuer.create(userDocument);
 			return issuer;
-		} catch (e){
-			DefaultAppContextProvider.LOG.debug("error new Issuer {}", e);	
+		} catch (e) {
+			DefaultAppContextProvider.LOG.debug("error new Issuer {}", e);
 
 			return null;
 		}
 
-    }
+	}
 
-    public async issueDiplomaFor(appInstanceDid: DID): Promise<VerifiableCredential> {
-			DefaultAppContextProvider.LOG.debug("issueDiplomaFor");	
+	public async issueDiplomaFor(appInstanceDid: DID): Promise<VerifiableCredential> {
+		DefaultAppContextProvider.LOG.debug("issueDiplomaFor");
 
-            let subject = {};
-    
-            subject["appDid"] = appInstanceDid.toString();
-            subject["appInstanceDid"] = appInstanceDid.toString();
-    
-            let cal = dayjs();
-            cal = cal.add(5, 'year');
+		let subject = {};
 
-            
-            let issuer = await this.getIssuer();
-            let cb = issuer.issueFor(appInstanceDid);
-            let vc = await cb.id(DIDURL.from('#app-id-credential', appInstanceDid) as DIDURL)
-                    .type("AppIdCredential")
-                    .properties(subject)
-                    .expirationDate(cal.toDate())
-                    .seal(this.getUserStorePassword());
-    
-			DefaultAppContextProvider.LOG.debug("VerifiableCredential IsValid: {}", vc.isValid());	
-            return vc;
-        }
-    
+		subject["appDid"] = appInstanceDid.toString();
+		subject["appInstanceDid"] = appInstanceDid.toString();
 
-    public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
+		let cal = dayjs();
+		cal = cal.add(5, 'year');
+
+
+		let issuer = await this.getIssuer();
+		let cb = issuer.issueFor(appInstanceDid);
+		let vc = await cb.id(DIDURL.from('#app-id-credential', appInstanceDid) as DIDURL)
+			.type("AppIdCredential")
+			.properties(subject)
+			.expirationDate(cal.toDate())
+			.seal(this.getUserStorePassword());
+
+		DefaultAppContextProvider.LOG.debug("VerifiableCredential IsValid: {}", vc.isValid());
+		return vc;
+	}
+
+
+	public async createPresentation(vc: VerifiableCredential, realm: string, nonce: string): Promise<VerifiablePresentation> {
 		DefaultAppContextProvider.LOG.debug("create Presentation");
-		
+
 		let vpb = await VerifiablePresentation.createFor(this.getAppDid(), null, this.getDIDStore());
 		let vp = await vpb.credentials(vc)
-				.realm(realm)
-				.nonce(nonce)
-				.seal(this.getAppStorePassword());
-				
+			.realm(realm)
+			.nonce(nonce)
+			.seal(this.getAppStorePassword());
+
 		DefaultAppContextProvider.LOG.debug("VerifiablePresentation:{}", vp.toString());
 		return vp;
 	}
@@ -208,37 +208,37 @@ export class DefaultAppContextProvider implements AppContextProvider {
 		return this.contextParameters.appStorePass;
 	}
 
-    private getUserStorePassword(): string {
+	private getUserStorePassword(): string {
 		return this.contextParameters.userStorePass;
 	}
 
-    private async getAppDocument() : Promise<DIDDocument> {
-        return await this.store.loadDid(this.contextParameters.appDID)
-    }
+	private async getAppDocument(): Promise<DIDDocument> {
+		return await this.store.loadDid(this.contextParameters.appDID)
+	}
 
 	private async createToken(vp: VerifiablePresentation, hiveDid: string): Promise<string> {
-        let cal = dayjs();
-        let iat = cal.unix();
-        let nbf = cal.unix();
-        let exp = cal.add(3, 'month').unix();
+		let cal = dayjs();
+		let iat = cal.unix();
+		let nbf = cal.unix();
+		let exp = cal.add(3, 'month').unix();
 
 		// Create JWT token with presentation.
 		let doc: DIDDocument = await this.getAppDocument();
 		let token = await doc.jwtBuilder()
-				.addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
-				.addHeader("version", "1.0")
-				.setSubject("DIDAuthResponse")
-				.setAudience(hiveDid)
-				.setIssuedAt(iat)
-				.setExpiration(exp)
-				.setNotBefore(nbf)
-				.claimsWithJson("presentation", vp.toString(true))
-				.sign(this.contextParameters.appStorePass);
+			.addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
+			.addHeader("version", "1.0")
+			.setSubject("DIDAuthResponse")
+			.setAudience(hiveDid)
+			.setIssuedAt(iat)
+			.setExpiration(exp)
+			.setNotBefore(nbf)
+			.claimsWithJson("presentation", vp.toString(true))
+			.sign(this.contextParameters.appStorePass);
 
 		return token;
-    }
+	}
 
-    protected getDIDStore(): DIDStore {
+	protected getDIDStore(): DIDStore {
 		return this.store;
 	}
 
