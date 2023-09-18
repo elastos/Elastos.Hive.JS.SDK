@@ -4,12 +4,12 @@ import {Executable, ExecutableType} from "./executable";
 /**
  * Convenient class to store and serialize a sequence of executables.
  */
-export abstract class AggregatedExecutable extends Executable {
-	protected constructor(name: string, executables?: Executable[]) {
+export class AggregatedExecutable extends Executable {
+	public constructor(name: string, executables?: Executable[]) {
 		super(name, ExecutableType.AGGREGATED, executables ? executables : []);
 	}
 
-	appendExecutable(executable: Executable): AggregatedExecutable {
+	public appendExecutable(executable: Executable): AggregatedExecutable {
         if (!executable)
             throw new InvalidParameterException('Invalid executable');
 

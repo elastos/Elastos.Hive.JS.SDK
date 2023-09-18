@@ -11,7 +11,7 @@ import {
     ScriptingService, ScriptRunner,
     Vault,
     QueryHasResultCondition,
-    Executable, NotFoundException, AlreadyExistsException, CountExecutable, AnonymousScriptRunner
+    Executable, NotFoundException, AlreadyExistsException, CountExecutable, AnonymousScriptRunner, AggregatedExecutable
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -282,6 +282,12 @@ describe("test scripting runner function", () => {
         await fileHash(true);
     });
 
+    test("testAggregated", async () => {
+        await uploadFile();
+        await filePropertiesAndHash();
+        await filePropertiesAndHash(true);
+    });
+
     interface InsertResponse {
         database_insert: { acknowledged: boolean, inserted_id: string};
     }
@@ -437,6 +443,29 @@ describe("test scripting runner function", () => {
         expect(result).not.toBeNull();
         expect(result.file_hash).not.toBeNull();
         expect(result.file_hash.SHA256).toEqual(FILE_HASH);
+
+        await scriptingService.unregisterScript(scriptName);
+    }
+
+    async function filePropertiesAndHash(anonymous=false) {
+        const [scriptName, executableName] = ['script_file_properties_hash', 'file_properties_hash'];
+        const executable = new AggregatedExecutable(executableName);
+        executable.appendExecutable(new FilePropertiesExecutable('file_properties'));
+        executable.appendExecutable(new FileHashExecutable('file_hash'));
+
+        await scriptingService.registerScript(scriptName,
+            executable, null, anonymous, anonymous);
+
+        // call script
+        const result: object = await getScriptRunner(anonymous).callScript<[]>(scriptName,
+            Executable.createRunFileParams(FILE_NAME), targetDid, appDid);
+        expect(result).not.toBeUndefined();
+        expect(result).not.toBeNull();
+        expect(Object.keys(result)).toHaveLength(2);
+        expect(result['file_properties']).not.toBeNull();
+        expect(result['file_properties'].type).toEqual('file');
+        expect(result['file_hash']).not.toBeNull();
+        expect(result['file_hash'].SHA256).toEqual(FILE_HASH);
 
         await scriptingService.unregisterScript(scriptName);
     }
