@@ -6,6 +6,9 @@ import {ProgressDisposer} from "./service/files/progressdisposer";
 
 /**
  * The script runner is for running script anonymously.
+ *
+ * This means we can call script API without token.
+ * Also means this ServiceEndpoint has no AppContext.
  */
 export class AnonymousScriptRunner extends ServiceEndpoint{
     private scriptService: ScriptingService;
@@ -76,7 +79,22 @@ export class AnonymousScriptRunner extends ServiceEndpoint{
     }
 
     /**
-     * Download anonymous file which can be uploaded by the files service with public flag.
+     * This is the implementation for downloading file by the hive url anonymously.
+     *
+     * This requires the script on hive url MUST be set all user and app anonymous to true.
+     *
+     * The hive url definition is as this format:
+     * <br>
+     * hive://&lt;targetDid&gt;@&lt;targetAppDid&gt;/&lt;scriptName&gt;?params=&lt;paramJsonStr&gt;
+     *
+     * @param hiveUrl
+     */
+    async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+        return await this.scriptService.downloadFileByHiveUrl(hiveUrl, true);
+    }
+
+    /**
+     * Download anonymous file which can be uploaded by the files service with publicOnIPFS flag = true.
      *
      * @param targetDid
      * @param targetAppDid

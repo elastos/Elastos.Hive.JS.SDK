@@ -87,7 +87,7 @@ export class FilesService extends RestServiceT<FilesAPI> {
      * @param data file's content.
      * @param progressHandler callback for the process of uploading with percent value. Only supported on browser side.
      * @param publicOnIPFS 'true' will return the cid of the file which can be used to access from global ipfs gateway.
-     *                      The file can be download by AnonymousScriptRunner.downloadAnonymousFile() with file path.
+     *                      The file can be downloaded by AnonymousScriptRunner.downloadAnonymousFile() with file path.
      */
     async upload(path: string, data: Buffer | string,
                  progressHandler: ProgressHandler = new ProgressDisposer(),
