@@ -1,17 +1,24 @@
 import {
     VaultSubscription,
     DatabaseService,
-    DeleteExecutable, InsertExecutable,
+    DeleteExecutable,
+    InsertExecutable,
     FindExecutable,
     FileUploadExecutable,
     FileDownloadExecutable,
     FilePropertiesExecutable,
     FileHashExecutable,
     UpdateExecutable,
-    ScriptingService, ScriptRunner,
+    ScriptingService,
+    ScriptRunner,
     Vault,
     QueryHasResultCondition,
-    Executable, NotFoundException, AlreadyExistsException, CountExecutable, AnonymousScriptRunner, AggregatedExecutable
+    Executable,
+    NotFoundException,
+    AlreadyExistsException,
+    CountExecutable,
+    AnonymousScriptRunner,
+    AggregatedExecutable
 } from "../../../src";
 import { TestData } from "../config/testdata";
 
@@ -229,10 +236,19 @@ describe("test scripting runner function", () => {
         await downloadFile(true);
     });
 
+    /**
+     * Run this only on mainnet.
+     */
     test.skip("testDownloadFileByHiveUrl", async () => {
         await uploadFile();
+        console.log('start downloadFileByHiveUrl()')
         await downloadFileByHiveUrl();
+        console.log('start downloadFileByHiveUrl(true)')
         await downloadFileByHiveUrl(true);
+        console.log('start downloadFileByHiveUrl(false, true)')
+        await downloadFileByHiveUrl(false, true);
+        console.log('start downloadFileByHiveUrl(true, true)')
+        await downloadFileByHiveUrl(true, true);
     });
 
     test("testDownloadFileByHiveUrlWithReal", async () => {
@@ -393,17 +409,17 @@ describe("test scripting runner function", () => {
         await scriptingService.unregisterScript(scriptName);
     }
 
-    async function downloadFileByHiveUrl(hasParams = false) {
+    async function downloadFileByHiveUrl(hasParams=false, anonymous=false) {
         const [scriptName, executableName] = ['script_file_download_by_hiveurl', 'file_download'];
 
         // register download script
         await scriptingService.registerScript(scriptName,
-            new FileDownloadExecutable(executableName, hasParams ? undefined : FILE_NAME), null, false, false);
+            new FileDownloadExecutable(executableName, hasParams ? undefined : FILE_NAME), null, anonymous, anonymous);
 
         // download by hive url
-        const paramStr = hasParams ? `?params={"path":"${FILE_NAME}"` : '';
+        const paramStr = hasParams ? `?params={"path":"${FILE_NAME}"}` : '?params={}';
         const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}${paramStr}`;
-        const buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
+        const buffer = await getScriptRunner(anonymous).downloadFileByHiveUrl(hiveUrl);
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
 
         // unregister the script.

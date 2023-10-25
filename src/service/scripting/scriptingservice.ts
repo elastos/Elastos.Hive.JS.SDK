@@ -223,8 +223,10 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	 * hive://&lt;targetDid&gt;@&lt;targetAppDid&gt;/&lt;scriptName&gt;?params=&lt;paramJsonStr&gt;
 	 *
 	 * @param hiveUrl
+	 * @param anonymous If anonymous is true, this will not compatible with v1.
+	 * 					This also requires the script called has pr
 	 */
-	async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+	async downloadFileByHiveUrl(hiveUrl: string, anonymous=false): Promise<Buffer> {
 		const params = this.parseHiveUrl(hiveUrl);
 
 		// Get the provider address for targetDid.
@@ -232,7 +234,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 		ScriptingService.LOG.info(`Got the hive url for targetDid: ${targetUrl}`);
 
 		// Prepare the new scripting service for targetDid with current user's appContext.
-		const endpoint = new ServiceEndpoint(this.getServiceContext().getAppContext(), targetUrl);
+		const endpoint = new ServiceEndpoint(anonymous ? null : this.getServiceContext().getAppContext(), targetUrl);
         const scriptingService = new ScriptingService(endpoint);
 
         // Call on the node contains targetDid vault.
