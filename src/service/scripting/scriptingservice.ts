@@ -176,7 +176,7 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
         return dataBuffer;
 	}
 
-	private parseHiveUrl(hiveUrl: string): HiveUrl {
+	private static parseHiveUrl(hiveUrl: string): HiveUrl {
 		if (!hiveUrl || !hiveUrl.startsWith('hive://')) {
 			throw new InvalidParameterException('Invalid hive url: no hive prefix');
 		}
@@ -216,6 +216,10 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 		}
 	}
 
+	async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+		return ScriptingService.downloadFileByHiveUrlDirect(hiveUrl, this.getServiceContext().getAppContext());
+	}
+
 	/**
 	 * This is the compatible implementation for downloading file by the hive url
 	 * which comes from v1 version SDK. The hive url definition is as this format:
@@ -223,21 +227,20 @@ export class ScriptingService extends RestServiceT<ScriptingAPI> {
 	 * hive://&lt;targetDid&gt;@&lt;targetAppDid&gt;/&lt;scriptName&gt;?params=&lt;paramJsonStr&gt;
 	 *
 	 * @param hiveUrl
-	 * @param anonymous If anonymous is true, this will not compatible with v1.
-	 * 					This also requires the script called has pr
+	 * @param context AppContext, MUST provide if anonymous is false.
 	 */
-	async downloadFileByHiveUrl(hiveUrl: string, anonymous=false): Promise<Buffer> {
-		const params = this.parseHiveUrl(hiveUrl);
+	static async downloadFileByHiveUrlDirect(hiveUrl: string, context: AppContext=null): Promise<Buffer> {
+		const params = ScriptingService.parseHiveUrl(hiveUrl);
 
 		// Get the provider address for targetDid.
 		const targetUrl = await AppContext.getProviderAddressByUserDid(params.targetUsrDid, null, true);
 		ScriptingService.LOG.info(`Got the hive url for targetDid: ${targetUrl}`);
 
 		// Prepare the new scripting service for targetDid with current user's appContext.
-		const endpoint = new ServiceEndpoint(anonymous ? null : this.getServiceContext().getAppContext(), targetUrl);
-        const scriptingService = new ScriptingService(endpoint);
+		const endpoint = new ServiceEndpoint(context, targetUrl);
+		const scriptingService = new ScriptingService(endpoint);
 
-        // Call on the node contains targetDid vault.
+		// Call on the node contains targetDid vault.
 		const result = await scriptingService.callScriptUrl(params.scriptName, params.params, params.targetUsrDid, params.targetAppDid);
 		return await scriptingService.downloadFile(Object.values(result)[0]['transaction_id']);
 	}
