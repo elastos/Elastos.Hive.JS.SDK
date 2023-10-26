@@ -419,7 +419,12 @@ describe("test scripting runner function", () => {
         // download by hive url
         const paramStr = hasParams ? `?params={"path":"${FILE_NAME}"}` : '?params={}';
         const hiveUrl = `hive://${targetDid}@${appDid}/${scriptName}${paramStr}`;
-        const buffer = await getScriptRunner(anonymous).downloadFileByHiveUrl(hiveUrl);
+        let buffer;
+        if (anonymous) {
+            buffer = await AnonymousScriptRunner.downloadFileByHiveUrl(hiveUrl);
+        } else {
+            buffer = await scriptRunner.downloadFileByHiveUrl(hiveUrl);
+        }
         expectBuffersToBeEqual(Buffer.from(FILE_CONTENT), buffer);
 
         // unregister the script.

@@ -89,8 +89,8 @@ export class AnonymousScriptRunner extends ServiceEndpoint{
      *
      * @param hiveUrl
      */
-    async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
-        return await this.scriptService.downloadFileByHiveUrl(hiveUrl, true);
+    static async downloadFileByHiveUrl(hiveUrl: string): Promise<Buffer> {
+        return await ScriptingService.downloadFileByHiveUrlDirect(hiveUrl);
     }
 
     /**
